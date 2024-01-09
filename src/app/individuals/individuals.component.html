@@ -1,0 +1,11 @@
+<h1> {{ individuals().length }} Individuals</h1>
+<ul>
+    <li *ngFor="let individuals of individualsBySurname() | keyvalue">
+        {{ individuals.key || "&nbsp;" }}
+        <ul>
+            <li *ngFor="let individual of individuals.value">
+                <a routerLink="/individual/{{ individual.xref }}">{{ individual.name }}</a>
+            </li>
+        </ul>
+    </li>
+</ul>

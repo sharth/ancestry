@@ -1,0 +1,87 @@
+<h2>Name</h2>
+<p>{{ individual().name }}</p>
+
+<h2>Relatives</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Relation</th>
+            <th scope="col">Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let relative of relatives()">
+            <td>{{ relative.relationship }}</td>
+            <td><a routerLink="/individual/{{ relative.individual.xref }}">{{ relative.individual.name }}</a></td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Events</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Event</th>
+            <th scope="col">Date</th>
+            <th scope="col">Location</th>
+            <th scope="col">Detail</th>
+            <th scope="col">Sources</th>
+            <th scope="col">Gedcom</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let event of individual().events">
+            <td>
+                {{ event.type }}
+            </td>
+            <td>
+                {{ event.dateDescriptive }}
+            </td>
+            <td>
+                <ng-container *ngIf="event.address">{{event.address}}<br></ng-container>
+                <ng-container *ngIf="event.place">{{event.place}}<br></ng-container>
+            </td>
+            <td>
+                <ng-container *ngIf="event.cause">{{ event.cause }}<br></ng-container>
+                <ng-container *ngIf="event.value">{{ event.value }}<br></ng-container>
+            </td>
+            <td>
+                <ng-container *ngFor="let citation of event.citations; let last = last">
+                    <a routerLink="/source/{{citation.source.xref}}">{{ citation.source.xref }}</a>
+                    {{ ' ' }}
+                </ng-container>
+            </td>
+            <td>
+                <app-individual-event-gedcom *ngIf="event.gedcom()">
+                    <pre>{{ event.gedcom() }}</pre>
+                </app-individual-event-gedcom>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Ancestors</h2>
+<ol>
+    <ng-container *ngFor="let ancestor of ancestors(); index as ahnentafel;">
+        <li *ngIf="ancestor" value="{{ahnentafel}}"><a routerLink="/individual/{{ancestor.xref}}">{{ancestor.name}}</a>
+        </li>
+    </ng-container>
+</ol>
+
+<h2>Census Table</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Ancestor</th>
+            <th scope="col" *ngFor="let date of censusTable().header">{{ date }}</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let censusRow of censusTable().rows">
+            <td>{{ censusRow.ancestor.name }}</td>
+            <td *ngFor="let census of censusRow.censuses">
+                {{ census?.place }}
+            </td>
+        </tr>
+    </tbody>
+</table>
