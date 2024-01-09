@@ -1,14 +1,29 @@
-<h1>Hello</h1>
-
-<nav>
-    <h2>Nav</h2>
-    <ul>
-        <li><a routerLink="/">Root</a>
-        <li><a routerLink="/individuals">Individuals</a>
-    </ul>
+<nav class="navbar navbar-light bg-light navbar-expand-lg sticky-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+            <img src="/favicon.ico" style="height:1em">
+            ancestry.lynch.us
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" routerLink="/">Home</a></li>
+                <li class="nav-item"><a class="nav-link" routerLink="/individuals">Individuals</a></li>
+                <li class="nav-item"><a class="nav-link" routerLink="/sources">Sources</a></li>
+            </ul>
+            <form class="d-flex">
+                <input id="gedcom-input" type="file" accept=".ged">
+            </form>
+            <form class="d-flex" role="search">
+                <input class="form-control me-2" type="search" placeholder="Search">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+        </div>
+    </div>
 </nav>
 
 <main>
-    <h2>Main</h2>
     <router-outlet></router-outlet>
 </main>
