@@ -1,1 +1,6 @@
-<p>sources works!</p>
+<h1>{{ sources().length }} Sources</h1>
+<ul>
+    <li *ngFor="let source of sources()">
+        <a routerLink="/source/{{ source.xref }}">{{ source.abbr }}</a>
+    </li>
+</ul>

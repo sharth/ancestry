@@ -130,6 +130,7 @@ export class Event {
   address?: string;
   place?: string;
   cause?: string;
+  date?: string;
   sources = new Array<Source>();
 };
 
@@ -366,6 +367,13 @@ export class Parser {
       }
     }
 
+    const dateEvent = (gedcom_record: Record) => {
+      if (gedcom_record.xref != undefined) throw new Error();
+      if (gedcom_record.value == undefined) throw new Error();
+      gedcom_record.children.forEach(this.reportUnparsedRecord, this);
+      gedcom_event.date = gedcom_record.value;
+    };
+
     for (const child_record of gedcom_record.children) {
       switch (child_record.tag) {
         case '_SHAR':
@@ -373,6 +381,9 @@ export class Parser {
           break;
         case 'SOUR':
           sourceEvent(child_record);
+          break;
+        case 'DATE':
+          dateEvent(child_record);
           break;
         case 'ADDR':
           child_record.children.forEach(this.reportUnparsedRecord, this);

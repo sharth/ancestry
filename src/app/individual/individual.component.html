@@ -22,6 +22,7 @@
     <thead>
         <tr>
             <th scope="col">Event</th>
+            <th scope="col">Date</th>
             <th scope="col">Address</th>
             <th scope="col">Place</th>
             <th scope="col">Sources</th>
@@ -29,12 +30,13 @@
     </thead>
     <tbody>
         <tr *ngFor="let event of individual().events">
-            <td>{{ event.description }} </td>
-            <td>{{ event.address }} </td>
-            <td>{{ event.place }} </td>
+            <td>{{ event.description }}</td>
+            <td>{{ event.date }}</td>
+            <td>{{ event.address }}</td>
+            <td>{{ event.place }}</td>
             <td>
                 <ng-container *ngFor="let source of event.sources">
-                    {{ source.xref }}
+                    <a routerLink="/source/{{source.xref}}">{{ source.xref }}</a>
                 </ng-container>
             </td>
         </tr>
