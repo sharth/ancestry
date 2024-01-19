@@ -29,7 +29,6 @@
                             "node_modules/bootstrap/dist/css/bootstrap.css"
                         ],
                         "scripts": [
-                            "node_modules/jquery/dist/jquery.js",
                             "node_modules/bootstrap/dist/js/bootstrap.js"
                         ]
                     },
@@ -93,7 +92,7 @@
                     }
                 }
             }
-        },
+        }
     },
     "cli": {
         "analytics": "490c2009-f2ab-4d7e-ac19-2cbfb2446442"

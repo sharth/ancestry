@@ -1,0 +1,42 @@
+<h2>Name</h2>
+<p>{{ individual().name }}</p>
+
+<h2>Relatives</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Relation</th>
+            <th scope="col">Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let relative of relatives()">
+            <td>{{ relative.relationship }}</td>
+            <td><a routerLink="/individual/{{ relative.individual.xref }}">{{ relative.individual.name }}</a></td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Events</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Event</th>
+            <th scope="col">Address</th>
+            <th scope="col">Place</th>
+            <th scope="col">Sources</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let event of individual().events">
+            <td>{{ event.description }} </td>
+            <td>{{ event.address }} </td>
+            <td>{{ event.place }} </td>
+            <td>
+                <ng-container *ngFor="let source of event.sources">
+                    {{ source.xref }}
+                </ng-container>
+            </td>
+        </tr>
+    </tbody>
+</table>
