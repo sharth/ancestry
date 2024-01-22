@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { AncestryService } from '../ancestry.service';
+import { AncestryService, Source } from '../ancestry.service';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router'
 
@@ -11,9 +11,9 @@ import { RouterLink } from '@angular/router'
   styleUrl: './sources.component.css'
 })
 export class SourcesComponent {
-  constructor(public ancestryService: AncestryService) {}
+  constructor(public ancestryService: AncestryService) { }
 
-  sources() {
+  sources(): Source[] {
     return this.ancestryService.sources();
   }
 }

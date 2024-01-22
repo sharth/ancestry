@@ -1,5 +1,4 @@
-import { ApplicationRef, ChangeDetectorRef, computed, inject, signal, Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { computed, signal, Injectable } from '@angular/core';
 
 export class ChunkStreamByNewline extends TransformStream {
   constructor() {
@@ -10,13 +9,9 @@ export class ChunkStreamByNewline extends TransformStream {
       },
       async transform(chunk, controller) {
         var lines = (incomplete_line + chunk).split(/\r?\n/);
-        while (lines.length > 1) {
-          controller.enqueue(lines.shift()!);
-        }
-        if (lines.length > 0) {
-          incomplete_line = lines.shift()!;
-        } else {
-          incomplete_line = ''
+        incomplete_line = lines.pop() || "";
+        for (var line of lines) {
+          controller.enqueue(line);
         }
       },
       flush(controller) {
@@ -45,7 +40,7 @@ export class ChunkStreamByRecord extends TransformStream {
         if (record.level == 0) {
           if (ladder.length)
             controller.enqueue(ladder[0]);
-          ladder = [record]
+          ladder = [record];
         } else if (record.tag == 'CONC') {
           ladder.at(-1)!.value += record.value;
         } else if (record.tag == 'CONT') {
@@ -53,7 +48,7 @@ export class ChunkStreamByRecord extends TransformStream {
         } else {
           ladder.length = record.level;
           ladder.at(-1)!.children.push(record);
-          ladder.push(record)
+          ladder.push(record);
         }
       },
       flush(controller) {
@@ -73,7 +68,7 @@ export class GedcomStreamToDatabase extends WritableStream {
       },
       close() { },
       abort(err) {
-        console.log('GedcomStreamToDatabase error:', err);
+        console.error('GedcomStreamToDatabase error:', err);
       },
     });
   }
@@ -89,40 +84,28 @@ interface Record {
 };
 
 export class Individual {
-  xref: string;
+  constructor(public xref: string) { }
   events: Array<Event> = [];
   name?: string;
   surname?: string;
   sex?: ('Male' | 'Female');
   familySearchId?: string;
-
-  constructor(xref: string) {
-    this.xref = xref;
-  }
 };
 
 export class Family {
-  xref: string;
+  constructor(public xref: string) { }
   husband?: Individual;
   wife?: Individual;
   children = new Array<Individual>();
   events = new Array<Event>();
-
-  constructor(xref: string) {
-    this.xref = xref;
-  }
 };
 
 export class Source {
-  xref: string;
+  constructor(public xref: string) { }
   abbr?: string;
   text?: string;
   titl?: string;
   bibl?: string;
-
-  constructor(xref: string) {
-    this.xref = xref;
-  }
 };
 
 export class Event {
@@ -131,8 +114,18 @@ export class Event {
   place?: string;
   cause?: string;
   date?: string;
-  sources = new Array<Source>();
+  value?: string;
+  citations = new Array<Citation>();
 };
+
+export class Citation {
+  constructor(public source: Source) { }
+  name?: string;
+  obje?: string;
+  note?: string;
+  text?: string;
+  page?: string;
+}
 
 export class Database {
   individuals = new Map<string, Individual>();
@@ -177,7 +170,7 @@ export class Parser {
 
   reportUnparsedRecord(gedcom_record: Record) {
     if (!this.unparsed_tags.has(gedcom_record.abstag)) {
-      console.log('Unparsed tag ', gedcom_record.abstag);
+      console.warn('Unparsed tag ', gedcom_record.abstag);
       this.unparsed_tags.add(gedcom_record.abstag);
     }
   }
@@ -340,14 +333,24 @@ export class Parser {
       ['SEX', 'Sex'],
       ['SSN', 'Social Security Number'],
       ['WILL', 'Will'],
-    ]).get(gedcom_record.tag);
-    gedcom_event.description ??= gedcom_record.tag;
+    ]).get(gedcom_record.tag) || gedcom_record.tag;
 
     const shareEvent = (gedcom_record: Record) => {
       if (gedcom_record.xref != undefined) throw new Error();
       if (gedcom_record.value == undefined) throw new Error();
-      gedcom_record.children.forEach(this.reportUnparsedRecord, this);
-      this.gedcom_database.individualOrFamily(gedcom_record.value).events.push(gedcom_event);
+
+      const gedcom_friend = this.gedcom_database.individualOrFamily(gedcom_record.value);
+      gedcom_friend.events.push(gedcom_event);
+
+      for (const child_record of gedcom_record.children) {
+        switch (child_record.tag) {
+          case 'ROLE':
+            break;
+          default:
+            this.reportUnparsedRecord(child_record);
+            break;
+        }
+      }
     };
 
     const sourceEvent = (gedcom_record: Record) => {
@@ -355,14 +358,50 @@ export class Parser {
       if (gedcom_record.value == undefined) throw new Error();
 
       const gedcom_source = this.gedcom_database.source(gedcom_record.value);
-      gedcom_event.sources.push(gedcom_source);
+      const gedcom_citation = new Citation(gedcom_source);
+      gedcom_event.citations.push(gedcom_citation);
 
       for (const child_record of gedcom_record.children) {
         switch (child_record.tag) {
           case '_TMPLT':
+          case '_QUAL':
+          case 'QUAY':
+            break;
+          case 'OBJE':
+            // child_record.children.forEach(this.reportUnparsedRecord, this);
+            gedcom_citation.obje = child_record.value;
+            break;
+          case 'NAME':
+            child_record.children.forEach(this.reportUnparsedRecord, this);
+            gedcom_citation.name = child_record.value;
+            break;
+          case 'NOTE':
+            child_record.children.forEach(this.reportUnparsedRecord, this);
+            gedcom_citation.note = child_record.value;
+            break;
+          case 'PAGE':
+            child_record.children.forEach(this.reportUnparsedRecord, this);
+            gedcom_citation.page = child_record.value;
+            break;
+          case 'DATA':
+            if (child_record.xref != undefined) throw new Error();
+            if (child_record.value != undefined) throw new Error();
+            for (let grandchild_record of child_record.children) {
+              switch (grandchild_record.tag) {
+                case 'TEXT':
+                  grandchild_record.children.forEach(this.reportUnparsedRecord, this);
+                  gedcom_citation.text ??= '';
+                  gedcom_citation.text += grandchild_record.value;
+                  break;
+                default:
+                  this.reportUnparsedRecord(grandchild_record);
+                  break;
+              }
+            }
             break;
           default:
             this.reportUnparsedRecord(child_record);
+            break;
         }
       }
     }
@@ -385,6 +424,10 @@ export class Parser {
         case 'DATE':
           dateEvent(child_record);
           break;
+        case 'TYPE':
+          child_record.children.forEach(this.reportUnparsedRecord, this);
+          gedcom_event.description = child_record.value;
+          break;
         case 'ADDR':
           child_record.children.forEach(this.reportUnparsedRecord, this);
           gedcom_event.address = child_record.value;
@@ -401,8 +444,11 @@ export class Parser {
           child_record.children.forEach(this.reportUnparsedRecord, this);
           gedcom_event.description = child_record.value;
           break;
+        case '_SENT': 
+        case '_SDATE':
         case '_PRIM':
         case '_PROOF':
+        case 'NOTE':
           break;
         default:
           this.reportUnparsedRecord(child_record);
@@ -455,13 +501,14 @@ export class AncestryService {
   constructor() {
     const database = new Database();
     const parser = new Parser(database);
-    new ReadableStream<string>({
+    const stream = new ReadableStream<string>({
       pull(controller) {
         const text = localStorage.getItem('text');
         if (text) controller.enqueue(text);
         controller.close();
       }
-    })
+    });
+    stream
       .pipeThrough(new ChunkStreamByNewline())
       .pipeThrough(new ChunkStreamByRecord())
       .pipeTo(new WritableStream({

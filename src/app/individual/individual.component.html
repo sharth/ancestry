@@ -25,6 +25,7 @@
             <th scope="col">Date</th>
             <th scope="col">Address</th>
             <th scope="col">Place</th>
+            <th scope="col">Cause</th>
             <th scope="col">Sources</th>
         </tr>
     </thead>
@@ -34,9 +35,10 @@
             <td>{{ event.date }}</td>
             <td>{{ event.address }}</td>
             <td>{{ event.place }}</td>
+            <td>{{ event.cause }}</td>
             <td>
-                <ng-container *ngFor="let source of event.sources">
-                    <a routerLink="/source/{{source.xref}}">{{ source.xref }}</a>
+                <ng-container *ngFor="let citation of event.citations">
+                    <a routerLink="/source/{{citation.source.xref}}">{{ citation.source.xref }}</a>
                 </ng-container>
             </td>
         </tr>
