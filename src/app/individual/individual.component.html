@@ -23,8 +23,7 @@
         <tr>
             <th scope="col">Event</th>
             <th scope="col">Date</th>
-            <th scope="col">Address</th>
-            <th scope="col">Place</th>
+            <th scope="col">Location</th>
             <th scope="col">Cause</th>
             <th scope="col">Sources</th>
         </tr>
@@ -33,8 +32,10 @@
         <tr *ngFor="let event of individual().events">
             <td>{{ event.description }}</td>
             <td>{{ event.date }}</td>
-            <td>{{ event.address }}</td>
-            <td>{{ event.place }}</td>
+            <td>
+                <ng-container *ngIf="event.address">{{event.address}}<br></ng-container>
+                <ng-container *ngIf="event.place">{{event.place}}<br></ng-container>
+            </td>
             <td>{{ event.cause }}</td>
             <td>
                 <ng-container *ngFor="let citation of event.citations">
@@ -44,3 +45,10 @@
         </tr>
     </tbody>
 </table>
+
+<h2>Ancestors</h2>
+<ol>
+    <ng-container *ngFor="let ancestor of ancestors(); index as ahnentafel;">
+        <li *ngIf="ancestor" value="{{ahnentafel}}"><a routerLink="/individual/{{ancestor.xref}}">{{ancestor.name}}</a></li>
+    </ng-container>
+</ol>

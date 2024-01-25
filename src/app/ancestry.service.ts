@@ -85,11 +85,13 @@ interface Record {
 
 export class Individual {
   constructor(public xref: string) { }
-  events: Array<Event> = [];
+  events = new Array<Event>();
   name?: string;
   surname?: string;
   sex?: ('Male' | 'Female');
   familySearchId?: string;
+  childOfFamily?: Family;
+  parentOfFamilies = new Array<Family>();
 };
 
 export class Family {
@@ -98,6 +100,13 @@ export class Family {
   wife?: Individual;
   children = new Array<Individual>();
   events = new Array<Event>();
+
+  parents() {
+    const parents = new Array<Individual>();
+    if (this.husband) parents.push(this.husband);
+    if (this.wife) parents.push(this.wife);
+    return parents;
+  }
 };
 
 export class Source {
@@ -263,21 +272,27 @@ export class Parser {
       if (gedcom_record.xref != undefined) throw new Error();
       if (gedcom_record.value == undefined) throw new Error();
       gedcom_record.children.forEach(this.reportUnparsedRecord, this);
-      gedcom_family.husband = this.gedcom_database.individual(gedcom_record.value);
+      const individual = this.gedcom_database.individual(gedcom_record.value);
+      individual.parentOfFamilies.push(gedcom_family);
+      gedcom_family.husband = individual;
     };
 
     const parseWife = (gedcom_record: Record) => {
       if (gedcom_record.xref != undefined) throw new Error();
       if (gedcom_record.value == undefined) throw new Error();
       gedcom_record.children.forEach(this.reportUnparsedRecord, this);
-      gedcom_family.wife = this.gedcom_database.individual(gedcom_record.value);
+      const individual = this.gedcom_database.individual(gedcom_record.value);
+      individual.parentOfFamilies.push(gedcom_family);
+      gedcom_family.wife = individual;
     };
 
     const parseChild = (gedcom_record: Record) => {
       if (gedcom_record.xref != undefined) throw new Error();
       if (gedcom_record.value == undefined) throw new Error();
       gedcom_record.children.forEach(this.reportUnparsedRecord, this);
-      gedcom_family.children.push(this.gedcom_database.individual(gedcom_record.value));
+      const individual = this.gedcom_database.individual(gedcom_record.value);
+      individual.childOfFamily = gedcom_family;
+      gedcom_family.children.push(individual);
     }
 
     for (const child_record of gedcom_record.children) {

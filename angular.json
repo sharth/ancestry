@@ -26,11 +26,15 @@
                         ],
                         "styles": [
                             "src/styles.css",
+                            "node_modules/@fontsource/roboto/300.css",
+                            "node_modules/@fontsource/roboto/400.css",
+                            "node_modules/@fontsource/roboto/500.css",
+                            "node_modules/@fontsource/material-icons/400.css",
+                            "@angular/material/prebuilt-themes/deeppurple-amber.css",
                             "node_modules/bootstrap/dist/css/bootstrap.css"
                         ],
                         "scripts": [
-                            "node_modules/bootstrap/dist/js/bootstrap.js",
-                            "node_modules/@popperjs/core/dist/esm/popper.js"
+                            "node_modules/bootstrap/dist/js/bootstrap.js"
                         ]
                     },
                     "configurations": {
@@ -87,6 +91,7 @@
                             "src/assets"
                         ],
                         "styles": [
+                            "@angular/material/prebuilt-themes/deeppurple-amber.css",
                             "src/styles.css"
                         ],
                         "scripts": []
