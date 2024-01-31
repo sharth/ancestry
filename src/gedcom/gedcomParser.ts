@@ -116,6 +116,7 @@ export class GedcomParser {
 
     for (const childRecord of gedcomRecord.children) {
       switch (childRecord.tag) {
+        case 'SOUR': this.parseCitation(gedcomEvent, childRecord); break
         default: this.reportUnparsedRecord(childRecord); break
       }
     }
