@@ -451,6 +451,7 @@ export class GedcomParser {
     if (gedcomRecord.value != null) throw new Error()
 
     const gedcomSource = this.gedcomDatabase.source(gedcomRecord.xref)
+    gedcomSource.gedcom = gedcomRecord.gedcom()
 
     for (const childRecord of gedcomRecord.children) {
       switch (childRecord.tag) {
