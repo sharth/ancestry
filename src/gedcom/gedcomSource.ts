@@ -1,3 +1,5 @@
+import { type GedcomRepository } from './gedcomRepository'
+
 export class GedcomSource {
   constructor (
     public xref: string) { }
@@ -7,4 +9,8 @@ export class GedcomSource {
   text?: string
   bibl?: string
   gedcom?: string[]
+
+  repositories = new Array<{
+    repository: GedcomRepository
+    callNumbers: string[] }>()
 };

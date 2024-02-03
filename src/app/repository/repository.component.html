@@ -1,0 +1,7 @@
+<h1>{{repository().name ?? repository().xref}}</h1>
+
+<ul>
+    <li *ngFor="let source of repository().sources">
+        <a routerLink="/source/{{source.xref}}">{{source.shortTitle}}</a>
+    </li>
+</ul>

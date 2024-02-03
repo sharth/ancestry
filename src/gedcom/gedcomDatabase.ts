@@ -1,10 +1,12 @@
 import { GedcomFamily } from './gedcomFamily'
 import { GedcomIndividual } from './gedcomIndividual'
+import { GedcomRepository } from './gedcomRepository'
 import { GedcomSource } from './gedcomSource'
 
 export class GedcomDatabase {
   individuals = new Map<string, GedcomIndividual>()
   families = new Map<string, GedcomFamily>()
+  repositories = new Map<string, GedcomRepository>()
   sources = new Map<string, GedcomSource>()
 
   individual (xref: string): GedcomIndividual {
@@ -25,6 +27,12 @@ export class GedcomDatabase {
     if (xref.startsWith('@I')) return this.individual(xref)
     if (xref.startsWith('@F')) return this.family(xref)
     throw new Error()
+  }
+
+  repository (xref: string): GedcomRepository {
+    let gedcomRepository = this.repositories.get(xref)
+    if (gedcomRepository == null) { this.repositories.set(xref, gedcomRepository = new GedcomRepository(xref)) }
+    return gedcomRepository
   }
 
   source (xref: string): GedcomSource {

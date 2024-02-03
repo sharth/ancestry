@@ -10,5 +10,17 @@
 <h2>bibl</h2>
 <pre>{{ source().bibl }}</pre>
 
+<h2>Repositories</h2>
+<dl>
+    <ng-container *ngFor="let repositoryCitation of source().repositories">
+        <dt>
+            <a routerLink="/repository/{{repositoryCitation.repository.xref}}">{{repositoryCitation.repository.name}}</a>
+        </dt>
+        <dd *ngFor="let callNumber of repositoryCitation.callNumbers">
+            <a *ngIf="callNumber.startsWith('http')" href={{callNumber}}>{{callNumber}}</a>
+        </dd>
+    </ng-container>
+</dl>
+
 <h2>gedcom</h2>
 <pre>{{ source().gedcom?.join('\n') }}</pre>

@@ -1,5 +1,5 @@
 import { computed, signal, Injectable } from '@angular/core'
-import { type GedcomIndividual, type GedcomSource, type GedcomFamily, GedcomDatabase, GedcomParser } from '../gedcom'
+import { type GedcomIndividual, type GedcomSource, type GedcomFamily, GedcomDatabase, GedcomParser, type GedcomRepository } from '../gedcom'
 
 @Injectable({ providedIn: 'root' })
 export class AncestryService {
@@ -63,6 +63,12 @@ export class AncestryService {
     const family = this.database().families.get(xref)
     if (family == null) throw new Error(`No family with xref '${xref}'`)
     return family
+  }
+
+  repository (xref: string): GedcomRepository {
+    const repository = this.database().repositories.get(xref)
+    if (repository == null) throw new Error(`No repository with xref '${xref}`)
+    return repository
   }
 
   source (xref: string): GedcomSource {

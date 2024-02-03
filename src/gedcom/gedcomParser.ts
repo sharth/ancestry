@@ -7,6 +7,7 @@ import { ChunkStreamByRecord } from './chunkStreamByRecord'
 import { ChunkStreamByNewline } from './chunkStreamByNewline'
 import { type GedcomIndividual } from './gedcomIndividual'
 import { type GedcomSource } from './gedcomSource'
+import { type GedcomRepository } from './gedcomRepository'
 
 export class GedcomParser {
   constructor (public readonly gedcomDatabase: GedcomDatabase) {}
@@ -41,14 +42,43 @@ export class GedcomParser {
     switch (gedcomRecord.tag) {
       case 'INDI': this.parseIndividual(gedcomRecord); break
       case 'FAM': this.parseFamily(gedcomRecord); break
+      case 'REPO': this.parseRepository(gedcomRecord); break
       case 'SOUR': this.parseSource(gedcomRecord); break
       default: this.reportUnparsedRecord(gedcomRecord); break
     }
   }
 
+  parseRepository (gedcomRecord: GedcomRecord): void {
+    if (gedcomRecord.abstag !== 'REPO') throw new Error()
+    if (gedcomRecord.xref == null) throw new Error()
+    if (gedcomRecord.value != null) throw new Error()
+
+    const gedcomRepository: GedcomRepository = this.gedcomDatabase.repository(gedcomRecord.xref)
+
+    for (const childRecord of gedcomRecord.children) {
+      switch (childRecord.tag) {
+        case 'NAME': this.parseRepositoryName(gedcomRepository, childRecord); break
+        default: this.reportUnparsedRecord(childRecord); break
+      }
+    }
+  }
+
+  parseRepositoryName (gedcomRepository: GedcomRepository, gedcomRecord: GedcomRecord): void {
+    if (gedcomRecord.abstag !== 'REPO.NAME') throw new Error()
+    if (gedcomRecord.xref != null) throw new Error()
+    if (gedcomRecord.value == null) throw new Error()
+
+    gedcomRepository.name = gedcomRecord.value
+
+    for (const childRecord of gedcomRecord.children) {
+      switch (childRecord.tag) {
+        default: this.reportUnparsedRecord(childRecord); break
+      }
+    }
+  }
+
   parseIndividual (gedcomRecord: GedcomRecord): void {
     if (gedcomRecord.abstag !== 'INDI') throw new Error()
-    if (gedcomRecord.level !== 0) throw new Error()
     if (gedcomRecord.xref == null) throw new Error()
     if (gedcomRecord.value != null) throw new Error()
 
@@ -146,8 +176,7 @@ export class GedcomParser {
   }
 
   parseFamily (gedcomRecord: GedcomRecord): void {
-    if (gedcomRecord.tag !== 'FAM') throw new Error()
-    if (gedcomRecord.level !== 0) throw new Error()
+    if (gedcomRecord.abstag !== 'FAM') throw new Error()
     if (gedcomRecord.xref == null) throw new Error()
     if (gedcomRecord.value != null) throw new Error()
 
@@ -459,6 +488,7 @@ export class GedcomParser {
         case 'TEXT': this.parseSourceText(gedcomSource, childRecord); break
         case 'TITL': this.parseSourceTitle(gedcomSource, childRecord); break
         case '_BIBL': this.parseSourceBibl(gedcomSource, childRecord); break
+        case 'REPO': this.parseSourceRepositoryCitation(gedcomSource, childRecord); break
         default: this.reportUnparsedRecord(childRecord); break
       }
     }
@@ -521,9 +551,42 @@ export class GedcomParser {
 
     for (const childRecord of gedcomRecord.children) {
       switch (childRecord.tag) {
-        default:
-          this.reportUnparsedRecord(childRecord)
-          break
+        default: this.reportUnparsedRecord(childRecord); break
+      }
+    }
+  }
+
+  parseSourceRepositoryCitation (gedcomSource: GedcomSource, gedcomRecord: GedcomRecord): void {
+    if (gedcomRecord.abstag !== 'SOUR.REPO') throw new Error()
+    if (gedcomRecord.xref != null) throw new Error()
+    if (gedcomRecord.value == null) throw new Error()
+
+    const gedcomRepository = this.gedcomDatabase.repository(gedcomRecord.value)
+    gedcomRepository.sources.push(gedcomSource)
+
+    const gedcomRepositoryCitation = { repository: gedcomRepository, callNumbers: [] }
+    gedcomSource.repositories.push(gedcomRepositoryCitation)
+
+    for (const childRecord of gedcomRecord.children) {
+      switch (childRecord.tag) {
+        case 'CALN': this.parseSourceRepositoryCallNumber(gedcomRepositoryCitation, childRecord); break
+        default: this.reportUnparsedRecord(childRecord); break
+      }
+    }
+  }
+
+  parseSourceRepositoryCallNumber (
+    gedcomRepositoryCitation: { repository: GedcomRepository, callNumbers: string[] },
+    gedcomRecord: GedcomRecord): void {
+    if (gedcomRecord.abstag !== 'SOUR.REPO.CALN') throw new Error()
+    if (gedcomRecord.xref != null) throw new Error()
+    if (gedcomRecord.value == null) throw new Error()
+
+    gedcomRepositoryCitation.callNumbers.push(gedcomRecord.value)
+
+    for (const childRecord of gedcomRecord.children) {
+      switch (childRecord.tag) {
+        default: this.reportUnparsedRecord(childRecord); break
       }
     }
   }
