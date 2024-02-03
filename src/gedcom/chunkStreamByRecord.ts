@@ -21,7 +21,7 @@ export class ChunkStreamByRecord extends TransformStream {
         } else if (record.tag === 'CONC') {
           ladder.at(-1)!.value! += record.value
         } else if (record.tag === 'CONT') {
-          ladder.at(-1)!.value! += '\n' + record.value
+          ladder.at(-1)!.value! += '\n' + (record.value ?? '')
         } else {
           ladder.length = record.level
           ladder.at(-1)!.children.push(record)
