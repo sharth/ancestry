@@ -1,4 +1,4 @@
-<h1> Repositories</h1>
+<h1> {{ repositories().length }} Individuals</h1>
 <ul>
     <li *ngFor="let repository of repositories()">
         <a routerLink="/repository/{{repository.xref}}">{{repository.name ?? repository.xref}}</a>
