@@ -52,9 +52,8 @@
                 </ng-container>
             </td>
             <td>
-                <app-individual-event-gedcom *ngIf="event.gedcom()">
-                    <pre>{{ event.gedcom() }}</pre>
-                </app-individual-event-gedcom>
+                <button (click)="toggleGedcom(event)">Toggle Gedcom</button><br>
+                <pre *ngIf="showGedcom(event)">{{ event.gedcom() }}</pre>
             </td>
         </tr>
     </tbody>

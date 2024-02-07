@@ -5,24 +5,9 @@ import { RouterLink } from '@angular/router'
 import { type GedcomIndividual, type GedcomEvent } from '../../gedcom'
 
 @Component({
-  selector: 'app-individual-event-gedcom',
-  standalone: true,
-  imports: [CommonModule],
-  template: `
-    <button (click)="toggleData()">Toggle Gedcom</button><br>
-    <ng-content *ngIf="showGedcom" />`
-})
-export class IndividualEventGedcomComponent {
-  showGedcom = false
-  toggleData (): void {
-    this.showGedcom = !this.showGedcom
-  }
-}
-
-@Component({
   selector: 'app-individual',
   standalone: true,
-  imports: [CommonModule, RouterLink, IndividualEventGedcomComponent],
+  imports: [CommonModule, RouterLink],
   templateUrl: './individual.component.html',
   styleUrl: './individual.component.css'
 })
@@ -126,4 +111,16 @@ export class IndividualComponent {
       rows
     }
   })
+
+  private readonly showEventGedcomMap = new Map<GedcomEvent, boolean>()
+  toggleGedcom (event: GedcomEvent): void {
+    const status: boolean = this.showEventGedcomMap.get(event) ?? false
+    console.log('toggleGedcom', !status, event)
+    this.showEventGedcomMap.set(event, !status)
+  }
+
+  showGedcom (event: GedcomEvent): boolean {
+    console.log('showGedcom', (this.showEventGedcomMap.get(event) ?? false), event)
+    return this.showEventGedcomMap.get(event) ?? false
+  }
 }
