@@ -3,7 +3,8 @@ import { type GedcomRecord } from './gedcomRecord'
 
 export class GedcomEvent {
   constructor (
-    public type: string) {}
+    public type: string,
+    public gedcomRecord: GedcomRecord) {}
 
   address?: string
   place?: string
@@ -12,9 +13,7 @@ export class GedcomEvent {
   dateDescriptive?: string
   value?: string
   citations = new Array<GedcomCitation>()
-  record?: GedcomRecord
-
   gedcom (): string | undefined {
-    return this.record?.gedcom()?.join('\n')
+    return this.gedcomRecord.gedcom().join('\n')
   }
 }

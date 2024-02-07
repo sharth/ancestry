@@ -1,3 +1,4 @@
+import { type GedcomRecord } from './gedcomRecord'
 import { type GedcomSource } from './gedcomSource'
 
 export class GedcomRepository {
@@ -6,4 +7,5 @@ export class GedcomRepository {
 
   name?: string
   sources = new Array<GedcomSource>()
+  gedcomRecord?: GedcomRecord
 };

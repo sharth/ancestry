@@ -54,6 +54,7 @@ export class GedcomParser {
     if (gedcomRecord.value != null) throw new Error()
 
     const gedcomRepository: GedcomRepository = this.gedcomDatabase.repository(gedcomRecord.xref)
+    gedcomRepository.gedcomRecord = gedcomRecord
 
     for (const childRecord of gedcomRecord.children) {
       switch (childRecord.tag) {
@@ -83,6 +84,7 @@ export class GedcomParser {
     if (gedcomRecord.value != null) throw new Error()
 
     const gedcomIndividual: GedcomIndividual = this.gedcomDatabase.individual(gedcomRecord.xref)
+    gedcomIndividual.gedcomRecord = gedcomRecord
 
     for (const childRecord of gedcomRecord.children) {
       switch (childRecord.tag) {
@@ -135,7 +137,7 @@ export class GedcomParser {
     if (gedcomRecord.xref != null) throw new Error()
     // if (gedcomRecord.value != null) throw new Error();
 
-    const gedcomEvent = new GedcomEvent('Name')
+    const gedcomEvent = new GedcomEvent('Name', gedcomRecord)
     gedcomIndividual.events.push(gedcomEvent)
     gedcomEvent.value = gedcomRecord.value
 
@@ -157,7 +159,7 @@ export class GedcomParser {
     if (gedcomRecord.xref != null) throw new Error()
     if (gedcomRecord.value == null) throw new Error()
 
-    const gedcomEvent = new GedcomEvent('Sex')
+    const gedcomEvent = new GedcomEvent('Sex', gedcomRecord)
     gedcomIndividual.events.push(gedcomEvent)
     gedcomEvent.value = gedcomRecord.value
 
@@ -181,6 +183,7 @@ export class GedcomParser {
     if (gedcomRecord.value != null) throw new Error()
 
     const gedcomFamily: GedcomFamily = this.gedcomDatabase.family(gedcomRecord.xref)
+    gedcomFamily.gedcomRecord = gedcomRecord
 
     for (const childRecord of gedcomRecord.children) {
       switch (childRecord.tag) {
@@ -272,11 +275,10 @@ export class GedcomParser {
       ['WILL', 'Will']
     ]).get(gedcomRecord.tag) ?? gedcomRecord.tag
 
-    const gedcomEvent = new GedcomEvent(type)
+    const gedcomEvent = new GedcomEvent(type, gedcomRecord)
     gedcomIndividualOrFamily.events.push(gedcomEvent)
 
     gedcomEvent.value = gedcomRecord.value
-    gedcomEvent.record = gedcomRecord
 
     for (const childRecord of gedcomRecord.children) {
       switch (childRecord.tag) {
@@ -480,7 +482,7 @@ export class GedcomParser {
     if (gedcomRecord.value != null) throw new Error()
 
     const gedcomSource = this.gedcomDatabase.source(gedcomRecord.xref)
-    gedcomSource.gedcom = gedcomRecord.gedcom()
+    gedcomSource.gedcomRecord = gedcomRecord
 
     for (const childRecord of gedcomRecord.children) {
       switch (childRecord.tag) {

@@ -1,5 +1,6 @@
 import { type GedcomEvent } from './gedcomEvent'
 import { type GedcomFamily } from './gedcomFamily'
+import { type GedcomRecord } from './gedcomRecord'
 
 export class GedcomIndividual {
   constructor (
@@ -12,6 +13,7 @@ export class GedcomIndividual {
   familySearchId?: string
   childOfFamily?: GedcomFamily
   parentOfFamilies = new Array<GedcomFamily>()
+  gedcomRecord?: GedcomRecord
 
   censusEvents (): GedcomEvent[] {
     return this.events.filter(gedcomEvent => gedcomEvent.type === 'Census')

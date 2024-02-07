@@ -1,3 +1,4 @@
+import { type GedcomRecord } from './gedcomRecord'
 import { type GedcomRepository } from './gedcomRepository'
 
 export class GedcomSource {
@@ -8,9 +9,13 @@ export class GedcomSource {
   fullTitle?: string
   text?: string
   bibl?: string
-  gedcom?: string[]
+  gedcomRecord?: GedcomRecord
 
   repositories = new Array<{
     repository: GedcomRepository
     callNumbers: string[] }>()
+
+  gedcom (): string {
+    return this.gedcomRecord?.gedcom()?.join('\n') ?? ''
+  }
 };
