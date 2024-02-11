@@ -1,0 +1,29 @@
+<h1>{{ source().shortTitle }}</h1>
+
+<h2>Text</h2>
+<div contenteditable class="form-control">{{ source().text }}</textarea>
+
+<h2>Citation</h2>
+<textarea class="form-control"s>{{ source().bibl }}</textarea>
+
+<h2>Repositories</h2>
+<table>
+    <thead>
+        <tr>
+            <td>Repository</td>
+            <td>Call Number</td>
+        </tr>
+    </thead>
+    <tbody>
+        <ng-container *ngFor="let repository of source().repositories">
+            <tr *ngFor="let callNumber of repository.callNumbers">
+                <td><a routerLink="/repository/{{repository.repository.xref}}">{{repository.repository.name}}</a></td>
+                <td>{{callNumber}}</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+            </tr>
+        </ng-container>
+    </tbody>
+</table>
