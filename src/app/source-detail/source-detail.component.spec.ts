@@ -1,18 +1,18 @@
 import { type ComponentFixture, TestBed } from '@angular/core/testing'
-import { SourceComponent } from './source.component'
+import { SourceDetailComponent } from './source-detail.component'
 import { Component } from '@angular/core'
 import { AncestryService } from '../ancestry.service'
 
 @Component({
   standalone: true,
   template: '<app-source [xref]="xref" />',
-  imports: [SourceComponent]
+  imports: [SourceDetailComponent]
 })
 class TestComponent {
   xref = '@S1@'
 }
 
-describe('SourceComponent', () => {
+describe('SourceDetailComponent', () => {
   let component: TestComponent
   let fixture: ComponentFixture<TestComponent>
   let ancestryService: AncestryService

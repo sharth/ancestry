@@ -4,13 +4,13 @@ import { RouterModule } from '@angular/router'
 import { CommonModule } from '@angular/common'
 
 @Component({
-  selector: 'app-source',
+  selector: 'app-source-detail',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  templateUrl: './source.component.html',
-  styleUrl: './source.component.css'
+  templateUrl: './source-detail.component.html',
+  styleUrl: './source-detail.component.css'
 })
-export class SourceComponent {
+export class SourceDetailComponent {
   ancestryService = inject(AncestryService)
   xref = input.required<string>()
   source = computed(() => this.ancestryService.source(this.xref()))
