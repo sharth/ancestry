@@ -13,7 +13,4 @@ export class GedcomEvent {
   dateDescriptive?: string
   value?: string
   citations = new Array<GedcomCitation>()
-  gedcom (): string | undefined {
-    return this.gedcomRecord.gedcom().join('\n')
-  }
 }

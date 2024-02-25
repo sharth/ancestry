@@ -14,8 +14,4 @@ export class GedcomSource {
   repositories = new Array<{
     repository: GedcomRepository
     callNumbers: string[] }>()
-
-  gedcom (): string {
-    return this.gedcomRecord?.gedcom()?.join('\n') ?? ''
-  }
 };

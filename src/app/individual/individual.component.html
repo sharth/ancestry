@@ -53,7 +53,7 @@
             </td>
             <td>
                 <button (click)="toggleGedcom(event)">Toggle Gedcom</button><br>
-                <pre *ngIf="showGedcom(event)">{{ event.gedcom() }}</pre>
+                <pre *ngIf="showGedcom(event)">{{ event.gedcomRecord.gedcom().join("\n") }}</pre>
             </td>
         </tr>
     </tbody>
@@ -85,3 +85,6 @@
         </tr>
     </tbody>
 </table>
+
+<h2>Gedcom</h2>
+<pre>{{ individual().gedcomRecord?.gedcom()?.join("\n") }}
