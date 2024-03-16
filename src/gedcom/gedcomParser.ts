@@ -8,6 +8,7 @@ import { ChunkStreamByNewline } from './chunkStreamByNewline'
 import { type GedcomIndividual } from './gedcomIndividual'
 import { type GedcomSource } from './gedcomSource'
 import { type GedcomRepository } from './gedcomRepository'
+import { GedcomHeader} from './gedcomHeader'
 
 export class GedcomParser {
   constructor (public readonly gedcomDatabase: GedcomDatabase) {}
@@ -41,6 +42,7 @@ export class GedcomParser {
   parse (gedcomRecord: GedcomRecord): void {
     switch (gedcomRecord.tag) {
       case 'HEAD': this.parseHeader(gedcomRecord); break
+      case 'TRLR': this.parseTrailer(gedcomRecord); break
       case 'INDI': this.parseIndividual(gedcomRecord); break
       case 'FAM': this.parseFamily(gedcomRecord); break
       case 'REPO': this.parseRepository(gedcomRecord); break
@@ -55,9 +57,16 @@ export class GedcomParser {
     if (gedcomRecord.value != null) throw new Error()
 
     // Only one header should be found in the gedcom file.
-    if (this.gedcomDatabase.header.gedcomRecord != null) throw new Error()
+    if (this.gedcomDatabase.header != null) throw new Error()
 
-    this.gedcomDatabase.header.gedcomRecord = gedcomRecord
+    this.gedcomDatabase.header = new GedcomHeader(gedcomRecord)
+  }
+
+  parseTrailer (gedcomRecord: GedcomRecord): void {
+    if (gedcomRecord.abstag !== 'TRLR') throw new Error()
+    if (gedcomRecord.xref != null) throw new Error()
+    if (gedcomRecord.value != null) throw new Error()
+    if (gedcomRecord.children.length != 0) throw new Error()
   }
 
   parseRepository (gedcomRecord: GedcomRecord): void {

@@ -5,3 +5,6 @@
     <li>{{ ancestryService.database().sources.size }} Sources
     <li>{{ ancestryService.database().repositories.size }} Repositories
 </ul>
+
+<h2>Header</h2>
+<pre>{{ ancestryService.database().header?.record?.gedcom()?.join("\n") }}</pre>
