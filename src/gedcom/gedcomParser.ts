@@ -40,12 +40,24 @@ export class GedcomParser {
 
   parse (gedcomRecord: GedcomRecord): void {
     switch (gedcomRecord.tag) {
+      case 'HEAD': this.parseHeader(gedcomRecord); break
       case 'INDI': this.parseIndividual(gedcomRecord); break
       case 'FAM': this.parseFamily(gedcomRecord); break
       case 'REPO': this.parseRepository(gedcomRecord); break
       case 'SOUR': this.parseSource(gedcomRecord); break
       default: this.reportUnparsedRecord(gedcomRecord); break
     }
+  }
+
+  parseHeader (gedcomRecord: GedcomRecord): void {
+    if (gedcomRecord.abstag !== 'HEAD') throw new Error()
+    if (gedcomRecord.xref != null) throw new Error()
+    if (gedcomRecord.value != null) throw new Error()
+
+    // Only one header should be found in the gedcom file.
+    if (this.gedcomDatabase.header.gedcomRecord != null) throw new Error()
+
+    this.gedcomDatabase.header.gedcomRecord = gedcomRecord
   }
 
   parseRepository (gedcomRecord: GedcomRecord): void {

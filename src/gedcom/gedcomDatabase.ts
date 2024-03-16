@@ -1,9 +1,11 @@
 import { GedcomFamily } from './gedcomFamily'
+import { GedcomHeader } from './gedcomHeader'
 import { GedcomIndividual } from './gedcomIndividual'
 import { GedcomRepository } from './gedcomRepository'
 import { GedcomSource } from './gedcomSource'
 
 export class GedcomDatabase {
+  header = new GedcomHeader()
   individuals = new Map<string, GedcomIndividual>()
   families = new Map<string, GedcomFamily>()
   repositories = new Map<string, GedcomRepository>()
