@@ -1,21 +1,11 @@
 import { type ComponentFixture, TestBed } from '@angular/core/testing'
 import { IndividualComponent } from './individual.component'
-import { Component } from '@angular/core'
 import { AncestryService } from '../ancestry.service'
 import { RouterTestingModule } from '@angular/router/testing'
 
-@Component({
-  standalone: true,
-  template: '<app-individual [xref]="xref" />',
-  imports: [IndividualComponent]
-})
-class TestComponent {
-  xref = '@I1@'
-}
-
 describe('IndividualComponent', () => {
-  let component: TestComponent
-  let fixture: ComponentFixture<TestComponent>
+  let component: IndividualComponent
+  let fixture: ComponentFixture<IndividualComponent>
   let ancestryService: AncestryService
 
   beforeEach(async () => {
@@ -26,7 +16,8 @@ describe('IndividualComponent', () => {
     ancestryService = TestBed.inject(AncestryService)
     ancestryService.database().individual('@I1@')
 
-    fixture = TestBed.createComponent(TestComponent)
+    fixture = TestBed.createComponent(IndividualComponent)
+    fixture.componentRef.setInput('xref', '@I1@')
     component = fixture.componentInstance
     fixture.detectChanges()
   })

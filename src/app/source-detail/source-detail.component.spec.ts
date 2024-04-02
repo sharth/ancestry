@@ -1,27 +1,18 @@
 import { type ComponentFixture, TestBed } from '@angular/core/testing'
 import { SourceDetailComponent } from './source-detail.component'
-import { Component } from '@angular/core'
 import { AncestryService } from '../ancestry.service'
 
-@Component({
-  standalone: true,
-  template: '<app-source [xref]="xref" />',
-  imports: [SourceDetailComponent]
-})
-class TestComponent {
-  xref = '@S1@'
-}
-
 describe('SourceDetailComponent', () => {
-  let component: TestComponent
-  let fixture: ComponentFixture<TestComponent>
+  let component: SourceDetailComponent
+  let fixture: ComponentFixture<SourceDetailComponent>
   let ancestryService: AncestryService
 
   beforeEach(async () => {
     ancestryService = TestBed.inject(AncestryService)
     ancestryService.database().source('@S1@')
 
-    fixture = TestBed.createComponent(TestComponent)
+    fixture = TestBed.createComponent(SourceDetailComponent)
+    fixture.componentRef.setInput('xref', '@S1@')
     component = fixture.componentInstance
     fixture.detectChanges()
   })
