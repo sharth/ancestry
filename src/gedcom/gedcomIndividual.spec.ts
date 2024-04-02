@@ -1,7 +1,7 @@
 import { GedcomDatabase } from './gedcomDatabase'
 import { GedcomParser } from './gedcomParser'
 
-describe('GedcomParser', () => {
+describe('GedcomIndividual', () => {
   let gedcomDatabase: GedcomDatabase
   let gedcomParser: GedcomParser
 
