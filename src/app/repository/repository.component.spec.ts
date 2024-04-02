@@ -1,10 +1,22 @@
 import { type ComponentFixture, TestBed } from '@angular/core/testing'
 
 import { RepositoryComponent } from './repository.component'
+import { Component } from '@angular/core'
+import { AncestryService } from '../ancestry.service'
+
+@Component({
+  standalone: true,
+  template: '<app-repository [xref]="xref" />',
+  imports: [RepositoryComponent]
+})
+class TestComponent {
+  xref = '@R1@'
+}
 
 describe('RepositoryComponent', () => {
-  let component: RepositoryComponent
-  let fixture: ComponentFixture<RepositoryComponent>
+  let component: TestComponent
+  let fixture: ComponentFixture<TestComponent>
+  let ancestryService: AncestryService
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -12,7 +24,10 @@ describe('RepositoryComponent', () => {
     })
       .compileComponents()
 
-    fixture = TestBed.createComponent(RepositoryComponent)
+    ancestryService = TestBed.inject(AncestryService)
+    ancestryService.database().repository('@R1@')
+
+    fixture = TestBed.createComponent(TestComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
   })
