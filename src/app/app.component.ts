@@ -13,7 +13,7 @@ import { AncestryService } from './ancestry.service'
 export class AppComponent {
   ancestryService = inject(AncestryService)
 
-  gedcomFileChanged (el: EventTarget | null): void {
+  gedcomFileChanged(el: EventTarget | null): void {
     if (!(el instanceof HTMLInputElement)) {
       throw new Error(`Expected el to be an HTMLInputElement, was ${el?.constructor?.name || el}`)
     }

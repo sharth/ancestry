@@ -2,7 +2,7 @@ import { type GedcomRecord } from './gedcomRecord'
 import { type GedcomSource } from './gedcomSource'
 
 export class GedcomRepository {
-  constructor (
+  constructor(
     public xref: string) { }
 
   name?: string

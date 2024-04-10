@@ -56,13 +56,13 @@ export class IndividualComponent {
   })
 
   private readonly showEventGedcomMap = new Map<GedcomEvent, boolean>()
-  toggleGedcom (event: GedcomEvent): void {
+  toggleGedcom(event: GedcomEvent): void {
     const status: boolean = this.showEventGedcomMap.get(event) ?? false
     console.log('toggleGedcom', !status, event)
     this.showEventGedcomMap.set(event, !status)
   }
 
-  showGedcom (event: GedcomEvent): boolean {
+  showGedcom(event: GedcomEvent): boolean {
     console.log('showGedcom', (this.showEventGedcomMap.get(event) ?? false), event)
     return this.showEventGedcomMap.get(event) ?? false
   }

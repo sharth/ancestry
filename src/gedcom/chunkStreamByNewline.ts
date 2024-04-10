@@ -1,18 +1,18 @@
 export class ChunkStreamByNewline extends TransformStream {
-  constructor () {
+  constructor() {
     let incompleteLine = ''
     super({
-      start (controller) {
+      start(controller) {
         incompleteLine = ''
       },
-      transform (chunk, controller) {
+      transform(chunk, controller) {
         const lines = (incompleteLine + chunk).split(/\r?\n/)
         incompleteLine = lines.pop() ?? ''
         for (const line of lines) {
           controller.enqueue(line)
         }
       },
-      flush (controller) {
+      flush(controller) {
         if (incompleteLine !== '') {
           controller.enqueue(incompleteLine)
         }

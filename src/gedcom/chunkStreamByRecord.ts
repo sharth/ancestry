@@ -1,10 +1,10 @@
 import { GedcomRecord } from './gedcomRecord'
 
 export class ChunkStreamByRecord extends TransformStream {
-  constructor () {
+  constructor() {
     let ladder = new Array<GedcomRecord>()
     super({
-      transform (chunk: string, controller) {
+      transform(chunk: string, controller) {
         const match = chunk.match(/^([0-9]+) *(@[^@]+@)? *([A-Za-z0-9_]+) *(.+)?$/)
         if (match == null) {
           throw new Error()
@@ -28,7 +28,7 @@ export class ChunkStreamByRecord extends TransformStream {
           ladder.push(record)
         }
       },
-      flush (controller) {
+      flush(controller) {
         if (ladder.length > 0) {
           controller.enqueue(ladder[0])
         }

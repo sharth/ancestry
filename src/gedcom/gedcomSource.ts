@@ -2,7 +2,7 @@ import { type GedcomRecord } from './gedcomRecord'
 import { type GedcomRepository } from './gedcomRepository'
 
 export class GedcomSource {
-  constructor (
+  constructor(
     public xref: string) { }
 
   shortTitle?: string
@@ -13,5 +13,6 @@ export class GedcomSource {
 
   repositories = new Array<{
     repository: GedcomRepository
-    callNumbers: string[] }>()
+    callNumbers: string[]
+  }>()
 };

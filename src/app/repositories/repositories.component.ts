@@ -14,7 +14,7 @@ import { RouterLink } from '@angular/router'
 export class RepositoriesComponent {
   ancestryService = inject(AncestryService)
 
-  repositories (): GedcomRepository[] {
+  repositories(): GedcomRepository[] {
     return Array.from(this.ancestryService.database().repositories.values())
   }
 }

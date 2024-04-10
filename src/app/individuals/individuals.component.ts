@@ -14,11 +14,11 @@ import { type GedcomIndividual } from '../../gedcom'
 export class IndividualsComponent {
   ancestryService = inject(AncestryService)
 
-  individuals (): GedcomIndividual[] {
+  individuals(): GedcomIndividual[] {
     return Array.from(this.ancestryService.individuals()).sort((a, b) => a.xref.localeCompare(b.xref))
   }
 
-  individualsBySurname (): Map<string | undefined, GedcomIndividual[]> {
+  individualsBySurname(): Map<string | undefined, GedcomIndividual[]> {
     const surnameMap = new Map<string, GedcomIndividual[]>()
     for (const individual of this.ancestryService.individuals()) {
       let surnames = surnameMap.get(individual.surname ?? '')

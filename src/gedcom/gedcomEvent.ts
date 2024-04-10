@@ -2,9 +2,9 @@ import { type GedcomCitation } from './gedcomCitation'
 import { type GedcomRecord } from './gedcomRecord'
 
 export class GedcomEvent {
-  constructor (
+  constructor(
     public type: string,
-    public gedcomRecord: GedcomRecord) {}
+    public gedcomRecord: GedcomRecord) { }
 
   address?: string
   place?: string

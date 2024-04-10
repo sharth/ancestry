@@ -8,29 +8,29 @@ import { ChunkStreamByNewline } from './chunkStreamByNewline'
 import { type GedcomIndividual } from './gedcomIndividual'
 import { type GedcomSource } from './gedcomSource'
 import { type GedcomRepository } from './gedcomRepository'
-import { GedcomHeader} from './gedcomHeader'
+import { GedcomHeader } from './gedcomHeader'
 
 export class GedcomParser {
-  constructor (public readonly gedcomDatabase: GedcomDatabase) {}
+  constructor(public readonly gedcomDatabase: GedcomDatabase) { }
   private readonly unparsedTags = new Set<string>()
 
-  reportUnparsedRecord (gedcomRecord: GedcomRecord): void {
+  reportUnparsedRecord(gedcomRecord: GedcomRecord): void {
     if (!this.unparsedTags.has(gedcomRecord.abstag)) {
       console.warn('Unparsed tag ', gedcomRecord.abstag)
       this.unparsedTags.add(gedcomRecord.abstag)
     }
   }
 
-  async parseText (text: string): Promise<void> {
+  async parseText(text: string): Promise<void> {
     await this.parseStream(new ReadableStream<string>({
-      pull (controller) {
+      pull(controller) {
         controller.enqueue(text)
         controller.close()
       }
     }))
   }
 
-  async parseStream (stream: ReadableStream<string>): Promise<void> {
+  async parseStream(stream: ReadableStream<string>): Promise<void> {
     await stream
       .pipeThrough(new ChunkStreamByNewline())
       .pipeThrough(new ChunkStreamByRecord())
@@ -39,7 +39,7 @@ export class GedcomParser {
       }))
   }
 
-  parse (gedcomRecord: GedcomRecord): void {
+  parse(gedcomRecord: GedcomRecord): void {
     switch (gedcomRecord.tag) {
       case 'HEAD': this.parseHeader(gedcomRecord); break
       case 'TRLR': this.parseTrailer(gedcomRecord); break
@@ -51,7 +51,7 @@ export class GedcomParser {
     }
   }
 
-  parseHeader (gedcomRecord: GedcomRecord): void {
+  parseHeader(gedcomRecord: GedcomRecord): void {
     if (gedcomRecord.abstag !== 'HEAD') throw new Error()
     if (gedcomRecord.xref != null) throw new Error()
     if (gedcomRecord.value != null) throw new Error()
@@ -62,14 +62,14 @@ export class GedcomParser {
     this.gedcomDatabase.header = new GedcomHeader(gedcomRecord)
   }
 
-  parseTrailer (gedcomRecord: GedcomRecord): void {
+  parseTrailer(gedcomRecord: GedcomRecord): void {
     if (gedcomRecord.abstag !== 'TRLR') throw new Error()
     if (gedcomRecord.xref != null) throw new Error()
     if (gedcomRecord.value != null) throw new Error()
     if (gedcomRecord.children.length != 0) throw new Error()
   }
 
-  parseRepository (gedcomRecord: GedcomRecord): void {
+  parseRepository(gedcomRecord: GedcomRecord): void {
     if (gedcomRecord.abstag !== 'REPO') throw new Error()
     if (gedcomRecord.xref == null) throw new Error()
     if (gedcomRecord.value != null) throw new Error()
@@ -85,7 +85,7 @@ export class GedcomParser {
     }
   }
 
-  parseRepositoryName (gedcomRepository: GedcomRepository, gedcomRecord: GedcomRecord): void {
+  parseRepositoryName(gedcomRepository: GedcomRepository, gedcomRecord: GedcomRecord): void {
     if (gedcomRecord.abstag !== 'REPO.NAME') throw new Error()
     if (gedcomRecord.xref != null) throw new Error()
     if (gedcomRecord.value == null) throw new Error()
@@ -99,7 +99,7 @@ export class GedcomParser {
     }
   }
 
-  parseIndividual (gedcomRecord: GedcomRecord): void {
+  parseIndividual(gedcomRecord: GedcomRecord): void {
     if (gedcomRecord.abstag !== 'INDI') throw new Error()
     if (gedcomRecord.xref == null) throw new Error()
     if (gedcomRecord.value != null) throw new Error()
@@ -139,7 +139,7 @@ export class GedcomParser {
     }
   }
 
-  parseIndividualFamilySearchId (gedcomIndividual: GedcomIndividual, gedcomRecord: GedcomRecord): void {
+  parseIndividualFamilySearchId(gedcomIndividual: GedcomIndividual, gedcomRecord: GedcomRecord): void {
     if (gedcomRecord.abstag !== 'INDI._FSFTID') throw new Error()
     if (gedcomRecord.xref != null) throw new Error()
     if (gedcomRecord.value == null) throw new Error()
@@ -153,7 +153,7 @@ export class GedcomParser {
     }
   }
 
-  parseIndividualName (gedcomIndividual: GedcomIndividual, gedcomRecord: GedcomRecord): void {
+  parseIndividualName(gedcomIndividual: GedcomIndividual, gedcomRecord: GedcomRecord): void {
     if (gedcomRecord.abstag !== 'INDI.NAME') throw new Error()
     if (gedcomRecord.xref != null) throw new Error()
     // if (gedcomRecord.value != null) throw new Error();
@@ -175,7 +175,7 @@ export class GedcomParser {
     }
   }
 
-  parseIndividualSex (gedcomIndividual: GedcomIndividual, gedcomRecord: GedcomRecord): void {
+  parseIndividualSex(gedcomIndividual: GedcomIndividual, gedcomRecord: GedcomRecord): void {
     if (gedcomRecord.abstag !== 'INDI.SEX') throw new Error()
     if (gedcomRecord.xref != null) throw new Error()
     if (gedcomRecord.value == null) throw new Error()
@@ -198,7 +198,7 @@ export class GedcomParser {
     }
   }
 
-  parseFamily (gedcomRecord: GedcomRecord): void {
+  parseFamily(gedcomRecord: GedcomRecord): void {
     if (gedcomRecord.abstag !== 'FAM') throw new Error()
     if (gedcomRecord.xref == null) throw new Error()
     if (gedcomRecord.value != null) throw new Error()
@@ -211,16 +211,16 @@ export class GedcomParser {
         case 'CHIL': this.parseFamilyChild(gedcomFamily, childRecord); break
         case 'HUSB': this.parseFamilyHusband(gedcomFamily, childRecord); break
         case 'WIFE': this.parseFamilyWife(gedcomFamily, childRecord); break
-        case 'DIV':this.parseEvent(gedcomFamily, childRecord); break
-        case 'EVEN':this.parseEvent(gedcomFamily, childRecord); break
-        case 'MARR':this.parseEvent(gedcomFamily, childRecord); break
+        case 'DIV': this.parseEvent(gedcomFamily, childRecord); break
+        case 'EVEN': this.parseEvent(gedcomFamily, childRecord); break
+        case 'MARR': this.parseEvent(gedcomFamily, childRecord); break
         case 'MARB': this.parseEvent(gedcomFamily, childRecord); break
         default: this.reportUnparsedRecord(childRecord); break
       }
     }
   }
 
-  parseFamilyChild (gedcomFamily: GedcomFamily, gedcomRecord: GedcomRecord): void {
+  parseFamilyChild(gedcomFamily: GedcomFamily, gedcomRecord: GedcomRecord): void {
     if (gedcomRecord.abstag !== 'FAM.CHIL') throw new Error()
     if (gedcomRecord.xref != null) throw new Error()
     if (gedcomRecord.value == null) throw new Error()
@@ -236,7 +236,7 @@ export class GedcomParser {
     }
   }
 
-  parseFamilyHusband (gedcomFamily: GedcomFamily, gedcomRecord: GedcomRecord): void {
+  parseFamilyHusband(gedcomFamily: GedcomFamily, gedcomRecord: GedcomRecord): void {
     if (gedcomRecord.abstag !== 'FAM.HUSB') throw new Error()
     if (gedcomRecord.xref != null) throw new Error()
     if (gedcomRecord.value == null) throw new Error()
@@ -252,7 +252,7 @@ export class GedcomParser {
     }
   }
 
-  parseFamilyWife (gedcomFamily: GedcomFamily, gedcomRecord: GedcomRecord): void {
+  parseFamilyWife(gedcomFamily: GedcomFamily, gedcomRecord: GedcomRecord): void {
     if (gedcomRecord.abstag !== 'FAM.WIFE') throw new Error()
     if (gedcomRecord.xref != null) throw new Error()
     if (gedcomRecord.value == null) throw new Error()
@@ -268,7 +268,7 @@ export class GedcomParser {
     }
   }
 
-  parseEvent (gedcomIndividualOrFamily: (GedcomIndividual | GedcomFamily), gedcomRecord: GedcomRecord): void {
+  parseEvent(gedcomIndividualOrFamily: (GedcomIndividual | GedcomFamily), gedcomRecord: GedcomRecord): void {
     if (gedcomRecord.xref != null) throw new Error()
 
     const type = new Map([
@@ -320,7 +320,7 @@ export class GedcomParser {
     }
   }
 
-  parseEventAddress (gedcomEvent: GedcomEvent, gedcomRecord: GedcomRecord): void {
+  parseEventAddress(gedcomEvent: GedcomEvent, gedcomRecord: GedcomRecord): void {
     if (gedcomRecord.tag !== 'ADDR') throw new Error()
     if (gedcomRecord.xref != null) throw new Error()
     if (gedcomRecord.value == null) throw new Error()
@@ -336,7 +336,7 @@ export class GedcomParser {
     }
   }
 
-  parseEventPlace (gedcomEvent: GedcomEvent, gedcomRecord: GedcomRecord): void {
+  parseEventPlace(gedcomEvent: GedcomEvent, gedcomRecord: GedcomRecord): void {
     if (gedcomRecord.tag !== 'PLAC') throw new Error()
     if (gedcomRecord.xref != null) throw new Error()
     if (gedcomRecord.value == null) throw new Error()
@@ -352,7 +352,7 @@ export class GedcomParser {
     }
   }
 
-  parseEventCause (gedcomEvent: GedcomEvent, gedcomRecord: GedcomRecord): void {
+  parseEventCause(gedcomEvent: GedcomEvent, gedcomRecord: GedcomRecord): void {
     if (gedcomRecord.tag !== 'CAUS') throw new Error()
     if (gedcomRecord.xref != null) throw new Error()
     if (gedcomRecord.value == null) throw new Error()
@@ -368,7 +368,7 @@ export class GedcomParser {
     }
   }
 
-  parseEventDate (gedcomEvent: GedcomEvent, gedcomRecord: GedcomRecord): void {
+  parseEventDate(gedcomEvent: GedcomEvent, gedcomRecord: GedcomRecord): void {
     if (gedcomRecord.tag !== 'DATE') throw new Error()
     if (gedcomRecord.xref != null) throw new Error()
     if (gedcomRecord.value == null) throw new Error()
@@ -411,7 +411,7 @@ export class GedcomParser {
     }
   }
 
-  parseEventShare (gedcomEvent: GedcomEvent, gedcomRecord: GedcomRecord): void {
+  parseEventShare(gedcomEvent: GedcomEvent, gedcomRecord: GedcomRecord): void {
     if (gedcomRecord.tag !== '_SHAR') throw new Error()
     if (gedcomRecord.xref != null) throw new Error()
     if (gedcomRecord.value == null) throw new Error()
@@ -427,7 +427,7 @@ export class GedcomParser {
     }
   }
 
-  parseEventType (gedcomEvent: GedcomEvent, gedcomRecord: GedcomRecord): void {
+  parseEventType(gedcomEvent: GedcomEvent, gedcomRecord: GedcomRecord): void {
     if (gedcomRecord.tag !== 'TYPE') throw new Error()
     if (gedcomRecord.xref != null) throw new Error()
     if (gedcomRecord.value == null) throw new Error()
@@ -441,7 +441,7 @@ export class GedcomParser {
     }
   }
 
-  parseCitation (gedcomEvent: GedcomEvent, gedcomRecord: GedcomRecord): void {
+  parseCitation(gedcomEvent: GedcomEvent, gedcomRecord: GedcomRecord): void {
     if (gedcomRecord.tag !== 'SOUR') throw new Error()
     if (gedcomRecord.xref != null) throw new Error()
     if (gedcomRecord.value == null) throw new Error()
@@ -478,7 +478,7 @@ export class GedcomParser {
     }
   }
 
-  parseCitationData (gedcomCitation: GedcomCitation, gedcomRecord: GedcomRecord): void {
+  parseCitationData(gedcomCitation: GedcomCitation, gedcomRecord: GedcomRecord): void {
     if (gedcomRecord.tag !== 'DATA') throw new Error()
     if (gedcomRecord.xref != null) throw new Error()
     if (gedcomRecord.value != null) throw new Error()
@@ -497,7 +497,7 @@ export class GedcomParser {
     }
   }
 
-  parseSource (gedcomRecord: GedcomRecord): void {
+  parseSource(gedcomRecord: GedcomRecord): void {
     if (gedcomRecord.abstag !== 'SOUR') throw new Error()
     if (gedcomRecord.xref == null) throw new Error()
     if (gedcomRecord.value != null) throw new Error()
@@ -517,7 +517,7 @@ export class GedcomParser {
     }
   }
 
-  parseSourceAbbr (gedcomSource: GedcomSource, gedcomRecord: GedcomRecord): void {
+  parseSourceAbbr(gedcomSource: GedcomSource, gedcomRecord: GedcomRecord): void {
     if (gedcomRecord.abstag !== 'SOUR.ABBR') throw new Error()
     if (gedcomRecord.xref != null) throw new Error()
     if (gedcomRecord.value == null) throw new Error()
@@ -533,7 +533,7 @@ export class GedcomParser {
     }
   }
 
-  parseSourceBibl (gedcomSource: GedcomSource, gedcomRecord: GedcomRecord): void {
+  parseSourceBibl(gedcomSource: GedcomSource, gedcomRecord: GedcomRecord): void {
     if (gedcomRecord.abstag !== 'SOUR._BIBL') throw new Error()
     if (gedcomRecord.xref != null) throw new Error()
     if (gedcomRecord.value == null) throw new Error()
@@ -549,7 +549,7 @@ export class GedcomParser {
     }
   }
 
-  parseSourceText (gedcomSource: GedcomSource, gedcomRecord: GedcomRecord): void {
+  parseSourceText(gedcomSource: GedcomSource, gedcomRecord: GedcomRecord): void {
     if (gedcomRecord.abstag !== 'SOUR.TEXT') throw new Error()
     if (gedcomRecord.xref != null) throw new Error()
     if (gedcomRecord.value == null) throw new Error()
@@ -565,7 +565,7 @@ export class GedcomParser {
     }
   }
 
-  parseSourceTitle (gedcomSource: GedcomSource, gedcomRecord: GedcomRecord): void {
+  parseSourceTitle(gedcomSource: GedcomSource, gedcomRecord: GedcomRecord): void {
     if (gedcomRecord.abstag !== 'SOUR.TITL') throw new Error()
     if (gedcomRecord.xref != null) throw new Error()
     if (gedcomRecord.value == null) throw new Error()
@@ -579,7 +579,7 @@ export class GedcomParser {
     }
   }
 
-  parseSourceRepositoryCitation (gedcomSource: GedcomSource, gedcomRecord: GedcomRecord): void {
+  parseSourceRepositoryCitation(gedcomSource: GedcomSource, gedcomRecord: GedcomRecord): void {
     if (gedcomRecord.abstag !== 'SOUR.REPO') throw new Error()
     if (gedcomRecord.xref != null) throw new Error()
     if (gedcomRecord.value == null) throw new Error()
@@ -598,7 +598,7 @@ export class GedcomParser {
     }
   }
 
-  parseSourceRepositoryCallNumber (
+  parseSourceRepositoryCallNumber(
     gedcomRepositoryCitation: { repository: GedcomRepository, callNumbers: string[] },
     gedcomRecord: GedcomRecord): void {
     if (gedcomRecord.abstag !== 'SOUR.REPO.CALN') throw new Error()

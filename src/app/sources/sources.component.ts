@@ -14,7 +14,7 @@ import { type GedcomSource } from '../../gedcom'
 export class SourcesComponent {
   ancestryService = inject(AncestryService)
 
-  sources (): GedcomSource[] {
+  sources(): GedcomSource[] {
     return this.ancestryService
       .sources()
       .toSorted((lhs, rhs) => (lhs.shortTitle ?? '').localeCompare(rhs.shortTitle ?? ''))

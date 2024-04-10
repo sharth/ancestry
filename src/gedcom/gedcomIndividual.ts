@@ -3,7 +3,7 @@ import { type GedcomFamily } from './gedcomFamily'
 import { type GedcomRecord } from './gedcomRecord'
 
 export class GedcomIndividual {
-  constructor (
+  constructor(
     public xref: string) { }
 
   events = new Array<GedcomEvent>()
@@ -15,11 +15,11 @@ export class GedcomIndividual {
   parentOfFamilies = new Array<GedcomFamily>()
   gedcomRecord?: GedcomRecord
 
-  censusEvents (): GedcomEvent[] {
+  censusEvents(): GedcomEvent[] {
     return this.events.filter(gedcomEvent => gedcomEvent.type === 'Census')
   }
 
-  ancestors (): Array<GedcomIndividual | undefined> {
+  ancestors(): Array<GedcomIndividual | undefined> {
     const ancestors = new Array<GedcomIndividual | undefined>()
     ancestors[1] = this
     for (let i = 1; i < ancestors.length; i += 1) {
@@ -31,7 +31,7 @@ export class GedcomIndividual {
     return ancestors
   }
 
-  relatives (): Array<{ relationship: string, individual: GedcomIndividual }> {
+  relatives(): Array<{ relationship: string, individual: GedcomIndividual }> {
     const relatives = []
 
     // Parents and Siblings
