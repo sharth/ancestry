@@ -35,4 +35,4 @@ export class ChunkStreamByRecord extends TransformStream {
       }
     })
   }
-};
+}
