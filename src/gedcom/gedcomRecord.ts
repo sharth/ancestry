@@ -1,14 +1,13 @@
 export class GedcomRecord {
-  constructor (
+  constructor(
     public level: number,
     public xref: string | undefined,
     public tag: string,
     public abstag: string,
-    public value: string | undefined) {}
+    public value: string | undefined,
+    public children = new Array<GedcomRecord>) { }
 
-  children = new Array<GedcomRecord>()
-
-  gedcom (): string[] {
+  gedcom(): string[] {
     const gedcom = new Array<string>()
     const values = this.value?.split('\n') ?? [undefined]
     gedcom.push([this.level, this.xref, this.tag, values[0]].filter(s => s != null).join(' '))
