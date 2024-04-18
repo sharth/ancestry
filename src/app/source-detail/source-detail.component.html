@@ -13,7 +13,8 @@
 <dl>
     <ng-container *ngFor="let repositoryCitation of source().repositories">
         <dt>
-            <a routerLink="/repository/{{repositoryCitation.repository.xref}}">{{repositoryCitation.repository.name}}</a>
+            <a
+                routerLink="/repository/{{repositoryCitation.repository.xref}}">{{repositoryCitation.repository.name}}</a>
         </dt>
         <dd *ngFor="let callNumber of repositoryCitation.callNumbers">
             <a *ngIf="callNumber.startsWith('http')" href={{callNumber}}>{{callNumber}}</a>
@@ -21,5 +22,24 @@
     </ng-container>
 </dl>
 
-<h2>gedcom</h2>
-<pre>{{ source().gedcomRecord?.gedcom()?.join('\n') }}</pre>
+<h2>Citations</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Individual</th>
+            <th scope="col">Event</th>
+            <th scope="col">Citation</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let ref of citations()">
+            <td><a routerLink="/individual/{{ ref.individual.xref }}">{{ ref.individual.name }}</a></td>
+            <td>{{ ref.event.type }}</td>
+            <td>
+                <pre>{{ ref.citation.text }}</pre>
+            </td>
+        </tr>
+    </tbody>
+
+    <h2>gedcom</h2>
+    <pre>{{ source().gedcomRecord?.gedcom()?.join('\n') }}</pre>
