@@ -8,3 +8,7 @@ updates:
       angular-dependencies:
         patterns:
           - "@angular/*"
+          - "@angular-devkit/build-angular"
+      fonts:
+        patterns:
+          - "@fontsource/*"
