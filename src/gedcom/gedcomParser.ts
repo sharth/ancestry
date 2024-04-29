@@ -21,24 +21,6 @@ export class GedcomParser {
     }
   }
 
-  async parseText(text: string): Promise<void> {
-    await this.parseStream(new ReadableStream<string>({
-      pull(controller) {
-        controller.enqueue(text)
-        controller.close()
-      }
-    }))
-  }
-
-  async parseStream(stream: ReadableStream<string>): Promise<void> {
-    await stream
-      .pipeThrough(new ChunkStreamByNewline())
-      .pipeThrough(new ChunkStreamByRecord())
-      .pipeTo(new WritableStream({
-        write: (gedcomRecord: GedcomRecord) => { this.parse(gedcomRecord) }
-      }))
-  }
-
   parse(gedcomRecord: GedcomRecord): void {
     switch (gedcomRecord.tag) {
       case 'HEAD': this.parseHeader(gedcomRecord); break

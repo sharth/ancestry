@@ -1,5 +1,7 @@
 import { computed, signal, Injectable } from '@angular/core'
-import { type GedcomIndividual, type GedcomSource, type GedcomFamily, GedcomDatabase, GedcomParser, type GedcomRepository } from '../gedcom'
+import { type GedcomIndividual, type GedcomSource, type GedcomFamily, GedcomDatabase, GedcomParser, type GedcomRepository, GedcomRecord } from '../gedcom'
+import { ChunkStreamByNewline } from '../gedcom/chunkStreamByNewline'
+import { ChunkStreamByRecord } from '../gedcom/chunkStreamByRecord'
 
 @Injectable({ providedIn: 'root' })
 export class AncestryService {
@@ -18,7 +20,7 @@ export class AncestryService {
       this.loading.set(true)
       const database = new GedcomDatabase()
       const parser = new GedcomParser(database)
-      void parser.parseText(text).then(() => {
+      void parseText(parser, text).then(() => {
         this.database.set(database)
         this.loading.set(false)
       })
@@ -28,12 +30,12 @@ export class AncestryService {
   reset(): void {
     localStorage.removeItem('text')
     this.database.set(new GedcomDatabase())
-    this.loading.set(false)
   }
 
   resetAndLoadFile(file: File): void {
     const streams = file.stream().pipeThrough(new TextDecoderStream()).tee()
 
+    // One copy of the stream will be written to localStorage.
     let text = ''
     void streams[0]
       .pipeTo(new WritableStream({
@@ -43,13 +45,11 @@ export class AncestryService {
         localStorage.setItem('text', text)
       })
 
-    this.loading.set(true)
-
+    // The other copy will be written to the database.
     const database = new GedcomDatabase()
     const parser = new GedcomParser(database)
-    void parser.parseStream(streams[1]).then(() => {
+    void parseStream(parser, streams[1]).then(() => {
       this.database.set(database)
-      this.loading.set(false)
     })
   }
 
@@ -76,4 +76,23 @@ export class AncestryService {
     if (source == null) throw new Error(`No source with xref '${xref}`)
     return source
   }
+}
+
+async function parseText(parser: GedcomParser, text: string): Promise<void> {
+  const stream = new ReadableStream<string>({
+    start(controller) {
+      controller.enqueue(text)
+      controller.close()
+    }
+  })
+  await parseStream(parser, stream)
+}
+
+async function parseStream(parser: GedcomParser, stream: ReadableStream<string>): Promise<void> {
+  await stream
+    .pipeThrough(new ChunkStreamByNewline())
+    .pipeThrough(new ChunkStreamByRecord())
+    .pipeTo(new WritableStream({
+      write: (gedcomRecord: GedcomRecord) => { parser.parse(gedcomRecord) }
+    }))
 }

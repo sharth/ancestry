@@ -1,5 +1,6 @@
 import { GedcomDatabase } from './gedcomDatabase'
 import { GedcomParser } from './gedcomParser'
+import { GedcomRecord } from './gedcomRecord'
 
 describe('GedcomIndividual', () => {
   let gedcomDatabase: GedcomDatabase
@@ -10,26 +11,39 @@ describe('GedcomIndividual', () => {
     gedcomParser = new GedcomParser(gedcomDatabase)
   })
 
-  it('Sex', async () => {
-    await gedcomParser.parseText([
-      '0 @I1@ INDI',
-      '1 SEX M',
-      '0 @I2@ INDI',
-      '1 SEX F',
-      '0 @I3@ INDI'
-    ].join('\r\n'))
-    expect(gedcomDatabase.individuals.size).toEqual(3)
+  it('Male', () => {
+    gedcomParser.parse(
+      new GedcomRecord(0, '@I1@', 'INDI', 'INDI', undefined, [
+        new GedcomRecord(1, undefined, 'SEX', 'INDI.SEX', 'M'),
+      ])
+    )
+    expect(gedcomDatabase.individuals.size).toEqual(1)
     expect(gedcomDatabase.individual('@I1@').sex).toEqual('Male')
+  })
+
+  it('Female', () => {
+    gedcomParser.parse(
+      new GedcomRecord(0, '@I2@', 'INDI', 'INDI', undefined, [
+        new GedcomRecord(1, undefined, 'SEX', 'INDI.SEX', 'F'),
+      ])
+    )
     expect(gedcomDatabase.individual('@I2@').sex).toEqual('Female')
+  })
+
+  it('UnspecifiedSex', () => {
+    gedcomParser.parse(
+      new GedcomRecord(0, '@I3@', 'INDI', 'INDI', undefined, []),
+    )
     expect(gedcomDatabase.individual('@I3@').sex).toEqual(undefined)
   })
 
   it('Family Search Id', async () => {
-    await gedcomParser.parseText([
-      '0 @I1@ INDI',
-      '1 _FSFTID family_search_id'
-    ].join('\r\n'))
+    gedcomParser.parse(
+      new GedcomRecord(0, '@I4@', 'INDI', 'INDI', undefined, [
+        new GedcomRecord(1, undefined, '_FSFTID', 'INDI._FSFTID', 'family_search_id'),
+      ])
+    )
     expect(gedcomDatabase.individuals.size).toEqual(1)
-    expect(gedcomDatabase.individual('@I1@').familySearchId).toEqual('family_search_id')
+    expect(gedcomDatabase.individual('@I4@').familySearchId).toEqual('family_search_id')
   })
 })

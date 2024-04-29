@@ -1,5 +1,6 @@
 import { GedcomDatabase } from './gedcomDatabase'
 import { GedcomParser } from './gedcomParser'
+import { GedcomRecord } from './gedcomRecord'
 
 describe('GedcomParser', () => {
   let gedcomDatabase: GedcomDatabase
@@ -10,11 +11,9 @@ describe('GedcomParser', () => {
     gedcomParser = new GedcomParser(gedcomDatabase)
   })
 
-  it('parse two individuals', async () => {
-    await gedcomParser.parseText([
-      '0 @I1@ INDI',
-      '0 @I2@ INDI'
-    ].join('\r\n'))
+  it('parse two individuals', () => {
+    gedcomParser.parse(new GedcomRecord(0, '@I1@', 'INDI', 'INDI', undefined))
+    gedcomParser.parse(new GedcomRecord(0, '@I2@', 'INDI', 'INDI', undefined))
     expect(gedcomDatabase.individuals.size).toEqual(2)
   })
 })
