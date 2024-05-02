@@ -1,7 +1,7 @@
 import { ChunkStreamByRecord } from "./chunkStreamByRecord";
 import { GedcomRecord } from "./gedcomRecord";
 
-class FromArray extends ReadableStream<string> {
+class ReadableStreamFromArray extends ReadableStream<string> {
     constructor(array: Array<string>) {
         super({
             start: (controller) => {
@@ -12,7 +12,7 @@ class FromArray extends ReadableStream<string> {
     }
 }
 
-class ToArray<T> extends WritableStream<T> {
+class WritableStreamToArray<T> extends WritableStream<T> {
     constructor(array: Array<T>) {
         super({
             write: (line: T) => {
@@ -23,10 +23,10 @@ class ToArray<T> extends WritableStream<T> {
 }
 
 it('HappyPath', () => {
-    let records = new Array<GedcomRecord>
-    new FromArray(['0 @I1@ INDI', '0 @I2@ INDI', '1 SEX M'])
+    const records = new Array<GedcomRecord>
+    new ReadableStreamFromArray(['0 @I1@ INDI', '0 @I2@ INDI', '1 SEX M'])
         .pipeThrough(new ChunkStreamByRecord())
-        .pipeTo(new ToArray(records))
+        .pipeTo(new WritableStreamToArray(records))
         .then(() => {
             expect(records).toEqual([
                 new GedcomRecord(0, "@I1@", "INDI", "INDI", undefined),
@@ -38,10 +38,10 @@ it('HappyPath', () => {
 })
 
 it('ConcAndCont', () => {
-    let records = new Array<GedcomRecord>
-    new FromArray(['0 STR Hello ', '1 CONT How ', '1 CONC are you?'])
+    const records = new Array<GedcomRecord>
+    new ReadableStreamFromArray(['0 STR Hello ', '1 CONT How ', '1 CONC are you?'])
         .pipeThrough(new ChunkStreamByRecord())
-        .pipeTo(new ToArray(records))
+        .pipeTo(new WritableStreamToArray(records))
         .then(() => {
             expect(records).toEqual([
                 new GedcomRecord(0, undefined, "STR", "STR", "Hello \nHow are you?"),

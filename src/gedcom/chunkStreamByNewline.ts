@@ -2,6 +2,7 @@ export class ChunkStreamByNewline extends TransformStream {
   constructor() {
     let incompleteLine = ''
     super({
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       start(controller) {
         incompleteLine = ''
       },

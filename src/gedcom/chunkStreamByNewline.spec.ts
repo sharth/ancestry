@@ -1,6 +1,6 @@
 import { ChunkStreamByNewline } from './chunkStreamByNewline'
 
-class FromArray extends ReadableStream<string> {
+class ReadableStreamFromArray extends ReadableStream<string> {
     constructor(array: Array<string>) {
         super({
             start: (controller) => {
@@ -11,7 +11,7 @@ class FromArray extends ReadableStream<string> {
     }
 }
 
-class ToArray extends WritableStream<string> {
+class WritableStreamToArray extends WritableStream<string> {
     constructor(array: Array<string>) {
         super({
             write: (line: string) => {
@@ -22,10 +22,10 @@ class ToArray extends WritableStream<string> {
 }
 
 it('HappyPath', () => {
-    let lines = new Array<string>
-    new FromArray(["Line 1\n", "Line 2\n", "Line 3\nLine 4", "\nLine ", "5"])
+    const lines = new Array<string>
+    new ReadableStreamFromArray(["Line 1\n", "Line 2\n", "Line 3\nLine 4", "\nLine ", "5"])
         .pipeThrough(new ChunkStreamByNewline())
-        .pipeTo(new ToArray(lines))
+        .pipeTo(new WritableStreamToArray(lines))
         .then(() => {
             expect(lines).toEqual(["Line 1", "Line 2", "Line 3", "Line 4", "Line 5"])
         })

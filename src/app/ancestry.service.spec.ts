@@ -6,8 +6,7 @@ describe('AncestryService', () => {
     ancestryService = new AncestryService()
   })
 
-  it('Empty on reset', () => {
-    ancestryService.reset()
+  it('Empty on init', () => {
     expect(ancestryService.individuals()).toEqual([])
     expect(ancestryService.families()).toEqual([])
     expect(ancestryService.sources()).toEqual([])

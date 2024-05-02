@@ -26,10 +26,9 @@
 </nav>
 
 <main class="container">
-    <ng-container *ngIf="ancestryService.loading(); else loaded">
-        Loading...
-    </ng-container>
-    <ng-template #loaded>
-        <router-outlet></router-outlet>
-    </ng-template>
+    @if (loading()) {
+    Loading...
+    } @else {
+    <router-outlet></router-outlet>
+    }
 </main>

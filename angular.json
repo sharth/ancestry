@@ -17,7 +17,6 @@
                         "index": "src/index.html",
                         "browser": "src/main.ts",
                         "polyfills": [
-                            "web-streams-polyfill/polyfill",
                             "zone.js"
                         ],
                         "tsConfig": "tsconfig.app.json",
@@ -84,7 +83,6 @@
                     "builder": "@angular-devkit/build-angular:jest",
                     "options": {
                         "polyfills": [
-                            "web-streams-polyfill/polyfill",
                             "zone.js",
                             "zone.js/testing"
                         ],
