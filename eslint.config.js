@@ -1,5 +1,4 @@
 import globals from "globals";
-import google from 'eslint-config-google';
 import javascript from "@eslint/js";
 import typescript from "typescript-eslint";
 
