@@ -22,7 +22,7 @@
     "@angular/platform-browser-dynamic": "^17.3.8",
     "@angular/router": "^17.3.8",
     "@fontsource/material-icons": "^5.0.18",
-    "@fontsource/roboto": "^5.0.12",
+    "@fontsource/roboto": "^5.0.13",
     "@popperjs/core": "^2.11.8",
     "bootstrap": "^5.3.3",
     "web-streams-polyfill": "^4.0.0"
@@ -33,7 +33,7 @@
     "@angular/compiler-cli": "^17.3.8",
     "@eslint/js": "^9.2.0",
     "@types/jasmine": "^5.1.4",
-    "@web/test-runner": "^0.18.1",
+    "@web/test-runner": "^0.18.2",
     "@web/test-runner-playwright": "^0.11.0",
     "eslint": "^8.57.0",
     "eslint-config-google": "^0.14.0",
@@ -47,8 +47,8 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "ng-packagr": "^17.3.0",
-    "playwright": "^1.43.1",
+    "playwright": "^1.44.0",
     "typescript": "^5.4.5",
-    "typescript-eslint": "^7.8.0"
+    "typescript-eslint": "^7.9.0"
   }
 }
