@@ -83,6 +83,7 @@
                     "builder": "@angular-devkit/build-angular:jest",
                     "options": {
                         "polyfills": [
+                            "core-js",
                             "zone.js",
                             "zone.js/testing"
                         ],
