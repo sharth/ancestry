@@ -16,11 +16,11 @@
     "@angular/common": "^17.3.8",
     "@angular/compiler": "^17.3.8",
     "@angular/core": "^17.3.8",
-    "@angular/forms": "^17.3.9",
-    "@angular/material": "^17.3.9",
+    "@angular/forms": "^17.3.10",
+    "@angular/material": "^17.3.10",
     "@angular/platform-browser": "^17.3.8",
-    "@angular/platform-browser-dynamic": "^17.3.9",
-    "@angular/router": "^17.3.9",
+    "@angular/platform-browser-dynamic": "^17.3.10",
+    "@angular/router": "^17.3.10",
     "@fontsource/material-icons": "^5.0.18",
     "@fontsource/roboto": "^5.0.13",
     "@popperjs/core": "^2.11.8",
@@ -28,9 +28,9 @@
     "core-js": "^3.37.1"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^17.3.7",
-    "@angular/cli": "^17.3.7",
-    "@angular/compiler-cli": "^17.3.9",
+    "@angular-devkit/build-angular": "^17.3.8",
+    "@angular/cli": "^17.3.8",
+    "@angular/compiler-cli": "^17.3.10",
     "@eslint/js": "^9.3.0",
     "@types/jest": "^29.5.12",
     "@web/test-runner": "^0.18.2",
@@ -43,6 +43,6 @@
     "ng-packagr": "^17.3.0",
     "playwright": "^1.44.1",
     "typescript": "^5.4.5",
-    "typescript-eslint": "^7.10.0"
+    "typescript-eslint": "^7.11.0"
   }
 }
