@@ -16,9 +16,7 @@
                         "outputPath": "dist/angular",
                         "index": "src/index.html",
                         "browser": "src/main.ts",
-                        "polyfills": [
-                            "zone.js"
-                        ],
+                        "polyfills": [],
                         "tsConfig": "tsconfig.app.json",
                         "assets": [
                             "src/favicon.ico",
@@ -83,9 +81,7 @@
                     "builder": "@angular-devkit/build-angular:jest",
                     "options": {
                         "polyfills": [
-                            "core-js",
-                            "zone.js",
-                            "zone.js/testing"
+                            "core-js"
                         ],
                         "tsConfig": "tsconfig.spec.json"
                     }

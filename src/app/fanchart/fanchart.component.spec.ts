@@ -1,5 +1,6 @@
 import { type ComponentFixture, TestBed } from '@angular/core/testing'
 import { FanchartComponent } from './fanchart.component'
+import { provideExperimentalZonelessChangeDetection } from '@angular/core'
 
 describe('FanchartComponent', () => {
   let component: FanchartComponent
@@ -7,9 +8,8 @@ describe('FanchartComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [FanchartComponent]
-    })
-      .compileComponents()
+      providers: [provideExperimentalZonelessChangeDetection()]
+    }).compileComponents()
 
     fixture = TestBed.createComponent(FanchartComponent)
     component = fixture.componentInstance

@@ -1,6 +1,7 @@
 import { type ComponentFixture, TestBed } from '@angular/core/testing'
 import { SourceDetailComponent } from './source-detail.component'
 import { AncestryService } from '../ancestry.service'
+import { provideExperimentalZonelessChangeDetection } from '@angular/core'
 
 describe('SourceDetailComponent', () => {
   let component: SourceDetailComponent
@@ -8,6 +9,10 @@ describe('SourceDetailComponent', () => {
   let ancestryService: AncestryService
 
   beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      providers: [provideExperimentalZonelessChangeDetection()]
+    }).compileComponents()
+
     ancestryService = TestBed.inject(AncestryService)
     ancestryService.database().source('@S1@')
 

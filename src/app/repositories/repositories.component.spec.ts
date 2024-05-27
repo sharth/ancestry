@@ -1,5 +1,6 @@
 import { type ComponentFixture, TestBed } from '@angular/core/testing'
 import { RepositoriesComponent } from './repositories.component'
+import { provideExperimentalZonelessChangeDetection } from '@angular/core'
 
 describe('RepositoriesComponent', () => {
   let component: RepositoriesComponent
@@ -7,9 +8,8 @@ describe('RepositoriesComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RepositoriesComponent]
-    })
-      .compileComponents()
+      providers: [provideExperimentalZonelessChangeDetection()]
+    }).compileComponents()
 
     fixture = TestBed.createComponent(RepositoriesComponent)
     component = fixture.componentInstance

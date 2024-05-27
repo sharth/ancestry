@@ -2,6 +2,7 @@ import { type ComponentFixture, TestBed } from '@angular/core/testing'
 import { IndividualComponent } from './individual.component'
 import { AncestryService } from '../ancestry.service'
 import { provideRouter } from '@angular/router'
+import { provideExperimentalZonelessChangeDetection } from '@angular/core'
 
 describe('IndividualComponent', () => {
   let component: IndividualComponent
@@ -11,7 +12,10 @@ describe('IndividualComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [IndividualComponent],
-      providers: [provideRouter([])]
+      providers: [
+        provideRouter([]),
+        provideExperimentalZonelessChangeDetection()
+      ]
     }).compileComponents()
 
     ancestryService = TestBed.inject(AncestryService)

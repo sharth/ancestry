@@ -1,6 +1,6 @@
 import { type ComponentFixture, TestBed } from '@angular/core/testing'
-
 import { IndexComponent } from './index.component'
+import { provideExperimentalZonelessChangeDetection } from '@angular/core'
 
 describe('IndexComponent', () => {
   let component: IndexComponent
@@ -8,9 +8,8 @@ describe('IndexComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [IndexComponent]
-    })
-      .compileComponents()
+      providers: [provideExperimentalZonelessChangeDetection()]
+    }).compileComponents()
 
     fixture = TestBed.createComponent(IndexComponent)
     component = fixture.componentInstance
