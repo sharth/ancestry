@@ -9,6 +9,7 @@ updates:
         patterns:
           - "@angular/*"
           - "@angular-devkit/build-angular"
+          - "ng-packagr"
       fonts:
         patterns:
           - "@fontsource/*"
