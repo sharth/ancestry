@@ -1,10 +1,15 @@
-import globals from "globals";
-import javascript from "@eslint/js";
-import typescript from "typescript-eslint";
+import eslint from "@eslint/js";
+import tseslint from "typescript-eslint";
+import google from "eslint-config-google";
 
-
-export default [
-  { languageOptions: { globals: globals.browser } },
-  javascript.configs.recommended,
-  ...typescript.configs.recommended,
-];
+export default tseslint.config(
+  eslint.configs.recommended,
+  ...tseslint.configs.recommended,
+  google,
+  {
+    rules: {
+      "require-jsdoc": "off",
+      "max-len": ["error", { "code": 120 }]
+    }
+  }
+);

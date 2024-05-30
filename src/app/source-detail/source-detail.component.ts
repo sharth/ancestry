@@ -1,35 +1,35 @@
-import { Component, computed, inject, input } from '@angular/core'
-import { AncestryService } from '../ancestry.service'
-import { RouterModule } from '@angular/router'
-import { CommonModule } from '@angular/common'
-import { GedcomCitation } from '../../gedcom/gedcomCitation'
-import { GedcomEvent } from '../../gedcom/gedcomEvent'
-import { GedcomIndividual } from '../../gedcom/gedcomIndividual'
+import {Component, computed, inject, input} from '@angular/core';
+import {AncestryService} from '../ancestry.service';
+import {RouterModule} from '@angular/router';
+import {CommonModule} from '@angular/common';
+import {GedcomCitation} from '../../gedcom/gedcomCitation';
+import {GedcomEvent} from '../../gedcom/gedcomEvent';
+import {GedcomIndividual} from '../../gedcom/gedcomIndividual';
 
 @Component({
   selector: 'app-source-detail',
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './source-detail.component.html',
-  styleUrl: './source-detail.component.css'
+  styleUrl: './source-detail.component.css',
 })
 export class SourceDetailComponent {
-  ancestryService = inject(AncestryService)
-  xref = input.required<string>()
-  source = computed(() => this.ancestryService.source(this.xref()))
+  ancestryService = inject(AncestryService);
+  xref = input.required<string>();
+  source = computed(() => this.ancestryService.source(this.xref()));
 
   citations(): { individual: GedcomIndividual; event: GedcomEvent; citation: GedcomCitation; }[] {
-    const arr = []
+    const arr = [];
     for (const individual of this.ancestryService.individuals()) {
       for (const event of individual.events) {
         for (const citation of event.citations) {
           if (citation.source == this.source()) {
-            arr.push({ individual: individual, event: event, citation: citation })
+            arr.push({individual: individual, event: event, citation: citation});
           }
         }
       }
     }
-    return arr
+    return arr;
   }
 }
 

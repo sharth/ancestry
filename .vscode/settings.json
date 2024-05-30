@@ -1,6 +1,9 @@
 {
   "editor.formatOnSave": true,
-  "eslint.experimental.useFlatConfig": true,
   "eslint.format.enable": true,
   "eslint.lintTask.enable": true,
+  "eslint.codeActionsOnSave.rules": null,
+  "[typescript]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
 }
