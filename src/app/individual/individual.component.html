@@ -10,7 +10,7 @@
         </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let relative of individual().relatives()">
+        <tr *ngFor="let relative of relatives()">
             <td>{{ relative.relationship }}</td>
             <td><a routerLink="/individual/{{ relative.individual.xref }}">{{ relative.individual.name }}</a></td>
         </tr>
