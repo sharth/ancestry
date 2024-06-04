@@ -43,6 +43,6 @@
     "ng-packagr": "^18.0.0",
     "playwright": "^1.44.1",
     "typescript": "^5.4.5",
-    "typescript-eslint": "^7.11.0"
+    "typescript-eslint": "^7.12.0"
   }
 }
