@@ -61,7 +61,7 @@
 
 <h2>Ancestors</h2>
 <ol>
-    <ng-container *ngFor="let ancestor of individual().ancestors(); index as ahnentafel;">
+    <ng-container *ngFor="let ancestor of ancestors(); index as ahnentafel;">
         <li *ngIf="ancestor" value="{{ahnentafel}}">
             <a routerLink="/individual/{{ancestor.xref}}">{{ancestor.name}}</a>
         </li>

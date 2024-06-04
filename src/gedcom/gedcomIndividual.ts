@@ -19,18 +19,6 @@ export class GedcomIndividual {
     return this.events.filter((gedcomEvent) => gedcomEvent.type === 'Census');
   }
 
-  ancestors(): (GedcomIndividual | undefined)[] {
-    const ancestors: (GedcomIndividual | undefined)[] = [];
-    ancestors[1] = this;
-    for (let i = 1; i < ancestors.length; i += 1) {
-      if (ancestors[i] != null) {
-        ancestors[2 * i + 0] = ancestors[i]?.childOfFamily?.husband;
-        ancestors[2 * i + 1] = ancestors[i]?.childOfFamily?.wife;
-      }
-    }
-    return ancestors;
-  }
-
   relatives(): { relationship: string, individual: GedcomIndividual }[] {
     const relatives = [];
 

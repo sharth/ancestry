@@ -3,6 +3,7 @@ import {AncestryService} from '../ancestry.service';
 import {CommonModule} from '@angular/common';
 import {RouterLink} from '@angular/router';
 import {GedcomEvent} from '../../gedcom/gedcomEvent';
+import {GedcomIndividual} from '../../gedcom/gedcomIndividual';
 
 @Component({
   selector: 'app-individual',
@@ -16,9 +17,21 @@ export class IndividualComponent {
   xref = input.required<string>();
   individual = computed(() => this.ancestryService.individual(this.xref()));
 
+  ancestors = computed<(GedcomIndividual | undefined)[]>(() => {
+    const ancestors: (GedcomIndividual | undefined)[] = [];
+    ancestors[1] = this.individual();
+    for (let i = 1; i < ancestors.length; i += 1) {
+      if (ancestors[i] != null) {
+        ancestors[2 * i + 0] = ancestors[i]?.childOfFamily?.husband;
+        ancestors[2 * i + 1] = ancestors[i]?.childOfFamily?.wife;
+      }
+    }
+    return ancestors;
+  });
+
   censusTable = computed(() => {
     const yearSet = new Set<string>();
-    for (const ancestor of this.individual().ancestors()) {
+    for (const ancestor of this.ancestors()) {
       if (ancestor != null) {
         for (const event of ancestor.censusEvents()) {
           if (event.date != null) {
@@ -33,7 +46,7 @@ export class IndividualComponent {
       dateToColumn.set(date, dateToColumn.size);
     }
     const rows = [];
-    for (const ancestor of this.individual().ancestors()) {
+    for (const ancestor of this.ancestors()) {
       if (ancestor != null) {
         const row = {
           ancestor,
