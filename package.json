@@ -33,7 +33,6 @@
     "@angular/compiler-cli": "^18.0.1",
     "@eslint/js": "^9.4.0",
     "@types/jest": "^29.5.12",
-    "@web/test-runner": "^0.18.2",
     "eslint": "^8.57.0",
     "eslint-config-google": "^0.14.0",
     "globals": "^15.3.0",
