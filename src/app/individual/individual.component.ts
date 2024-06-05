@@ -33,56 +33,60 @@ export class IndividualComponent {
   relatives = computed<{ relationship: string, individual: GedcomIndividual }[]>(() => {
     const relatives = [];
 
-    // Parents and Siblings
     const family = this.individual().childOfFamily;
-    if (family?.husband != null) {
-      relatives.push({relationship: 'Father', individual: family.husband});
-    }
-    if (family?.wife != null) {
-      relatives.push({relationship: 'Mother', individual: family.wife});
-    }
-    if (family?.children != null) {
-      relatives.push(...family.children
-          .filter((sibling) => sibling !== this.individual())
-          .map((sibling) => ({
-            relationship: sibling.sex === 'Male' ? 'Brother' : sibling.sex === 'Female' ? 'Sister' : 'Sibling',
-            individual: sibling,
-          })));
-    }
+    const stepfamilies = (family?.parents() ?? [])
+        .flatMap((parent) => parent.parentOfFamilies)
+        .filter((stepfamily) => stepfamily !== family);
 
-    // Stepparents and Stepsiblings
-    for (const parent of family?.parents() ?? []) {
-      for (const stepfamily of parent.parentOfFamilies) {
-        if (stepfamily !== family) {
-          if ((stepfamily.husband != null) && stepfamily.husband !== family?.husband) {
-            relatives.push({relationship: 'Stepfather', individual: stepfamily.husband});
-          }
-          if ((stepfamily.wife != null) && stepfamily.wife !== family?.wife) {
-            relatives.push({relationship: 'Stepmother', individual: stepfamily.wife});
-          }
-          relatives.push(...stepfamily.children
-              .map((stepsibling) => ({
-                relationship: stepsibling.sex === 'Male' ? 'Stepbrother' : stepsibling.sex === 'Female' ? 'Stepsister' : 'Stepsibling',
-                individual: stepsibling,
-              })));
-        }
-      }
-    }
+    // Parents
+    relatives.push(...(family?.parents() ?? [])
+        .map((parent) => ({
+          relationship: parent.sex === 'Male' ? 'Father' : parent.sex === 'Female' ? 'Mother' : 'Parent',
+          individual: parent,
+        })));
 
-    // Spouse and children
-    for (const family of this.individual().parentOfFamilies) {
-      if (family.husband != null && family.husband !== this.individual()) {
-        relatives.push({relationship: 'Husband', individual: family.husband});
-      }
-      if (family.wife != null && family.wife !== this.individual()) {
-        relatives.push({relationship: 'Wife', individual: family.wife});
-      }
-      relatives.push(...family.children
-          .map((child) => ({
-            relationship: child.sex === 'Male' ? 'Son' : child.sex === 'Female' ? 'Daughter' : 'Child',
-            individual: child,
-          })));
-    }
+    // Siblings
+    relatives.push(...(family?.children ?? [])
+        .filter((sibling) => sibling !== this.individual())
+        .map((sibling) => ({
+          relationship: sibling.sex === 'Male' ? 'Brother' : sibling.sex === 'Female' ? 'Sister' : 'Sibling',
+          individual: sibling,
+        })));
+
+    // Stepparents
+    relatives.push(...stepfamilies
+        .flatMap((stepfamily) => stepfamily.parents())
+        .filter((stepparent) => stepparent !== family?.husband)
+        .filter((stepparent) => stepparent !== family?.wife)
+        .map((stepparent) => ({
+          relationship: stepparent.sex === 'Male' ? 'Stepfather' : stepparent.sex === 'Female' ? 'Stepmother' : 'Stepparent',
+          individual: stepparent,
+        })));
+
+    // Stepsiblings
+    relatives.push(...stepfamilies
+        .flatMap((stepfamily) => stepfamily.children)
+        .map((stepsibling) => ({
+          relationship: stepsibling.sex === 'Male' ? 'Stepbrother' : stepsibling.sex === 'Female' ? 'Stepsister' : 'Stepsibling',
+          individual: stepsibling,
+        })));
+
+    // Spouses
+    relatives.push(...this.individual().parentOfFamilies
+        .flatMap((family) => family.parents())
+        .filter((parent) => parent !== this.individual())
+        .map((spouse) =>({
+          relationship: spouse.sex === 'Male' ? 'Husband' : spouse.sex === 'Female' ? 'Wife' : 'Spouse',
+          individual: spouse,
+        })));
+
+    // Children
+    relatives.push(...this.individual().parentOfFamilies
+        .flatMap((family) => family.children)
+        .map((child) => ({
+          relationship: child.sex === 'Male' ? 'Son' : child.sex === 'Female' ? 'Daughter' : 'Child',
+          individual: child,
+        })));
 
     return relatives;
   });
