@@ -80,9 +80,7 @@
                 "test": {
                     "builder": "@angular-devkit/build-angular:jest",
                     "options": {
-                        "polyfills": [
-                            "core-js"
-                        ],
+                        "polyfills": [],
                         "tsConfig": "tsconfig.spec.json"
                     }
                 }
