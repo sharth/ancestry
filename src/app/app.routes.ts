@@ -7,9 +7,11 @@ import {SourceDetailComponent} from './source-detail/source-detail.component';
 import {RepositoriesComponent} from './repositories/repositories.component';
 import {RepositoryComponent} from './repository/repository.component';
 import {SourceEditorComponent} from './source-editor/source-editor.component';
+import {GedcomComponent} from './gedcom/gedcom.component';
 
 export const routes: Routes = [
   {path: '', component: IndexComponent},
+  {path: 'gedcom', component: GedcomComponent},
   {path: 'individuals', component: IndividualsComponent},
   {path: 'individual/:xref', component: IndividualComponent},
   {path: 'repositories', component: RepositoriesComponent},

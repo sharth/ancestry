@@ -1,6 +1,7 @@
 import {GedcomFamily} from './gedcomFamily';
 import {GedcomHeader} from './gedcomHeader';
 import {GedcomIndividual} from './gedcomIndividual';
+import {GedcomRecord} from './gedcomRecord';
 import {GedcomRepository} from './gedcomRepository';
 import {GedcomSource} from './gedcomSource';
 
@@ -44,5 +45,33 @@ export class GedcomDatabase {
     let source = this.sources.get(xref);
     if (source == null) this.sources.set(xref, source = new GedcomSource(xref));
     return source;
+  }
+
+  gedcomRecords(): GedcomRecord[] {
+    const gedcom = [];
+    if (this.header) {
+      gedcom.push(this.header.record);
+    }
+    for (const individual of this.individuals.values()) {
+      if (individual.gedcomRecord) {
+        gedcom.push(individual.gedcomRecord);
+      }
+    }
+    for (const family of this.families.values()) {
+      if (family.gedcomRecord) {
+        gedcom.push(family.gedcomRecord);
+      }
+    }
+    for (const source of this.sources.values()) {
+      if (source.gedcomRecord) {
+        gedcom.push(source.gedcomRecord);
+      }
+    }
+    for (const repository of this.repositories.values()) {
+      if (repository.gedcomRecord) {
+        gedcom.push(repository.gedcomRecord);
+      }
+    }
+    return gedcom;
   }
 };
