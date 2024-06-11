@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { GedcomComponent } from './gedcom.component';
+import {GedcomComponent} from './gedcom.component';
 
 describe('GedcomComponent', () => {
   let component: GedcomComponent;
@@ -8,9 +8,8 @@ describe('GedcomComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [GedcomComponent]
-    })
-    .compileComponents();
+      imports: [GedcomComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(GedcomComponent);
     component = fixture.componentInstance;
