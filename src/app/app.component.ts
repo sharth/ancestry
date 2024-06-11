@@ -6,7 +6,7 @@ import {ChunkStreamByNewline} from '../gedcom/chunkStreamByNewline';
 import {ChunkStreamByRecord} from '../gedcom/chunkStreamByRecord';
 import {GedcomDatabase} from '../gedcom/gedcomDatabase';
 import {GedcomParser} from '../gedcom/gedcomParser';
-import {GedcomRecord} from '../gedcom/gedcomRecord';
+import type {GedcomRecord} from '../gedcom/gedcomRecord';
 
 @Component({
   selector: 'app-root',

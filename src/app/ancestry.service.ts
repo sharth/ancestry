@@ -1,9 +1,9 @@
-import {computed, signal, Injectable} from '@angular/core';
+import {Injectable, computed, signal} from '@angular/core';
 import {GedcomDatabase} from '../gedcom/gedcomDatabase';
-import {GedcomFamily} from '../gedcom/gedcomFamily';
-import {GedcomIndividual} from '../gedcom/gedcomIndividual';
-import {GedcomRepository} from '../gedcom/gedcomRepository';
-import {GedcomSource} from '../gedcom/gedcomSource';
+import type {GedcomFamily} from '../gedcom/gedcomFamily';
+import type {GedcomIndividual} from '../gedcom/gedcomIndividual';
+import type {GedcomRepository} from '../gedcom/gedcomRepository';
+import type {GedcomSource} from '../gedcom/gedcomSource';
 
 @Injectable({providedIn: 'root'})
 export class AncestryService {

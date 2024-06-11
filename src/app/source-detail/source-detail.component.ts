@@ -2,9 +2,9 @@ import {Component, computed, inject, input} from '@angular/core';
 import {AncestryService} from '../ancestry.service';
 import {RouterModule} from '@angular/router';
 import {CommonModule} from '@angular/common';
-import {GedcomCitation} from '../../gedcom/gedcomCitation';
-import {GedcomEvent} from '../../gedcom/gedcomEvent';
-import {GedcomIndividual} from '../../gedcom/gedcomIndividual';
+import type {GedcomCitation} from '../../gedcom/gedcomCitation';
+import type {GedcomEvent} from '../../gedcom/gedcomEvent';
+import type {GedcomIndividual} from '../../gedcom/gedcomIndividual';
 
 @Component({
   selector: 'app-source-detail',

@@ -1,7 +1,7 @@
 import {GedcomFamily} from './gedcomFamily';
-import {GedcomHeader} from './gedcomHeader';
+import type {GedcomHeader} from './gedcomHeader';
 import {GedcomIndividual} from './gedcomIndividual';
-import {GedcomRecord} from './gedcomRecord';
+import type {GedcomRecord} from './gedcomRecord';
 import {GedcomRepository} from './gedcomRepository';
 import {GedcomSource} from './gedcomSource';
 

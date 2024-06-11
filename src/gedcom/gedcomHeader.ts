@@ -1,4 +1,4 @@
-import {type GedcomRecord} from './gedcomRecord';
+import type {GedcomRecord} from './gedcomRecord';
 
 export class GedcomHeader {
   constructor(public record: GedcomRecord) { }

@@ -1,5 +1,5 @@
-import {type GedcomRecord} from './gedcomRecord';
-import {type GedcomSource} from './gedcomSource';
+import type {GedcomRecord} from './gedcomRecord';
+import type {GedcomSource} from './gedcomSource';
 
 export class GedcomRepository {
   constructor(

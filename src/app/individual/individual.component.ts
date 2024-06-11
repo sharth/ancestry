@@ -2,9 +2,8 @@ import {Component, computed, inject, input} from '@angular/core';
 import {AncestryService} from '../ancestry.service';
 import {CommonModule} from '@angular/common';
 import {RouterLink} from '@angular/router';
-import {GedcomEvent} from '../../gedcom/gedcomEvent';
-import {GedcomIndividual} from '../../gedcom/gedcomIndividual';
-import {GedcomFamily} from '../../gedcom/gedcomFamily';
+import type {GedcomEvent} from '../../gedcom/gedcomEvent';
+import type {GedcomIndividual} from '../../gedcom/gedcomIndividual';
 
 @Component({
   selector: 'app-individual',

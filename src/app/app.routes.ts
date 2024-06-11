@@ -1,4 +1,4 @@
-import {type Routes} from '@angular/router';
+import type {Routes} from '@angular/router';
 import {IndexComponent} from './index/index.component';
 import {IndividualComponent} from './individual/individual.component';
 import {IndividualsComponent} from './individuals/individuals.component';

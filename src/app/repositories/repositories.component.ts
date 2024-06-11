@@ -1,6 +1,6 @@
 import {Component, inject} from '@angular/core';
 import {AncestryService} from '../ancestry.service';
-import {type GedcomRepository} from '../../gedcom/gedcomRepository';
+import type {GedcomRepository} from '../../gedcom/gedcomRepository';
 import {CommonModule} from '@angular/common';
 import {RouterLink} from '@angular/router';
 

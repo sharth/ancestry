@@ -1,6 +1,6 @@
-import {type GedcomEvent} from './gedcomEvent';
-import {type GedcomIndividual} from './gedcomIndividual';
-import {type GedcomRecord} from './gedcomRecord';
+import type {GedcomEvent} from './gedcomEvent';
+import type {GedcomIndividual} from './gedcomIndividual';
+import type {GedcomRecord} from './gedcomRecord';
 
 export class GedcomFamily {
   constructor(public xref: string) { }

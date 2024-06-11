@@ -1,11 +1,11 @@
-import {type GedcomRecord} from './gedcomRecord';
+import type {GedcomRecord} from './gedcomRecord';
 import {GedcomEvent} from './gedcomEvent';
-import {type GedcomFamily} from './gedcomFamily';
-import {type GedcomDatabase} from './gedcomDatabase';
+import type {GedcomFamily} from './gedcomFamily';
+import type {GedcomDatabase} from './gedcomDatabase';
 import {GedcomCitation} from './gedcomCitation';
-import {type GedcomIndividual} from './gedcomIndividual';
-import {type GedcomSource} from './gedcomSource';
-import {type GedcomRepository} from './gedcomRepository';
+import type {GedcomIndividual} from './gedcomIndividual';
+import type {GedcomSource} from './gedcomSource';
+import type {GedcomRepository} from './gedcomRepository';
 import {GedcomHeader} from './gedcomHeader';
 
 export class GedcomParser {

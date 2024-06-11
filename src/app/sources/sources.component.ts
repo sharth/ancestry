@@ -2,7 +2,7 @@ import {Component, inject} from '@angular/core';
 import {AncestryService} from '../ancestry.service';
 import {CommonModule} from '@angular/common';
 import {RouterLink} from '@angular/router';
-import {GedcomSource} from '../../gedcom/gedcomSource';
+import type {GedcomSource} from '../../gedcom/gedcomSource';
 
 @Component({
   selector: 'app-sources',

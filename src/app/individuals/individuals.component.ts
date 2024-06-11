@@ -2,7 +2,7 @@ import {Component, inject} from '@angular/core';
 import {CommonModule, KeyValuePipe} from '@angular/common';
 import {RouterLink} from '@angular/router';
 import {AncestryService} from '../ancestry.service';
-import {type GedcomIndividual} from '../../gedcom/gedcomIndividual';
+import type {GedcomIndividual} from '../../gedcom/gedcomIndividual';
 
 @Component({
   selector: 'app-individuals',
