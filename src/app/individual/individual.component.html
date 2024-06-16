@@ -47,7 +47,7 @@
             </td>
             <td>
                 <ng-container *ngFor="let citation of event.citations; let last = last">
-                    <a routerLink="/source/{{citation.source.xref}}">{{ citation.source.xref }}</a>
+                    <a routerLink="/source/{{citation.sourceXref}}">{{ citation.sourceXref }}</a>
                     {{ ' ' }}
                 </ng-container>
             </td>

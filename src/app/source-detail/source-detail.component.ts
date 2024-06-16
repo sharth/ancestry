@@ -18,19 +18,19 @@ export class SourceDetailComponent {
   xref = input.required<string>();
   source = computed(() => this.ancestryService.source(this.xref()));
 
-  citations(): { individual: GedcomIndividual; event: GedcomEvent; citation: GedcomCitation; }[] {
+  citations = computed<{ individual: GedcomIndividual; event: GedcomEvent; citation: GedcomCitation; }[]>(() => {
     const arr = [];
     for (const individual of this.ancestryService.individuals()) {
       for (const event of individual.events) {
         for (const citation of event.citations) {
-          if (citation.source == this.source()) {
+          if (citation.sourceXref == this.xref()) {
             arr.push({individual: individual, event: event, citation: citation});
           }
         }
       }
     }
     return arr;
-  }
+  });
 }
 
 // individualsBySurname(): Map<string | undefined, GedcomIndividual[]> {

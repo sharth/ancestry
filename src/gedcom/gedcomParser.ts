@@ -426,8 +426,8 @@ export class GedcomParser {
     if (gedcomRecord.xref != null) throw new Error();
     if (gedcomRecord.value == null) throw new Error();
 
-    const gedcomSource = this.gedcomDatabase.source(gedcomRecord.value);
-    const gedcomCitation = new GedcomCitation(gedcomSource);
+    const gedcomSourceXref = gedcomRecord.value;
+    const gedcomCitation = new GedcomCitation(gedcomSourceXref);
     gedcomEvent.citations.push(gedcomCitation);
 
     for (const childRecord of gedcomRecord.children) {
