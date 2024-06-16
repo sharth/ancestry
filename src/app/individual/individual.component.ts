@@ -22,8 +22,10 @@ export class IndividualComponent {
     ancestors[1] = this.individual();
     for (let i = 1; i < ancestors.length; i += 1) {
       if (ancestors[i] != null) {
-        ancestors[2 * i + 0] = ancestors[i]?.childOfFamily?.husband;
-        ancestors[2 * i + 1] = ancestors[i]?.childOfFamily?.wife;
+        const familyXref = ancestors[i]?.childOfFamilyXref;
+        const family = familyXref ? this.ancestryService.family(familyXref) : undefined;
+        ancestors[2 * i + 0] = family?.husband;
+        ancestors[2 * i + 1] = family?.wife;
       }
     }
     return ancestors;
@@ -32,9 +34,11 @@ export class IndividualComponent {
   relatives = computed<{ relationship: string, individual: GedcomIndividual }[]>(() => {
     const relatives = [];
 
-    const family = this.individual().childOfFamily;
+    const familyXref = this.individual().childOfFamilyXref;
+    const family = familyXref ? this.ancestryService.family(familyXref) : undefined;
     const stepfamilies = (family?.parents() ?? [])
-        .flatMap((parent) => parent.parentOfFamilies)
+        .flatMap((parent) => parent.parentOfFamilyXrefs)
+        .map((xref) => this.ancestryService.family(xref))
         .filter((stepfamily) => stepfamily !== family);
 
     // Parents
@@ -71,7 +75,8 @@ export class IndividualComponent {
         })));
 
     // Spouses
-    relatives.push(...this.individual().parentOfFamilies
+    relatives.push(...this.individual().parentOfFamilyXrefs
+        .map((xref) => this.ancestryService.family(xref))
         .flatMap((family) => family.parents())
         .filter((parent) => parent !== this.individual())
         .map((spouse) =>({
@@ -80,7 +85,8 @@ export class IndividualComponent {
         })));
 
     // Children
-    relatives.push(...this.individual().parentOfFamilies
+    relatives.push(...this.individual().parentOfFamilyXrefs
+        .map((familyXref) => this.ancestryService.family(familyXref))
         .flatMap((family) => family.children)
         .map((child) => ({
           relationship: child.sex === 'Male' ? 'Son' : child.sex === 'Female' ? 'Daughter' : 'Child',
