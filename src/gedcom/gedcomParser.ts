@@ -206,7 +206,7 @@ export class GedcomParser {
     if (gedcomRecord.value == null) throw new Error();
 
     const individual = this.gedcomDatabase.individual(gedcomRecord.value);
-    individual.childOfFamily = gedcomFamily;
+    individual.childOfFamilyXref = gedcomFamily.xref;
     gedcomFamily.children.push(individual);
 
     for (const childRecord of gedcomRecord.children) {
@@ -222,7 +222,7 @@ export class GedcomParser {
     if (gedcomRecord.value == null) throw new Error();
 
     const individual = this.gedcomDatabase.individual(gedcomRecord.value);
-    individual.parentOfFamilies.push(gedcomFamily);
+    individual.parentOfFamilyXrefs.push(gedcomFamily.xref);
     gedcomFamily.husband = individual;
 
     for (const childRecord of gedcomRecord.children) {
@@ -238,7 +238,7 @@ export class GedcomParser {
     if (gedcomRecord.value == null) throw new Error();
 
     const individual = this.gedcomDatabase.individual(gedcomRecord.value);
-    individual.parentOfFamilies.push(gedcomFamily);
+    individual.parentOfFamilyXrefs.push(gedcomFamily.xref);
     gedcomFamily.wife = individual;
 
     for (const childRecord of gedcomRecord.children) {

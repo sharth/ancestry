@@ -3,16 +3,15 @@ import type {GedcomFamily} from './gedcomFamily';
 import type {GedcomRecord} from './gedcomRecord';
 
 export class GedcomIndividual {
-  constructor(
-    public xref: string) { }
+  constructor(public xref: string) { }
 
   events: GedcomEvent[] = [];
   name?: string;
   surname?: string;
   sex?: ('Male' | 'Female');
   familySearchId?: string;
-  childOfFamily?: GedcomFamily;
-  parentOfFamilies: GedcomFamily[] = [];
+  childOfFamilyXref?: string;
+  parentOfFamilyXrefs: string[] = [];
   gedcomRecord?: GedcomRecord;
 
   censusEvents(): GedcomEvent[] {
