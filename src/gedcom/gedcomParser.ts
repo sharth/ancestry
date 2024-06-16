@@ -207,7 +207,7 @@ export class GedcomParser {
 
     const individual = this.gedcomDatabase.individual(gedcomRecord.value);
     individual.childOfFamilyXref = gedcomFamily.xref;
-    gedcomFamily.children.push(individual);
+    gedcomFamily.childXrefs.push(individual.xref);
 
     for (const childRecord of gedcomRecord.children) {
       switch (childRecord.tag) {
@@ -223,7 +223,7 @@ export class GedcomParser {
 
     const individual = this.gedcomDatabase.individual(gedcomRecord.value);
     individual.parentOfFamilyXrefs.push(gedcomFamily.xref);
-    gedcomFamily.husband = individual;
+    gedcomFamily.husbandXref = individual.xref;
 
     for (const childRecord of gedcomRecord.children) {
       switch (childRecord.tag) {
@@ -239,7 +239,7 @@ export class GedcomParser {
 
     const individual = this.gedcomDatabase.individual(gedcomRecord.value);
     individual.parentOfFamilyXrefs.push(gedcomFamily.xref);
-    gedcomFamily.wife = individual;
+    gedcomFamily.wifeXref = individual.xref;
 
     for (const childRecord of gedcomRecord.children) {
       switch (childRecord.tag) {

@@ -5,13 +5,13 @@ import type {GedcomRecord} from './gedcomRecord';
 export class GedcomFamily {
   constructor(public xref: string) { }
 
-  husband?: GedcomIndividual;
-  wife?: GedcomIndividual;
-  children: GedcomIndividual[] = [];
+  husbandXref?: string;
+  wifeXref?: string;
+  childXrefs: string[] = [];
   events: GedcomEvent[] = [];
   gedcomRecord?: GedcomRecord;
 
-  parents(): GedcomIndividual[] {
-    return [this.husband, this.wife].filter((e): e is NonNullable<typeof e> => e != null);
+  parentXrefs(): string[] {
+    return [this.husbandXref, this.wifeXref].filter((e): e is NonNullable<typeof e> => e != null);
   }
 };

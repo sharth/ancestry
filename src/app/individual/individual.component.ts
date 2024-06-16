@@ -24,8 +24,10 @@ export class IndividualComponent {
       if (ancestors[i] != null) {
         const familyXref = ancestors[i]?.childOfFamilyXref;
         const family = familyXref ? this.ancestryService.family(familyXref) : undefined;
-        ancestors[2 * i + 0] = family?.husband;
-        ancestors[2 * i + 1] = family?.wife;
+        const husband = family?.husbandXref ? this.ancestryService.individual(family?.husbandXref) : undefined;
+        const wife = family?.wifeXref ? this.ancestryService.individual(family?.wifeXref) : undefined;
+        ancestors[2 * i + 0] = husband;
+        ancestors[2 * i + 1] = wife;
       }
     }
     return ancestors;
@@ -36,20 +38,23 @@ export class IndividualComponent {
 
     const familyXref = this.individual().childOfFamilyXref;
     const family = familyXref ? this.ancestryService.family(familyXref) : undefined;
-    const stepfamilies = (family?.parents() ?? [])
+    const stepfamilies = (family?.parentXrefs() ?? [])
+        .map((parentXref) => this.ancestryService.individual(parentXref))
         .flatMap((parent) => parent.parentOfFamilyXrefs)
         .map((xref) => this.ancestryService.family(xref))
         .filter((stepfamily) => stepfamily !== family);
 
     // Parents
-    relatives.push(...(family?.parents() ?? [])
+    relatives.push(...(family?.parentXrefs() ?? [])
+        .map((parentXref) => this.ancestryService.individual(parentXref))
         .map((parent) => ({
           relationship: parent.sex === 'Male' ? 'Father' : parent.sex === 'Female' ? 'Mother' : 'Parent',
           individual: parent,
         })));
 
     // Siblings
-    relatives.push(...(family?.children ?? [])
+    relatives.push(...(family?.childXrefs ?? [])
+        .map((childXref) => this.ancestryService.individual(childXref))
         .filter((sibling) => sibling !== this.individual())
         .map((sibling) => ({
           relationship: sibling.sex === 'Male' ? 'Brother' : sibling.sex === 'Female' ? 'Sister' : 'Sibling',
@@ -58,9 +63,10 @@ export class IndividualComponent {
 
     // Stepparents
     relatives.push(...stepfamilies
-        .flatMap((stepfamily) => stepfamily.parents())
-        .filter((stepparent) => stepparent !== family?.husband)
-        .filter((stepparent) => stepparent !== family?.wife)
+        .flatMap((stepfamily) => stepfamily.parentXrefs())
+        .filter((stepparentXref) => stepparentXref != family?.husbandXref)
+        .filter((stepparentXref) => stepparentXref != family?.wifeXref)
+        .map((stepparentXref) => this.ancestryService.individual(stepparentXref))
         .map((stepparent) => ({
           relationship: stepparent.sex === 'Male' ? 'Stepfather' : stepparent.sex === 'Female' ? 'Stepmother' : 'Stepparent',
           individual: stepparent,
@@ -68,7 +74,8 @@ export class IndividualComponent {
 
     // Stepsiblings
     relatives.push(...stepfamilies
-        .flatMap((stepfamily) => stepfamily.children)
+        .flatMap((stepfamily) => stepfamily.childXrefs)
+        .map((childXref) => this.ancestryService.individual(childXref))
         .map((stepsibling) => ({
           relationship: stepsibling.sex === 'Male' ? 'Stepbrother' : stepsibling.sex === 'Female' ? 'Stepsister' : 'Stepsibling',
           individual: stepsibling,
@@ -77,7 +84,8 @@ export class IndividualComponent {
     // Spouses
     relatives.push(...this.individual().parentOfFamilyXrefs
         .map((xref) => this.ancestryService.family(xref))
-        .flatMap((family) => family.parents())
+        .flatMap((family) => family.parentXrefs())
+        .map((parentXref) => (this.ancestryService.individual(parentXref)))
         .filter((parent) => parent !== this.individual())
         .map((spouse) =>({
           relationship: spouse.sex === 'Male' ? 'Husband' : spouse.sex === 'Female' ? 'Wife' : 'Spouse',
@@ -87,7 +95,8 @@ export class IndividualComponent {
     // Children
     relatives.push(...this.individual().parentOfFamilyXrefs
         .map((familyXref) => this.ancestryService.family(familyXref))
-        .flatMap((family) => family.children)
+        .flatMap((family) => family.childXrefs)
+        .map((childXref) => this.ancestryService.individual(childXref))
         .map((child) => ({
           relationship: child.sex === 'Male' ? 'Son' : child.sex === 'Female' ? 'Daughter' : 'Child',
           individual: child,
