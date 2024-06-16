@@ -14,4 +14,6 @@ export class RepositoryComponent {
   ancestryService = inject(AncestryService);
   xref = input.required<string>();
   repository = computed(() => this.ancestryService.repository(this.xref()));
+  sources = computed(() => this.repository().sourceXrefs
+      .map((sourceXref) => this.ancestryService.source(sourceXref)));
 }

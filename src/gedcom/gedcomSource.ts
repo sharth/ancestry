@@ -1,5 +1,4 @@
 import type {GedcomRecord} from './gedcomRecord';
-import type {GedcomRepository} from './gedcomRepository';
 
 export class GedcomSource {
   constructor(
@@ -12,7 +11,7 @@ export class GedcomSource {
   gedcomRecord?: GedcomRecord;
 
   repositories: {
-    repository: GedcomRepository,
+    repositoryXref: string,
     callNumbers: string[],
   }[] = [];
 };

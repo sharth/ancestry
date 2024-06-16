@@ -17,12 +17,14 @@
     <tbody>
         <ng-container *ngFor="let repository of source().repositories">
             <tr *ngFor="let callNumber of repository.callNumbers">
-                <td><a routerLink="/repository/{{repository.repository.xref}}">{{repository.repository.name}}</a></td>
-                <td>{{callNumber}}</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td></td>
+                <td>
+                    <a routerLink="/repository/{{repository.repositoryXref}}">
+                        {{ancestryService.repository(repository.repositoryXref).name}}
+                    </a>
+                </td>
+                <td>
+                    {{callNumber}}
+                </td>
             </tr>
         </ng-container>
     </tbody>

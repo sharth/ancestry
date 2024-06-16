@@ -1,5 +1,4 @@
 import {GedcomFamily} from './gedcomFamily';
-import {GedcomIndividual} from './gedcomIndividual';
 
 describe('GedcomFamily', () => {
   it('parents', () => {

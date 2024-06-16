@@ -1,11 +1,9 @@
 import type {GedcomRecord} from './gedcomRecord';
-import type {GedcomSource} from './gedcomSource';
 
 export class GedcomRepository {
-  constructor(
-    public xref: string) { }
+  constructor(public xref: string) { }
 
   name?: string;
-  sources: GedcomSource[] = [];
+  sourceXrefs: string[] = [];
   gedcomRecord?: GedcomRecord;
 };

@@ -565,9 +565,9 @@ export class GedcomParser {
     if (gedcomRecord.value == null) throw new Error();
 
     const gedcomRepository = this.gedcomDatabase.repository(gedcomRecord.value);
-    gedcomRepository.sources.push(gedcomSource);
+    gedcomRepository.sourceXrefs.push(gedcomSource.xref);
 
-    const gedcomRepositoryCitation = {repository: gedcomRepository, callNumbers: []};
+    const gedcomRepositoryCitation = {repositoryXref: gedcomRepository.xref, callNumbers: []};
     gedcomSource.repositories.push(gedcomRepositoryCitation);
 
     for (const childRecord of gedcomRecord.children) {
@@ -579,7 +579,7 @@ export class GedcomParser {
   }
 
   parseSourceRepositoryCallNumber(
-      gedcomRepositoryCitation: { repository: GedcomRepository, callNumbers: string[] },
+      gedcomRepositoryCitation: { repositoryXref: string, callNumbers: string[] },
       gedcomRecord: GedcomRecord): void {
     if (gedcomRecord.abstag !== 'SOUR.REPO.CALN') throw new Error();
     if (gedcomRecord.xref != null) throw new Error();
