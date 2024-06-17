@@ -10,6 +10,13 @@ updates:
           - "@angular/*"
           - "@angular-devkit/build-angular"
           - "ng-packagr"
+      eslint:
+        patterns:
+          - "@eslint/js"
+          - "eslint"
+          - "eslint-config-google"
+          - "eslint-plugin-markdown"
+          - "typescript-eslint"
       fonts:
         patterns:
           - "@fontsource/*"
