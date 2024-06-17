@@ -13,4 +13,5 @@ export class GedcomEvent {
   dateDescriptive?: string;
   value?: string;
   citations: GedcomCitation[] = [];
+  sharedWithXrefs: string[] = [];
 }

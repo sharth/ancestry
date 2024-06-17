@@ -396,8 +396,7 @@ export class GedcomParser {
     if (gedcomRecord.xref != null) throw new Error();
     if (gedcomRecord.value == null) throw new Error();
 
-    const gedcomIndividualOrFamily = this.gedcomDatabase.individualOrFamily(gedcomRecord.value);
-    gedcomIndividualOrFamily.events.push(gedcomEvent);
+    gedcomEvent.sharedWithXrefs.push(gedcomRecord.value);
 
     for (const childRecord of gedcomRecord.children) {
       switch (childRecord.tag) {
