@@ -14,5 +14,8 @@ export class SourceEditorComponent {
   ancestryService = inject(AncestryService);
   xref = input.required<string>();
   source = computed(() => this.ancestryService.source(this.xref()));
-  repositories = computed(() => [...this.ancestryService.database().repositories.values()]);
+
+  repositories = computed(() => {
+    return [...this.ancestryService.repositories().values()];
+  });
 }

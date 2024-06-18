@@ -20,7 +20,7 @@ export class SourceDetailComponent {
 
   citations = computed<{ individual: GedcomIndividual; event: GedcomEvent; citation: GedcomCitation; }[]>(() => {
     const arr = [];
-    for (const individual of this.ancestryService.individuals()) {
+    for (const individual of this.ancestryService.individuals().values()) {
       for (const event of individual.events) {
         for (const citation of event.citations) {
           if (citation.sourceXref == this.xref()) {

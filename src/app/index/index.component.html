@@ -1,10 +1,10 @@
 <h1>Hello!</h1>
 <ul>
-    <li>{{ ancestryService.database().individuals.size }} Individuals
-    <li>{{ ancestryService.database().families.size }} Families
-    <li>{{ ancestryService.database().sources.size }} Sources
-    <li>{{ ancestryService.database().repositories.size }} Repositories
+    <li>{{ ancestryService.individuals().size }} Individuals
+    <li>{{ ancestryService.families().size }} Families
+    <li>{{ ancestryService.sources().size }} Sources
+    <li>{{ ancestryService.repositories().size }} Repositories
 </ul>
 
 <h2>Header</h2>
-<pre>{{ ancestryService.database().header?.record?.gedcom()?.join("\n") }}</pre>
+<pre>{{ ancestryService.header()?.record?.gedcom()?.join("\n") }}</pre>

@@ -4,7 +4,6 @@ import {RouterLink, RouterOutlet} from '@angular/router';
 import {AncestryService} from './ancestry.service';
 import {ChunkStreamByNewline} from '../gedcom/chunkStreamByNewline';
 import {ChunkStreamByRecord} from '../gedcom/chunkStreamByRecord';
-import {GedcomDatabase} from '../gedcom/gedcomDatabase';
 import {GedcomParser} from '../gedcom/gedcomParser';
 import type {GedcomRecord} from '../gedcom/gedcomRecord';
 
@@ -44,7 +43,7 @@ export class AppComponent {
   }
 
   reset(): void {
-    this.ancestryService.database.set(new GedcomDatabase());
+    this.ancestryService.reset();
   }
 
   async parseSomeText(text: string): Promise<void> {
@@ -79,20 +78,17 @@ export class AppComponent {
         });
 
     // One copy of the stream will be written to the ancestryService.
-    const database = new GedcomDatabase();
-    const parser = new GedcomParser(database);
-    const databasePromise = databaseStream
+    const parser = new GedcomParser(this.ancestryService);
+    const parserPromise = databaseStream
         .pipeThrough(new ChunkStreamByNewline())
         .pipeThrough(new ChunkStreamByRecord())
         .pipeTo(new WritableStream({
           write: (gedcomRecord: GedcomRecord) => {
             parser.parse(gedcomRecord);
           },
-        })).then(() => {
-          this.ancestryService.database.set(database);
-        });
+        }));
 
-    return Promise.all([localStoragePromise, databasePromise]).then(() => {
+    return Promise.all([localStoragePromise, parserPromise]).then(() => {
       this.loading.set(false);
     });
   }

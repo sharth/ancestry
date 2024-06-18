@@ -15,6 +15,6 @@ export class RepositoriesComponent {
   ancestryService = inject(AncestryService);
 
   repositories(): GedcomRepository[] {
-    return Array.from(this.ancestryService.database().repositories.values());
+    return [...this.ancestryService.repositories().values()];
   }
 }

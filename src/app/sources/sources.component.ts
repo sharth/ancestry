@@ -1,4 +1,4 @@
-import {Component, inject} from '@angular/core';
+import {Component, computed, inject} from '@angular/core';
 import {AncestryService} from '../ancestry.service';
 import {CommonModule} from '@angular/common';
 import {RouterLink} from '@angular/router';
@@ -14,9 +14,9 @@ import type {GedcomSource} from '../../gedcom/gedcomSource';
 export class SourcesComponent {
   ancestryService = inject(AncestryService);
 
-  sources(): GedcomSource[] {
-    return this.ancestryService
-        .sources()
-        .toSorted((lhs, rhs) => (lhs.shortTitle ?? '').localeCompare(rhs.shortTitle ?? ''));
-  }
+  readonly sources = computed(() => {
+    const sources: GedcomSource[] = [...this.ancestryService.sources().values()];
+    sources.sort((lhs, rhs) => (lhs.shortTitle ?? '').localeCompare(rhs.shortTitle ?? ''));
+    return sources;
+  });
 }
