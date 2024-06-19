@@ -7,8 +7,11 @@ describe('AncestryService', () => {
   });
 
   it('Empty on init', () => {
-    expect([...ancestryService.individuals().values()]).toEqual([]);
-    expect([...ancestryService.families().values()]).toEqual([]);
-    expect([...ancestryService.sources().values()]).toEqual([]);
+    expect(ancestryService.header()).toEqual(undefined);
+    expect(ancestryService.trailer()).toEqual(undefined);
+    expect(ancestryService.individuals().size).toEqual(0);
+    expect(ancestryService.families().size).toEqual(0);
+    expect(ancestryService.sources().size).toEqual(0);
+    expect(ancestryService.repositories().size).toEqual(0);
   });
 });
