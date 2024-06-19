@@ -30,7 +30,7 @@ export class GedcomParser {
       }
       case 'TRLR': {
         // Only one trailer should be found in the gedcom file.
-        if (this.ancestryService.header() != null) throw new Error();
+        if (this.ancestryService.trailer() != null) throw new Error();
         const gedcomTrailer = parseTrailer(gedcomRecord, reportUnparsedRecord);
         this.ancestryService.trailer.set(gedcomTrailer);
         break;
