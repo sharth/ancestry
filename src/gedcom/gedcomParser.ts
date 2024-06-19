@@ -4,7 +4,7 @@ import {GedcomFamily} from './gedcomFamily';
 import {parseCitation} from './gedcomCitation';
 import {GedcomIndividual} from './gedcomIndividual';
 import {GedcomSource} from './gedcomSource';
-import {GedcomRepository} from './gedcomRepository';
+import {parseRepository} from './gedcomRepository';
 import {GedcomHeader} from './gedcomHeader';
 import type {AncestryService} from '../app/ancestry.service';
 
@@ -25,7 +25,12 @@ export class GedcomParser {
       case 'TRLR': this.parseTrailer(gedcomRecord); break;
       case 'INDI': this.parseIndividual(gedcomRecord); break;
       case 'FAM': this.parseFamily(gedcomRecord); break;
-      case 'REPO': this.parseRepository(gedcomRecord); break;
+      case 'REPO': {
+        const gedcomRepository = parseRepository(gedcomRecord, (record) => this.reportUnparsedRecord(record));
+        this.ancestryService.repositories.update(
+            (repositories) => repositories.set(gedcomRepository.xref, gedcomRepository ));
+        break;
+      }
       case 'SOUR': this.parseSource(gedcomRecord); break;
       default: this.reportUnparsedRecord(gedcomRecord); break;
     }
@@ -47,40 +52,6 @@ export class GedcomParser {
     if (gedcomRecord.xref != null) throw new Error();
     if (gedcomRecord.value != null) throw new Error();
     if (gedcomRecord.children.length != 0) throw new Error();
-  }
-
-  parseRepository(gedcomRecord: GedcomRecord): void {
-    if (gedcomRecord.abstag !== 'REPO') throw new Error();
-    if (gedcomRecord.xref == null) throw new Error();
-    if (gedcomRecord.value != null) throw new Error();
-
-    const xref = gedcomRecord.xref;
-    const gedcomRepository = new GedcomRepository(xref);
-    // const gedcomRepository: GedcomRepository = this.gedcomDatabase.repository(gedcomRecord.xref);
-    gedcomRepository.gedcomRecord = gedcomRecord;
-
-    for (const childRecord of gedcomRecord.children) {
-      switch (childRecord.tag) {
-        case 'NAME': this.parseRepositoryName(gedcomRepository, childRecord); break;
-        default: this.reportUnparsedRecord(childRecord); break;
-      }
-    }
-
-    this.ancestryService.repositories.update((repositories) => repositories.set(xref, gedcomRepository));
-  }
-
-  parseRepositoryName(gedcomRepository: GedcomRepository, gedcomRecord: GedcomRecord): void {
-    if (gedcomRecord.abstag !== 'REPO.NAME') throw new Error();
-    if (gedcomRecord.xref != null) throw new Error();
-    if (gedcomRecord.value == null) throw new Error();
-
-    gedcomRepository.name = gedcomRecord.value;
-
-    for (const childRecord of gedcomRecord.children) {
-      switch (childRecord.tag) {
-        default: this.reportUnparsedRecord(childRecord); break;
-      }
-    }
   }
 
   parseIndividual(gedcomRecord: GedcomRecord): void {
