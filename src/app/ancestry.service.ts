@@ -5,11 +5,13 @@ import type {GedcomRepository} from '../gedcom/gedcomRepository';
 import type {GedcomSource} from '../gedcom/gedcomSource';
 import type {GedcomHeader} from '../gedcom/gedcomHeader';
 import type {GedcomRecord} from '../gedcom/gedcomRecord';
+import type {GedcomTrailer} from '../gedcom/gedcomTrailer';
 import {Map as ImmutableMap} from 'immutable';
 
 @Injectable({providedIn: 'root'})
 export class AncestryService {
   readonly header = signal<GedcomHeader|undefined>(undefined);
+  readonly trailer = signal<GedcomTrailer|undefined>(undefined);
 
   readonly individuals = signal(ImmutableMap<string, GedcomIndividual>({}));
   readonly families = signal(ImmutableMap<string, GedcomFamily>());
@@ -65,6 +67,10 @@ export class AncestryService {
       if (repository.gedcomRecord) {
         gedcom.push(repository.gedcomRecord);
       }
+    }
+    const trailer = this.trailer();
+    if (trailer) {
+      gedcom.push(trailer.record);
     }
     return gedcom;
   });

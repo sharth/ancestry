@@ -1,12 +1,11 @@
 import type {GedcomRecord} from './gedcomRecord';
-import {GedcomEvent, parseEvent} from './gedcomEvent';
-import {GedcomFamily, parseFamily} from './gedcomFamily';
-import {parseCitation} from './gedcomCitation';
-import {GedcomIndividual, parseIndividual} from './gedcomIndividual';
+import {parseFamily} from './gedcomFamily';
+import {parseIndividual} from './gedcomIndividual';
 import {parseSource} from './gedcomSource';
 import {parseRepository} from './gedcomRepository';
 import {parseHeader} from './gedcomHeader';
 import type {AncestryService} from '../app/ancestry.service';
+import {parseTrailer} from './gedcomTrailer';
 
 export class GedcomParser {
   constructor(public readonly ancestryService: AncestryService) { }
@@ -29,7 +28,13 @@ export class GedcomParser {
         this.ancestryService.header.set(gedcomHeader);
         break;
       }
-      case 'TRLR': this.parseTrailer(gedcomRecord); break;
+      case 'TRLR': {
+        // Only one trailer should be found in the gedcom file.
+        if (this.ancestryService.header() != null) throw new Error();
+        const gedcomTrailer = parseTrailer(gedcomRecord, reportUnparsedRecord);
+        this.ancestryService.trailer.set(gedcomTrailer);
+        break;
+      }
       case 'INDI': {
         const gedcomIndividual = parseIndividual(gedcomRecord, this.ancestryService, reportUnparsedRecord);
         this.ancestryService.individuals.update(
@@ -58,12 +63,5 @@ export class GedcomParser {
         this.reportUnparsedRecord(gedcomRecord);
         break;
     }
-  }
-
-  parseTrailer(gedcomRecord: GedcomRecord): void {
-    if (gedcomRecord.abstag !== 'TRLR') throw new Error();
-    if (gedcomRecord.xref != null) throw new Error();
-    if (gedcomRecord.value != null) throw new Error();
-    if (gedcomRecord.children.length != 0) throw new Error();
   }
 };
