@@ -1,7 +1,7 @@
 import type {GedcomRecord} from './gedcomRecord';
 import {GedcomEvent} from './gedcomEvent';
 import {GedcomFamily} from './gedcomFamily';
-import {GedcomCitation} from './gedcomCitation';
+import {parseCitation} from './gedcomCitation';
 import {GedcomIndividual} from './gedcomIndividual';
 import {GedcomSource} from './gedcomSource';
 import {GedcomRepository} from './gedcomRepository';
@@ -155,8 +155,14 @@ export class GedcomParser {
 
     for (const childRecord of gedcomRecord.children) {
       switch (childRecord.tag) {
-        case 'SOUR': this.parseCitation(gedcomEvent, childRecord); break;
-        default: this.reportUnparsedRecord(childRecord); break;
+        case 'SOUR':
+          gedcomEvent.citations.push(parseCitation(
+              childRecord,
+              (record: GedcomRecord) => this.reportUnparsedRecord(record)));
+          break;
+        default:
+          this.reportUnparsedRecord(childRecord);
+          break;
       }
     }
   }
@@ -295,7 +301,11 @@ export class GedcomParser {
     for (const childRecord of gedcomRecord.children) {
       switch (childRecord.tag) {
         case '_SHAR': this.parseEventShare(gedcomEvent, childRecord); break;
-        case 'SOUR': this.parseCitation(gedcomEvent, childRecord); break;
+        case 'SOUR':
+          gedcomEvent.citations.push(parseCitation(
+              childRecord,
+              (record) => this.reportUnparsedRecord(record)));
+          break;
         case 'DATE': this.parseEventDate(gedcomEvent, childRecord); break;
         case 'TYPE': this.parseEventType(gedcomEvent, childRecord); break;
         case 'ADDR': this.parseEventAddress(gedcomEvent, childRecord); break;
@@ -427,62 +437,6 @@ export class GedcomParser {
     for (const childRecord of gedcomRecord.children) {
       switch (childRecord.tag) {
         default: this.reportUnparsedRecord(childRecord); break;
-      }
-    }
-  }
-
-  parseCitation(gedcomEvent: GedcomEvent, gedcomRecord: GedcomRecord): void {
-    if (gedcomRecord.tag !== 'SOUR') throw new Error();
-    if (gedcomRecord.xref != null) throw new Error();
-    if (gedcomRecord.value == null) throw new Error();
-
-    const gedcomSourceXref = gedcomRecord.value;
-    const gedcomCitation = new GedcomCitation(gedcomSourceXref);
-    gedcomEvent.citations.push(gedcomCitation);
-
-    for (const childRecord of gedcomRecord.children) {
-      switch (childRecord.tag) {
-        case '_TMPLT':
-        case '_QUAL':
-        case 'QUAY':
-          break;
-        case 'OBJE':
-          childRecord.children.forEach(this.reportUnparsedRecord.bind(this));
-          gedcomCitation.obje = childRecord.value;
-          break;
-        case 'NAME':
-          childRecord.children.forEach(this.reportUnparsedRecord.bind(this));
-          gedcomCitation.name = childRecord.value;
-          break;
-        case 'NOTE':
-          childRecord.children.forEach(this.reportUnparsedRecord.bind(this));
-          gedcomCitation.note = childRecord.value;
-          break;
-        case 'PAGE':
-          childRecord.children.forEach(this.reportUnparsedRecord.bind(this));
-          gedcomCitation.page = childRecord.value;
-          break;
-        case 'DATA': this.parseCitationData(gedcomCitation, childRecord); break;
-        default: this.reportUnparsedRecord(childRecord); break;
-      }
-    }
-  }
-
-  parseCitationData(gedcomCitation: GedcomCitation, gedcomRecord: GedcomRecord): void {
-    if (gedcomRecord.tag !== 'DATA') throw new Error();
-    if (gedcomRecord.xref != null) throw new Error();
-    if (gedcomRecord.value != null) throw new Error();
-
-    for (const childRecord of gedcomRecord.children) {
-      switch (childRecord.tag) {
-        case 'TEXT':
-          childRecord.children.forEach(this.reportUnparsedRecord.bind(this));
-          gedcomCitation.text ??= '';
-          gedcomCitation.text += childRecord.value;
-          break;
-        default:
-          this.reportUnparsedRecord(childRecord);
-          break;
       }
     }
   }
