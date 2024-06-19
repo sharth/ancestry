@@ -7,8 +7,8 @@ describe('AncestryService', () => {
   });
 
   it('Empty on init', () => {
-    expect(ancestryService.individuals()).toEqual([]);
-    expect(ancestryService.families()).toEqual([]);
-    expect(ancestryService.sources()).toEqual([]);
+    expect([...ancestryService.individuals().values()]).toEqual([]);
+    expect([...ancestryService.families().values()]).toEqual([]);
+    expect([...ancestryService.sources().values()]).toEqual([]);
   });
 });

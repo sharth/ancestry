@@ -3,11 +3,12 @@ import {IndividualComponent} from './individual.component';
 import {AncestryService} from '../ancestry.service';
 import {provideRouter} from '@angular/router';
 import {provideExperimentalZonelessChangeDetection} from '@angular/core';
+import {GedcomRecord} from '../../gedcom/gedcomRecord';
+import {GedcomParser} from '../../gedcom/gedcomParser';
 
 describe('IndividualComponent', () => {
   let component: IndividualComponent;
   let fixture: ComponentFixture<IndividualComponent>;
-  let ancestryService: AncestryService;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -18,8 +19,9 @@ describe('IndividualComponent', () => {
       ],
     }).compileComponents();
 
-    ancestryService = TestBed.inject(AncestryService);
-    ancestryService.database().individual('@I1@');
+    const ancestryService = TestBed.inject(AncestryService);
+    const gedcomParser = new GedcomParser(ancestryService);
+    gedcomParser.parse(new GedcomRecord(0, '@I1@', 'INDI', 'INDI', undefined, []));
 
     fixture = TestBed.createComponent(IndividualComponent);
     fixture.componentRef.setInput('xref', '@I1@');
