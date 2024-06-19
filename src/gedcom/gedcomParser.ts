@@ -88,10 +88,8 @@ export class GedcomParser {
     if (gedcomRecord.xref == null) throw new Error();
     if (gedcomRecord.value != null) throw new Error();
 
-    const gedcomIndividualXref = gedcomRecord.xref;
-    const gedcomIndividual = new GedcomIndividual(gedcomIndividualXref);
-    // const gedcomIndividual: GedcomIndividual = this.gedcomDatabase.individual(gedcomRecord.xref);
-    gedcomIndividual.gedcomRecord = gedcomRecord;
+    const xref = gedcomRecord.xref;
+    const gedcomIndividual = new GedcomIndividual(xref, gedcomRecord, this.ancestryService);
 
     for (const childRecord of gedcomRecord.children) {
       switch (childRecord.tag) {
@@ -124,7 +122,7 @@ export class GedcomParser {
       }
     }
 
-    this.ancestryService.individuals.update((individuals) => individuals.set(gedcomIndividualXref, gedcomIndividual));
+    this.ancestryService.individuals.update((individuals) => individuals.set(xref, gedcomIndividual));
   }
 
   parseIndividualFamilySearchId(gedcomIndividual: GedcomIndividual, gedcomRecord: GedcomRecord): void {
@@ -191,10 +189,8 @@ export class GedcomParser {
     if (gedcomRecord.xref == null) throw new Error();
     if (gedcomRecord.value != null) throw new Error();
 
-    const gedcomFamilyXref = gedcomRecord.xref;
-    const gedcomFamily = new GedcomFamily(gedcomFamilyXref);
-    // const gedcomFamily: GedcomFamily = this.gedcomDatabase.family(gedcomRecord.xref);
-    gedcomFamily.gedcomRecord = gedcomRecord;
+    const xref = gedcomRecord.xref;
+    const gedcomFamily = new GedcomFamily(xref, gedcomRecord, this.ancestryService);
 
     for (const childRecord of gedcomRecord.children) {
       switch (childRecord.tag) {
@@ -209,7 +205,7 @@ export class GedcomParser {
       }
     }
 
-    this.ancestryService.families.update((families) => families.set(gedcomFamilyXref, gedcomFamily));
+    this.ancestryService.families.update((families) => families.set(xref, gedcomFamily));
   }
 
   parseFamilyChild(gedcomFamily: GedcomFamily, gedcomRecord: GedcomRecord): void {
