@@ -77,6 +77,7 @@ export class AncestryService {
 
   reset(): void {
     this.header.set(undefined);
+    this.trailer.set(undefined);
     this.individuals.set(ImmutableMap<string, GedcomIndividual>({}));
     this.families.set(ImmutableMap<string, GedcomFamily>());
     this.sources.set(ImmutableMap<string, GedcomSource>());
