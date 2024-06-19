@@ -1,6 +1,4 @@
 import {parseCitation, type GedcomCitation} from './gedcomCitation';
-import type {GedcomFamily} from './gedcomFamily';
-import type {GedcomIndividual} from './gedcomIndividual';
 import type {GedcomRecord} from './gedcomRecord';
 
 export class GedcomEvent {
@@ -19,9 +17,8 @@ export class GedcomEvent {
 }
 
 export function parseEvent(
-    gedcomIndividualOrFamily: (GedcomIndividual | GedcomFamily),
     gedcomRecord: GedcomRecord,
-    reportUnparsedRecord: (record: GedcomRecord) => void): void {
+    reportUnparsedRecord: (record: GedcomRecord) => void): GedcomEvent {
   if (gedcomRecord.xref != null) throw new Error();
 
   const type = new Map([
@@ -50,8 +47,6 @@ export function parseEvent(
   ]).get(gedcomRecord.tag) ?? gedcomRecord.tag;
 
   const gedcomEvent = new GedcomEvent(type, gedcomRecord);
-  gedcomIndividualOrFamily.events.push(gedcomEvent);
-
   gedcomEvent.value = gedcomRecord.value;
 
   for (const childRecord of gedcomRecord.children) {
@@ -87,6 +82,8 @@ export function parseEvent(
         break;
     }
   }
+
+  return gedcomEvent;
 }
 
 function parseEventAddress(

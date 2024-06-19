@@ -101,7 +101,7 @@ export function parseIndividual(
       case 'WILL':
       case 'DIV':
       case 'SSN':
-        parseEvent(gedcomIndividual, childRecord, reportUnparsedRecord);
+        gedcomIndividual.events.push(parseEvent(childRecord, reportUnparsedRecord));
         break;
       case 'NAME':
         parseIndividualName(gedcomIndividual, childRecord, reportUnparsedRecord);

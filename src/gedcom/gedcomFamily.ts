@@ -64,16 +64,10 @@ export function parseFamily(
         parseFamilyWife(gedcomFamily, childRecord, reportUnparsedRecord);
         break;
       case 'DIV':
-        parseEvent(gedcomFamily, childRecord, reportUnparsedRecord);
-        break;
       case 'EVEN':
-        parseEvent(gedcomFamily, childRecord, reportUnparsedRecord);
-        break;
       case 'MARR':
-        parseEvent(gedcomFamily, childRecord, reportUnparsedRecord);
-        break;
       case 'MARB':
-        parseEvent(gedcomFamily, childRecord, reportUnparsedRecord);
+        gedcomFamily.events.push(parseEvent(childRecord, reportUnparsedRecord));
         break;
       default:
         reportUnparsedRecord(childRecord);
