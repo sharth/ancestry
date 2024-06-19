@@ -1,5 +1,5 @@
 import type {GedcomRecord} from './gedcomRecord';
-import {GedcomEvent} from './gedcomEvent';
+import {GedcomEvent, parseEvent} from './gedcomEvent';
 import {GedcomFamily} from './gedcomFamily';
 import {parseCitation} from './gedcomCitation';
 import {GedcomIndividual} from './gedcomIndividual';
@@ -93,32 +93,42 @@ export class GedcomParser {
 
     for (const childRecord of gedcomRecord.children) {
       switch (childRecord.tag) {
-        case 'BAPM': this.parseEvent(gedcomIndividual, childRecord); break;
-        case 'BIRT': this.parseEvent(gedcomIndividual, childRecord); break;
-        case 'BURI': this.parseEvent(gedcomIndividual, childRecord); break;
-        case 'CENS': this.parseEvent(gedcomIndividual, childRecord); break;
-        case 'DEAT': this.parseEvent(gedcomIndividual, childRecord); break;
-        case 'EDUC': this.parseEvent(gedcomIndividual, childRecord); break;
-        case 'EMIG': this.parseEvent(gedcomIndividual, childRecord); break;
-        case 'EVEN': this.parseEvent(gedcomIndividual, childRecord); break;
-        case 'IMMI': this.parseEvent(gedcomIndividual, childRecord); break;
-        case 'MARB': this.parseEvent(gedcomIndividual, childRecord); break;
-        case 'MARR': this.parseEvent(gedcomIndividual, childRecord); break;
-        case 'NATU': this.parseEvent(gedcomIndividual, childRecord); break;
-        case 'OCCU': this.parseEvent(gedcomIndividual, childRecord); break;
-        case 'PROB': this.parseEvent(gedcomIndividual, childRecord); break;
-        case 'RELI': this.parseEvent(gedcomIndividual, childRecord); break;
-        case 'RESI': this.parseEvent(gedcomIndividual, childRecord); break;
-        case 'RETI': this.parseEvent(gedcomIndividual, childRecord); break;
-        case 'WILL': this.parseEvent(gedcomIndividual, childRecord); break;
-        case 'DIV': this.parseEvent(gedcomIndividual, childRecord); break;
-        case 'SSN': this.parseEvent(gedcomIndividual, childRecord); break;
-        case 'NAME': this.parseIndividualName(gedcomIndividual, childRecord); break;
-        case 'SEX': this.parseIndividualSex(gedcomIndividual, childRecord); break;
+        case 'BAPM':
+        case 'BIRT':
+        case 'BURI':
+        case 'CENS':
+        case 'DEAT':
+        case 'EDUC':
+        case 'EMIG':
+        case 'EVEN':
+        case 'IMMI':
+        case 'MARB':
+        case 'MARR':
+        case 'NATU':
+        case 'OCCU':
+        case 'PROB':
+        case 'RELI':
+        case 'RESI':
+        case 'RETI':
+        case 'WILL':
+        case 'DIV':
+        case 'SSN':
+          parseEvent(gedcomIndividual, childRecord, (record: GedcomRecord) => this.reportUnparsedRecord(record));
+          break;
+        case 'NAME':
+          this.parseIndividualName(gedcomIndividual, childRecord);
+          break;
+        case 'SEX':
+          this.parseIndividualSex(gedcomIndividual, childRecord);
+          break;
         case 'FAMS': break; // Let's just use the links inside the Family record.
         case 'FAMC': break; // Let's just use the links inside the Family record.
-        case '_FSFTID': this.parseIndividualFamilySearchId(gedcomIndividual, childRecord); break;
-        default: this.reportUnparsedRecord(childRecord); break;
+        case '_FSFTID':
+          this.parseIndividualFamilySearchId(gedcomIndividual, childRecord);
+          break;
+        default:
+          this.reportUnparsedRecord(childRecord);
+          break;
       }
     }
 
@@ -203,10 +213,18 @@ export class GedcomParser {
         case 'CHIL': this.parseFamilyChild(gedcomFamily, childRecord); break;
         case 'HUSB': this.parseFamilyHusband(gedcomFamily, childRecord); break;
         case 'WIFE': this.parseFamilyWife(gedcomFamily, childRecord); break;
-        case 'DIV': this.parseEvent(gedcomFamily, childRecord); break;
-        case 'EVEN': this.parseEvent(gedcomFamily, childRecord); break;
-        case 'MARR': this.parseEvent(gedcomFamily, childRecord); break;
-        case 'MARB': this.parseEvent(gedcomFamily, childRecord); break;
+        case 'DIV':
+          parseEvent(gedcomFamily, childRecord, (record: GedcomRecord) => this.reportUnparsedRecord(record));
+          break;
+        case 'EVEN':
+          parseEvent(gedcomFamily, childRecord, (record: GedcomRecord) => this.reportUnparsedRecord(record));
+          break;
+        case 'MARR':
+          parseEvent(gedcomFamily, childRecord, (record: GedcomRecord) => this.reportUnparsedRecord(record));
+          break;
+        case 'MARB':
+          parseEvent(gedcomFamily, childRecord, (record: GedcomRecord) => this.reportUnparsedRecord(record));
+          break;
         default: this.reportUnparsedRecord(childRecord); break;
       }
     }
@@ -257,182 +275,6 @@ export class GedcomParser {
     // const individual = this.gedcomDatabase.individual(gedcomRecord.value);
     // individual.parentOfFamilyXrefs.push(gedcomFamily.xref);
     gedcomFamily.wifeXref = wifeXref;
-
-    for (const childRecord of gedcomRecord.children) {
-      switch (childRecord.tag) {
-        default: this.reportUnparsedRecord(childRecord); break;
-      }
-    }
-  }
-
-  parseEvent(gedcomIndividualOrFamily: (GedcomIndividual | GedcomFamily), gedcomRecord: GedcomRecord): void {
-    if (gedcomRecord.xref != null) throw new Error();
-
-    const type = new Map([
-      ['BAPM', 'Baptism'],
-      ['BIRT', 'Birth'],
-      ['BURI', 'Burial'],
-      ['CENS', 'Census'],
-      ['DEAT', 'Death'],
-      ['DIV', 'Divorce'],
-      ['EDUC', 'Education'],
-      ['EMIG', 'Emigration'],
-      ['EVEN', 'Event'],
-      ['IMMI', 'Immigration'],
-      ['MARB', 'Marriage Banns'],
-      ['MARR', 'Marriage'],
-      ['NAME', 'Name'],
-      ['NATU', 'Naturalization'],
-      ['OCCU', 'Occupation'],
-      ['PROB', 'Probate'],
-      ['RELI', 'Religion'],
-      ['RESI', 'Residence'],
-      ['RETI', 'Retirement'],
-      ['SEX', 'Sex'],
-      ['SSN', 'Social Security Number'],
-      ['WILL', 'Will'],
-    ]).get(gedcomRecord.tag) ?? gedcomRecord.tag;
-
-    const gedcomEvent = new GedcomEvent(type, gedcomRecord);
-    gedcomIndividualOrFamily.events.push(gedcomEvent);
-
-    gedcomEvent.value = gedcomRecord.value;
-
-    for (const childRecord of gedcomRecord.children) {
-      switch (childRecord.tag) {
-        case '_SHAR': this.parseEventShare(gedcomEvent, childRecord); break;
-        case 'SOUR':
-          gedcomEvent.citations.push(parseCitation(
-              childRecord,
-              (record) => this.reportUnparsedRecord(record)));
-          break;
-        case 'DATE': this.parseEventDate(gedcomEvent, childRecord); break;
-        case 'TYPE': this.parseEventType(gedcomEvent, childRecord); break;
-        case 'ADDR': this.parseEventAddress(gedcomEvent, childRecord); break;
-        case 'PLAC': this.parseEventPlace(gedcomEvent, childRecord); break;
-        case 'CAUS': this.parseEventCause(gedcomEvent, childRecord); break;
-        case '_SENT': break;
-        case '_SDATE': break;
-        case '_PRIM': break;
-        case '_PROOF': break;
-        case 'NOTE': break;
-        default: this.reportUnparsedRecord(childRecord); break;
-      }
-    }
-  }
-
-  parseEventAddress(gedcomEvent: GedcomEvent, gedcomRecord: GedcomRecord): void {
-    if (gedcomRecord.tag !== 'ADDR') throw new Error();
-    if (gedcomRecord.xref != null) throw new Error();
-    if (gedcomRecord.value == null) throw new Error();
-
-    gedcomEvent.address = gedcomRecord.value;
-
-    for (const childRecord of gedcomRecord.children) {
-      switch (childRecord.tag) {
-        default:
-          this.reportUnparsedRecord(childRecord);
-          break;
-      }
-    }
-  }
-
-  parseEventPlace(gedcomEvent: GedcomEvent, gedcomRecord: GedcomRecord): void {
-    if (gedcomRecord.tag !== 'PLAC') throw new Error();
-    if (gedcomRecord.xref != null) throw new Error();
-    if (gedcomRecord.value == null) throw new Error();
-
-    gedcomEvent.place = gedcomRecord.value;
-
-    for (const childRecord of gedcomRecord.children) {
-      switch (childRecord.tag) {
-        default:
-          this.reportUnparsedRecord(childRecord);
-          break;
-      }
-    }
-  }
-
-  parseEventCause(gedcomEvent: GedcomEvent, gedcomRecord: GedcomRecord): void {
-    if (gedcomRecord.tag !== 'CAUS') throw new Error();
-    if (gedcomRecord.xref != null) throw new Error();
-    if (gedcomRecord.value == null) throw new Error();
-
-    gedcomEvent.cause = gedcomRecord.value;
-
-    for (const childRecord of gedcomRecord.children) {
-      switch (childRecord.tag) {
-        default:
-          this.reportUnparsedRecord(childRecord);
-          break;
-      }
-    }
-  }
-
-  parseEventDate(gedcomEvent: GedcomEvent, gedcomRecord: GedcomRecord): void {
-    if (gedcomRecord.tag !== 'DATE') throw new Error();
-    if (gedcomRecord.xref != null) throw new Error();
-    if (gedcomRecord.value == null) throw new Error();
-
-    gedcomEvent.date = gedcomRecord.value;
-    gedcomEvent.dateDescriptive = gedcomEvent.date.replaceAll(/\w+/g, (s: string) => {
-      switch (s) {
-        case 'JAN': return 'January';
-        case 'FEB': return 'February';
-        case 'MAR': return 'March';
-        case 'APR': return 'April';
-        case 'MAY': return 'May';
-        case 'JUN': return 'June';
-        case 'JUL': return 'July';
-        case 'AUG': return 'August';
-        case 'SEP': return 'September';
-        case 'OCT': return 'October';
-        case 'NOV': return 'November';
-        case 'DEC': return 'December';
-        case 'AFT': return 'after';
-        case 'BET': return 'between';
-        case 'BEF': return 'before';
-        case 'ABT': return 'about';
-        case 'CAL': return 'calculated';
-        case 'EST': return 'estimated';
-        default: return s.toLowerCase();
-      }
-    }).replace(/^\w/, (s) => s.toUpperCase());
-
-    // const dateHelper = '(?:(?:(\\d+) +)?(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC) +)(\\d+)'
-    // const dateValue = new RegExp(`^${dateHelper}$`)
-    // const datePeriod = new RegExp(`^FROM +${dateHelper} +TO +${dateHelper}$`)
-    // const dateRange = new RegExp(`^BET +${dateHelper} +AND +${dateHelper}$`)
-    // const dateApprox = new RegExp(`^(FROM|TO|AFT|BEF|ABT|CAL|EST) +${dateHelper}$`)
-
-    for (const childRecord of gedcomRecord.children) {
-      switch (childRecord.tag) {
-        default: this.reportUnparsedRecord(childRecord); break;
-      }
-    }
-  }
-
-  parseEventShare(gedcomEvent: GedcomEvent, gedcomRecord: GedcomRecord): void {
-    if (gedcomRecord.tag !== '_SHAR') throw new Error();
-    if (gedcomRecord.xref != null) throw new Error();
-    if (gedcomRecord.value == null) throw new Error();
-
-    gedcomEvent.sharedWithXrefs.push(gedcomRecord.value);
-
-    for (const childRecord of gedcomRecord.children) {
-      switch (childRecord.tag) {
-        case 'ROLE': break;
-        default: this.reportUnparsedRecord(childRecord); break;
-      }
-    }
-  }
-
-  parseEventType(gedcomEvent: GedcomEvent, gedcomRecord: GedcomRecord): void {
-    if (gedcomRecord.tag !== 'TYPE') throw new Error();
-    if (gedcomRecord.xref != null) throw new Error();
-    if (gedcomRecord.value == null) throw new Error();
-
-    gedcomEvent.type = gedcomRecord.value;
 
     for (const childRecord of gedcomRecord.children) {
       switch (childRecord.tag) {
