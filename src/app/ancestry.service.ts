@@ -7,11 +7,12 @@ import type {GedcomHeader} from '../gedcom/gedcomHeader';
 import type {GedcomRecord} from '../gedcom/gedcomRecord';
 import type {GedcomTrailer} from '../gedcom/gedcomTrailer';
 import {Map as ImmutableMap} from 'immutable';
+import {List as ImmutableList} from 'immutable';
 
 @Injectable({providedIn: 'root'})
 export class AncestryService {
-  readonly header = signal<GedcomHeader|undefined>(undefined);
-  readonly trailer = signal<GedcomTrailer|undefined>(undefined);
+  readonly headers = signal(ImmutableList<GedcomHeader>());
+  readonly trailers = signal(ImmutableList<GedcomTrailer>());
 
   readonly individuals = signal(ImmutableMap<string, GedcomIndividual>({}));
   readonly families = signal(ImmutableMap<string, GedcomFamily>());
@@ -43,41 +44,19 @@ export class AncestryService {
   }
 
   gedcomRecords = computed<GedcomRecord[]>(() => {
-    const gedcom = [];
-    const header = this.header();
-    if (header) {
-      gedcom.push(header.record);
-    }
-    for (const individual of this.individuals().values()) {
-      if (individual.gedcomRecord) {
-        gedcom.push(individual.gedcomRecord);
-      }
-    }
-    for (const family of this.families().values()) {
-      if (family.gedcomRecord) {
-        gedcom.push(family.gedcomRecord);
-      }
-    }
-    for (const source of this.sources().values()) {
-      if (source.gedcomRecord) {
-        gedcom.push(source.gedcomRecord);
-      }
-    }
-    for (const repository of this.repositories().values()) {
-      if (repository.gedcomRecord) {
-        gedcom.push(repository.gedcomRecord);
-      }
-    }
-    const trailer = this.trailer();
-    if (trailer) {
-      gedcom.push(trailer.record);
-    }
-    return gedcom;
+    return [
+      ...this.headers().map((header) => header.record),
+      ...this.individuals().toList().map((individual) => individual.gedcomRecord),
+      ...this.families().toList().map((family) => family.gedcomRecord),
+      ...this.sources().toList().map((source) => source.gedcomRecord),
+      ...this.repositories().toList().map((repository) => repository.gedcomRecord),
+      ...this.trailers().map((trailer) => trailer.record),
+    ];
   });
 
   reset(): void {
-    this.header.set(undefined);
-    this.trailer.set(undefined);
+    this.headers.set(ImmutableList<GedcomHeader>());
+    this.trailers.set(ImmutableList<GedcomTrailer>());
     this.individuals.set(ImmutableMap<string, GedcomIndividual>({}));
     this.families.set(ImmutableMap<string, GedcomFamily>());
     this.sources.set(ImmutableMap<string, GedcomSource>());

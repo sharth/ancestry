@@ -7,4 +7,7 @@
 </ul>
 
 <h2>Header</h2>
-<pre>{{ ancestryService.header()?.record?.gedcom()?.join("\n") }}</pre>
+<pre>{{ ancestryService.headers().flatMap((header) => header.gedcom).join("\n")</pre>
+
+<h2>Trailer</h2>
+<pre>{{ ancestryService.trailers().flatMap((trailer) => trailer.gedcom).join("\n")</pre>

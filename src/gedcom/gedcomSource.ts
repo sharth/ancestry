@@ -2,13 +2,13 @@ import type {GedcomRecord} from './gedcomRecord';
 
 export class GedcomSource {
   constructor(
-    public xref: string) { }
+    public xref: string,
+  public gedcomRecord: GedcomRecord) { }
 
   shortTitle?: string;
   fullTitle?: string;
   text?: string;
   bibl?: string;
-  gedcomRecord?: GedcomRecord;
 
   repositories: {
     repositoryXref: string,
@@ -23,10 +23,9 @@ export function parseSource(
   if (gedcomRecord.xref == null) throw new Error();
   if (gedcomRecord.value != null) throw new Error();
 
-  const gedcomSourceXref = gedcomRecord.xref;
-  const gedcomSource = new GedcomSource(gedcomSourceXref);
+  const xref = gedcomRecord.xref;
+  const gedcomSource = new GedcomSource(xref, gedcomRecord);
   // const gedcomSource = this.gedcomDatabase.source(gedcomRecord.xref);
-  gedcomSource.gedcomRecord = gedcomRecord;
 
   for (const childRecord of gedcomRecord.children) {
     switch (childRecord.tag) {

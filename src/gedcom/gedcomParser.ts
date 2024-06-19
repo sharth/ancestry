@@ -22,17 +22,13 @@ export class GedcomParser {
     const reportUnparsedRecord = this.reportUnparsedRecord.bind(this);
     switch (gedcomRecord.tag) {
       case 'HEAD': {
-        // Only one header should be found in the gedcom file.
-        if (this.ancestryService.header() != null) throw new Error();
         const gedcomHeader = parseHeader(gedcomRecord, reportUnparsedRecord);
-        this.ancestryService.header.set(gedcomHeader);
+        this.ancestryService.headers.update((headers) => headers.push(gedcomHeader));
         break;
       }
       case 'TRLR': {
-        // Only one trailer should be found in the gedcom file.
-        if (this.ancestryService.trailer() != null) throw new Error();
         const gedcomTrailer = parseTrailer(gedcomRecord, reportUnparsedRecord);
-        this.ancestryService.trailer.set(gedcomTrailer);
+        this.ancestryService.trailers.update((trailers) => trailers.push(gedcomTrailer));
         break;
       }
       case 'INDI': {
