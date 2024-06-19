@@ -1,5 +1,6 @@
-import {Component, inject} from '@angular/core';
+import {Component, computed, inject} from '@angular/core';
 import {AncestryService} from '../ancestry.service';
+import type {GedcomRecord} from '../../gedcom/gedcomRecord';
 
 @Component({
   selector: 'app-index',
@@ -10,4 +11,12 @@ import {AncestryService} from '../ancestry.service';
 })
 export class IndexComponent {
   ancestryService = inject(AncestryService);
+
+  headerText = computed(() => {
+    return this.ancestryService.headers().flatMap((header) => header.record.gedcom()).join('\n');
+  });
+
+  trailerText = computed(() => {
+    return this.ancestryService.trailers().flatMap((trailer) => trailer.record.gedcom()).join('\n');
+  });
 }
