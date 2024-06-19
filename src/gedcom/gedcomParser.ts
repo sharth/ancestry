@@ -3,7 +3,7 @@ import {GedcomEvent, parseEvent} from './gedcomEvent';
 import {GedcomFamily} from './gedcomFamily';
 import {parseCitation} from './gedcomCitation';
 import {GedcomIndividual} from './gedcomIndividual';
-import {GedcomSource} from './gedcomSource';
+import {parseSource} from './gedcomSource';
 import {parseRepository} from './gedcomRepository';
 import {parseHeader} from './gedcomHeader';
 import type {AncestryService} from '../app/ancestry.service';
@@ -37,7 +37,12 @@ export class GedcomParser {
             (repositories) => repositories.set(gedcomRepository.xref, gedcomRepository ));
         break;
       }
-      case 'SOUR': this.parseSource(gedcomRecord); break;
+      case 'SOUR': {
+        const gedcomSource = parseSource(gedcomRecord, (record:GedcomRecord) => this.reportUnparsedRecord(record));
+        this.ancestryService.sources.update(
+            (sources) => sources.set(gedcomSource.xref, gedcomSource));
+        break;
+      }
       default: this.reportUnparsedRecord(gedcomRecord); break;
     }
   }
@@ -241,128 +246,6 @@ export class GedcomParser {
     // const individual = this.gedcomDatabase.individual(gedcomRecord.value);
     // individual.parentOfFamilyXrefs.push(gedcomFamily.xref);
     gedcomFamily.wifeXref = wifeXref;
-
-    for (const childRecord of gedcomRecord.children) {
-      switch (childRecord.tag) {
-        default: this.reportUnparsedRecord(childRecord); break;
-      }
-    }
-  }
-
-  parseSource(gedcomRecord: GedcomRecord): void {
-    if (gedcomRecord.abstag !== 'SOUR') throw new Error();
-    if (gedcomRecord.xref == null) throw new Error();
-    if (gedcomRecord.value != null) throw new Error();
-
-    const gedcomSourceXref = gedcomRecord.xref;
-    const gedcomSource = new GedcomSource(gedcomSourceXref);
-    // const gedcomSource = this.gedcomDatabase.source(gedcomRecord.xref);
-    gedcomSource.gedcomRecord = gedcomRecord;
-
-    for (const childRecord of gedcomRecord.children) {
-      switch (childRecord.tag) {
-        case 'ABBR': this.parseSourceAbbr(gedcomSource, childRecord); break;
-        case 'TEXT': this.parseSourceText(gedcomSource, childRecord); break;
-        case 'TITL': this.parseSourceTitle(gedcomSource, childRecord); break;
-        case '_BIBL': this.parseSourceBibl(gedcomSource, childRecord); break;
-        case 'REPO': this.parseSourceRepositoryCitation(gedcomSource, childRecord); break;
-        default: this.reportUnparsedRecord(childRecord); break;
-      }
-    }
-
-    this.ancestryService.sources.update((sources) => sources.set(gedcomSourceXref, gedcomSource));
-  }
-
-  parseSourceAbbr(gedcomSource: GedcomSource, gedcomRecord: GedcomRecord): void {
-    if (gedcomRecord.abstag !== 'SOUR.ABBR') throw new Error();
-    if (gedcomRecord.xref != null) throw new Error();
-    if (gedcomRecord.value == null) throw new Error();
-
-    gedcomSource.shortTitle = gedcomRecord.value;
-
-    for (const childRecord of gedcomRecord.children) {
-      switch (childRecord.tag) {
-        default:
-          this.reportUnparsedRecord(childRecord);
-          break;
-      }
-    }
-  }
-
-  parseSourceBibl(gedcomSource: GedcomSource, gedcomRecord: GedcomRecord): void {
-    if (gedcomRecord.abstag !== 'SOUR._BIBL') throw new Error();
-    if (gedcomRecord.xref != null) throw new Error();
-    if (gedcomRecord.value == null) throw new Error();
-
-    gedcomSource.bibl = gedcomRecord.value;
-
-    for (const childRecord of gedcomRecord.children) {
-      switch (childRecord.tag) {
-        default:
-          this.reportUnparsedRecord(childRecord);
-          break;
-      }
-    }
-  }
-
-  parseSourceText(gedcomSource: GedcomSource, gedcomRecord: GedcomRecord): void {
-    if (gedcomRecord.abstag !== 'SOUR.TEXT') throw new Error();
-    if (gedcomRecord.xref != null) throw new Error();
-    if (gedcomRecord.value == null) throw new Error();
-
-    gedcomSource.text = gedcomRecord.value;
-
-    for (const childRecord of gedcomRecord.children) {
-      switch (childRecord.tag) {
-        default:
-          this.reportUnparsedRecord(childRecord);
-          break;
-      }
-    }
-  }
-
-  parseSourceTitle(gedcomSource: GedcomSource, gedcomRecord: GedcomRecord): void {
-    if (gedcomRecord.abstag !== 'SOUR.TITL') throw new Error();
-    if (gedcomRecord.xref != null) throw new Error();
-    if (gedcomRecord.value == null) throw new Error();
-
-    gedcomSource.fullTitle = gedcomRecord.value;
-
-    for (const childRecord of gedcomRecord.children) {
-      switch (childRecord.tag) {
-        default: this.reportUnparsedRecord(childRecord); break;
-      }
-    }
-  }
-
-  parseSourceRepositoryCitation(gedcomSource: GedcomSource, gedcomRecord: GedcomRecord): void {
-    if (gedcomRecord.abstag !== 'SOUR.REPO') throw new Error();
-    if (gedcomRecord.xref != null) throw new Error();
-    if (gedcomRecord.value == null) throw new Error();
-
-    const gedcomRepositoryXref = gedcomRecord.value;
-    // const gedcomRepository = this.gedcomDatabase.repository(gedcomRecord.value);
-    // gedcomRepository.sourceXrefs.push(gedcomSource.xref);
-
-    const gedcomRepositoryCitation = {repositoryXref: gedcomRepositoryXref, callNumbers: []};
-    gedcomSource.repositories.push(gedcomRepositoryCitation);
-
-    for (const childRecord of gedcomRecord.children) {
-      switch (childRecord.tag) {
-        case 'CALN': this.parseSourceRepositoryCallNumber(gedcomRepositoryCitation, childRecord); break;
-        default: this.reportUnparsedRecord(childRecord); break;
-      }
-    }
-  }
-
-  parseSourceRepositoryCallNumber(
-      gedcomRepositoryCitation: { repositoryXref: string, callNumbers: string[] },
-      gedcomRecord: GedcomRecord): void {
-    if (gedcomRecord.abstag !== 'SOUR.REPO.CALN') throw new Error();
-    if (gedcomRecord.xref != null) throw new Error();
-    if (gedcomRecord.value == null) throw new Error();
-
-    gedcomRepositoryCitation.callNumbers.push(gedcomRecord.value);
 
     for (const childRecord of gedcomRecord.children) {
       switch (childRecord.tag) {
