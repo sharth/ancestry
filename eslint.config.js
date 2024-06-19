@@ -10,6 +10,7 @@ export default tseslint.config(
     google,
     {
       rules: {
+        'new-cap': 'off',
         'require-jsdoc': 'off',
         'max-len': ['error', {'code': 120}],
         '@typescript-eslint/consistent-type-imports': 'error',
