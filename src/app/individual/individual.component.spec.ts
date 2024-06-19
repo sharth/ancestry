@@ -3,8 +3,6 @@ import {IndividualComponent} from './individual.component';
 import {AncestryService} from '../ancestry.service';
 import {provideRouter} from '@angular/router';
 import {provideExperimentalZonelessChangeDetection} from '@angular/core';
-import {GedcomRecord} from '../../gedcom/gedcomRecord';
-import {GedcomParser} from '../../gedcom/gedcomParser';
 
 describe('IndividualComponent', () => {
   let component: IndividualComponent;
@@ -20,8 +18,9 @@ describe('IndividualComponent', () => {
     }).compileComponents();
 
     const ancestryService = TestBed.inject(AncestryService);
-    const gedcomParser = new GedcomParser(ancestryService);
-    gedcomParser.parse(new GedcomRecord(0, '@I1@', 'INDI', 'INDI', undefined, []));
+    ancestryService.parseText([
+      '0 @I1@ INDI',
+    ].join('\n'));
 
     fixture = TestBed.createComponent(IndividualComponent);
     fixture.componentRef.setInput('xref', '@I1@');

@@ -1,11 +1,7 @@
 import {CommonModule} from '@angular/common';
-import {Component, inject, signal} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {RouterLink, RouterOutlet} from '@angular/router';
 import {AncestryService} from './ancestry.service';
-import {ChunkStreamByNewline} from '../gedcom/chunkStreamByNewline';
-import {ChunkStreamByRecord} from '../gedcom/chunkStreamByRecord';
-import {GedcomParser} from '../gedcom/gedcomParser';
-import type {GedcomRecord} from '../gedcom/gedcomRecord';
 
 @Component({
   selector: 'app-root',
@@ -16,7 +12,6 @@ import type {GedcomRecord} from '../gedcom/gedcomRecord';
 })
 export class AppComponent {
   ancestryService = inject(AncestryService);
-  loading = signal(false);
 
   ngOnInit() {
     const text = localStorage.getItem('text');
@@ -46,50 +41,13 @@ export class AppComponent {
     this.ancestryService.reset();
   }
 
-  async parseSomeText(text: string): Promise<void> {
-    const stream = new ReadableStream<string>({
-      start(controller) {
-        controller.enqueue(text);
-        controller.close();
-      },
-    });
-    return this.parseSomeStream(stream);
-  }
-
   async parseSomeFile(file: File): Promise<void> {
-    const stream = file.stream().pipeThrough(new TextDecoderStream());
-    return this.parseSomeStream(stream);
+    const response = await file.text();
+    this.parseSomeText(response);
   }
 
-  async parseSomeStream(stream: ReadableStream<string>): Promise<void> {
-    this.loading.set(true);
-    const [localStorageStream, databaseStream] = stream.tee();
-
-    // One copy of the stream will be written to localStorage.
-    let text = '';
-    const localStoragePromise = localStorageStream
-        .pipeTo(new WritableStream({
-          write(chunk: string) {
-            text += chunk;
-          },
-        }))
-        .then(() => {
-          localStorage.setItem('text', text);
-        });
-
-    // One copy of the stream will be written to the ancestryService.
-    const parser = new GedcomParser(this.ancestryService);
-    const parserPromise = databaseStream
-        .pipeThrough(new ChunkStreamByNewline())
-        .pipeThrough(new ChunkStreamByRecord())
-        .pipeTo(new WritableStream({
-          write: (gedcomRecord: GedcomRecord) => {
-            parser.parse(gedcomRecord);
-          },
-        }));
-
-    return Promise.all([localStoragePromise, parserPromise]).then(() => {
-      this.loading.set(false);
-    });
+  parseSomeText(text: string): void {
+    localStorage.setItem('text', text);
+    return this.ancestryService.parseText(text);
   }
 }

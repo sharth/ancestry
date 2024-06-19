@@ -1,11 +1,11 @@
 import {computed, Injectable, signal} from '@angular/core';
-import type {GedcomFamily} from '../gedcom/gedcomFamily';
-import type {GedcomIndividual} from '../gedcom/gedcomIndividual';
-import type {GedcomRepository} from '../gedcom/gedcomRepository';
-import type {GedcomSource} from '../gedcom/gedcomSource';
-import type {GedcomHeader} from '../gedcom/gedcomHeader';
-import type {GedcomRecord} from '../gedcom/gedcomRecord';
-import type {GedcomTrailer} from '../gedcom/gedcomTrailer';
+import {parseFamily, type GedcomFamily} from '../gedcom/gedcomFamily';
+import {parseIndividual, type GedcomIndividual} from '../gedcom/gedcomIndividual';
+import {parseRepository, type GedcomRepository} from '../gedcom/gedcomRepository';
+import {parseSource, type GedcomSource} from '../gedcom/gedcomSource';
+import {parseHeader, type GedcomHeader} from '../gedcom/gedcomHeader';
+import {parseTrailer, type GedcomTrailer} from '../gedcom/gedcomTrailer';
+import {GedcomRecord} from '../gedcom/gedcomRecord';
 import {Map as ImmutableMap} from 'immutable';
 import {List as ImmutableList} from 'immutable';
 
@@ -18,6 +18,8 @@ export class AncestryService {
   readonly families = signal(ImmutableMap<string, GedcomFamily>());
   readonly sources = signal(ImmutableMap<string, GedcomSource>());
   readonly repositories = signal(ImmutableMap<string, GedcomRepository>());
+
+  private readonly unparsedTags = new Set<string>();
 
   individual(xref: string): GedcomIndividual {
     const individual = this.individuals().get(xref);
@@ -53,6 +55,93 @@ export class AncestryService {
       ...this.trailers().map((trailer) => trailer.record),
     ];
   });
+
+  parseText(text: string) {
+    const lines = text.split(/\r?\n/);
+    let ladder: GedcomRecord[] = [];
+
+    for (const line of lines) {
+      if (line == '') {
+        continue;
+      }
+      const match = line.match(/^([0-9]+) *(@[^@]+@)? *([A-Za-z0-9_]+) *(.+)?$/);
+      if (match == null) {
+        throw new Error();
+      }
+      const level = parseInt(match[1], 10);
+      const [xref, tag, value] = match.slice(2);
+      const abstag = [...ladder.slice(0, level).map((record) => record.tag), tag].join('.');
+      const record = new GedcomRecord(level, xref, tag, abstag, value);
+
+      if (record.level === 0) {
+        if (ladder.length > 0) {
+          this.parseRecord(ladder[0]);
+        }
+        ladder = [record];
+      } else if (record.tag === 'CONC') {
+        ladder.at(-1)!.value! += record.value;
+      } else if (record.tag === 'CONT') {
+        ladder.at(-1)!.value! += '\n' + (record.value ?? '');
+      } else {
+        ladder.length = record.level;
+        ladder.at(-1)!.children.push(record);
+        ladder.push(record);
+      }
+    }
+    if (ladder.length > 0) {
+      this.parseRecord(ladder[0]);
+    }
+  }
+
+  parseRecord(gedcomRecord: GedcomRecord): void {
+    const reportUnparsedRecord = this.reportUnparsedRecord.bind(this);
+    switch (gedcomRecord.tag) {
+      case 'HEAD': {
+        const gedcomHeader = parseHeader(gedcomRecord, reportUnparsedRecord);
+        this.headers.update((headers) => headers.push(gedcomHeader));
+        break;
+      }
+      case 'TRLR': {
+        const gedcomTrailer = parseTrailer(gedcomRecord, reportUnparsedRecord);
+        this.trailers.update((trailers) => trailers.push(gedcomTrailer));
+        break;
+      }
+      case 'INDI': {
+        const gedcomIndividual = parseIndividual(gedcomRecord, this, reportUnparsedRecord);
+        this.individuals.update(
+            (individuals) => individuals.set(gedcomIndividual.xref, gedcomIndividual));
+        break;
+      }
+      case 'FAM': {
+        const gedcomFamily = parseFamily(gedcomRecord, this, reportUnparsedRecord);
+        this.families.update(
+            (families) => families.set(gedcomFamily.xref, gedcomFamily));
+        break;
+      }
+      case 'REPO': {
+        const gedcomRepository = parseRepository(gedcomRecord, reportUnparsedRecord);
+        this.repositories.update(
+            (repositories) => repositories.set(gedcomRepository.xref, gedcomRepository ));
+        break;
+      }
+      case 'SOUR': {
+        const gedcomSource = parseSource(gedcomRecord, reportUnparsedRecord);
+        this.sources.update(
+            (sources) => sources.set(gedcomSource.xref, gedcomSource));
+        break;
+      }
+      default:
+        this.reportUnparsedRecord(gedcomRecord);
+        break;
+    }
+  }
+
+  reportUnparsedRecord(gedcomRecord: GedcomRecord): void {
+    if (!this.unparsedTags.has(gedcomRecord.abstag)) {
+      console.warn('Unparsed tag ', gedcomRecord.abstag);
+      this.unparsedTags.add(gedcomRecord.abstag);
+    }
+  }
 
   reset(): void {
     this.headers.set(ImmutableList<GedcomHeader>());
