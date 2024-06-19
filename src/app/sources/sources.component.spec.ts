@@ -9,8 +9,7 @@ describe('SourcesComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       providers: [provideExperimentalZonelessChangeDetection()],
-    })
-        .compileComponents();
+    }) .compileComponents();
 
     fixture = TestBed.createComponent(SourcesComponent);
     component = fixture.componentInstance;

@@ -1,8 +1,18 @@
+import {TestBed} from '@angular/core/testing';
 import {AncestryService} from '../app/ancestry.service';
+import {provideExperimentalZonelessChangeDetection} from '@angular/core';
 
 describe('GedcomFamily', () => {
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      providers: [
+        provideExperimentalZonelessChangeDetection(),
+      ],
+    }).compileComponents();
+  });
+
   it('Parents', () => {
-    const ancestryService = new AncestryService();
+    const ancestryService = TestBed.inject(AncestryService);
     ancestryService.parseText([
       '0 @F1@ FAM',
       '0 @F2@ FAM',
