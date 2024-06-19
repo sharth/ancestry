@@ -5,7 +5,7 @@ import {parseCitation} from './gedcomCitation';
 import {GedcomIndividual} from './gedcomIndividual';
 import {GedcomSource} from './gedcomSource';
 import {parseRepository} from './gedcomRepository';
-import {GedcomHeader} from './gedcomHeader';
+import {parseHeader} from './gedcomHeader';
 import type {AncestryService} from '../app/ancestry.service';
 
 export class GedcomParser {
@@ -21,7 +21,13 @@ export class GedcomParser {
 
   parse(gedcomRecord: GedcomRecord): void {
     switch (gedcomRecord.tag) {
-      case 'HEAD': this.parseHeader(gedcomRecord); break;
+      case 'HEAD': {
+        // Only one header should be found in the gedcom file.
+        if (this.ancestryService.header() != null) throw new Error();
+        const gedcomHeader = parseHeader(gedcomRecord, (record: GedcomRecord) => this.reportUnparsedRecord(record));
+        this.ancestryService.header.set(gedcomHeader);
+        break;
+      }
       case 'TRLR': this.parseTrailer(gedcomRecord); break;
       case 'INDI': this.parseIndividual(gedcomRecord); break;
       case 'FAM': this.parseFamily(gedcomRecord); break;
@@ -34,17 +40,6 @@ export class GedcomParser {
       case 'SOUR': this.parseSource(gedcomRecord); break;
       default: this.reportUnparsedRecord(gedcomRecord); break;
     }
-  }
-
-  parseHeader(gedcomRecord: GedcomRecord): void {
-    if (gedcomRecord.abstag !== 'HEAD') throw new Error();
-    if (gedcomRecord.xref != null) throw new Error();
-    if (gedcomRecord.value != null) throw new Error();
-
-    // Only one header should be found in the gedcom file.
-    if (this.ancestryService.header() != null) throw new Error();
-
-    this.ancestryService.header.set(new GedcomHeader(gedcomRecord));
   }
 
   parseTrailer(gedcomRecord: GedcomRecord): void {
