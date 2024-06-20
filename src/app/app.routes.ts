@@ -3,7 +3,7 @@ import {IndexComponent} from './index/index.component';
 import {IndividualComponent} from './individual/individual.component';
 import {IndividualsComponent} from './individuals/individuals.component';
 import {SourcesComponent} from './sources/sources.component';
-import {SourceDetailComponent} from './source-detail/source-detail.component';
+import {SourceComponent} from './source/source.component';
 import {RepositoriesComponent} from './repositories/repositories.component';
 import {RepositoryComponent} from './repository/repository.component';
 import {SourceEditorComponent} from './source-editor/source-editor.component';
@@ -17,6 +17,6 @@ export const routes: Routes = [
   {path: 'repositories', component: RepositoriesComponent},
   {path: 'repository/:xref', component: RepositoryComponent},
   {path: 'sources', component: SourcesComponent},
-  {path: 'source/:xref', component: SourceDetailComponent},
+  {path: 'source/:xref', component: SourceComponent},
   {path: 'source/:xref/edit', component: SourceEditorComponent},
 ];

@@ -7,13 +7,13 @@ import type {GedcomEvent} from '../../gedcom/gedcomEvent';
 import type {GedcomIndividual} from '../../gedcom/gedcomIndividual';
 
 @Component({
-  selector: 'app-source-detail',
+  selector: 'app-source',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  templateUrl: './source-detail.component.html',
-  styleUrl: './source-detail.component.css',
+  templateUrl: './source.component.html',
+  styleUrl: './source.component.css',
 })
-export class SourceDetailComponent {
+export class SourceComponent {
   ancestryService = inject(AncestryService);
   xref = input.required<string>();
   source = computed(() => this.ancestryService.source(this.xref()));

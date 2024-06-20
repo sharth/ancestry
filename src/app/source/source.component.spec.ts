@@ -1,11 +1,11 @@
 import {type ComponentFixture, TestBed} from '@angular/core/testing';
-import {SourceDetailComponent} from './source-detail.component';
+import {SourceComponent} from './source.component';
 import {AncestryService} from '../ancestry.service';
 import {provideExperimentalZonelessChangeDetection} from '@angular/core';
 
-describe('SourceDetailComponent', () => {
-  let component: SourceDetailComponent;
-  let fixture: ComponentFixture<SourceDetailComponent>;
+describe('SourceComponent', () => {
+  let component: SourceComponent;
+  let fixture: ComponentFixture<SourceComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -17,7 +17,7 @@ describe('SourceDetailComponent', () => {
       '0 @S1@ SOUR',
     ].join('\n'));
 
-    fixture = TestBed.createComponent(SourceDetailComponent);
+    fixture = TestBed.createComponent(SourceComponent);
     fixture.componentRef.setInput('xref', '@S1@');
     component = fixture.componentInstance;
     fixture.detectChanges();
