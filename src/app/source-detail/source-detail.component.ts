@@ -32,14 +32,3 @@ export class SourceDetailComponent {
     return arr;
   });
 }
-
-// individualsBySurname(): Map<string | undefined, GedcomIndividual[]> {
-//   const surnameMap = new Map<string, GedcomIndividual[]>()
-//   for (const individual of this.ancestryService.individuals()) {
-//     let surnames = surnameMap.get(individual.surname ?? '')
-//     if (surnames == null) surnameMap.set(individual.surname ?? '', surnames = [])
-//     surnames.push(individual)
-//   }
-//   return surnameMap
-// }
-
