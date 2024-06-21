@@ -47,12 +47,14 @@ export class IndividualComponent {
 
     // Stepparents
     relatives.push(...this.individual().stepparents().map((stepparent) => ({
+      // eslint-disable-next-line max-len
       relationship: stepparent.sex === 'Male' ? 'Stepfather' : stepparent.sex === 'Female' ? 'Stepmother' : 'Stepparent',
       individual: stepparent,
     })));
 
     // Stepsiblings
     relatives.push(...this.individual().stepsiblings() .map((stepsibling) => ({
+      // eslint-disable-next-line max-len
       relationship: stepsibling.sex === 'Male' ? 'Stepbrother' : stepsibling.sex === 'Female' ? 'Stepsister' : 'Stepsibling',
       individual: stepsibling,
     })));
