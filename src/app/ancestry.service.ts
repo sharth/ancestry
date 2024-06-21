@@ -94,7 +94,6 @@ export class AncestryService {
   }
 
   parseRecord(gedcomRecord: GedcomRecord): void {
-    const reportUnparsedRecord = this.reportUnparsedRecord.bind(this);
     switch (gedcomRecord.tag) {
       case 'HEAD': {
         const gedcomHeader = new GedcomHeader(gedcomRecord);
