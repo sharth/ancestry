@@ -1,16 +1,133 @@
 import {computed} from '@angular/core';
 import type {AncestryService} from '../app/ancestry.service';
-import {GedcomEvent, parseEvent} from './gedcomEvent';
+import {GedcomEvent} from './gedcomEvent';
+import {parseEvent} from './gedcomEvent';
 import type {GedcomRecord} from './gedcomRecord';
 import type {GedcomFamily} from './gedcomFamily';
 import {parseCitation} from './gedcomCitation';
 
 export class GedcomIndividual {
   constructor(
-    public xref: string,
-    private record: GedcomRecord,
-    private ancestryService: AncestryService) { }
+      private record: GedcomRecord,
+      private ancestryService: AncestryService) {
+    if (record.abstag !== 'INDI') throw new Error();
+    if (record.xref == null) throw new Error();
+    if (record.value != null) throw new Error();
 
+    this.xref = record.xref;
+
+    for (const childRecord of record.children) {
+      switch (childRecord.tag) {
+        case 'BAPM':
+        case 'BIRT':
+        case 'BURI':
+        case 'CENS':
+        case 'DEAT':
+        case 'EDUC':
+        case 'EMIG':
+        case 'EVEN':
+        case 'IMMI':
+        case 'MARB':
+        case 'MARR':
+        case 'NATU':
+        case 'OCCU':
+        case 'PROB':
+        case 'RELI':
+        case 'RESI':
+        case 'RETI':
+        case 'WILL':
+        case 'DIV':
+        case 'SSN':
+          this.events.push(parseEvent(childRecord, this.ancestryService.reportUnparsedRecord));
+          break;
+        case 'NAME':
+          this.parseIndividualName(this, childRecord);
+          break;
+        case 'SEX':
+          this.parseIndividualSex(this, childRecord);
+          break;
+        case 'FAMS': break; // Let's just use the links inside the Family record.
+        case 'FAMC': break; // Let's just use the links inside the Family record.
+        case '_FSFTID':
+          this.familySearchId = this.parseIndividualFamilySearchId(childRecord);
+          break;
+        default:
+          ancestryService.reportUnparsedRecord(childRecord);
+          break;
+      }
+    }
+  }
+
+  private parseIndividualFamilySearchId(
+      gedcomRecord: GedcomRecord): string {
+    if (gedcomRecord.abstag !== 'INDI._FSFTID') throw new Error();
+    if (gedcomRecord.xref != null) throw new Error();
+    if (gedcomRecord.value == null) throw new Error();
+
+    gedcomRecord.children.map((childRecord) => this.ancestryService.reportUnparsedRecord(childRecord));
+    return gedcomRecord.value;
+  }
+
+  private parseIndividualName(
+      gedcomIndividual: GedcomIndividual,
+      gedcomRecord: GedcomRecord): void {
+    if (gedcomRecord.abstag !== 'INDI.NAME') throw new Error();
+    if (gedcomRecord.xref != null) throw new Error();
+    // if (gedcomRecord.value != null) throw new Error();
+
+    const gedcomEvent = new GedcomEvent('Name', gedcomRecord);
+    gedcomIndividual.events.push(gedcomEvent);
+    gedcomEvent.value = gedcomRecord.value;
+
+    if (gedcomIndividual.name == null) {
+      gedcomIndividual.name = gedcomRecord.value;
+      gedcomIndividual.surname = gedcomRecord.value?.match('/(.*)/')?.[1];
+    }
+
+    for (const childRecord of gedcomRecord.children) {
+      switch (childRecord.tag) {
+        case 'SOUR':
+          gedcomEvent.citations.push(parseCitation(childRecord, this.ancestryService.reportUnparsedRecord));
+          break;
+        default:
+          this.ancestryService.reportUnparsedRecord(childRecord);
+          break;
+      }
+    }
+  }
+
+  private parseIndividualSex(
+      gedcomIndividual: GedcomIndividual,
+      gedcomRecord: GedcomRecord): void {
+    if (gedcomRecord.abstag !== 'INDI.SEX') throw new Error();
+    if (gedcomRecord.xref != null) throw new Error();
+    if (gedcomRecord.value == null) throw new Error();
+
+    const gedcomEvent = new GedcomEvent('Sex', gedcomRecord);
+    gedcomIndividual.events.push(gedcomEvent);
+    gedcomEvent.value = gedcomRecord.value;
+
+    if (gedcomIndividual.sex == null) {
+      switch (gedcomRecord.value) {
+        case 'M':
+          gedcomIndividual.sex = 'Male';
+          break;
+        case 'F':
+          gedcomIndividual.sex = 'Female';
+          break;
+      }
+    }
+
+    for (const childRecord of gedcomRecord.children) {
+      switch (childRecord.tag) {
+        default:
+          this.ancestryService.reportUnparsedRecord(childRecord);
+          break;
+      }
+    }
+  }
+
+  xref: string;
   events: GedcomEvent[] = [];
   name?: string;
   surname?: string;
@@ -71,138 +188,3 @@ export class GedcomIndividual {
     return this.record;
   }
 };
-
-export function parseIndividual(
-    gedcomRecord: GedcomRecord,
-    ancestryService: AncestryService,
-    reportUnparsedRecord: (record:GedcomRecord) => void): GedcomIndividual {
-  if (gedcomRecord.abstag !== 'INDI') throw new Error();
-  if (gedcomRecord.xref == null) throw new Error();
-  if (gedcomRecord.value != null) throw new Error();
-
-  const xref = gedcomRecord.xref;
-  const gedcomIndividual = new GedcomIndividual(xref, gedcomRecord, ancestryService);
-
-  for (const childRecord of gedcomRecord.children) {
-    switch (childRecord.tag) {
-      case 'BAPM':
-      case 'BIRT':
-      case 'BURI':
-      case 'CENS':
-      case 'DEAT':
-      case 'EDUC':
-      case 'EMIG':
-      case 'EVEN':
-      case 'IMMI':
-      case 'MARB':
-      case 'MARR':
-      case 'NATU':
-      case 'OCCU':
-      case 'PROB':
-      case 'RELI':
-      case 'RESI':
-      case 'RETI':
-      case 'WILL':
-      case 'DIV':
-      case 'SSN':
-        gedcomIndividual.events.push(parseEvent(childRecord, reportUnparsedRecord));
-        break;
-      case 'NAME':
-        parseIndividualName(gedcomIndividual, childRecord, reportUnparsedRecord);
-        break;
-      case 'SEX':
-        parseIndividualSex(gedcomIndividual, childRecord, reportUnparsedRecord);
-        break;
-      case 'FAMS': break; // Let's just use the links inside the Family record.
-      case 'FAMC': break; // Let's just use the links inside the Family record.
-      case '_FSFTID':
-        parseIndividualFamilySearchId(gedcomIndividual, childRecord, reportUnparsedRecord);
-        break;
-      default:
-        reportUnparsedRecord(childRecord);
-        break;
-    }
-  }
-
-  return gedcomIndividual;
-}
-
-function parseIndividualFamilySearchId(
-    gedcomIndividual: GedcomIndividual,
-    gedcomRecord: GedcomRecord,
-    reportUnparsedRecord: (record:GedcomRecord) => void): void {
-  if (gedcomRecord.abstag !== 'INDI._FSFTID') throw new Error();
-  if (gedcomRecord.xref != null) throw new Error();
-  if (gedcomRecord.value == null) throw new Error();
-
-  gedcomIndividual.familySearchId ??= gedcomRecord.value;
-
-  for (const childRecord of gedcomRecord.children) {
-    switch (childRecord.tag) {
-      default:
-        reportUnparsedRecord(childRecord);
-        break;
-    }
-  }
-}
-
-function parseIndividualName(
-    gedcomIndividual: GedcomIndividual,
-    gedcomRecord: GedcomRecord,
-    reportUnparsedRecord: (record:GedcomRecord) => void): void {
-  if (gedcomRecord.abstag !== 'INDI.NAME') throw new Error();
-  if (gedcomRecord.xref != null) throw new Error();
-  // if (gedcomRecord.value != null) throw new Error();
-
-  const gedcomEvent = new GedcomEvent('Name', gedcomRecord);
-  gedcomIndividual.events.push(gedcomEvent);
-  gedcomEvent.value = gedcomRecord.value;
-
-  if (gedcomIndividual.name == null) {
-    gedcomIndividual.name = gedcomRecord.value;
-    gedcomIndividual.surname = gedcomRecord.value?.match('/(.*)/')?.[1];
-  }
-
-  for (const childRecord of gedcomRecord.children) {
-    switch (childRecord.tag) {
-      case 'SOUR':
-        gedcomEvent.citations.push(parseCitation(childRecord, reportUnparsedRecord));
-        break;
-      default:
-        reportUnparsedRecord(childRecord);
-        break;
-    }
-  }
-}
-
-function parseIndividualSex(
-    gedcomIndividual: GedcomIndividual,
-    gedcomRecord: GedcomRecord,
-    reportUnparsedRecord: (record:GedcomRecord) => void): void {
-  if (gedcomRecord.abstag !== 'INDI.SEX') throw new Error();
-  if (gedcomRecord.xref != null) throw new Error();
-  if (gedcomRecord.value == null) throw new Error();
-
-  const gedcomEvent = new GedcomEvent('Sex', gedcomRecord);
-  gedcomIndividual.events.push(gedcomEvent);
-  gedcomEvent.value = gedcomRecord.value;
-
-  if (gedcomIndividual.sex == null) {
-    switch (gedcomRecord.value) {
-      case 'M':
-        gedcomIndividual.sex = 'Male';
-        break;
-      case 'F':
-        gedcomIndividual.sex = 'Female';
-        break;
-    }
-  }
-
-  for (const childRecord of gedcomRecord.children) {
-    switch (childRecord.tag) {
-      default:
-        reportUnparsedRecord(childRecord);
-        break;
-    }
-  }
-}

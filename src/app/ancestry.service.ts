@@ -1,8 +1,8 @@
 import {computed, Injectable, signal} from '@angular/core';
 import {parseFamily, type GedcomFamily} from '../gedcom/gedcomFamily';
-import {parseIndividual, type GedcomIndividual} from '../gedcom/gedcomIndividual';
-import {parseRepository, type GedcomRepository} from '../gedcom/gedcomRepository';
-import {parseSource, type GedcomSource} from '../gedcom/gedcomSource';
+import {GedcomIndividual} from '../gedcom/gedcomIndividual';
+import {GedcomRepository} from '../gedcom/gedcomRepository';
+import {GedcomSource} from '../gedcom/gedcomSource';
 import {parseHeader, type GedcomHeader} from '../gedcom/gedcomHeader';
 import {parseTrailer, type GedcomTrailer} from '../gedcom/gedcomTrailer';
 import {GedcomRecord} from '../gedcom/gedcomRecord';
@@ -107,7 +107,7 @@ export class AncestryService {
         break;
       }
       case 'INDI': {
-        const gedcomIndividual = parseIndividual(gedcomRecord, this, reportUnparsedRecord);
+        const gedcomIndividual = new GedcomIndividual(gedcomRecord, this);
         this.individuals.update(
             (individuals) => individuals.set(gedcomIndividual.xref, gedcomIndividual));
         break;
@@ -119,13 +119,13 @@ export class AncestryService {
         break;
       }
       case 'REPO': {
-        const gedcomRepository = parseRepository(gedcomRecord, reportUnparsedRecord);
+        const gedcomRepository = new GedcomRepository(gedcomRecord, this);
         this.repositories.update(
             (repositories) => repositories.set(gedcomRepository.xref, gedcomRepository ));
         break;
       }
       case 'SOUR': {
-        const gedcomSource = parseSource(gedcomRecord, reportUnparsedRecord);
+        const gedcomSource = new GedcomSource(gedcomRecord, this);
         this.sources.update(
             (sources) => sources.set(gedcomSource.xref, gedcomSource));
         break;

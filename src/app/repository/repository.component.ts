@@ -2,6 +2,7 @@ import {Component, computed, inject, input} from '@angular/core';
 import {AncestryService} from '../ancestry.service';
 import {CommonModule} from '@angular/common';
 import {RouterModule} from '@angular/router';
+import type {GedcomSource} from '../../gedcom/gedcomSource';
 
 @Component({
   selector: 'app-repository',
@@ -14,6 +15,7 @@ export class RepositoryComponent {
   ancestryService = inject(AncestryService);
   xref = input.required<string>();
   repository = computed(() => this.ancestryService.repository(this.xref()));
-  sources = computed(() => this.repository().sourceXrefs
-      .map((sourceXref) => this.ancestryService.source(sourceXref)));
+  sources = computed(() => this.ancestryService.sources().toList()
+      .filter((source) => source.repositories
+          .map((repository) => repository.repositoryXref)));
 }
