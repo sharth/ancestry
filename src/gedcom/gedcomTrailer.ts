@@ -1,7 +1,12 @@
 import type {GedcomRecord} from './gedcomRecord';
 
 export class GedcomTrailer {
-  constructor(public record: GedcomRecord) { }
+  constructor(
+    private record: GedcomRecord) { }
+
+  gedcomRecord() : GedcomRecord {
+    return this.record;
+  }
 };
 
 export function parseTrailer(

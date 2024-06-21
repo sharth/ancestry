@@ -4,7 +4,7 @@ import type {GedcomRecord} from './gedcomRecord';
 export class GedcomEvent {
   constructor(
     public type: string,
-    public gedcomRecord: GedcomRecord) { }
+    private record: GedcomRecord) { }
 
   address?: string;
   place?: string;
@@ -14,6 +14,10 @@ export class GedcomEvent {
   value?: string;
   citations: GedcomCitation[] = [];
   sharedWithXrefs: string[] = [];
+
+  gedcomRecord(): GedcomRecord {
+    return this.record;
+  }
 }
 
 export function parseEvent(

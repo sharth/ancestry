@@ -8,7 +8,7 @@ import {parseCitation} from './gedcomCitation';
 export class GedcomIndividual {
   constructor(
     public xref: string,
-    public gedcomRecord: GedcomRecord,
+    private record: GedcomRecord,
     private ancestryService: AncestryService) { }
 
   events: GedcomEvent[] = [];
@@ -66,6 +66,10 @@ export class GedcomIndividual {
   readonly censusEvents = computed<GedcomEvent[]>(() => {
     return this.events.filter((gedcomEvent) => gedcomEvent.type === 'Census');
   });
+
+  gedcomRecord(): GedcomRecord {
+    return this.record;
+  }
 };
 
 export function parseIndividual(

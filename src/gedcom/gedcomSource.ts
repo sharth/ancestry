@@ -1,9 +1,9 @@
-import type {GedcomRecord} from './gedcomRecord';
+import {GedcomRecord} from './gedcomRecord';
 
 export class GedcomSource {
   constructor(
     public xref: string,
-  public gedcomRecord: GedcomRecord) { }
+    private record: GedcomRecord) { }
 
   shortTitle?: string;
   fullTitle?: string;
@@ -14,6 +14,16 @@ export class GedcomSource {
     repositoryXref: string,
     callNumbers: string[],
   }[] = [];
+
+  gedcomRecord(): GedcomRecord {
+    return new GedcomRecord(0, this.xref, 'SOUR', 'SOUR', undefined, [
+      ...this.shortTitle ? [new GedcomRecord(1, undefined, 'ABBR', 'SOUR.ABBR', this.shortTitle)] : [],
+      ...this.fullTitle ? [new GedcomRecord(1, undefined, 'TITL', 'SOUR.TITL', this.fullTitle)] : [],
+      ...this.text ? [new GedcomRecord(1, undefined, 'TEXT', 'SOUR.TEXT', this.text)] : [],
+      ...this.bibl ? [new GedcomRecord(1, undefined, '_BIBL', 'SOUR._BIBL', this.bibl)] : [],
+      // TODO: Add repository call numbers.
+    ]);
+  }
 };
 
 export function parseSource(

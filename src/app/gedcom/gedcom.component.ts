@@ -11,6 +11,6 @@ import {AncestryService} from '../ancestry.service';
 export class GedcomComponent {
   ancestryService = inject(AncestryService);
   gedcomText = computed(() => this.ancestryService.gedcomRecords()
-      .flatMap((record) => record.gedcom())
+      .flatMap((gedcomRecord) => gedcomRecord.text())
       .join('\n'));
 }

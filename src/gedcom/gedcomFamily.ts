@@ -6,7 +6,7 @@ import type {GedcomRecord} from './gedcomRecord';
 export class GedcomFamily {
   constructor(
     public xref: string,
-    public gedcomRecord: GedcomRecord,
+    private record: GedcomRecord,
     private ancestryService: AncestryService) { }
 
   husbandXref?: string;
@@ -39,6 +39,10 @@ export class GedcomFamily {
 
   children = computed(() => this.childXrefs
       .map((xref) => this.ancestryService.individual(xref)));
+
+  gedcomRecord(): GedcomRecord {
+    return this.record;
+  }
 };
 
 export function parseFamily(

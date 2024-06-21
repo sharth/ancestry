@@ -7,12 +7,12 @@ export class GedcomRecord {
     public value: string | undefined,
     public children: GedcomRecord[] = []) { }
 
-  gedcom(): string[] {
+  text(): string[] {
     const gedcom: string[] = [];
     const values = this.value?.split('\n') ?? [undefined];
     gedcom.push([this.level, this.xref, this.tag, values[0]].filter((s) => s != null).join(' '));
     gedcom.push(...values.slice(1).map((v) => `${this.level + 1} CONT ${v}`));
-    gedcom.push(...this.children.map((childRecord) => childRecord.gedcom()).flat());
+    gedcom.push(...this.children.flatMap((childRecord) => childRecord.text()));
     return gedcom;
   }
 };

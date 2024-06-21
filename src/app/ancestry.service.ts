@@ -46,14 +46,14 @@ export class AncestryService {
   }
 
   gedcomRecords = computed<GedcomRecord[]>(() => {
-    return [
-      ...this.headers().map((header) => header.record),
-      ...this.individuals().toList().map((individual) => individual.gedcomRecord),
-      ...this.families().toList().map((family) => family.gedcomRecord),
-      ...this.sources().toList().map((source) => source.gedcomRecord),
-      ...this.repositories().toList().map((repository) => repository.gedcomRecord),
-      ...this.trailers().map((trailer) => trailer.record),
-    ];
+    return Array.from([
+      ...this.headers(),
+      ...this.individuals().values(),
+      ...this.families().values(),
+      ...this.sources().values(),
+      ...this.repositories().values(),
+      ...this.trailers(),
+    ], (gedcomObject) => gedcomObject.gedcomRecord());
   });
 
   parseText(text: string) {

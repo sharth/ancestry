@@ -3,10 +3,14 @@ import type {GedcomRecord} from './gedcomRecord';
 export class GedcomRepository {
   constructor(
     public xref: string,
-    public gedcomRecord: GedcomRecord) { }
+    private record: GedcomRecord) { }
 
   name?: string;
   sourceXrefs: string[] = [];
+
+  gedcomRecord(): GedcomRecord {
+    return this.record;
+  }
 };
 
 export function parseRepository(
