@@ -1,10 +1,9 @@
 import {computed} from '@angular/core';
 import type {AncestryService} from '../app/ancestry.service';
 import {GedcomEvent} from './gedcomEvent';
-import {parseEvent} from './gedcomEvent';
 import type {GedcomRecord} from './gedcomRecord';
 import type {GedcomFamily} from './gedcomFamily';
-import {parseCitation} from './gedcomCitation';
+import {GedcomCitation} from './gedcomCitation';
 
 export class GedcomIndividual {
   constructor(
@@ -38,7 +37,7 @@ export class GedcomIndividual {
         case 'WILL':
         case 'DIV':
         case 'SSN':
-          this.events.push(parseEvent(childRecord, this.ancestryService.reportUnparsedRecord));
+          this.events.push(new GedcomEvent(childRecord, ancestryService));
           break;
         case 'NAME':
           this.parseIndividualName(this, childRecord);
@@ -64,7 +63,7 @@ export class GedcomIndividual {
     if (gedcomRecord.xref != null) throw new Error();
     if (gedcomRecord.value == null) throw new Error();
 
-    gedcomRecord.children.map((childRecord) => this.ancestryService.reportUnparsedRecord(childRecord));
+    gedcomRecord.children.forEach(this.ancestryService.reportUnparsedRecord);
     return gedcomRecord.value;
   }
 
@@ -75,7 +74,7 @@ export class GedcomIndividual {
     if (gedcomRecord.xref != null) throw new Error();
     // if (gedcomRecord.value != null) throw new Error();
 
-    const gedcomEvent = new GedcomEvent('Name', gedcomRecord);
+    const gedcomEvent = new GedcomEvent(gedcomRecord, this.ancestryService);
     gedcomIndividual.events.push(gedcomEvent);
     gedcomEvent.value = gedcomRecord.value;
 
@@ -87,7 +86,7 @@ export class GedcomIndividual {
     for (const childRecord of gedcomRecord.children) {
       switch (childRecord.tag) {
         case 'SOUR':
-          gedcomEvent.citations.push(parseCitation(childRecord, this.ancestryService.reportUnparsedRecord));
+          gedcomEvent.citations.push(new GedcomCitation(childRecord, this.ancestryService));
           break;
         default:
           this.ancestryService.reportUnparsedRecord(childRecord);
@@ -103,7 +102,7 @@ export class GedcomIndividual {
     if (gedcomRecord.xref != null) throw new Error();
     if (gedcomRecord.value == null) throw new Error();
 
-    const gedcomEvent = new GedcomEvent('Sex', gedcomRecord);
+    const gedcomEvent = new GedcomEvent(gedcomRecord, this.ancestryService);
     gedcomIndividual.events.push(gedcomEvent);
     gedcomEvent.value = gedcomRecord.value;
 

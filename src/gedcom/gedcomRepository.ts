@@ -28,7 +28,7 @@ export class GedcomRepository {
     if (gedcomRecord.xref != null) throw new Error();
     if (gedcomRecord.value == null) throw new Error();
 
-    gedcomRecord.children.map((childRecord) => this.ancestryService.reportUnparsedRecord(childRecord));
+    gedcomRecord.children.forEach(this.ancestryService.reportUnparsedRecord);
     return gedcomRecord.value;
   }
 

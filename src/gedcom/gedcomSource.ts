@@ -40,7 +40,7 @@ export class GedcomSource {
     if (gedcomRecord.xref != null) throw new Error();
     if (gedcomRecord.value == null) throw new Error();
 
-    gedcomRecord.children.map((childRecord: GedcomRecord) => this.ancestryService.reportUnparsedRecord(childRecord));
+    gedcomRecord.children.forEach(this.ancestryService.reportUnparsedRecord);
     return gedcomRecord.value;
   }
 
@@ -49,7 +49,7 @@ export class GedcomSource {
     if (gedcomRecord.xref != null) throw new Error();
     if (gedcomRecord.value == null) throw new Error();
 
-    gedcomRecord.children.map((childRecord: GedcomRecord) => this.ancestryService.reportUnparsedRecord(childRecord));
+    gedcomRecord.children.forEach(this.ancestryService.reportUnparsedRecord);
     return gedcomRecord.value;
   }
 
@@ -58,7 +58,7 @@ export class GedcomSource {
     if (gedcomRecord.xref != null) throw new Error();
     if (gedcomRecord.value == null) throw new Error();
 
-    gedcomRecord.children.map((childRecord: GedcomRecord) => this.ancestryService.reportUnparsedRecord(childRecord));
+    gedcomRecord.children.forEach(this.ancestryService.reportUnparsedRecord);
     return gedcomRecord.value;
   }
 
@@ -67,7 +67,7 @@ export class GedcomSource {
     if (gedcomRecord.xref != null) throw new Error();
     if (gedcomRecord.value == null) throw new Error();
 
-    gedcomRecord.children.map((childRecord: GedcomRecord) => this.ancestryService.reportUnparsedRecord(childRecord));
+    gedcomRecord.children.forEach(this.ancestryService.reportUnparsedRecord);
     return gedcomRecord.value;
   }
 
@@ -98,7 +98,7 @@ export class GedcomSource {
     if (gedcomRecord.xref != null) throw new Error();
     if (gedcomRecord.value == null) throw new Error();
 
-    gedcomRecord.children.map((childRecord: GedcomRecord) => this.ancestryService.reportUnparsedRecord(childRecord));
+    gedcomRecord.children.forEach(this.ancestryService.reportUnparsedRecord);
     return gedcomRecord.value;
   }
 

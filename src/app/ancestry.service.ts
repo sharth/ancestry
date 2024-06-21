@@ -1,10 +1,10 @@
 import {computed, Injectable, signal} from '@angular/core';
-import {parseFamily, type GedcomFamily} from '../gedcom/gedcomFamily';
+import {GedcomFamily} from '../gedcom/gedcomFamily';
 import {GedcomIndividual} from '../gedcom/gedcomIndividual';
 import {GedcomRepository} from '../gedcom/gedcomRepository';
 import {GedcomSource} from '../gedcom/gedcomSource';
-import {parseHeader, type GedcomHeader} from '../gedcom/gedcomHeader';
-import {parseTrailer, type GedcomTrailer} from '../gedcom/gedcomTrailer';
+import {GedcomHeader} from '../gedcom/gedcomHeader';
+import {GedcomTrailer} from '../gedcom/gedcomTrailer';
 import {GedcomRecord} from '../gedcom/gedcomRecord';
 import {Map as ImmutableMap} from 'immutable';
 import {List as ImmutableList} from 'immutable';
@@ -97,12 +97,12 @@ export class AncestryService {
     const reportUnparsedRecord = this.reportUnparsedRecord.bind(this);
     switch (gedcomRecord.tag) {
       case 'HEAD': {
-        const gedcomHeader = parseHeader(gedcomRecord, reportUnparsedRecord);
+        const gedcomHeader = new GedcomHeader(gedcomRecord);
         this.headers.update((headers) => headers.push(gedcomHeader));
         break;
       }
       case 'TRLR': {
-        const gedcomTrailer = parseTrailer(gedcomRecord, reportUnparsedRecord);
+        const gedcomTrailer = new GedcomTrailer(gedcomRecord);
         this.trailers.update((trailers) => trailers.push(gedcomTrailer));
         break;
       }
@@ -113,7 +113,7 @@ export class AncestryService {
         break;
       }
       case 'FAM': {
-        const gedcomFamily = parseFamily(gedcomRecord, this, reportUnparsedRecord);
+        const gedcomFamily = new GedcomFamily(gedcomRecord, this);
         this.families.update(
             (families) => families.set(gedcomFamily.xref, gedcomFamily));
         break;
