@@ -48,6 +48,7 @@ export class AppComponent {
 
   parseSomeText(text: string): void {
     localStorage.setItem('text', text);
+    this.ancestryService.reset();
     return this.ancestryService.parseText(text);
   }
 }
