@@ -5,7 +5,8 @@ import {GedcomRepository} from '../gedcom/gedcomRepository';
 import {GedcomSource} from '../gedcom/gedcomSource';
 import {GedcomHeader} from '../gedcom/gedcomHeader';
 import {GedcomTrailer} from '../gedcom/gedcomTrailer';
-import {GedcomRecord} from '../gedcom/gedcomRecord';
+import type {GedcomRecord} from '../gedcom/gedcomRecord';
+import {parseGedcomRecordsFromText} from '../gedcom/gedcomRecord';
 import {Map as ImmutableMap} from 'immutable';
 import {List as ImmutableList} from 'immutable';
 
@@ -57,81 +58,46 @@ export class AncestryService {
   });
 
   parseText(text: string) {
-    const lines = text.split(/\r?\n/);
-    let ladder: GedcomRecord[] = [];
-
-    for (const line of lines) {
-      if (line == '') {
-        continue;
-      }
-      const match = line.match(/^([0-9]+) *(@[^@]+@)? *([A-Za-z0-9_]+) *(.+)?$/);
-      if (match == null) {
-        throw new Error();
-      }
-      const level = parseInt(match[1], 10);
-      const [xref, tag, value] = match.slice(2);
-      const abstag = [...ladder.slice(0, level).map((record) => record.tag), tag].join('.');
-      const record = new GedcomRecord(level, xref, tag, abstag, value);
-
-      if (record.level === 0) {
-        if (ladder.length > 0) {
-          this.parseRecord(ladder[0]);
+    for (const gedcomRecord of parseGedcomRecordsFromText(text)) {
+      switch (gedcomRecord.tag) {
+        case 'HEAD': {
+          const gedcomHeader = new GedcomHeader(gedcomRecord);
+          this.headers.update((headers) => headers.push(gedcomHeader));
+          break;
         }
-        ladder = [record];
-      } else if (record.tag === 'CONC') {
-        ladder.at(-1)!.value! += record.value;
-      } else if (record.tag === 'CONT') {
-        ladder.at(-1)!.value! += '\n' + (record.value ?? '');
-      } else {
-        ladder.length = record.level;
-        ladder.at(-1)!.children.push(record);
-        ladder.push(record);
+        case 'TRLR': {
+          const gedcomTrailer = new GedcomTrailer(gedcomRecord);
+          this.trailers.update((trailers) => trailers.push(gedcomTrailer));
+          break;
+        }
+        case 'INDI': {
+          const gedcomIndividual = new GedcomIndividual(gedcomRecord, this);
+          this.individuals.update(
+              (individuals) => individuals.set(gedcomIndividual.xref, gedcomIndividual));
+          break;
+        }
+        case 'FAM': {
+          const gedcomFamily = new GedcomFamily(gedcomRecord, this);
+          this.families.update(
+              (families) => families.set(gedcomFamily.xref, gedcomFamily));
+          break;
+        }
+        case 'REPO': {
+          const gedcomRepository = new GedcomRepository(gedcomRecord, this);
+          this.repositories.update(
+              (repositories) => repositories.set(gedcomRepository.xref, gedcomRepository ));
+          break;
+        }
+        case 'SOUR': {
+          const gedcomSource = new GedcomSource(gedcomRecord, this);
+          this.sources.update(
+              (sources) => sources.set(gedcomSource.xref, gedcomSource));
+          break;
+        }
+        default:
+          this.reportUnparsedRecord(gedcomRecord);
+          break;
       }
-    }
-    if (ladder.length > 0) {
-      this.parseRecord(ladder[0]);
-    }
-  }
-
-  parseRecord(gedcomRecord: GedcomRecord): void {
-    switch (gedcomRecord.tag) {
-      case 'HEAD': {
-        const gedcomHeader = new GedcomHeader(gedcomRecord);
-        this.headers.update((headers) => headers.push(gedcomHeader));
-        break;
-      }
-      case 'TRLR': {
-        const gedcomTrailer = new GedcomTrailer(gedcomRecord);
-        this.trailers.update((trailers) => trailers.push(gedcomTrailer));
-        break;
-      }
-      case 'INDI': {
-        const gedcomIndividual = new GedcomIndividual(gedcomRecord, this);
-        this.individuals.update(
-            (individuals) => individuals.set(gedcomIndividual.xref, gedcomIndividual));
-        break;
-      }
-      case 'FAM': {
-        const gedcomFamily = new GedcomFamily(gedcomRecord, this);
-        this.families.update(
-            (families) => families.set(gedcomFamily.xref, gedcomFamily));
-        break;
-      }
-      case 'REPO': {
-        const gedcomRepository = new GedcomRepository(gedcomRecord, this);
-        this.repositories.update(
-            (repositories) => repositories.set(gedcomRepository.xref, gedcomRepository ));
-        break;
-      }
-      case 'SOUR': {
-        const gedcomSource = new GedcomSource(gedcomRecord, this);
-        this.sources.update(
-            (sources) => sources.set(gedcomSource.xref, gedcomSource));
-        break;
-      }
-      default:
-        this.reportUnparsedRecord(gedcomRecord);
-        break;
     }
   }
 
