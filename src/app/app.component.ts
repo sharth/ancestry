@@ -20,7 +20,7 @@ export class AppComponent {
     }
   }
 
-  gedcomFileChanged(el: EventTarget | null): void {
+  gedcomFileChanged(el: EventTarget): void {
     if (!(el instanceof HTMLInputElement)) {
       throw new Error(`Expected el to be an HTMLInputElement, was ${el?.constructor?.name || el}`);
     }
@@ -29,16 +29,12 @@ export class AppComponent {
     }
 
     if (el.files.length === 0) {
-      this.reset();
+      this.parseSomeText('');
     } else if (el.files.length === 1) {
       this.parseSomeFile(el.files[0]);
     } else {
       throw new Error(`Expected el.files.length to be <= 1, was ${el.files.length}`);
     }
-  }
-
-  reset(): void {
-    this.ancestryService.reset();
   }
 
   async parseSomeFile(file: File): Promise<void> {
@@ -48,7 +44,6 @@ export class AppComponent {
 
   parseSomeText(text: string): void {
     localStorage.setItem('text', text);
-    this.ancestryService.reset();
     return this.ancestryService.parseText(text);
   }
 }

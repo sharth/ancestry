@@ -58,6 +58,13 @@ export class AncestryService {
   });
 
   parseText(text: string) {
+    this.headers.set(ImmutableList<GedcomHeader>());
+    this.trailers.set(ImmutableList<GedcomTrailer>());
+    this.individuals.set(ImmutableMap<string, GedcomIndividual>({}));
+    this.families.set(ImmutableMap<string, GedcomFamily>());
+    this.repositories .set(ImmutableMap<string, GedcomRepository>());
+    this.sources.set(ImmutableMap<string, GedcomSource>());
+
     for (const gedcomRecord of parseGedcomRecordsFromText(text)) {
       switch (gedcomRecord.tag) {
         case 'HEAD': {
@@ -106,14 +113,5 @@ export class AncestryService {
       console.warn('Unparsed tag ', gedcomRecord.abstag);
       this.unparsedTags.add(gedcomRecord.abstag);
     }
-  }
-
-  reset(): void {
-    this.headers.set(ImmutableList<GedcomHeader>());
-    this.trailers.set(ImmutableList<GedcomTrailer>());
-    this.individuals.set(ImmutableMap<string, GedcomIndividual>({}));
-    this.families.set(ImmutableMap<string, GedcomFamily>());
-    this.sources.set(ImmutableMap<string, GedcomSource>());
-    this.repositories .set(ImmutableMap<string, GedcomRepository>());
   }
 }

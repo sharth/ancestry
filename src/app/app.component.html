@@ -16,7 +16,7 @@
                 <li class="nav-item"><a class="nav-link" routerLink="/repositories">Repositories</a></li>
             </ul>
             <form class="d-flex">
-                <input id="gedcom-input" type="file" (change)="gedcomFileChanged($event.target)" accept=".ged">
+                <input id="gedcom-input" type="file" (change)="gedcomFileChanged($event.target!)" accept=".ged">
             </form>
             <form class="d-flex" role="search">
                 <input class="form-control me-2" type="search" placeholder="Search">
