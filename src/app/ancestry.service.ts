@@ -20,6 +20,8 @@ export class AncestryService {
   readonly sources = signal(ImmutableMap<string, GedcomSource>());
   readonly repositories = signal(ImmutableMap<string, GedcomRepository>());
 
+  readonly originalGedcomText = signal<string>('');
+
   private readonly unparsedTags = new Set<string>();
 
   individual(xref: string): GedcomIndividual {
@@ -64,6 +66,9 @@ export class AncestryService {
     this.families.set(ImmutableMap<string, GedcomFamily>());
     this.repositories .set(ImmutableMap<string, GedcomRepository>());
     this.sources.set(ImmutableMap<string, GedcomSource>());
+
+    // Remember the gedcomText that was passed in.
+    this.originalGedcomText.set(text);
 
     for (const gedcomRecord of parseGedcomRecordsFromText(text)) {
       switch (gedcomRecord.tag) {
