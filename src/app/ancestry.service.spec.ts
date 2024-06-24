@@ -20,4 +20,32 @@ describe('AncestryService', () => {
     expect(ancestryService.sources().size).toEqual(0);
     expect(ancestryService.repositories().size).toEqual(0);
   });
+
+  it('Track the originally passed in text', () => {
+    const ancestryService = TestBed.inject(AncestryService);
+    const rawGedcomText = [
+      '0 @I1@ INDI',
+    ].join('\n');
+    ancestryService.parseText(rawGedcomText);
+    expect(ancestryService.originalGedcomText()).toEqual(rawGedcomText);
+    // Even though we delete an individual, no change to the originally stored gedcom text is expected.
+    ancestryService.individuals.update((individuals) => individuals.delete('@I1@'));
+    expect(ancestryService.originalGedcomText()).toEqual(rawGedcomText);
+  });
+
+  it('Generated gedcom text matches', () => {
+    const ancestryService = TestBed.inject(AncestryService);
+    const rawGedcomText = [
+      '0 @I1@ INDI',
+    ].join('\n');
+    ancestryService.parseText(rawGedcomText);
+    expect(ancestryService.gedcomText()).toEqual(rawGedcomText);
+  });
+
+  it('Remember order of insertion', () => {
+    const ancestryService = TestBed.inject(AncestryService);
+    const rawGedcomText = [...Array(100).keys()].map((i) => `0 @I${i}@ INDI`).join('\n');
+    ancestryService.parseText(rawGedcomText);
+    expect(ancestryService.gedcomText()).toEqual(rawGedcomText);
+  });
 });

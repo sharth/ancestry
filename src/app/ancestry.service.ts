@@ -7,7 +7,7 @@ import {GedcomHeader} from '../gedcom/gedcomHeader';
 import {GedcomTrailer} from '../gedcom/gedcomTrailer';
 import type {GedcomRecord} from '../gedcom/gedcomRecord';
 import {parseGedcomRecordsFromText} from '../gedcom/gedcomRecord';
-import {Map as ImmutableMap} from 'immutable';
+import {OrderedMap as ImmutableOrderedMap} from 'immutable';
 import {List as ImmutableList} from 'immutable';
 
 @Injectable({providedIn: 'root'})
@@ -15,10 +15,10 @@ export class AncestryService {
   readonly headers = signal(ImmutableList<GedcomHeader>());
   readonly trailers = signal(ImmutableList<GedcomTrailer>());
 
-  readonly individuals = signal(ImmutableMap<string, GedcomIndividual>({}));
-  readonly families = signal(ImmutableMap<string, GedcomFamily>());
-  readonly sources = signal(ImmutableMap<string, GedcomSource>());
-  readonly repositories = signal(ImmutableMap<string, GedcomRepository>());
+  readonly individuals = signal(ImmutableOrderedMap<string, GedcomIndividual>());
+  readonly families = signal(ImmutableOrderedMap<string, GedcomFamily>());
+  readonly sources = signal(ImmutableOrderedMap<string, GedcomSource>());
+  readonly repositories = signal(ImmutableOrderedMap<string, GedcomRepository>());
 
   readonly originalGedcomText = signal<string>('');
 
@@ -48,7 +48,7 @@ export class AncestryService {
     return source;
   }
 
-  gedcomRecords = computed<GedcomRecord[]>(() => {
+  readonly gedcomRecords = computed<GedcomRecord[]>(() => {
     return Array.from([
       ...this.headers(),
       ...this.individuals().values(),
@@ -59,13 +59,17 @@ export class AncestryService {
     ], (gedcomObject) => gedcomObject.gedcomRecord());
   });
 
+  readonly gedcomText = computed<string>(() => this.gedcomRecords()
+      .flatMap((record) => record.text())
+      .join('\n'));
+
   parseText(text: string) {
     this.headers.set(ImmutableList<GedcomHeader>());
     this.trailers.set(ImmutableList<GedcomTrailer>());
-    this.individuals.set(ImmutableMap<string, GedcomIndividual>({}));
-    this.families.set(ImmutableMap<string, GedcomFamily>());
-    this.repositories .set(ImmutableMap<string, GedcomRepository>());
-    this.sources.set(ImmutableMap<string, GedcomSource>());
+    this.individuals.set(ImmutableOrderedMap<string, GedcomIndividual>());
+    this.families.set(ImmutableOrderedMap<string, GedcomFamily>());
+    this.repositories .set(ImmutableOrderedMap<string, GedcomRepository>());
+    this.sources.set(ImmutableOrderedMap<string, GedcomSource>());
 
     // Remember the gedcomText that was passed in.
     this.originalGedcomText.set(text);
