@@ -60,8 +60,8 @@ export class AncestryService {
   });
 
   readonly gedcomText = computed<string>(() => this.gedcomRecords()
-      .flatMap((record) => record.text())
-      .join('\n'));
+      .flatMap((record) => record.text() + '\n')
+      .join(''));
 
   parseText(text: string) {
     this.headers.set(ImmutableList<GedcomHeader>());
