@@ -62,3 +62,16 @@ it('empty lines presented correctly', () => {
     '1 CONT',
   ]);
 });
+
+it('conc records disappear', () => {
+  const gedcomText =
+  '0 TAG abc\n' +
+  '1 CONC def\n';
+  const gedcomRecords = Array.from(parseGedcomRecordsFromText(gedcomText));
+  expect(gedcomRecords).toStrictEqual([
+    new GedcomRecord(0, undefined, 'TAG', 'TAG', 'abcdef', []),
+  ]);
+  expect(gedcomRecords.flatMap((record) => record.text())).toStrictEqual([
+    '0 TAG abcdef',
+  ]);
+});
