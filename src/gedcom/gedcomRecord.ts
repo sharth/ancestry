@@ -9,9 +9,9 @@ export class GedcomRecord {
 
   text(): string[] {
     const gedcom: string[] = [];
-    const values = this.value?.split('\n') ?? [undefined];
-    gedcom.push([this.level, this.xref, this.tag, values[0]].filter((s) => s != null).join(' '));
-    gedcom.push(...values.slice(1).map((v) => `${this.level + 1} CONT ${v}`));
+    const [firstValue, ...remainingValues] = this.value?.split('\n') ?? [];
+    gedcom.push([this.level, this.xref, this.tag, firstValue].filter((s) => s != null).join(' '));
+    gedcom.push(...remainingValues.map((v) => `${this.level + 1} CONT ${v}`));
     gedcom.push(...this.children.flatMap((childRecord) => childRecord.text()));
     return gedcom;
   }
