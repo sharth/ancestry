@@ -18,3 +18,47 @@ it('validate merging of conc and cont', () => {
     '2 CONT senior',
   ]);
 });
+
+it('conc onto the empty string', () => {
+  const gedcomText =
+  '0 TAG\n' +
+  '1 CONC value\n';
+  const gedcomRecords = Array.from(parseGedcomRecordsFromText(gedcomText));
+  expect(gedcomRecords).toStrictEqual([
+    new GedcomRecord(0, undefined, 'TAG', 'TAG', 'value', []),
+  ]);
+  expect(gedcomRecords.flatMap((record) => record.text())).toStrictEqual([
+    '0 TAG value',
+  ]);
+});
+
+it('cont onto the empty string', () => {
+  const gedcomText =
+  '0 TAG\n' +
+  '1 CONT value\n';
+  const gedcomRecords = Array.from(parseGedcomRecordsFromText(gedcomText));
+  expect(gedcomRecords).toStrictEqual([
+    new GedcomRecord(0, undefined, 'TAG', 'TAG', '\nvalue', []),
+  ]);
+  expect(gedcomRecords.flatMap((record) => record.text())).toStrictEqual([
+    '0 TAG',
+    '1 CONT value',
+  ]);
+});
+
+it('empty lines presented correctly', () => {
+  const gedcomText =
+  '0 TAG\n' +
+  '1 CONC\n' +
+  '1 CONT\n' +
+  '1 CONT\n';
+  const gedcomRecords = Array.from(parseGedcomRecordsFromText(gedcomText));
+  expect(gedcomRecords).toStrictEqual([
+    new GedcomRecord(0, undefined, 'TAG', 'TAG', '\n\n', []),
+  ]);
+  expect(gedcomRecords.flatMap((record) => record.text())).toStrictEqual([
+    '0 TAG',
+    '1 CONT',
+    '1 CONT',
+  ]);
+});
