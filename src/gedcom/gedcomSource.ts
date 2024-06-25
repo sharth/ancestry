@@ -14,16 +14,19 @@ export class GedcomSource {
     for (const childRecord of record.children) {
       switch (childRecord.tag) {
         case 'ABBR':
-          this.shortTitle = this.parseSourceAbbr(childRecord);
+          if (this.abbr != null) throw new Error();
+          this.abbr = new GedcomSourceAbbreviation(childRecord, ancestryService);
+          this.childRecords.push(this.abbr);
           break;
         case 'TEXT':
-          this.text = this.parseSourceText(childRecord);
+          if (this.text != null) throw new Error();
+          this.text = new GedcomSourceText(childRecord, ancestryService);
+          this.childRecords.push(this.text);
           break;
         case 'TITL':
-          this.fullTitle = this.parseSourceTitle(childRecord);
-          break;
-        case '_BIBL':
-          this.bibl = this.parseSourceBibl(childRecord);
+          if (this.title != null) throw new Error();
+          this.title = new GedcomSourceTitle(childRecord, ancestryService);
+          this.childRecords.push(this.title);
           break;
         case 'REPO':
           this.repositories.push(this.parseSourceRepositoryCitation(childRecord));
@@ -33,42 +36,6 @@ export class GedcomSource {
           break;
       }
     }
-  }
-
-  private parseSourceAbbr(gedcomRecord: GedcomRecord): string {
-    if (gedcomRecord.abstag !== 'SOUR.ABBR') throw new Error();
-    if (gedcomRecord.xref != null) throw new Error();
-    if (gedcomRecord.value == null) throw new Error();
-
-    gedcomRecord.children.forEach(this.ancestryService.reportUnparsedRecord);
-    return gedcomRecord.value;
-  }
-
-  private parseSourceBibl(gedcomRecord: GedcomRecord): string {
-    if (gedcomRecord.abstag !== 'SOUR._BIBL') throw new Error();
-    if (gedcomRecord.xref != null) throw new Error();
-    if (gedcomRecord.value == null) throw new Error();
-
-    gedcomRecord.children.forEach(this.ancestryService.reportUnparsedRecord);
-    return gedcomRecord.value;
-  }
-
-  private parseSourceText( gedcomRecord: GedcomRecord): string {
-    if (gedcomRecord.abstag !== 'SOUR.TEXT') throw new Error();
-    if (gedcomRecord.xref != null) throw new Error();
-    if (gedcomRecord.value == null) throw new Error();
-
-    gedcomRecord.children.forEach(this.ancestryService.reportUnparsedRecord);
-    return gedcomRecord.value;
-  }
-
-  private parseSourceTitle( gedcomRecord: GedcomRecord): string {
-    if (gedcomRecord.abstag !== 'SOUR.TITL') throw new Error();
-    if (gedcomRecord.xref != null) throw new Error();
-    if (gedcomRecord.value == null) throw new Error();
-
-    gedcomRecord.children.forEach(this.ancestryService.reportUnparsedRecord);
-    return gedcomRecord.value;
   }
 
   private parseSourceRepositoryCitation( gedcomRecord: GedcomRecord): {repositoryXref: string, callNumbers: string[]} {
@@ -103,23 +70,77 @@ export class GedcomSource {
   }
 
   xref: string;
-  shortTitle?: string;
-  fullTitle?: string;
-  text?: string;
-  bibl?: string;
+  abbr?: GedcomSourceAbbreviation;
+  title?: GedcomSourceTitle;
+  text?: GedcomSourceText;
 
   repositories: {
     repositoryXref: string,
     callNumbers: string[],
   }[] = [];
 
+  childRecords: {gedcomRecord: () => GedcomRecord}[] = [];
+
   gedcomRecord(): GedcomRecord {
-    return new GedcomRecord(0, this.xref, 'SOUR', 'SOUR', undefined, [
-      ...this.shortTitle ? [new GedcomRecord(1, undefined, 'ABBR', 'SOUR.ABBR', this.shortTitle)] : [],
-      ...this.fullTitle ? [new GedcomRecord(1, undefined, 'TITL', 'SOUR.TITL', this.fullTitle)] : [],
-      ...this.text ? [new GedcomRecord(1, undefined, 'TEXT', 'SOUR.TEXT', this.text)] : [],
-      ...this.bibl ? [new GedcomRecord(1, undefined, '_BIBL', 'SOUR._BIBL', this.bibl)] : [],
-      // TODO: Add repository call numbers.
-    ]);
+    return new GedcomRecord(
+        0, this.xref, 'SOUR', 'SOUR', undefined,
+        this.childRecords.map((record) => record.gedcomRecord()));
   }
+};
+
+class GedcomSourceTitle {
+  constructor(
+      gedcomRecord: GedcomRecord,
+      ancestryService: AncestryService) {
+    if (gedcomRecord.abstag !== 'SOUR.TITL') throw new Error();
+    if (gedcomRecord.xref != null) throw new Error();
+    if (gedcomRecord.value == null) throw new Error();
+
+    this.value = gedcomRecord.value;
+    gedcomRecord.children.forEach(ancestryService.reportUnparsedRecord);
+  }
+
+  gedcomRecord() {
+    return new GedcomRecord(1, undefined, 'TITL', 'SOUR.TITL', this.value, []);
+  }
+
+  readonly value: string;
+};
+
+class GedcomSourceText {
+  constructor(
+      gedcomRecord: GedcomRecord,
+      ancestryService: AncestryService) {
+    if (gedcomRecord.abstag !== 'SOUR.TEXT') throw new Error();
+    if (gedcomRecord.xref != null) throw new Error();
+    if (gedcomRecord.value == null) throw new Error();
+
+    this.value = gedcomRecord.value;
+    gedcomRecord.children.forEach(ancestryService.reportUnparsedRecord);
+  }
+
+  gedcomRecord() {
+    return new GedcomRecord(1, undefined, 'TEXT', 'SOUR.TEXT', this.value, []);
+  }
+
+  readonly value: string;
+};
+
+class GedcomSourceAbbreviation {
+  constructor(
+      gedcomRecord: GedcomRecord,
+      ancestryService: AncestryService) {
+    if (gedcomRecord.abstag !== 'SOUR.ABBR') throw new Error();
+    if (gedcomRecord.xref != null) throw new Error();
+    if (gedcomRecord.value == null) throw new Error();
+
+    this.value = gedcomRecord.value;
+    gedcomRecord.children.forEach(ancestryService.reportUnparsedRecord);
+  }
+
+  gedcomRecord() {
+    return new GedcomRecord(1, undefined, 'ABBR', 'SOUR.ABBR', this.value, []);
+  }
+
+  readonly value: string;
 };

@@ -1,10 +1,7 @@
-<h1>{{ source().shortTitle }}</h1>
+<h1>{{ source().abbr?.value }}</h1>
 
 <h2>Text</h2>
-<textarea class="form-control">{{ source().text }}</textarea>
-
-<h2>Citation</h2>
-<textarea class="form-control">{{ source().bibl }}</textarea>
+<textarea class="form-control">{{ source().text?.value }}</textarea>
 
 <h2>Repositories</h2>
 <table>

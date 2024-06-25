@@ -2,6 +2,6 @@
 
 <ul>
     <li *ngFor="let source of sources()">
-        <a routerLink="/source/{{source.xref}}">{{source.shortTitle}}</a>
+        <a routerLink="/source/{{source.xref}}">{{source.abbr?.value}}</a>
     </li>
 </ul>

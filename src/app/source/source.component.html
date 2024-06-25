@@ -1,13 +1,10 @@
-<h2>{{ source().shortTitle }}</h2>
+<h2>{{ source().abbr?.value }}</h2>
 
 <h2>Title</h2>
-<pre>{{ source().fullTitle }}</pre>
+<pre>{{ source().title?.value }}</pre>
 
 <h2>Text</h2>
-<pre>{{ source().text }}</pre>
-
-<h2>bibl</h2>
-<pre>{{ source().bibl }}</pre>
+<pre>{{ source().text?.value }}</pre>
 
 <h2>Repositories</h2>
 <dl>

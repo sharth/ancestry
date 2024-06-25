@@ -16,7 +16,7 @@ export class SourcesComponent {
 
   readonly sources = computed(() => {
     const sources: GedcomSource[] = [...this.ancestryService.sources().values()];
-    sources.sort((lhs, rhs) => (lhs.shortTitle ?? '').localeCompare(rhs.shortTitle ?? ''));
+    sources.sort((lhs, rhs) => (lhs.abbr?.value ?? '').localeCompare(rhs.abbr?.value ?? ''));
     return sources;
   });
 }
