@@ -15,26 +15,27 @@ describe('AncestryService', () => {
   });
 
   test('Empty on init', () => {
-    expect(ancestryService.headers().size).toEqual(0);
-    expect(ancestryService.trailers().size).toEqual(0);
-    expect(ancestryService.records().size).toEqual(0);
+    expect(ancestryService.headers().size).toStrictEqual(0);
+    expect(ancestryService.trailers().size).toStrictEqual(0);
+    expect(ancestryService.records().size).toStrictEqual(0);
   });
 
   test('Track the originally passed in text', () => {
     const rawGedcomText =
       '0 @I1@ INDI\n';
     ancestryService.parseText(rawGedcomText);
-    expect(ancestryService.originalGedcomText()).toEqual(rawGedcomText);
+    expect(ancestryService.originalGedcomText()).toStrictEqual(rawGedcomText);
     // Even though we delete an individual, no change to the originally stored gedcom text is expected.
     ancestryService.records.update((records) => records.delete('@I1@'));
-    expect(ancestryService.originalGedcomText()).toEqual(rawGedcomText);
+    expect(ancestryService.originalGedcomText()).toStrictEqual(rawGedcomText);
   });
 
   test('Generated gedcom text matches', () => {
     const rawGedcomText =
-      '0 @I1@ INDI\n';
+      '0 @I1@ INDI\n' +
+      '1 NAME\n';
     ancestryService.parseText(rawGedcomText);
-    expect(ancestryService.gedcomText()).toEqual(rawGedcomText);
+    expect(ancestryService.gedcomText()).toStrictEqual(rawGedcomText);
   });
 
   test('Remember order of insertion', () => {
@@ -42,7 +43,7 @@ describe('AncestryService', () => {
         .map((i) => `0 @I${i}@ INDI\n`)
         .join('');
     ancestryService.parseText(rawGedcomText);
-    expect(ancestryService.gedcomText()).toEqual(rawGedcomText);
+    expect(ancestryService.gedcomText()).toStrictEqual(rawGedcomText);
   });
 
   test('Preserve order of individuals families and sources', () => {
@@ -54,6 +55,6 @@ describe('AncestryService', () => {
           `0 @F${i}@ FAM\n`,
         ]).join('');
     ancestryService.parseText(rawGedcomText);
-    expect(ancestryService.gedcomText()).toEqual(rawGedcomText);
+    expect(ancestryService.gedcomText()).toStrictEqual(rawGedcomText);
   });
 });
