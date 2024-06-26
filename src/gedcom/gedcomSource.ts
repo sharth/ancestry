@@ -4,6 +4,7 @@ import {GedcomSourceAbbreviation} from './gedcomSourceAbbreviation';
 import {GedcomSourceRepository} from './gedcomSourceRepository';
 import {GedcomSourceText} from './gedcomSourceText';
 import {GedcomSourceTitle} from './gedcomSourceTitle';
+import {GedcomUnknown} from './gedcomUnknown';
 
 export class GedcomSource {
   constructor(
@@ -38,9 +39,13 @@ export class GedcomSource {
           this.childRecords.push(sourceRepository);
           break;
         }
-        default:
+        default: {
+          const unknown = new GedcomUnknown(childRecord);
+          this.unknowns.push(unknown);
+          this.childRecords.push(unknown);
           ancestryService.reportUnparsedRecord(childRecord);
           break;
+        }
       }
     }
   }
@@ -50,6 +55,7 @@ export class GedcomSource {
   title?: GedcomSourceTitle;
   text?: GedcomSourceText;
   repositories: GedcomSourceRepository[] = [];
+  unknowns: GedcomUnknown[] = [];
 
   childRecords: {gedcomRecord: () => GedcomRecord}[] = [];
 

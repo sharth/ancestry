@@ -40,5 +40,10 @@
     </tbody>
 </table>
 
+@if (source().unknowns.length > 0) {
+<h2>Unknown Records</h2>
+<pre *ngFor="let unknown of source().unknowns">{{ unknown.gedcomRecord().text().join('\n') }}</pre>
+}
+
 <h2>gedcom</h2>
 <pre>{{ source().gedcomRecord().text().join('\n') }}</pre>
