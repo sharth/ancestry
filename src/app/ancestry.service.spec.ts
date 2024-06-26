@@ -3,48 +3,56 @@ import {AncestryService} from './ancestry.service';
 import {TestBed} from '@angular/core/testing';
 
 describe('AncestryService', () => {
+  let ancestryService: AncestryService;
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       providers: [
         provideExperimentalZonelessChangeDetection(),
       ],
     }).compileComponents();
+    ancestryService = TestBed.inject(AncestryService);
   });
 
-  it('Empty on init', () => {
-    const ancestryService = TestBed.inject(AncestryService);
+  test('Empty on init', () => {
     expect(ancestryService.headers().size).toEqual(0);
     expect(ancestryService.trailers().size).toEqual(0);
-    expect(ancestryService.individuals().size).toEqual(0);
-    expect(ancestryService.families().size).toEqual(0);
-    expect(ancestryService.sources().size).toEqual(0);
-    expect(ancestryService.repositories().size).toEqual(0);
+    expect(ancestryService.records().size).toEqual(0);
   });
 
-  it('Track the originally passed in text', () => {
-    const ancestryService = TestBed.inject(AncestryService);
+  test('Track the originally passed in text', () => {
     const rawGedcomText =
       '0 @I1@ INDI\n';
     ancestryService.parseText(rawGedcomText);
     expect(ancestryService.originalGedcomText()).toEqual(rawGedcomText);
     // Even though we delete an individual, no change to the originally stored gedcom text is expected.
-    ancestryService.individuals.update((individuals) => individuals.delete('@I1@'));
+    ancestryService.records.update((records) => records.delete('@I1@'));
     expect(ancestryService.originalGedcomText()).toEqual(rawGedcomText);
   });
 
-  it('Generated gedcom text matches', () => {
-    const ancestryService = TestBed.inject(AncestryService);
+  test('Generated gedcom text matches', () => {
     const rawGedcomText =
       '0 @I1@ INDI\n';
     ancestryService.parseText(rawGedcomText);
     expect(ancestryService.gedcomText()).toEqual(rawGedcomText);
   });
 
-  it('Remember order of insertion', () => {
-    const ancestryService = TestBed.inject(AncestryService);
+  test('Remember order of insertion', () => {
     const rawGedcomText = [...Array(100).keys()]
         .map((i) => `0 @I${i}@ INDI\n`)
         .join('');
+    ancestryService.parseText(rawGedcomText);
+    expect(ancestryService.gedcomText()).toEqual(rawGedcomText);
+  });
+
+  test('Preserve order of individuals families and sources', () => {
+    const rawGedcomText = Array.from(Array(100).keys())
+        .flatMap((i) => [
+          `0 @I${i}@ INDI\n`,
+          `0 @S${i}@ SOUR\n`,
+          `0 @R${i}@ REPO\n`,
+          `0 @F${i}@ FAM\n`,
+        ]).join('');
     ancestryService.parseText(rawGedcomText);
     expect(ancestryService.gedcomText()).toEqual(rawGedcomText);
   });

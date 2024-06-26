@@ -14,11 +14,8 @@ import {List as ImmutableList} from 'immutable';
 export class AncestryService {
   readonly headers = signal(ImmutableList<GedcomHeader>());
   readonly trailers = signal(ImmutableList<GedcomTrailer>());
-
-  readonly individuals = signal(ImmutableOrderedMap<string, GedcomIndividual>());
-  readonly families = signal(ImmutableOrderedMap<string, GedcomFamily>());
-  readonly sources = signal(ImmutableOrderedMap<string, GedcomSource>());
-  readonly repositories = signal(ImmutableOrderedMap<string, GedcomRepository>());
+  readonly records = signal(
+      ImmutableOrderedMap<string, GedcomIndividual | GedcomFamily | GedcomSource | GedcomRepository>());
 
   readonly originalGedcomText = signal<string>('');
 
@@ -30,10 +27,20 @@ export class AncestryService {
     return individual;
   }
 
+  individuals(): ImmutableOrderedMap<string, GedcomIndividual> {
+    return this.records()
+        .filter((record) => record instanceof GedcomIndividual) as ImmutableOrderedMap<string, GedcomIndividual>;
+  }
+
   family(xref: string): GedcomFamily {
     const family = this.families().get(xref);
     if (family == null) throw new Error(`No family with xref '${xref}'`);
     return family;
+  }
+
+  families(): ImmutableOrderedMap<string, GedcomFamily> {
+    return this.records()
+        .filter((record) => record instanceof GedcomFamily) as ImmutableOrderedMap<string, GedcomFamily>;
   }
 
   repository(xref: string): GedcomRepository {
@@ -42,19 +49,26 @@ export class AncestryService {
     return repository;
   }
 
+  repositories(): ImmutableOrderedMap<string, GedcomRepository> {
+    return this.records()
+        .filter((record) => record instanceof GedcomRepository) as ImmutableOrderedMap<string, GedcomRepository>;
+  }
+
   source(xref: string): GedcomSource {
     const source = this.sources().get(xref);
     if (source == null) throw new Error(`No source with xref '${xref}`);
     return source;
   }
 
+  sources(): ImmutableOrderedMap<string, GedcomSource> {
+    return this.records()
+        .filter((record) => record instanceof GedcomSource) as ImmutableOrderedMap<string, GedcomSource>;
+  }
+
   readonly gedcomRecords = computed<GedcomRecord[]>(() => {
     return Array.from([
       ...this.headers(),
-      ...this.individuals().values(),
-      ...this.families().values(),
-      ...this.sources().values(),
-      ...this.repositories().values(),
+      ...this.records().values(),
       ...this.trailers(),
     ], (gedcomObject) => gedcomObject.gedcomRecord());
   });
@@ -64,12 +78,9 @@ export class AncestryService {
       .join(''));
 
   parseText(text: string) {
-    this.headers.set(ImmutableList<GedcomHeader>());
-    this.trailers.set(ImmutableList<GedcomTrailer>());
-    this.individuals.set(ImmutableOrderedMap<string, GedcomIndividual>());
-    this.families.set(ImmutableOrderedMap<string, GedcomFamily>());
-    this.repositories .set(ImmutableOrderedMap<string, GedcomRepository>());
-    this.sources.set(ImmutableOrderedMap<string, GedcomSource>());
+    this.headers.set(ImmutableList());
+    this.trailers.set(ImmutableList());
+    this.records.set(ImmutableOrderedMap());
 
     // Remember the gedcomText that was passed in.
     this.originalGedcomText.set(text);
@@ -88,25 +99,25 @@ export class AncestryService {
         }
         case 'INDI': {
           const gedcomIndividual = new GedcomIndividual(gedcomRecord, this);
-          this.individuals.update(
+          this.records.update(
               (individuals) => individuals.set(gedcomIndividual.xref, gedcomIndividual));
           break;
         }
         case 'FAM': {
           const gedcomFamily = new GedcomFamily(gedcomRecord, this);
-          this.families.update(
+          this.records.update(
               (families) => families.set(gedcomFamily.xref, gedcomFamily));
           break;
         }
         case 'REPO': {
           const gedcomRepository = new GedcomRepository(gedcomRecord, this);
-          this.repositories.update(
+          this.records.update(
               (repositories) => repositories.set(gedcomRepository.xref, gedcomRepository ));
           break;
         }
         case 'SOUR': {
           const gedcomSource = new GedcomSource(gedcomRecord, this);
-          this.sources.update(
+          this.records.update(
               (sources) => sources.set(gedcomSource.xref, gedcomSource));
           break;
         }
