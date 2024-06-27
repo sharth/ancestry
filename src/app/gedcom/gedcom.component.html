@@ -1,2 +1,21 @@
-<h2>Gedcom</h2>
-<pre>{{ gedcomText() }}</pre>
+<h2>Gedcom Differences</h2>
+<table>
+    <colgroup>
+        <col>
+        <col>
+    </colgroup>
+    <thead>
+        <tr>
+            <th>New Gedcom</th>
+            <th>Original Gedcom</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (difference of differences(); track difference) {
+        <tr>
+            <td>{{ difference.newText }}</td>
+            <td>{{ difference.oldText }}</td>
+        </tr>
+        }
+    </tbody>
+</table>
