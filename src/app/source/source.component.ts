@@ -1,4 +1,4 @@
-import {Component, computed, inject, input} from '@angular/core';
+import {Component, computed, inject, input, signal} from '@angular/core';
 import {AncestryService} from '../ancestry.service';
 import {RouterModule} from '@angular/router';
 import {CommonModule} from '@angular/common';
@@ -31,4 +31,12 @@ export class SourceComponent {
     }
     return arr;
   });
+
+  readonly editing = signal<boolean>(false);
+  setEditMode() {
+    this.editing.set(true);
+  }
+  completeEdits() {
+    this.editing.set(false);
+  }
 }
