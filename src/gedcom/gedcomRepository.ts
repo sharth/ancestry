@@ -1,5 +1,7 @@
+import {computed} from '@angular/core';
 import type {AncestryService} from '../app/ancestry.service';
 import type {GedcomRecord} from './gedcomRecord';
+import type {GedcomSource} from './gedcomSource';
 
 export class GedcomRepository {
   constructor(
@@ -14,8 +16,13 @@ export class GedcomRepository {
     for (const childRecord of record.children) {
       switch (childRecord.tag) {
         case 'NAME':
-          this.parseRepositoryName(childRecord);
+          if (childRecord.abstag !== 'REPO.NAME') throw new Error();
+          if (childRecord.xref != null) throw new Error();
+          if (childRecord.value == null) throw new Error();
+          if (childRecord.children.length != 0) throw new Error();
+          this.name = childRecord.value;
           break;
+
         default:
           this.ancestryService.reportUnparsedRecord(childRecord);
           break;
@@ -23,17 +30,19 @@ export class GedcomRepository {
     }
   }
 
-  private parseRepositoryName(gedcomRecord: GedcomRecord): string {
-    if (gedcomRecord.abstag !== 'REPO.NAME') throw new Error();
-    if (gedcomRecord.xref != null) throw new Error();
-    if (gedcomRecord.value == null) throw new Error();
-
-    gedcomRecord.children.forEach(this.ancestryService.reportUnparsedRecord);
-    return gedcomRecord.value;
-  }
-
   xref: string;
   name?: string;
+
+  sources = computed<GedcomSource[]>(() => {
+    const sources: GedcomSource[] = [];
+    const xref = this.xref;
+    for (const source of this.ancestryService.sources().values()) {
+      if (source.repositories.map((sr) => sr.repositoryXref).includes(xref)) {
+        sources.push(source);
+      }
+    }
+    return sources;
+  });
 
   gedcomRecord(): GedcomRecord {
     return this.record;
