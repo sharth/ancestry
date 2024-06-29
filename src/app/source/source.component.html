@@ -44,7 +44,7 @@
         </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let ref of citations()">
+        <tr *ngFor="let ref of source().citations()">
             <td><a routerLink="/individual/{{ ref.individual.xref }}">{{ ref.individual.name }}</a></td>
             <td>{{ ref.event.type }}</td>
             <td>

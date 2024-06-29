@@ -1,4 +1,7 @@
 import type {AncestryService} from '../app/ancestry.service';
+import type {GedcomCitation} from './gedcomCitation';
+import type {GedcomEvent} from './gedcomEvent';
+import type {GedcomIndividual} from './gedcomIndividual';
 import {GedcomRecord} from './gedcomRecord';
 import {GedcomSourceAbbreviation} from './gedcomSourceAbbreviation';
 import {GedcomSourceRepository} from './gedcomSourceRepository';
@@ -63,5 +66,19 @@ export class GedcomSource {
     return new GedcomRecord(
         0, this.xref, 'SOUR', 'SOUR', undefined,
         this.childRecords.map((record) => record.gedcomRecord()));
+  }
+
+  citations(): { individual: GedcomIndividual; event: GedcomEvent; citation: GedcomCitation }[] {
+    const arr = [];
+    for (const individual of this.ancestryService.individuals().values()) {
+      for (const event of individual.events) {
+        for (const citation of event.citations) {
+          if (citation.sourceXref == this.xref) {
+            arr.push({individual: individual, event: event, citation: citation});
+          }
+        }
+      }
+    }
+    return arr;
   }
 };

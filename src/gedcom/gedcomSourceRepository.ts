@@ -4,7 +4,7 @@ import {GedcomRecord} from './gedcomRecord';
 export class GedcomSourceRepository {
   constructor(
       gedcomRecord: GedcomRecord,
-      ancestryService: AncestryService) {
+      private ancestryService: AncestryService) {
     if (gedcomRecord.abstag !== 'SOUR.REPO') throw new Error();
     if (gedcomRecord.xref != null) throw new Error();
     if (gedcomRecord.value == null) throw new Error();
@@ -32,6 +32,10 @@ export class GedcomSourceRepository {
     return new GedcomRecord(
         1, undefined, 'REPO', 'SOUR.REPO', this.repositoryXref,
         this.callNumbers.map((callNumber) => new GedcomRecord(2, undefined, 'CALN', 'SOUR.REPO.CALN', callNumber, [])));
+  }
+
+  repository() {
+    return this.ancestryService.repository(this.repositoryXref);
   }
 
   readonly repositoryXref: string;

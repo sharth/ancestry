@@ -71,4 +71,38 @@ describe('GedcomSource', () => {
     const sources = records.map((record) => new GedcomSource(record, ancestryService));
     expect(sources.flatMap((source) => source.gedcomRecord().text())).toStrictEqual(gedcomArray);
   });
+
+  test('citations', () => {
+    const gedcomArray = [
+      '0 @I0@ INDI',
+      '0 @I1@ INDI',
+      '1 BIRT',
+      '2 SOUR @S1@',
+      '1 DEAT Y',
+      '2 SOUR @S4@',
+      '2 SOUR @S1@',
+      '1 BURI',
+      '2 SOUR @S2@',
+      '0 @S1@ SOUR',
+      '0 @S2@ SOUR',
+      '0 @S3@ SOUR',
+      '0 @S4@ SOUR',
+    ];
+    ancestryService.parseText(gedcomArray.join('\n'));
+    const individual = ancestryService.individual('@I1@');
+    const birthEvent = individual.events.filter((event) => event.gedcomRecord().tag == 'BIRT')[0];
+    const deathEvent = individual.events.filter((event) => event.gedcomRecord().tag == 'DEAT')[0];
+    const burialEvent = individual.events.filter((event) => event.gedcomRecord().tag == 'BURI')[0];
+    expect(ancestryService.source('@S1@').citations()).toStrictEqual([
+      {individual: individual, event: birthEvent, citation: birthEvent.citations[0]},
+      {individual: individual, event: deathEvent, citation: deathEvent.citations[1]},
+    ]);
+    expect(ancestryService.source('@S2@').citations()).toStrictEqual([
+      {individual: individual, event: burialEvent, citation: burialEvent.citations[0]},
+    ]);
+    expect(ancestryService.source('@S3@').citations()).toStrictEqual([]);
+    expect(ancestryService.source('@S4@').citations()).toStrictEqual([
+      {individual: individual, event: deathEvent, citation: deathEvent.citations[0]},
+    ]);
+  });
 });
