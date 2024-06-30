@@ -1,6 +1,5 @@
 import {Component, computed, inject} from '@angular/core';
 import {AncestryService} from '../ancestry.service';
-import type {GedcomRecord} from '../../gedcom/gedcomRecord';
 import {parseGedcomRecordsFromText} from '../../gedcom/gedcomRecord';
 
 @Component({
