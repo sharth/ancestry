@@ -1,24 +1,10 @@
 <h1>{{ source().abbr?.value ?? source().xref }}</h1>
 
-@if (editing()) {
-<button type="button" class="btn btn-primary" (click)="completeEdits()">Save!</button>
-} @else {
-<button type="button" class="btn btn-primary" (click)="setEditMode()">Edit!</button>
-}
-
 <h2>Title</h2>
-@if (editing()) {
-<textarea>{{ source().title?.value }}</textarea>
-} @else {
 <div>{{ source().title?.value }}</div>
-}
 
 <h2>Text</h2>
-@if (editing()) {
-<textarea>{{ source().text?.value }}</textarea>
-} @else {
 <div>{{ source().text?.value }}</div>
-}
 
 <h2>Repositories</h2>
 <dl>
@@ -61,3 +47,14 @@
 
 <h2>gedcom</h2>
 <pre>{{ source().gedcomRecord().text().join('\n') }}</pre>
+
+<h2>Edit</h2>
+<form [formGroup]="sourceForm" (ngSubmit)="onSubmit()">
+    <h3>Abbr</h3>
+    <textarea formControlName="abbr">{{ source().abbr?.value }}</textarea>
+    <h3>Title</h3>
+    <textarea formControlName="title">{{ source().title?.value }}</textarea>
+    <h3>Text</h3>
+    <textarea formControlName="text">{{ source().text?.value }}</textarea>
+    <input type="submit">
+</form>

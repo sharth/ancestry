@@ -18,7 +18,7 @@ describe('GedcomSource', () => {
     const gedcomText = '0 @S1@ SOUR\n';
     const records = Array.from(parseGedcomRecordsFromText(gedcomText));
     expect(records).toHaveLength(1);
-    const source = new GedcomSource(records[0], ancestryService);
+    const source = GedcomSource.constructFromGedcom(records[0], ancestryService);
     expect(source.abbr).toBe(undefined);
     expect(source.repositories).toHaveLength(0);
     expect(source.text).toBe(undefined);
@@ -68,7 +68,7 @@ describe('GedcomSource', () => {
     ]},
   ])('incoming gedcom matches outgoing gedcom', ({gedcomArray}) => {
     const records = Array.from(parseGedcomRecordsFromText(gedcomArray.join('\n')));
-    const sources = records.map((record) => new GedcomSource(record, ancestryService));
+    const sources = records.map((record) => GedcomSource.constructFromGedcom(record, ancestryService));
     expect(sources.flatMap((source) => source.gedcomRecord().text())).toStrictEqual(gedcomArray);
   });
 
@@ -104,5 +104,43 @@ describe('GedcomSource', () => {
     expect(ancestryService.source('@S4@').citations()).toStrictEqual([
       {individual: individual, event: deathEvent, citation: deathEvent.citations[0]},
     ]);
+  });
+
+  test('clone', () => {
+    const gedcomSource = new GedcomSource('@S1@', ancestryService).updateAbbr('abbr');
+    const clonedSource = gedcomSource.clone();
+    expect(gedcomSource).not.toBe(clonedSource);
+    expect(gedcomSource.abbr).toBe(clonedSource.abbr);
+  });
+
+  test('Change abbr from null to null', () => {
+    const gedcomSource = new GedcomSource('@S1@', ancestryService);
+    const changedSource = gedcomSource.updateAbbr(null);
+    expect(changedSource).toBe(gedcomSource);
+    expect(changedSource.abbr).toBeUndefined;
+  });
+
+  test('Change abbr from null to value', () => {
+    const gedcomSource = new GedcomSource('@S1@', ancestryService);
+    const changedSource = gedcomSource.updateAbbr('new value');
+    expect(changedSource).not.toBe(gedcomSource);
+    expect(changedSource.abbr?.value).toStrictEqual('new value');
+    expect(gedcomSource.abbr).toBeUndefined;
+  });
+
+  test('Change abbr from value to null', () => {
+    const gedcomSource = new GedcomSource('@S1@', ancestryService).updateAbbr('old');
+    const changedSource = gedcomSource.updateAbbr(null);
+    expect(changedSource).not.toBe(gedcomSource);
+    expect(changedSource.abbr).toBeUndefined;
+    expect(gedcomSource.abbr?.value).toStrictEqual('old');
+  });
+
+  test('Change abbr from value to another value', () => {
+    const gedcomSource = new GedcomSource('@S1@', ancestryService).updateAbbr('old');
+    const changedSource = gedcomSource.updateAbbr('new');
+    expect(changedSource).not.toBe(gedcomSource);
+    expect(changedSource.abbr?.value).toStrictEqual('new');
+    expect(gedcomSource.abbr?.value).toStrictEqual('old');
   });
 });

@@ -10,50 +10,50 @@ import {GedcomSourceTitle} from './gedcomSourceTitle';
 import {GedcomUnknown} from './gedcomUnknown';
 
 export class GedcomSource {
-  constructor(
-      private record: GedcomRecord,
-      private ancestryService: AncestryService) {
+  constructor(public xref: string, private ancestryService: AncestryService) {}
+
+  static constructFromGedcom(record: GedcomRecord, ancestryService: AncestryService): GedcomSource {
     if (record.abstag !== 'SOUR') throw new Error();
     if (record.xref == null) throw new Error();
     if (record.value != null) throw new Error();
 
-    this.xref = record.xref;
+    const gedcomSource = new GedcomSource(record.xref, ancestryService);
 
     for (const childRecord of record.children) {
       switch (childRecord.tag) {
         case 'ABBR':
-          if (this.abbr != null) throw new Error();
-          this.abbr = new GedcomSourceAbbreviation(childRecord, ancestryService);
-          this.childRecords.push(this.abbr);
+          if (gedcomSource.abbr != null) throw new Error();
+          gedcomSource.abbr = GedcomSourceAbbreviation.constructFromGedcom(childRecord, ancestryService);
+          gedcomSource.childRecords.push(gedcomSource.abbr);
           break;
         case 'TEXT':
-          if (this.text != null) throw new Error();
-          this.text = new GedcomSourceText(childRecord, ancestryService);
-          this.childRecords.push(this.text);
+          if (gedcomSource.text != null) throw new Error();
+          gedcomSource.text = new GedcomSourceText(childRecord, ancestryService);
+          gedcomSource.childRecords.push(gedcomSource.text);
           break;
         case 'TITL':
-          if (this.title != null) throw new Error();
-          this.title = new GedcomSourceTitle(childRecord, ancestryService);
-          this.childRecords.push(this.title);
+          if (gedcomSource.title != null) throw new Error();
+          gedcomSource.title = new GedcomSourceTitle(childRecord, ancestryService);
+          gedcomSource.childRecords.push(gedcomSource.title);
           break;
         case 'REPO': {
           const sourceRepository = new GedcomSourceRepository(childRecord, ancestryService);
-          this.repositories.push(sourceRepository);
-          this.childRecords.push(sourceRepository);
+          gedcomSource.repositories.push(sourceRepository);
+          gedcomSource.childRecords.push(sourceRepository);
           break;
         }
         default: {
           const unknown = new GedcomUnknown(childRecord);
-          this.unknowns.push(unknown);
-          this.childRecords.push(unknown);
-          ancestryService.reportUnparsedRecord(childRecord);
+          gedcomSource.unknowns.push(unknown);
+          gedcomSource.childRecords.push(unknown);
           break;
         }
       }
     }
+
+    return gedcomSource;
   }
 
-  xref: string;
   abbr?: GedcomSourceAbbreviation;
   title?: GedcomSourceTitle;
   text?: GedcomSourceText;
@@ -80,5 +80,34 @@ export class GedcomSource {
       }
     }
     return arr;
+  }
+
+  clone(): GedcomSource {
+    const cloned = new GedcomSource(this.xref, this.ancestryService);
+    cloned.abbr = this.abbr;
+    cloned.title = this.title;
+    cloned.text = this.text;
+    cloned.repositories = this.repositories;
+    cloned.unknowns = this.unknowns;
+    return cloned;
+  }
+
+  updateAbbr(abbr: string | null): GedcomSource {
+    const cloned = this.clone();
+    if (abbr != null && this.abbr != null) {
+      cloned.abbr = new GedcomSourceAbbreviation(abbr, this.ancestryService);
+      cloned.childRecords = this.childRecords.toSpliced(this.childRecords.indexOf(this.abbr), 1, cloned.abbr);
+      return cloned;
+    } else if (abbr == null && this.abbr != null) {
+      cloned.abbr = undefined;
+      cloned.childRecords = this.childRecords.toSpliced(this.childRecords.indexOf(this.abbr), 1);
+      return cloned;
+    } else if (abbr != null && this.abbr == null) {
+      cloned.abbr = new GedcomSourceAbbreviation(abbr, this.ancestryService);
+      cloned.childRecords = this.childRecords.toSpliced(-1, 0, cloned.abbr);
+      return cloned;
+    } else {
+      return this;
+    }
   }
 };

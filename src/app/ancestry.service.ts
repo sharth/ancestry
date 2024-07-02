@@ -117,7 +117,7 @@ export class AncestryService {
           break;
         }
         case 'SOUR': {
-          const gedcomSource = new GedcomSource(gedcomRecord, this);
+          const gedcomSource = GedcomSource.constructFromGedcom(gedcomRecord, this);
           this.records.update(
               (sources) => sources.set(gedcomSource.xref, gedcomSource));
           break;
