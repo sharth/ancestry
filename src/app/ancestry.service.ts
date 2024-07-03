@@ -9,13 +9,14 @@ import type {GedcomRecord} from '../gedcom/gedcomRecord';
 import {parseGedcomRecordsFromText} from '../gedcom/gedcomRecord';
 import {OrderedMap as ImmutableOrderedMap} from 'immutable';
 import {List as ImmutableList} from 'immutable';
+import {GedcomSubmitter} from '../gedcom/gedcomSubmitter';
 
 @Injectable({providedIn: 'root'})
 export class AncestryService {
   readonly headers = signal(ImmutableList<GedcomHeader>());
   readonly trailers = signal(ImmutableList<GedcomTrailer>());
-  readonly records = signal(
-      ImmutableOrderedMap<string, GedcomIndividual | GedcomFamily | GedcomSource | GedcomRepository>());
+  readonly records = signal(ImmutableOrderedMap<
+    string, GedcomIndividual | GedcomFamily | GedcomSource | GedcomRepository | GedcomSubmitter>());
 
   readonly originalGedcomText = signal<string>('');
 
@@ -101,25 +102,32 @@ export class AncestryService {
         case 'INDI': {
           const gedcomIndividual = new GedcomIndividual(gedcomRecord, this);
           this.records.update(
-              (individuals) => individuals.set(gedcomIndividual.xref, gedcomIndividual));
+              (records) => records.set(gedcomIndividual.xref, gedcomIndividual));
           break;
         }
         case 'FAM': {
           const gedcomFamily = new GedcomFamily(gedcomRecord, this);
           this.records.update(
-              (families) => families.set(gedcomFamily.xref, gedcomFamily));
+              (records) => records.set(gedcomFamily.xref, gedcomFamily));
           break;
         }
         case 'REPO': {
           const gedcomRepository = new GedcomRepository(gedcomRecord, this);
           this.records.update(
-              (repositories) => repositories.set(gedcomRepository.xref, gedcomRepository ));
+              (records) => records.set(gedcomRepository.xref, gedcomRepository ));
           break;
         }
         case 'SOUR': {
           const gedcomSource = GedcomSource.constructFromGedcom(gedcomRecord, this);
           this.records.update(
-              (sources) => sources.set(gedcomSource.xref, gedcomSource));
+              (records) => records.set(gedcomSource.xref, gedcomSource));
+          break;
+        }
+
+        case 'SUBM': {
+          const gedcomSubmitter = new GedcomSubmitter(gedcomRecord, this);
+          this.records.update(
+              (records) => records.set(gedcomSubmitter.xref, gedcomSubmitter));
           break;
         }
         default:
