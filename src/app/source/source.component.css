@@ -1,7 +1,15 @@
-textarea {
+div {
+    white-space: pre-wrap;
+}
+
+dialog {
+    width: 80%;
+}
+
+mat-form-field {
     width: 100%;
 }
 
-div {
-    white-space: pre-wrap;
+textarea {
+    field-sizing: content
 }

@@ -28,12 +28,12 @@ export class GedcomSource {
           break;
         case 'TEXT':
           if (gedcomSource.text != null) throw new Error();
-          gedcomSource.text = new GedcomSourceText(childRecord, ancestryService);
+          gedcomSource.text = GedcomSourceText.constructFromGedcom(childRecord, ancestryService);
           gedcomSource.childRecords.push(gedcomSource.text);
           break;
         case 'TITL':
           if (gedcomSource.title != null) throw new Error();
-          gedcomSource.title = new GedcomSourceTitle(childRecord, ancestryService);
+          gedcomSource.title = GedcomSourceTitle.constructFromGedcom(childRecord, ancestryService);
           gedcomSource.childRecords.push(gedcomSource.title);
           break;
         case 'REPO': {
@@ -92,22 +92,50 @@ export class GedcomSource {
     return cloned;
   }
 
-  updateAbbr(abbr: string | null): GedcomSource {
-    const cloned = this.clone();
-    if (abbr != null && this.abbr != null) {
-      cloned.abbr = new GedcomSourceAbbreviation(abbr, this.ancestryService);
-      cloned.childRecords = this.childRecords.toSpliced(this.childRecords.indexOf(this.abbr), 1, cloned.abbr);
-      return cloned;
-    } else if (abbr == null && this.abbr != null) {
-      cloned.abbr = undefined;
-      cloned.childRecords = this.childRecords.toSpliced(this.childRecords.indexOf(this.abbr), 1);
-      return cloned;
-    } else if (abbr != null && this.abbr == null) {
-      cloned.abbr = new GedcomSourceAbbreviation(abbr, this.ancestryService);
-      cloned.childRecords = this.childRecords.toSpliced(-1, 0, cloned.abbr);
-      return cloned;
+  private updateChildRecords(
+      oldRecord: {gedcomRecord: () => GedcomRecord} | null | undefined,
+      newRecord: {gedcomRecord: () => GedcomRecord} | null | undefined): {gedcomRecord: () => GedcomRecord}[] {
+    if (oldRecord != null && newRecord != null) {
+      return this.childRecords.toSpliced(this.childRecords.indexOf(oldRecord), 1, newRecord);
+    } else if (oldRecord != null && newRecord == null) {
+      return this.childRecords.toSpliced(this.childRecords.indexOf(oldRecord), 1);
+    } else if (oldRecord == null && newRecord != null) {
+      return this.childRecords.toSpliced(-1, 0, newRecord);
     } else {
-      return this;
+      return this.childRecords;
     }
   }
-};
+
+  updateAbbr(value: string | null): GedcomSource {
+    if (this.abbr?.value == value) {
+      return this;
+    } else {
+      const cloned = this.clone();
+      cloned.abbr = value ? new GedcomSourceAbbreviation(value, this.ancestryService) : undefined;
+      cloned.childRecords = this.updateChildRecords(this.abbr, cloned.abbr);
+      return cloned;
+    }
+  }
+
+  updateTitle(value: string | null): GedcomSource {
+    if (this.title?.value == value) {
+      return this;
+    } else {
+      const cloned = this.clone();
+      cloned.title = value ? new GedcomSourceTitle(value, this.ancestryService) : undefined;
+      cloned.childRecords = this.updateChildRecords(this.title, cloned.title);
+      return cloned;
+    }
+  }
+
+  updateText(value: string | null): GedcomSource {
+    if (this.text?.value == value) {
+      return this;
+    } else {
+      const cloned = this.clone();
+      cloned.text = value ? new GedcomSourceText(value, this.ancestryService) : undefined;
+      cloned.childRecords = this.updateChildRecords(this.text, cloned.text);
+      return cloned;
+    }
+  }
+}

@@ -143,4 +143,10 @@ describe('GedcomSource', () => {
     expect(changedSource.abbr?.value).toStrictEqual('new');
     expect(gedcomSource.abbr?.value).toStrictEqual('old');
   });
+
+  test('Change abbr from value to an identical value', () => {
+    const gedcomSource = new GedcomSource('@S1@', ancestryService).updateAbbr('value');
+    const changedSource = gedcomSource.updateAbbr('value');
+    expect(changedSource).toBe(gedcomSource);
+  });
 });

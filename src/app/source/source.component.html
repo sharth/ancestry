@@ -48,13 +48,26 @@
 <h2>gedcom</h2>
 <pre>{{ source().gedcomRecord().text().join('\n') }}</pre>
 
-<h2>Edit</h2>
-<form [formGroup]="sourceForm" (ngSubmit)="onSubmit()">
-    <h3>Abbr</h3>
-    <textarea formControlName="abbr">{{ source().abbr?.value }}</textarea>
-    <h3>Title</h3>
-    <textarea formControlName="title">{{ source().title?.value }}</textarea>
-    <h3>Text</h3>
-    <textarea formControlName="text">{{ source().text?.value }}</textarea>
-    <input type="submit">
-</form>
+<h2><button (click)="openForm()">Edit!</button></h2>
+
+<dialog #editDialog>
+    <form [formGroup]="sourceForm">
+        <mat-form-field>
+            <mat-label>Short Title</mat-label>
+            <textarea matInput formControlName="abbr"></textarea>
+        </mat-form-field>
+        <br>
+        <mat-form-field>
+            <mat-label>Title</mat-label>
+            <textarea matInput formControlName="title"></textarea>
+        </mat-form-field>
+        <br>
+        <mat-form-field>
+            <mat-label>Text</mat-label>
+            <textarea matInput formControlName="text">{{ source().text?.value }}</textarea>
+        </mat-form-field>
+        <br>
+        <input type="submit" (click)="submitForm()">
+        <input type="button" value="Cancel" (click)="editDialog.close()">
+    </form>
+</dialog>
