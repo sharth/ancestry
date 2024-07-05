@@ -1,6 +1,4 @@
 import type {ElementRef} from '@angular/core';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatInputModule} from '@angular/material/input';
 import {Component, computed, inject, input, viewChild} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {AncestryService} from '../ancestry.service';
@@ -10,7 +8,7 @@ import {CommonModule} from '@angular/common';
 @Component({
   selector: 'app-source',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule],
   templateUrl: './source.component.html',
   styleUrl: './source.component.css',
 })
