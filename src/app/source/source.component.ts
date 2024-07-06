@@ -1,6 +1,6 @@
 import type {ElementRef} from '@angular/core';
 import {Component, computed, inject, input, viewChild} from '@angular/core';
-import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {AncestryService} from '../ancestry.service';
 import {RouterModule} from '@angular/router';
 import {CommonModule} from '@angular/common';
@@ -19,10 +19,17 @@ export class SourceComponent {
 
   editDialog = viewChild.required<ElementRef<HTMLDialogElement>>('editDialog');
 
-  sourceForm = new FormGroup({
-    abbr: new FormControl(''),
-    title: new FormControl(''),
-    text: new FormControl(''),
+  formBuilder = inject(FormBuilder);
+  sourceForm = this.formBuilder.group({
+    abbr: '',
+    title: '',
+    text: '',
+    repositories: this.formBuilder.array([
+      this.formBuilder.group({
+        repositoryXref: '',
+        callNumber: '',
+      }),
+    ]),
   });
 
   openForm() {
@@ -30,6 +37,14 @@ export class SourceComponent {
       abbr: this.source().abbr?.value ?? '',
       title: this.source().title?.value ?? '',
       text: this.source().text?.value ?? '',
+      repositories: [
+        // {repositoryXref: '', callNumber: ''},
+        ...this.source().repositories.flatMap((sourceRepository) =>
+          sourceRepository.callNumbers.map((callNumber) => ({
+            repositoryXref: sourceRepository.repositoryXref,
+            callNumber: callNumber,
+          }))),
+      ],
     });
     this.editDialog().nativeElement.showModal();
   }
@@ -41,5 +56,16 @@ export class SourceComponent {
         .updateTitle(this.sourceForm.value.title || null);
     this.ancestryService.records.update((records) => records.set(newSource.xref, newSource));
     this.editDialog().nativeElement.close();
+  }
+
+  addRepositoryToForm() {
+    this.sourceForm.controls.repositories.controls.push(this.formBuilder.group({
+      repositoryXref: '',
+      callNumber: '',
+    }));
+    // this.sourceForm.controls.repositories.push(this.formBuilder.control({
+    //   repositoryXref: '',
+    //   callNumber: '',
+    // }));
   }
 }

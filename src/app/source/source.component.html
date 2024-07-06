@@ -64,6 +64,23 @@
             <textarea class="form-control h-auto" formControlName="text"></textarea>
             <label>Text</label>
         </div>
+        @for (sourceRepository of sourceForm.controls.repositories.controls; track sourceRepository) {
+        <div class="input-group">
+            <button class="btn btn-outline-secondary" type="button">x</button>
+            <div class="form-floating">
+                <input class="form-control" type="text">
+                <label>Repository Xref</label>
+            </div>
+            <div class="form-floating">
+                <input class="form-control" type="text">
+                <label>Call Number</label>
+            </div>
+        </div>
+        }
+        <div class="input-group">
+            <button class="btn btn-outline-secondary" type="button" (click)="addRepositoryToForm()">+</button>
+            <span class="input-group-text">Associate with another repository</span>
+        </div>
         <input type="submit" (click)="submitForm()">
         <input type="button" value="Cancel" (click)="editDialog.close()">
     </form>
