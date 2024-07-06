@@ -14,7 +14,6 @@
   "dependencies": {
     "@angular-devkit/build-angular": "^18.0.7",
     "@angular/animations": "^18.0.3",
-    "@angular/cdk": "^18.0.3",
     "@angular/cli": "^18.0.7",
     "@angular/common": "^18.0.3",
     "@angular/compiler": "^18.0.3",
