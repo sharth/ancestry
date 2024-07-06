@@ -35,13 +35,11 @@ export class SourceComponent {
   }
 
   submitForm() {
-    const source = this.source();
-    const sourceForm = this.sourceForm;
-    console.log(this.sourceForm.value);
-    this.ancestryService.records.update((records) => records.set(source.xref, source
-        .updateAbbr(sourceForm.value.abbr || null)
-        .updateText(sourceForm.value.text || null)
-        .updateTitle(sourceForm.value.title || null)));
+    const newSource = this.source()
+        .updateAbbr(this.sourceForm.value.abbr || null)
+        .updateText(this.sourceForm.value.text || null)
+        .updateTitle(this.sourceForm.value.title || null);
+    this.ancestryService.records.update((records) => records.set(newSource.xref, newSource));
     this.editDialog().nativeElement.close();
   }
 }
