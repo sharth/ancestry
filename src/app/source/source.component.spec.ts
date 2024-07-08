@@ -26,4 +26,8 @@ describe('SourceComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('open dialog', () => {
+    component.openForm();
+  });
 });
