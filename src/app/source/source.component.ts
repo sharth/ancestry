@@ -1,35 +1,39 @@
-import type {ElementRef} from '@angular/core';
+import type {ElementRef, OnInit} from '@angular/core';
 import {Component, computed, inject, input, viewChild} from '@angular/core';
-import type {FormArray, FormControl, FormGroup} from '@angular/forms';
-import {FormBuilder, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {AncestryService} from '../ancestry.service';
 import {RouterModule} from '@angular/router';
 import {CommonModule} from '@angular/common';
+import type {SourceModel} from './source-model';
+import {SourceEditAbbrComponent} from './source-edit-abbr.component';
+import {SourceEditTitleComponent} from './source-edit-title.component';
+import {SourceEditTextComponent} from './source-edit-text.component';
+import {SourceEditRepositoriesComponent} from './source-edit-repositories.component';
 
 @Component({
   selector: 'app-source',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule],
   templateUrl: './source.component.html',
   styleUrl: './source.component.css',
+  imports: [
+    CommonModule, RouterModule,
+    SourceEditAbbrComponent, SourceEditTitleComponent, SourceEditTextComponent,
+    SourceEditRepositoriesComponent,
+  ],
 })
-export class SourceComponent {
+export class SourceComponent implements OnInit {
   ancestryService = inject(AncestryService);
   xref = input.required<string>();
   source = computed(() => this.ancestryService.source(this.xref()));
 
-  formBuilder = inject(FormBuilder);
-  form = computed(() => this.formBuilder.group({
-    abbr: this.source().abbr?.value,
-    title: this.source().title?.value,
-    text: this.source().text?.value,
-    repositories: this.formBuilder.array([
-      this.formBuilder.group({
-        repositoryXref: 'abc',
-        callNumber: 'def',
-      }),
-    ]),
-  }));
+  model?: SourceModel;
+  ngOnInit(): void {
+    this.model = {
+      abbr: this.source().abbr?.value ?? '',
+      title: this.source().title?.value ?? '',
+      text: this.source().text?.value ?? '',
+      repositories: [],
+    };
+  }
 
   editDialog = viewChild.required<ElementRef<HTMLDialogElement>>('editDialog');
 
@@ -39,21 +43,10 @@ export class SourceComponent {
 
   submitForm() {
     const newSource = this.source()
-        .updateAbbr(this.form().value.abbr || null)
-        .updateText(this.form().value.text || null)
-        .updateTitle(this.form().value.title || null);
+        .updateAbbr(this.model?.abbr || null)
+        .updateText(this.model?.text || null)
+        .updateTitle(this.model?.title || null);
     this.ancestryService.records.update((records) => records.set(newSource.xref, newSource));
     this.editDialog().nativeElement.close();
-  }
-
-  addRepositoryToForm() {
-    this.form().controls.repositories.push(this.formBuilder.group({
-      repositoryXref: 'pushed',
-      callNumber: '',
-    }));
-    // this.sourceForm.controls.repositories.push(this.formBuilder.control({
-    //   repositoryXref: '',
-    //   callNumber: '',
-    // }));
   }
 }

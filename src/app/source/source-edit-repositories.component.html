@@ -1,0 +1,15 @@
+<div class="input-group" *ngFor="let sr of sourceModel().repositories">
+    <button class="btn btn-outline-secondary" type="button">x</button>
+    <div class="form-floating">
+        <input class="form-control" type="text" [(ngModel)]="sr.repositoryXref">
+        <label>Repository Xref</label>
+    </div>
+    <div class=" form-floating">
+        <input class="form-control" type="text" [(ngModel)]="sr.callNumber">
+        <label>Call Number</label>
+    </div>
+</div>
+<div class="input-group">
+    <button class="btn btn-outline-secondary" type="button" (click)="addSourceRepository()">+</button>
+    <span class="input-group-text">Associate with another repository</span>
+</div>

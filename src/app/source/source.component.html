@@ -51,39 +51,14 @@
 <h2><button (click)="openForm()">Edit!</button></h2>
 
 <dialog #editDialog>
-    <form [formGroup]="form()" class="vstack gap-3">
-        <div class="form-floating">
-            <textarea class="form-control h-auto" formControlName="abbr"></textarea>
-            <label>Short Title</label>
-        </div>
-        <div class="form-floating">
-            <textarea class="form-control h-auto" formControlName="title"></textarea>
-            <label>Title</label>
-        </div>
-        <div class="form-floating">
-            <textarea class="form-control h-auto" formControlName="text"></textarea>
-            <label>Text</label>
-        </div>
-        <ng-component formArrayName="repositories">
-            @for (sr of form().controls.repositories.controls; track sr; let i = $index) {
-            <div class="input-group" formGroupName={{i}}>
-                <button class="btn btn-outline-secondary" type="button">x</button>
-                <div class="form-floating">
-                    <input class="form-control" type="text" formControlName="repositoryXref">
-                    <label>Repository Xref</label>
-                </div>
-                <div class="form-floating">
-                    <input class="form-control" type="text" formControlName="callNumber">
-                    <label>Call Number</label>
-                </div>
-            </div>
-            }
-        </ng-component>
-        <div class="input-group">
-            <button class="btn btn-outline-secondary" type="button" (click)="addRepositoryToForm()">+</button>
-            <span class="input-group-text">Associate with another repository</span>
-        </div>
-        <input type="submit" (click)="submitForm()">
+    <form (ngSubmit)="submitForm()" class="vstack gap-3">
+        <app-source-edit-abbr [(sourceModel)]="model!"></app-source-edit-abbr>
+        <app-source-edit-title [(sourceModel)]="model!"></app-source-edit-title>
+        <app-source-edit-text [(sourceModel)]="model!"></app-source-edit-text>
+        <app-source-edit-repositories [(sourceModel)]="model!"></app-source-edit-repositories>
+        <input type="submit">
         <input type="button" value="Cancel" (click)="editDialog.close()">
+
+        <pre>{{ model | json }}</pre>
     </form>
 </dialog>
