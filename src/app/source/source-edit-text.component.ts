@@ -1,6 +1,5 @@
 import {Component, inject, model} from '@angular/core';
 import {AncestryService} from '../ancestry.service';
-import type {SourceModel} from './source-model';
 import {FormsModule} from '@angular/forms';
 
 @Component({
@@ -12,5 +11,5 @@ import {FormsModule} from '@angular/forms';
 })
 export class SourceEditTextComponent {
   readonly ancestryService = inject(AncestryService);
-  readonly sourceModel = model.required<SourceModel>();
+  readonly sourceModel = model.required<{text: string}>();
 }

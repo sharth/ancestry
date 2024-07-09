@@ -92,50 +92,30 @@ export class GedcomSource {
     return cloned;
   }
 
-  private updateChildRecords(
-      oldRecord: {gedcomRecord: () => GedcomRecord} | null | undefined,
-      newRecord: {gedcomRecord: () => GedcomRecord} | null | undefined): {gedcomRecord: () => GedcomRecord}[] {
-    if (oldRecord != null && newRecord != null) {
-      return this.childRecords.toSpliced(this.childRecords.indexOf(oldRecord), 1, newRecord);
-    } else if (oldRecord != null && newRecord == null) {
-      return this.childRecords.toSpliced(this.childRecords.indexOf(oldRecord), 1);
-    } else if (oldRecord == null && newRecord != null) {
-      return this.childRecords.toSpliced(-1, 0, newRecord);
-    } else {
-      return this.childRecords;
-    }
+  modify(changes: {
+    abbr?: string
+    title?: string
+    text?: string
+  }): GedcomSource {
+    const clone = this.clone();
+    clone.abbr = changes.abbr === undefined ? undefined : new GedcomSourceAbbreviation(changes.abbr, this.ancestryService);
+    clone.replaceChildRecord(this.abbr, clone.abbr);
+    clone.title = changes.title === undefined ? undefined : new GedcomSourceTitle(changes.title, this.ancestryService);
+    clone.replaceChildRecord(this.title, clone.title);
+    clone.text = changes.text === undefined ? undefined : new GedcomSourceText(changes.text, this.ancestryService);
+    clone.replaceChildRecord(this.text, clone.text);
+    return clone;
   }
 
-  updateAbbr(value: string | null): GedcomSource {
-    if (this.abbr?.value == value) {
-      return this;
-    } else {
-      const cloned = this.clone();
-      cloned.abbr = value ? new GedcomSourceAbbreviation(value, this.ancestryService) : undefined;
-      cloned.childRecords = this.updateChildRecords(this.abbr, cloned.abbr);
-      return cloned;
-    }
-  }
-
-  updateTitle(value: string | null): GedcomSource {
-    if (this.title?.value == value) {
-      return this;
-    } else {
-      const cloned = this.clone();
-      cloned.title = value ? new GedcomSourceTitle(value, this.ancestryService) : undefined;
-      cloned.childRecords = this.updateChildRecords(this.title, cloned.title);
-      return cloned;
-    }
-  }
-
-  updateText(value: string | null): GedcomSource {
-    if (this.text?.value == value) {
-      return this;
-    } else {
-      const cloned = this.clone();
-      cloned.text = value ? new GedcomSourceText(value, this.ancestryService) : undefined;
-      cloned.childRecords = this.updateChildRecords(this.text, cloned.text);
-      return cloned;
+  private replaceChildRecord(
+      oldRecord?: typeof this.childRecords[0],
+      newRecord?: typeof this.childRecords[0]) {
+    if (oldRecord !== undefined && newRecord !== undefined) {
+      this.childRecords.splice(this.childRecords.indexOf(oldRecord), 1, newRecord);
+    } else if (oldRecord !== undefined && newRecord === undefined) {
+      this.childRecords.splice(this.childRecords.indexOf(oldRecord), 1);
+    } else if (oldRecord === undefined && newRecord !== undefined) {
+      this.childRecords.splice(-1, 0, newRecord);
     }
   }
 }

@@ -1,6 +1,5 @@
 import {Component, inject, model} from '@angular/core';
 import {AncestryService} from '../ancestry.service';
-import type {SourceModel} from './source-model';
 import {FormsModule} from '@angular/forms';
 import {CommonModule} from '@angular/common';
 
@@ -13,14 +12,15 @@ import {CommonModule} from '@angular/common';
 })
 export class SourceEditRepositoriesComponent {
   readonly ancestryService = inject(AncestryService);
-  readonly sourceModel = model.required<SourceModel>();
+  readonly sourceModel = model.required<{repositories: {repositoryXref: string, callNumber: string}[]}>();
 
   addSourceRepository() {
-    const copy = structuredClone(this.sourceModel());
-    copy.repositories = [...copy.repositories, {
-      repositoryXref: '',
-      callNumber: '',
-    }];
-    this.sourceModel.set(copy);
+    this.sourceModel.update((model) => ({
+      ...model,
+      repositories: [
+        ...model.repositories,
+        {repositoryXref: '', callNumber: ''},
+      ],
+    }));
   }
 }

@@ -3,7 +3,7 @@ import {Component, computed, inject, input, viewChild} from '@angular/core';
 import {AncestryService} from '../ancestry.service';
 import {RouterModule} from '@angular/router';
 import {CommonModule} from '@angular/common';
-import type {SourceModel} from './source-model';
+import {FormsModule} from '@angular/forms';
 import {SourceEditAbbrComponent} from './source-edit-abbr.component';
 import {SourceEditTitleComponent} from './source-edit-title.component';
 import {SourceEditTextComponent} from './source-edit-text.component';
@@ -15,7 +15,7 @@ import {SourceEditRepositoriesComponent} from './source-edit-repositories.compon
   templateUrl: './source.component.html',
   styleUrl: './source.component.css',
   imports: [
-    CommonModule, RouterModule,
+    CommonModule, RouterModule, FormsModule,
     SourceEditAbbrComponent, SourceEditTitleComponent, SourceEditTextComponent,
     SourceEditRepositoriesComponent,
   ],
@@ -25,7 +25,15 @@ export class SourceComponent implements OnInit {
   xref = input.required<string>();
   source = computed(() => this.ancestryService.source(this.xref()));
 
-  model?: SourceModel;
+  model?: {
+    abbr: string
+    title: string
+    text: string
+    repositories: {
+      repositoryXref: string
+      callNumber: string
+    }[]
+  };
   ngOnInit(): void {
     this.model = {
       abbr: this.source().abbr?.value ?? '',
@@ -42,11 +50,11 @@ export class SourceComponent implements OnInit {
   }
 
   submitForm() {
-    const newSource = this.source()
-        .updateAbbr(this.model?.abbr || null)
-        .updateText(this.model?.text || null)
-        .updateTitle(this.model?.title || null);
-    this.ancestryService.records.update((records) => records.set(newSource.xref, newSource));
+    this.ancestryService.records.update((records) => records.set(this.xref(), this.source().modify({
+      abbr: this.model?.abbr,
+      text: this.model?.text,
+      title: this.model?.title,
+    })));
     this.editDialog().nativeElement.close();
   }
 }
