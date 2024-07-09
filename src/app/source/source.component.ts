@@ -54,6 +54,7 @@ export class SourceComponent implements OnInit {
       abbr: this.model?.abbr,
       text: this.model?.text,
       title: this.model?.title,
+      repositories: this.model?.repositories ?? [],
     })));
     this.editDialog().nativeElement.close();
   }

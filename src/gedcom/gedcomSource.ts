@@ -97,6 +97,7 @@ export class GedcomSource {
     abbr?: string
     title?: string
     text?: string
+    repositories: {repositoryXref: string, callNumber: string}[]
   }): GedcomSource {
     const clone = this.clone();
     clone.abbr = changes.abbr === undefined ? undefined : new GedcomSourceAbbreviation(changes.abbr, this.ancestryService);
@@ -105,6 +106,15 @@ export class GedcomSource {
     clone.replaceChildRecord(this.title, clone.title);
     clone.text = changes.text === undefined ? undefined : new GedcomSourceText(changes.text, this.ancestryService);
     clone.replaceChildRecord(this.text, clone.text);
+
+    // FIXME: This fails to maintain the order of the SOUR.REPO records within the larger SOUR record.
+    clone.repositories = changes.repositories
+        .map((sr) => new GedcomSourceRepository(
+            sr.repositoryXref,
+            (sr.callNumber ? [sr.callNumber] : []),
+            clone.ancestryService));
+    this.repositories.forEach((sr) => clone.replaceChildRecord(sr, undefined));
+    clone.repositories.forEach((sr) => clone.replaceChildRecord(undefined, sr));
 
     return clone;
   }
