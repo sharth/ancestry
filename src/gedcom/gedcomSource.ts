@@ -89,6 +89,7 @@ export class GedcomSource {
     cloned.text = this.text;
     cloned.repositories = this.repositories;
     cloned.unknowns = this.unknowns;
+    cloned.childRecords = this.childRecords;
     return cloned;
   }
 
