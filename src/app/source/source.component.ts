@@ -51,10 +51,10 @@ export class SourceComponent implements OnInit {
 
   submitForm() {
     this.ancestryService.records.update((records) => records.set(this.xref(), this.source().modify({
-      abbr: this.model?.abbr,
-      text: this.model?.text,
-      title: this.model?.title,
-      repositories: this.model?.repositories ?? [],
+      abbr: this.model!.abbr,
+      text: this.model!.text,
+      title: this.model!.title,
+      repositories: this.model!.repositories,
     })));
     this.editDialog().nativeElement.close();
   }
