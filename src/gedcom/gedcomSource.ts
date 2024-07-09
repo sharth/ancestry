@@ -37,7 +37,7 @@ export class GedcomSource {
           gedcomSource.childRecords.push(gedcomSource.title);
           break;
         case 'REPO': {
-          const sourceRepository = new GedcomSourceRepository(childRecord, ancestryService);
+          const sourceRepository = GedcomSourceRepository.constructFromGedcom(childRecord, ancestryService);
           gedcomSource.repositories.push(sourceRepository);
           gedcomSource.childRecords.push(sourceRepository);
           break;
@@ -105,6 +105,7 @@ export class GedcomSource {
     clone.replaceChildRecord(this.title, clone.title);
     clone.text = changes.text === undefined ? undefined : new GedcomSourceText(changes.text, this.ancestryService);
     clone.replaceChildRecord(this.text, clone.text);
+
     return clone;
   }
 
