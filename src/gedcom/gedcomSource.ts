@@ -127,7 +127,7 @@ export class GedcomSource {
     } else if (oldRecord !== undefined && newRecord === undefined) {
       this.childRecords.splice(this.childRecords.indexOf(oldRecord), 1);
     } else if (oldRecord === undefined && newRecord !== undefined) {
-      this.childRecords.splice(-1, 0, newRecord);
+      this.childRecords.push(newRecord);
     }
   }
 }
