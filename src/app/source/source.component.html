@@ -7,18 +7,29 @@
 <div>{{ source().text?.value }}</div>
 
 <h2>Repositories</h2>
-<dl>
-    <ng-container *ngFor="let repositoryCitation of source().repositories">
-        <dt>
-            <a routerLink="/repository/{{repositoryCitation.repositoryXref}}">
-                {{ancestryService.repository(repositoryCitation.repositoryXref).name}}
-            </a>
-        </dt>
-        <dd *ngFor="let callNumber of repositoryCitation.callNumbers">
-            <a *ngIf="callNumber.startsWith('http')" href={{callNumber}}>{{callNumber}}</a>
-        </dd>
-    </ng-container>
-</dl>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Repository Xref</th>
+            <th scope="col">Repository</th>
+            <th scope="col">Call Number</th>
+        </tr>
+    </thead>
+    <tbody>
+        <ng-container *ngFor="let sr of source().repositories">
+            <tr *ngIf="sr.callNumbers.length == 0">
+                <td>{{sr.repositoryXref}}</td>
+                <td>{{ancestryService.repository(sr.repositoryXref).name}}</td>
+                <td></td>
+            </tr>
+            <tr *ngFor="let callNumber of sr.callNumbers">
+                <td>{{sr.repositoryXref}}</td>
+                <td>{{ancestryService.repository(sr.repositoryXref).name}}</td>
+                <td>{{callNumber}}</td>
+            </tr>
+        </ng-container>
+    </tbody>
+</table>
 
 <h2>Citations</h2>
 <table class="table table-striped">
