@@ -1,10 +1,15 @@
 <div class="input-group" *ngFor="let sr of sourceModel().repositories">
     <button class="btn btn-outline-secondary" type="button">x</button>
     <div class="form-floating">
-        <input class="form-control" type="text" [(ngModel)]="sr.repositoryXref">
-        <label>Repository Xref</label>
+        <select class="form-select" [(ngModel)]="sr.repositoryXref">
+            <option selected>Repositories...</option>
+            <option *ngFor="let repository of ancestryService.repositories().toList()" value="{{repository.xref}}">
+                {{repository.name ?? repository.xref}}
+            </option>
+        </select>
+        <label>Repository</label>
     </div>
-    <div class=" form-floating">
+    <div class="form-floating">
         <input class="form-control" type="text" [(ngModel)]="sr.callNumber">
         <label>Call Number</label>
     </div>
