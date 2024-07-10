@@ -14,13 +14,20 @@ export class SourceEditRepositoriesComponent {
   readonly ancestryService = inject(AncestryService);
   readonly sourceModel = model.required<{repositories: {repositoryXref: string, callNumber: string}[]}>();
 
-  addSourceRepository() {
+  append() {
     this.sourceModel.update((model) => ({
       ...model,
       repositories: [
         ...model.repositories,
         {repositoryXref: '', callNumber: ''},
       ],
+    }));
+  }
+
+  remove(index: number) {
+    this.sourceModel.update((model) => ({
+      ...model,
+      repositories: model.repositories.toSpliced(index, 1),
     }));
   }
 }

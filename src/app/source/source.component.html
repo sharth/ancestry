@@ -1,7 +1,5 @@
-<h1>{{ source().abbr?.value ?? source().xref }}</h1>
-
-<h2>Title</h2>
-<div>{{ source().title?.value }}</div>
+<app-source-view-abbr [source]="source()"></app-source-view-abbr>
+<app-source-view-title [source]="source()"></app-source-view-title>
 
 <h2>Text</h2>
 <div>{{ source().text?.value }}</div>
@@ -67,6 +65,7 @@
         <app-source-edit-title [(sourceModel)]="model!"></app-source-edit-title>
         <app-source-edit-text [(sourceModel)]="model!"></app-source-edit-text>
         <app-source-edit-repositories [(sourceModel)]="model!"></app-source-edit-repositories>
+        <app-source-edit-unknowns [(sourceModel)]="model!"></app-source-edit-unknowns>
         <input type="submit">
         <input type="button" value="Cancel" (click)="editDialog.close()">
 

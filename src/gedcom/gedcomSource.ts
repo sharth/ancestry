@@ -98,6 +98,7 @@ export class GedcomSource {
     title: string
     text: string
     repositories: {repositoryXref: string, callNumber: string}[]
+    unknowns: GedcomRecord[]
   }): GedcomSource {
     const clone = this.clone();
     clone.abbr = changes.abbr ? new GedcomSourceAbbreviation(changes.abbr, this.ancestryService) : undefined;
@@ -115,6 +116,12 @@ export class GedcomSource {
             clone.ancestryService));
     this.repositories.forEach((sr) => clone.replaceChildRecord(sr, undefined));
     clone.repositories.forEach((sr) => clone.replaceChildRecord(undefined, sr));
+
+    // FIXME: This fails to maintain the order of the unknown records within the larger SOUR record.
+    clone.unknowns = changes.unknowns
+        .map((unknown) => new GedcomUnknown(unknown));
+    this.unknowns.forEach((unknown) => clone.replaceChildRecord(unknown, undefined));
+    clone.unknowns.forEach((unknown) => clone.replaceChildRecord(undefined, unknown));
 
     return clone;
   }

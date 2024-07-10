@@ -1,5 +1,5 @@
-<div class="input-group" *ngFor="let sr of sourceModel().repositories">
-    <button class="btn btn-outline-secondary" type="button">x</button>
+<div class="input-group" *ngFor="let sr of sourceModel().repositories; index as i">
+    <button class="btn btn-outline-secondary bi bi-trash" type="button" (click)="remove(i)"></button>
     <div class="form-floating">
         <select class="form-select" [(ngModel)]="sr.repositoryXref">
             <option selected>Repositories...</option>
@@ -15,6 +15,6 @@
     </div>
 </div>
 <div class="input-group">
-    <button class="btn btn-outline-secondary" type="button" (click)="addSourceRepository()">+</button>
+    <button class="btn btn-outline-secondary bi bi-plus" type="button" (click)="append()"></button>
     <span class="input-group-text">Associate with another repository</span>
 </div>

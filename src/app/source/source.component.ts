@@ -8,6 +8,10 @@ import {SourceEditAbbrComponent} from './source-edit-abbr.component';
 import {SourceEditTitleComponent} from './source-edit-title.component';
 import {SourceEditTextComponent} from './source-edit-text.component';
 import {SourceEditRepositoriesComponent} from './source-edit-repositories.component';
+import {SourceEditUnknownsComponent} from './source-edit-unknowns.component';
+import {SourceViewAbbrComponent} from './source-view-abbr.component';
+import {SourceViewTitleComponent} from './source-view-title.component';
+import type {GedcomRecord} from '../../gedcom/gedcomRecord';
 
 @Component({
   selector: 'app-source',
@@ -17,7 +21,8 @@ import {SourceEditRepositoriesComponent} from './source-edit-repositories.compon
   imports: [
     CommonModule, RouterModule, FormsModule,
     SourceEditAbbrComponent, SourceEditTitleComponent, SourceEditTextComponent,
-    SourceEditRepositoriesComponent,
+    SourceEditRepositoriesComponent, SourceEditUnknownsComponent,
+    SourceViewAbbrComponent, SourceViewTitleComponent,
   ],
 })
 export class SourceComponent implements OnInit {
@@ -33,13 +38,21 @@ export class SourceComponent implements OnInit {
       repositoryXref: string
       callNumber: string
     }[]
+    unknowns: GedcomRecord[]
   };
   ngOnInit(): void {
     this.model = {
       abbr: this.source().abbr?.value ?? '',
       title: this.source().title?.value ?? '',
       text: this.source().text?.value ?? '',
-      repositories: [],
+      repositories: this.source().repositories
+          .flatMap((repository) => repository.callNumbers
+              .map((callNumber) => ({
+                repositoryXref: repository.repositoryXref,
+                callNumber: callNumber,
+              }))),
+      unknowns: this.source().unknowns
+          .map((unknown) => unknown.gedcomRecord()),
     };
   }
 
@@ -55,6 +68,7 @@ export class SourceComponent implements OnInit {
       text: this.model!.text,
       title: this.model!.title,
       repositories: this.model!.repositories,
+      unknowns: this.model!.unknowns,
     })));
     this.editDialog().nativeElement.close();
   }
