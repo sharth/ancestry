@@ -9,7 +9,7 @@ import type {GedcomRecord} from '../../gedcom/gedcomRecord';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './source-edit-unknowns.component.html',
-  styleUrls: ['./source.component.css'],
+  styleUrl: './source.component.css',
 })
 export class SourceEditUnknownsComponent {
   readonly ancestryService = inject(AncestryService);

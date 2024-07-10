@@ -1,0 +1,14 @@
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Unknown Record</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let unknown of source().unknowns">
+            <td>
+                <pre>{{unknown.gedcomRecord().text().join('\n')}}</pre>
+            </td>
+        </tr>
+    </tbody>
+</table>

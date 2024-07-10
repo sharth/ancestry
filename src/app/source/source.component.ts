@@ -4,6 +4,7 @@ import {AncestryService} from '../ancestry.service';
 import {RouterModule} from '@angular/router';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
+import type {GedcomRecord} from '../../gedcom/gedcomRecord';
 import {SourceEditAbbrComponent} from './source-edit-abbr.component';
 import {SourceEditTitleComponent} from './source-edit-title.component';
 import {SourceEditTextComponent} from './source-edit-text.component';
@@ -11,7 +12,10 @@ import {SourceEditRepositoriesComponent} from './source-edit-repositories.compon
 import {SourceEditUnknownsComponent} from './source-edit-unknowns.component';
 import {SourceViewAbbrComponent} from './source-view-abbr.component';
 import {SourceViewTitleComponent} from './source-view-title.component';
-import type {GedcomRecord} from '../../gedcom/gedcomRecord';
+import {SourceViewTextComponent} from './source-view-text.component';
+import {SourceViewRepositoriesComponent} from './source-view-repositories.component';
+import {SourceViewCitationsComponent} from './source-view-citations.component';
+import {SourceViewUnknownsComponent} from './source-view-unknowns.component';
 
 @Component({
   selector: 'app-source',
@@ -19,10 +23,20 @@ import type {GedcomRecord} from '../../gedcom/gedcomRecord';
   templateUrl: './source.component.html',
   styleUrl: './source.component.css',
   imports: [
-    CommonModule, RouterModule, FormsModule,
-    SourceEditAbbrComponent, SourceEditTitleComponent, SourceEditTextComponent,
-    SourceEditRepositoriesComponent, SourceEditUnknownsComponent,
-    SourceViewAbbrComponent, SourceViewTitleComponent,
+    CommonModule,
+    RouterModule,
+    FormsModule,
+    SourceEditAbbrComponent,
+    SourceEditTitleComponent,
+    SourceEditTextComponent,
+    SourceEditRepositoriesComponent,
+    SourceEditUnknownsComponent,
+    SourceViewAbbrComponent,
+    SourceViewTitleComponent,
+    SourceViewTextComponent,
+    SourceViewRepositoriesComponent,
+    SourceViewCitationsComponent,
+    SourceViewUnknownsComponent,
   ],
 })
 export class SourceComponent implements OnInit {
@@ -34,10 +48,7 @@ export class SourceComponent implements OnInit {
     abbr: string
     title: string
     text: string
-    repositories: {
-      repositoryXref: string
-      callNumber: string
-    }[]
+    repositories: {repositoryXref: string, callNumber: string}[]
     unknowns: GedcomRecord[]
   };
   ngOnInit(): void {

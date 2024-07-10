@@ -8,7 +8,7 @@ import {CommonModule} from '@angular/common';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './source-edit-repositories.component.html',
-  styleUrls: ['./source.component.css'],
+  styleUrl: './source.component.css',
 })
 export class SourceEditRepositoriesComponent {
   readonly ancestryService = inject(AncestryService);

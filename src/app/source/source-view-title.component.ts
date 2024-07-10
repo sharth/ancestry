@@ -6,7 +6,7 @@ import type {GedcomSource} from '../../gedcom/gedcomSource';
   standalone: true,
   imports: [],
   templateUrl: './source-view-title.component.html',
-  styleUrls: ['./source.component.css'],
+  styleUrl: './source.component.css',
 })
 export class SourceViewTitleComponent {
   readonly source = input.required<GedcomSource>();

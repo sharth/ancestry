@@ -1,57 +1,26 @@
-<app-source-view-abbr [source]="source()"></app-source-view-abbr>
+<h1>
+    <app-source-view-abbr [source]="source()"></app-source-view-abbr>
+</h1>
+
+<h2>Title</h2>
 <app-source-view-title [source]="source()"></app-source-view-title>
 
 <h2>Text</h2>
-<div>{{ source().text?.value }}</div>
+<app-source-view-text [source]="source()"></app-source-view-text>
 
+@if (source().repositories.length > 0) {
 <h2>Repositories</h2>
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th scope="col">Repository Xref</th>
-            <th scope="col">Repository</th>
-            <th scope="col">Call Number</th>
-        </tr>
-    </thead>
-    <tbody>
-        <ng-container *ngFor="let sr of source().repositories">
-            <tr *ngIf="sr.callNumbers.length == 0">
-                <td>{{sr.repositoryXref}}</td>
-                <td>{{ancestryService.repository(sr.repositoryXref).name}}</td>
-                <td></td>
-            </tr>
-            <tr *ngFor="let callNumber of sr.callNumbers">
-                <td>{{sr.repositoryXref}}</td>
-                <td>{{ancestryService.repository(sr.repositoryXref).name}}</td>
-                <td>{{callNumber}}</td>
-            </tr>
-        </ng-container>
-    </tbody>
-</table>
+<app-source-view-repositories [source]="source()"></app-source-view-repositories>
+}
 
+@if (source().citations.length > 0) {
 <h2>Citations</h2>
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th scope="col">Individual</th>
-            <th scope="col">Event</th>
-            <th scope="col">Citation</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr *ngFor="let ref of source().citations()">
-            <td><a routerLink="/individual/{{ ref.individual.xref }}">{{ ref.individual.name }}</a></td>
-            <td>{{ ref.event.type }}</td>
-            <td>
-                <pre>{{ ref.citation.text }}</pre>
-            </td>
-        </tr>
-    </tbody>
-</table>
+<app-source-view-citations [source]="source()"></app-source-view-citations>
+}
 
 @if (source().unknowns.length > 0) {
 <h2>Unknown Records</h2>
-<pre *ngFor="let unknown of source().unknowns">{{ unknown.gedcomRecord().text().join('\n') }}</pre>
+<app-source-view-unknowns [source]="source()"></app-source-view-unknowns>
 }
 
 <h2>gedcom</h2>

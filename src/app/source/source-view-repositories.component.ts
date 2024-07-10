@@ -1,13 +1,14 @@
 import {Component, input} from '@angular/core';
 import type {GedcomSource} from '../../gedcom/gedcomSource';
+import {CommonModule} from '@angular/common';
 
 @Component({
-  selector: 'app-source-view-abbr',
+  selector: 'app-source-view-repositories',
   standalone: true,
-  imports: [],
-  templateUrl: './source-view-abbr.component.html',
+  imports: [CommonModule],
+  templateUrl: './source-view-repositories.component.html',
   styleUrl: './source.component.css',
 })
-export class SourceViewAbbrComponent {
+export class SourceViewRepositoriesComponent {
   readonly source = input.required<GedcomSource>();
 }

@@ -7,7 +7,7 @@ import {FormsModule} from '@angular/forms';
   standalone: true,
   imports: [FormsModule],
   templateUrl: './source-edit-abbr.component.html',
-  styleUrls: ['./source.component.css'],
+  styleUrl: './source.component.css',
 })
 export class SourceEditAbbrComponent {
   readonly ancestryService = inject(AncestryService);
