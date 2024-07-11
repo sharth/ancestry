@@ -101,7 +101,7 @@ export class GedcomFamily {
   events: GedcomEvent[] = [];
 
   get parentXrefs(): string[] {
-    return [this.husbandXref, this.wifeXref].filter((e): e is NonNullable<typeof e> => e != null);
+    return [this.husbandXref, this.wifeXref].filter((e) => e != null);
   }
 
   husband = computed(() => {
@@ -130,4 +130,3 @@ export class GedcomFamily {
     return this.record;
   }
 };
-
