@@ -15,9 +15,11 @@
                 <li class="nav-item"><a class="nav-link" routerLink="/sources">Sources</a></li>
                 <li class="nav-item"><a class="nav-link" routerLink="/repositories">Repositories</a></li>
             </ul>
+            <span class="mx-3"></span>
             <form class="d-flex">
-                <input id="gedcom-input" type="file" (change)="gedcomFileChanged($event.target!)" accept=".ged">
+                <input type="button" (click)="openFile()" value="Open File">
             </form>
+            <span class="mx-3"></span>
             <form class="d-flex" role="search">
                 <input class="form-control me-2" type="search" placeholder="Search">
                 <button class="btn btn-outline-success" type="submit">Search</button>
