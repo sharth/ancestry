@@ -14,9 +14,7 @@ import type {GedcomSource} from '../../gedcom/gedcomSource';
 export class SourcesComponent {
   ancestryService = inject(AncestryService);
 
-  readonly sources = computed(() => {
-    const sources: GedcomSource[] = [...this.ancestryService.sources().values()];
-    sources.sort((lhs, rhs) => (lhs.abbr?.value ?? '').localeCompare(rhs.abbr?.value ?? ''));
-    return sources;
-  });
+  readonly sources = computed(() =>
+    this.ancestryService.sources().toList()
+        .sort((lhs, rhs) => (lhs.abbr?.value ?? '').localeCompare(rhs.abbr?.value ?? '')));
 }
