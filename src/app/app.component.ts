@@ -20,7 +20,6 @@ export class AppComponent {
     }
   }
 
-
   async openFile(): Promise<void> {
     const [fileHandle] = await window.showOpenFilePicker({
       types: [{
