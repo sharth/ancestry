@@ -1,0 +1,42 @@
+<h1>Validation</h1>
+<table>
+    <thead>
+        <tr>
+            <th>Source</th>
+            <th>Severity</th>
+            <th>Field</th>
+            <th>Group</th>
+            <th>Message</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (sourceScenario of sourceScenarios(); track sourceScenario) {
+        @for (error of sourceScenario.result.errors; track error) {
+        <tr>
+            <td>
+                <a [routerLink]="['/source', sourceScenario.source.xref]">
+                    {{ sourceScenario.source.abbr?.value ?? sourceScenario.source.xref }}
+                </a>
+            </td>
+            <td>Error</td>
+            <td>{{ error.fieldName }}</td>
+            <td>{{ error.groupName }}</td>
+            <td>{{ error.message }}</td>
+        </tr>
+        }
+        @for (warning of sourceScenario.result.warnings; track warning) {
+        <tr>
+            <td>
+                <a [routerLink]="['/source', sourceScenario.source.xref]">
+                    {{ sourceScenario.source.abbr?.value ?? sourceScenario.source.xref }}
+                </a>
+            </td>
+            <td>Warning</td>
+            <td>{{ warning.fieldName }}</td>
+            <td>{{ warning.groupName }}</td>
+            <td>{{ warning.message }}</td>
+        </tr>
+        }
+        }
+    </tbody>
+</table>

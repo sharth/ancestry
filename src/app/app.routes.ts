@@ -7,6 +7,7 @@ import {SourceComponent} from './source/source.component';
 import {RepositoriesComponent} from './repositories/repositories.component';
 import {RepositoryComponent} from './repository/repository.component';
 import {GedcomComponent} from './gedcom/gedcom.component';
+import {ValidationComponent} from './validation/validation.component';
 
 export const routes: Routes = [
   {path: '', component: IndexComponent},
@@ -17,4 +18,5 @@ export const routes: Routes = [
   {path: 'repository/:xref', component: RepositoryComponent},
   {path: 'sources', component: SourcesComponent},
   {path: 'source/:xref', component: SourceComponent},
+  {path: 'validation', component: ValidationComponent},
 ];
