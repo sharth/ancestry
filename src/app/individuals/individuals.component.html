@@ -1,9 +1,9 @@
-<h1> {{ individuals().length }} Individuals</h1>
+<h1> {{ individuals().size }} Individuals</h1>
 <ul>
-    <li *ngFor="let individuals of individualsBySurname() | keyvalue">
-        {{ individuals.key || "&nbsp;" }}
+    <li *ngFor="let group of individualsBySurname()">
+        {{ group.surname || "&nbsp;" }}
         <ul>
-            <li *ngFor="let individual of individuals.value">
+            <li *ngFor="let individual of group.individuals">
                 <a routerLink="/individual/{{ individual.xref }}">{{ individual.name }}</a>
             </li>
         </ul>
