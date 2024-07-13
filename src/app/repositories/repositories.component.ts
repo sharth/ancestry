@@ -1,6 +1,5 @@
-import {Component, inject} from '@angular/core';
+import {Component, computed, inject} from '@angular/core';
 import {AncestryService} from '../ancestry.service';
-import type {GedcomRepository} from '../../gedcom/gedcomRepository';
 import {CommonModule} from '@angular/common';
 import {RouterLink} from '@angular/router';
 
@@ -13,8 +12,5 @@ import {RouterLink} from '@angular/router';
 })
 export class RepositoriesComponent {
   ancestryService = inject(AncestryService);
-
-  repositories(): GedcomRepository[] {
-    return [...this.ancestryService.repositories().values()];
-  }
+  repositories = computed(() => this.ancestryService.repositories().toList());
 }
