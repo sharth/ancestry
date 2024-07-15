@@ -2,12 +2,12 @@ import type {GedcomRecord} from './gedcomRecord';
 
 export class GedcomUnknown {
   constructor(gedcomRecord: GedcomRecord) {
-    this.#gedcomRecord = gedcomRecord;
+    this._gedcomRecord = gedcomRecord;
   }
 
   gedcomRecord(): GedcomRecord {
-    return this.#gedcomRecord;
+    return this._gedcomRecord;
   }
 
-  #gedcomRecord: GedcomRecord;
+  private _gedcomRecord: GedcomRecord;
 };
