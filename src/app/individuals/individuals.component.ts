@@ -14,11 +14,11 @@ export class IndividualsComponent {
   readonly ancestryService = inject(AncestryService);
 
   readonly individuals = computed(() =>
-    this.ancestryService.individuals().toList()
+    this.ancestryService.individuals()
         .sort((a, b) => a.xref.localeCompare(b.xref)));
 
   readonly individualsBySurname = computed(() =>
-    this.ancestryService.individuals().valueSeq()
+    this.ancestryService.individuals()
         .groupBy((individual) => individual.surname ?? '')
         .mapEntries(([surname, individuals]) =>
           [surname, individuals.sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''))])

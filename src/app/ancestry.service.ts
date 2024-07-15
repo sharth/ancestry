@@ -23,47 +23,55 @@ export class AncestryService {
   private readonly unparsedTags = new Set<string>();
 
   individual(xref: string): GedcomIndividual {
-    const individual = this.individuals().get(xref);
+    const individual = this.records().get(xref);
     if (individual == null) throw new Error(`No individual with xref '${xref}'`);
+    if (!(individual instanceof GedcomIndividual)) throw new Error(`${xref} is not a GedcomIndividual`);
     return individual;
   }
 
-  individuals(): ImmutableOrderedMap<string, GedcomIndividual> {
+  individuals(): ImmutableList<GedcomIndividual> {
     return this.records()
-        .filter((record) => record instanceof GedcomIndividual) as ImmutableOrderedMap<string, GedcomIndividual>;
+        .toList()
+        .filter((record) => record instanceof GedcomIndividual);
   }
 
   family(xref: string): GedcomFamily {
-    const family = this.families().get(xref);
+    const family = this.records().get(xref);
     if (family == null) throw new Error(`No family with xref '${xref}'`);
+    if (!(family instanceof GedcomFamily)) throw new Error(`${xref} is not a GedcomFamilys`);
     return family;
   }
 
-  families(): ImmutableOrderedMap<string, GedcomFamily> {
+  families(): ImmutableList<GedcomFamily> {
     return this.records()
-        .filter((record) => record instanceof GedcomFamily) as ImmutableOrderedMap<string, GedcomFamily>;
+        .toList()
+        .filter((record) => record instanceof GedcomFamily);
   }
 
   repository(xref: string): GedcomRepository {
-    const repository = this.repositories().get(xref);
+    const repository = this.records().get(xref);
     if (repository == null) throw new Error(`No repository with xref '${xref}`);
+    if (!(repository instanceof GedcomRepository)) throw new Error(`${xref} is not a GedcomRepository`);
     return repository;
   }
 
-  repositories(): ImmutableOrderedMap<string, GedcomRepository> {
+  repositories(): ImmutableList<GedcomRepository> {
     return this.records()
-        .filter((record) => record instanceof GedcomRepository) as ImmutableOrderedMap<string, GedcomRepository>;
+        .toList()
+        .filter((record) => record instanceof GedcomRepository);
   }
 
   source(xref: string): GedcomSource {
-    const source = this.sources().get(xref);
+    const source = this.records().get(xref);
     if (source == null) throw new Error(`No source with xref '${xref}`);
+    if (!(source instanceof GedcomSource)) throw new Error(`${xref} is not a GedcomSource`);
     return source;
   }
 
-  sources(): ImmutableOrderedMap<string, GedcomSource> {
+  sources(): ImmutableList<GedcomSource> {
     return this.records()
-        .filter((record) => record instanceof GedcomSource) as ImmutableOrderedMap<string, GedcomSource>;
+        .toList()
+        .filter((record) => record instanceof GedcomSource);
   }
 
   readonly gedcomRecords = computed<GedcomRecord[]>(() => {

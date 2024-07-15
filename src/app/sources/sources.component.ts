@@ -14,6 +14,6 @@ export class SourcesComponent {
   ancestryService = inject(AncestryService);
 
   readonly sources = computed(() =>
-    this.ancestryService.sources().toList()
+    this.ancestryService.sources()
         .sort((lhs, rhs) => (lhs.abbr?.value ?? '').localeCompare(rhs.abbr?.value ?? '')));
 }

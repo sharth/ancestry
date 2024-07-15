@@ -12,5 +12,5 @@ import {RouterLink} from '@angular/router';
 })
 export class RepositoriesComponent {
   ancestryService = inject(AncestryService);
-  repositories = computed(() => this.ancestryService.repositories().toList());
+  repositories = computed(() => this.ancestryService.repositories());
 }
