@@ -117,7 +117,7 @@ describe('GedcomSource', () => {
     const gedcomSource = new GedcomSource('@S1@', ancestryService);
     const changedSource = gedcomSource.updateAbbr(null);
     expect(changedSource).toBe(gedcomSource);
-    expect(changedSource.abbr).toBeUndefined;
+    expect(changedSource.abbr).toBeUndefined();
   });
 
   test('Change abbr from null to value', () => {
@@ -125,14 +125,14 @@ describe('GedcomSource', () => {
     const changedSource = gedcomSource.updateAbbr('new value');
     expect(changedSource).not.toBe(gedcomSource);
     expect(changedSource.abbr?.value).toStrictEqual('new value');
-    expect(gedcomSource.abbr).toBeUndefined;
+    expect(gedcomSource.abbr).toBeUndefined();
   });
 
   test('Change abbr from value to null', () => {
     const gedcomSource = new GedcomSource('@S1@', ancestryService).updateAbbr('old');
     const changedSource = gedcomSource.updateAbbr(null);
     expect(changedSource).not.toBe(gedcomSource);
-    expect(changedSource.abbr).toBeUndefined;
+    expect(changedSource.abbr).toBeUndefined();
     expect(gedcomSource.abbr?.value).toStrictEqual('old');
   });
 
