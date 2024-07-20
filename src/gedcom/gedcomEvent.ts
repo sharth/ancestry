@@ -1,11 +1,9 @@
-import type {AncestryService} from '../app/ancestry.service';
+import {ancestryService} from '../app/ancestry.service';
 import {GedcomCitation} from './gedcomCitation';
 import type {GedcomRecord} from './gedcomRecord';
 
 export class GedcomEvent {
-  constructor(
-      private record: GedcomRecord,
-      private ancestryService: AncestryService) {
+  constructor(private record: GedcomRecord) {
     if (record.xref != null) throw new Error();
 
     this.type = new Map([
@@ -41,7 +39,7 @@ export class GedcomEvent {
           this.sharedWithXrefs.push(this.parseEventShare(childRecord));
           break;
         case 'SOUR':
-          this.citations.push(new GedcomCitation(childRecord, ancestryService));
+          this.citations.push(new GedcomCitation(childRecord));
           break;
         case 'DATE':
           this.parseEventDate(childRecord);
@@ -75,7 +73,7 @@ export class GedcomEvent {
     if (gedcomRecord.xref != null) throw new Error();
     if (gedcomRecord.value == null) throw new Error();
 
-    gedcomRecord.children.forEach(this.ancestryService.reportUnparsedRecord.bind(this.ancestryService));
+    gedcomRecord.children.forEach(ancestryService.reportUnparsedRecord.bind(ancestryService));
     return gedcomRecord.value;
   }
 
@@ -84,7 +82,7 @@ export class GedcomEvent {
     if (gedcomRecord.xref != null) throw new Error();
     if (gedcomRecord.value == null) throw new Error();
 
-    gedcomRecord.children.forEach(this.ancestryService.reportUnparsedRecord.bind(this.ancestryService));
+    gedcomRecord.children.forEach(ancestryService.reportUnparsedRecord.bind(ancestryService));
     return gedcomRecord.value;
   }
 
@@ -93,7 +91,7 @@ export class GedcomEvent {
     if (gedcomRecord.xref != null) throw new Error();
     if (gedcomRecord.value == null) throw new Error();
 
-    gedcomRecord.children.forEach(this.ancestryService.reportUnparsedRecord.bind(this.ancestryService));
+    gedcomRecord.children.forEach(ancestryService.reportUnparsedRecord.bind(ancestryService));
     return gedcomRecord.value;
   }
 
@@ -136,7 +134,7 @@ export class GedcomEvent {
     for (const childRecord of gedcomRecord.children) {
       switch (childRecord.tag) {
         default:
-          this.ancestryService.reportUnparsedRecord(childRecord);
+          ancestryService.reportUnparsedRecord(childRecord);
           break;
       }
     }
@@ -147,7 +145,7 @@ export class GedcomEvent {
     if (gedcomRecord.xref != null) throw new Error();
     if (gedcomRecord.value == null) throw new Error();
 
-    gedcomRecord.children.forEach(this.ancestryService.reportUnparsedRecord.bind(this.ancestryService));
+    gedcomRecord.children.forEach(ancestryService.reportUnparsedRecord.bind(ancestryService));
     return gedcomRecord.value;
   }
 
@@ -156,7 +154,7 @@ export class GedcomEvent {
     if (gedcomRecord.xref != null) throw new Error();
     if (gedcomRecord.value == null) throw new Error();
 
-    gedcomRecord.children.forEach(this.ancestryService.reportUnparsedRecord.bind(this.ancestryService));
+    gedcomRecord.children.forEach(ancestryService.reportUnparsedRecord.bind(ancestryService));
     return gedcomRecord.value;
   }
 

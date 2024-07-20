@@ -1,12 +1,10 @@
 import {computed} from '@angular/core';
-import type {AncestryService} from '../app/ancestry.service';
+import {ancestryService} from '../app/ancestry.service';
 import {GedcomEvent} from './gedcomEvent';
 import type {GedcomRecord} from './gedcomRecord';
 
 export class GedcomFamily {
-  constructor(
-      private record: GedcomRecord,
-      private ancestryService: AncestryService) {
+  constructor(private record: GedcomRecord) {
     if (record.abstag !== 'FAM') throw new Error();
     if (record.xref == null) throw new Error();
     if (record.value != null) throw new Error();
@@ -28,7 +26,7 @@ export class GedcomFamily {
         case 'EVEN':
         case 'MARR':
         case 'MARB':
-          this.events.push(new GedcomEvent(childRecord, ancestryService));
+          this.events.push(new GedcomEvent(childRecord));
           break;
         default:
           ancestryService.reportUnparsedRecord(childRecord);
@@ -50,7 +48,7 @@ export class GedcomFamily {
     for (const childRecord of gedcomRecord.children) {
       switch (childRecord.tag) {
         default:
-          this.ancestryService.reportUnparsedRecord(childRecord);
+          ancestryService.reportUnparsedRecord(childRecord);
           break;
       }
     }
@@ -69,7 +67,7 @@ export class GedcomFamily {
     for (const childRecord of gedcomRecord.children) {
       switch (childRecord.tag) {
         default:
-          this.ancestryService.reportUnparsedRecord(childRecord);
+          ancestryService.reportUnparsedRecord(childRecord);
           break;
       }
     }
@@ -88,7 +86,7 @@ export class GedcomFamily {
     for (const childRecord of gedcomRecord.children) {
       switch (childRecord.tag) {
         default:
-          this.ancestryService.reportUnparsedRecord(childRecord);
+          ancestryService.reportUnparsedRecord(childRecord);
           break;
       }
     }
@@ -106,7 +104,7 @@ export class GedcomFamily {
 
   husband = computed(() => {
     if (this.husbandXref) {
-      return this.ancestryService.individual(this.husbandXref);
+      return ancestryService.individual(this.husbandXref);
     } else {
       return undefined;
     }
@@ -114,17 +112,17 @@ export class GedcomFamily {
 
   wife = computed(() => {
     if (this.wifeXref) {
-      return this.ancestryService.individual(this.wifeXref);
+      return ancestryService.individual(this.wifeXref);
     } else {
       return undefined;
     }
   });
 
   parents = computed(() => this.parentXrefs
-      .map((xref) => this.ancestryService.individual(xref)));
+      .map((xref) => ancestryService.individual(xref)));
 
   children = computed(() => this.childXrefs
-      .map((xref) => this.ancestryService.individual(xref)));
+      .map((xref) => ancestryService.individual(xref)));
 
   gedcomRecord(): GedcomRecord {
     return this.record;

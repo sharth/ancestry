@@ -1,4 +1,4 @@
-import type {AncestryService} from '../app/ancestry.service';
+import {ancestryService} from '../app/ancestry.service';
 import type {GedcomCitation} from './gedcomCitation';
 import type {GedcomEvent} from './gedcomEvent';
 import type {GedcomIndividual} from './gedcomIndividual';
@@ -10,34 +10,34 @@ import {GedcomSourceTitle} from './gedcomSourceTitle';
 import {GedcomUnknown} from './gedcomUnknown';
 
 export class GedcomSource {
-  constructor(public xref: string, private ancestryService: AncestryService) {}
+  constructor(public xref: string) {}
 
-  static constructFromGedcom(record: GedcomRecord, ancestryService: AncestryService): GedcomSource {
+  static constructFromGedcom(record: GedcomRecord): GedcomSource {
     if (record.abstag !== 'SOUR') throw new Error();
     if (record.xref == null) throw new Error();
     if (record.value != null) throw new Error();
 
-    const gedcomSource = new GedcomSource(record.xref, ancestryService);
+    const gedcomSource = new GedcomSource(record.xref);
 
     for (const childRecord of record.children) {
       switch (childRecord.tag) {
         case 'ABBR':
           if (gedcomSource.abbr != null) throw new Error();
-          gedcomSource.abbr = GedcomSourceAbbreviation.constructFromGedcom(childRecord, ancestryService);
+          gedcomSource.abbr = GedcomSourceAbbreviation.constructFromGedcom(childRecord);
           gedcomSource.childRecords.push(gedcomSource.abbr);
           break;
         case 'TEXT':
           if (gedcomSource.text != null) throw new Error();
-          gedcomSource.text = GedcomSourceText.constructFromGedcom(childRecord, ancestryService);
+          gedcomSource.text = GedcomSourceText.constructFromGedcom(childRecord);
           gedcomSource.childRecords.push(gedcomSource.text);
           break;
         case 'TITL':
           if (gedcomSource.title != null) throw new Error();
-          gedcomSource.title = GedcomSourceTitle.constructFromGedcom(childRecord, ancestryService);
+          gedcomSource.title = GedcomSourceTitle.constructFromGedcom(childRecord);
           gedcomSource.childRecords.push(gedcomSource.title);
           break;
         case 'REPO': {
-          const sourceRepository = GedcomSourceRepository.constructFromGedcom(childRecord, ancestryService);
+          const sourceRepository = GedcomSourceRepository.constructFromGedcom(childRecord);
           gedcomSource.repositories.push(sourceRepository);
           gedcomSource.childRecords.push(sourceRepository);
           break;
@@ -70,7 +70,7 @@ export class GedcomSource {
 
   citations(): { individual: GedcomIndividual; event: GedcomEvent; citation: GedcomCitation }[] {
     const arr = [];
-    for (const individual of this.ancestryService.individuals().values()) {
+    for (const individual of ancestryService.individuals().values()) {
       for (const event of individual.events) {
         for (const citation of event.citations) {
           if (citation.sourceXref == this.xref) {
@@ -83,7 +83,7 @@ export class GedcomSource {
   }
 
   clone(): GedcomSource {
-    const cloned = new GedcomSource(this.xref, this.ancestryService);
+    const cloned = new GedcomSource(this.xref);
     cloned.abbr = this.abbr;
     cloned.title = this.title;
     cloned.text = this.text;
@@ -101,19 +101,18 @@ export class GedcomSource {
     unknowns: GedcomRecord[]
   }): GedcomSource {
     const clone = this.clone();
-    clone.abbr = changes.abbr ? new GedcomSourceAbbreviation(changes.abbr, this.ancestryService) : undefined;
+    clone.abbr = changes.abbr ? new GedcomSourceAbbreviation(changes.abbr) : undefined;
     clone.replaceChildRecord(this.abbr, clone.abbr);
-    clone.title = changes.title ? new GedcomSourceTitle(changes.title, this.ancestryService) : undefined;
+    clone.title = changes.title ? new GedcomSourceTitle(changes.title) : undefined;
     clone.replaceChildRecord(this.title, clone.title);
-    clone.text = changes.text ? new GedcomSourceText(changes.text, this.ancestryService) : undefined;
+    clone.text = changes.text ? new GedcomSourceText(changes.text) : undefined;
     clone.replaceChildRecord(this.text, clone.text);
 
     // FIXME: This fails to maintain the order of the SOUR.REPO records within the larger SOUR record.
     clone.repositories = changes.repositories
         .map((sr) => new GedcomSourceRepository(
             sr.repositoryXref,
-            (sr.callNumber ? [sr.callNumber] : []),
-            clone.ancestryService));
+            (sr.callNumber ? [sr.callNumber] : [])));
     this.repositories.forEach((sr) => clone.replaceChildRecord(sr, undefined));
     clone.repositories.forEach((sr) => clone.replaceChildRecord(undefined, sr));
 

@@ -107,32 +107,32 @@ export class AncestryService {
           break;
         }
         case 'INDI': {
-          const gedcomIndividual = new GedcomIndividual(gedcomRecord, this);
+          const gedcomIndividual = new GedcomIndividual(gedcomRecord);
           this.records.update(
               (records) => records.set(gedcomIndividual.xref, gedcomIndividual));
           break;
         }
         case 'FAM': {
-          const gedcomFamily = new GedcomFamily(gedcomRecord, this);
+          const gedcomFamily = new GedcomFamily(gedcomRecord);
           this.records.update(
               (records) => records.set(gedcomFamily.xref, gedcomFamily));
           break;
         }
         case 'REPO': {
-          const gedcomRepository = new GedcomRepository(gedcomRecord, this);
+          const gedcomRepository = new GedcomRepository(gedcomRecord);
           this.records.update(
               (records) => records.set(gedcomRepository.xref, gedcomRepository ));
           break;
         }
         case 'SOUR': {
-          const gedcomSource = GedcomSource.constructFromGedcom(gedcomRecord, this);
+          const gedcomSource = GedcomSource.constructFromGedcom(gedcomRecord);
           this.records.update(
               (records) => records.set(gedcomSource.xref, gedcomSource));
           break;
         }
 
         case 'SUBM': {
-          const gedcomSubmitter = new GedcomSubmitter(gedcomRecord, this);
+          const gedcomSubmitter = new GedcomSubmitter(gedcomRecord);
           this.records.update(
               (records) => records.set(gedcomSubmitter.xref, gedcomSubmitter));
           break;

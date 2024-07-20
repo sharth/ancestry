@@ -1,10 +1,8 @@
-import type {AncestryService} from '../app/ancestry.service';
+import {ancestryService} from '../app/ancestry.service';
 import type {GedcomRecord} from './gedcomRecord';
 
 export class GedcomSubmitter {
-  constructor(
-      private record: GedcomRecord,
-      private ancestryService: AncestryService) {
+  constructor(private record: GedcomRecord) {
     if (record.abstag !== 'SUBM') throw new Error();
     if (record.xref == null) throw new Error();
     if (record.value != null) throw new Error();

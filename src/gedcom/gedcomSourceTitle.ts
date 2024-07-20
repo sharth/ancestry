@@ -1,16 +1,16 @@
-import type {AncestryService} from '../app/ancestry.service';
+import {ancestryService} from '../app/ancestry.service';
 import {GedcomRecord} from './gedcomRecord';
 
 export class GedcomSourceTitle {
-  constructor(readonly value: string, private ancestryService: AncestryService) {}
+  constructor(readonly value: string) {}
 
-  static constructFromGedcom(gedcomRecord: GedcomRecord, ancestryService: AncestryService) {
+  static constructFromGedcom(gedcomRecord: GedcomRecord) {
     if (gedcomRecord.abstag !== 'SOUR.TITL') throw new Error();
     if (gedcomRecord.xref != null) throw new Error();
     if (gedcomRecord.value == null) throw new Error();
     gedcomRecord.children.forEach(ancestryService.reportUnparsedRecord);
 
-    return new GedcomSourceTitle(gedcomRecord.value, ancestryService);
+    return new GedcomSourceTitle(gedcomRecord.value);
   }
 
   gedcomRecord() {

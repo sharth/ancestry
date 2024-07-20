@@ -1,13 +1,10 @@
-import type {AncestryService} from '../app/ancestry.service';
+import {ancestryService} from '../app/ancestry.service';
 import {GedcomRecord} from './gedcomRecord';
 
 export class GedcomSourceRepository {
-  constructor(
-    readonly repositoryXref: string,
-    readonly callNumbers: string[],
-    private ancestryService: AncestryService) {}
+  constructor(readonly repositoryXref: string, readonly callNumbers: string[]) {}
 
-  static constructFromGedcom(gedcomRecord: GedcomRecord, ancestryService: AncestryService): GedcomSourceRepository {
+  static constructFromGedcom(gedcomRecord: GedcomRecord): GedcomSourceRepository {
     if (gedcomRecord.abstag !== 'SOUR.REPO') throw new Error();
     if (gedcomRecord.xref != null) throw new Error();
     if (gedcomRecord.value == null) throw new Error();
@@ -30,7 +27,7 @@ export class GedcomSourceRepository {
       }
     }
 
-    return new GedcomSourceRepository(repositoryXref, callNumbers, ancestryService);
+    return new GedcomSourceRepository(repositoryXref, callNumbers);
   }
 
   gedcomRecord() {
@@ -40,6 +37,6 @@ export class GedcomSourceRepository {
   }
 
   repository() {
-    return this.ancestryService.repository(this.repositoryXref);
+    return ancestryService.repository(this.repositoryXref);
   }
 }

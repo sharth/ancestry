@@ -1,14 +1,12 @@
 import {computed} from '@angular/core';
-import type {AncestryService} from '../app/ancestry.service';
+import {ancestryService} from '../app/ancestry.service';
 import {GedcomEvent} from './gedcomEvent';
 import type {GedcomRecord} from './gedcomRecord';
 import type {GedcomFamily} from './gedcomFamily';
 import {GedcomCitation} from './gedcomCitation';
 
 export class GedcomIndividual {
-  constructor(
-      private record: GedcomRecord,
-      private ancestryService: AncestryService) {
+  constructor(private record: GedcomRecord) {
     if (record.abstag !== 'INDI') throw new Error();
     if (record.xref == null) throw new Error();
     if (record.value != null) throw new Error();
@@ -37,7 +35,7 @@ export class GedcomIndividual {
         case 'WILL':
         case 'DIV':
         case 'SSN':
-          this.events.push(new GedcomEvent(childRecord, ancestryService));
+          this.events.push(new GedcomEvent(childRecord));
           break;
         case 'NAME':
           this.parseIndividualName(this, childRecord);
@@ -63,7 +61,7 @@ export class GedcomIndividual {
     if (gedcomRecord.xref != null) throw new Error();
     if (gedcomRecord.value == null) throw new Error();
 
-    gedcomRecord.children.forEach(this.ancestryService.reportUnparsedRecord);
+    gedcomRecord.children.forEach(ancestryService.reportUnparsedRecord);
     return gedcomRecord.value;
   }
 
@@ -74,7 +72,7 @@ export class GedcomIndividual {
     if (gedcomRecord.xref != null) throw new Error();
     // if (gedcomRecord.value != null) throw new Error();
 
-    const gedcomEvent = new GedcomEvent(gedcomRecord, this.ancestryService);
+    const gedcomEvent = new GedcomEvent(gedcomRecord);
     gedcomIndividual.events.push(gedcomEvent);
     gedcomEvent.value = gedcomRecord.value;
 
@@ -86,10 +84,10 @@ export class GedcomIndividual {
     for (const childRecord of gedcomRecord.children) {
       switch (childRecord.tag) {
         case 'SOUR':
-          gedcomEvent.citations.push(new GedcomCitation(childRecord, this.ancestryService));
+          gedcomEvent.citations.push(new GedcomCitation(childRecord));
           break;
         default:
-          this.ancestryService.reportUnparsedRecord(childRecord);
+          ancestryService.reportUnparsedRecord(childRecord);
           break;
       }
     }
@@ -102,7 +100,7 @@ export class GedcomIndividual {
     if (gedcomRecord.xref != null) throw new Error();
     if (gedcomRecord.value == null) throw new Error();
 
-    const gedcomEvent = new GedcomEvent(gedcomRecord, this.ancestryService);
+    const gedcomEvent = new GedcomEvent(gedcomRecord);
     gedcomIndividual.events.push(gedcomEvent);
     gedcomEvent.value = gedcomRecord.value;
 
@@ -120,7 +118,7 @@ export class GedcomIndividual {
     for (const childRecord of gedcomRecord.children) {
       switch (childRecord.tag) {
         default:
-          this.ancestryService.reportUnparsedRecord(childRecord);
+          ancestryService.reportUnparsedRecord(childRecord);
           break;
       }
     }
@@ -134,12 +132,12 @@ export class GedcomIndividual {
   familySearchId?: string;
 
   readonly childOfFamilies = computed<GedcomFamily[]>(() => {
-    return Array.from(this.ancestryService.families().values())
+    return Array.from(ancestryService.families().values())
         .filter((family) => family.childXrefs.includes(this.xref));
   });
 
   readonly parentOfFamilies = computed<GedcomFamily[]>(() => {
-    return Array.from(this.ancestryService.families().values())
+    return Array.from(ancestryService.families().values())
         .filter((family) => family.parentXrefs.includes(this.xref));
   });
 

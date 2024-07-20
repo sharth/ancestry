@@ -1,12 +1,10 @@
 import {computed} from '@angular/core';
-import type {AncestryService} from '../app/ancestry.service';
+import {ancestryService} from '../app/ancestry.service';
 import type {GedcomRecord} from './gedcomRecord';
 import type {GedcomSource} from './gedcomSource';
 
 export class GedcomRepository {
-  constructor(
-      private record: GedcomRecord,
-      private ancestryService: AncestryService) {
+  constructor(private record: GedcomRecord) {
     if (record.abstag !== 'REPO') throw new Error();
     if (record.xref == null) throw new Error();
     if (record.value != null) throw new Error();
@@ -24,7 +22,7 @@ export class GedcomRepository {
           break;
 
         default:
-          this.ancestryService.reportUnparsedRecord(childRecord);
+          ancestryService.reportUnparsedRecord(childRecord);
           break;
       }
     }
@@ -36,7 +34,7 @@ export class GedcomRepository {
   sources = computed<GedcomSource[]>(() => {
     const sources: GedcomSource[] = [];
     const xref = this.xref;
-    for (const source of this.ancestryService.sources().values()) {
+    for (const source of ancestryService.sources().values()) {
       if (source.repositories.map((sr) => sr.repositoryXref).includes(xref)) {
         sources.push(source);
       }
