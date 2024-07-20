@@ -1,5 +1,5 @@
-import {Component, inject, model} from '@angular/core';
-import {AncestryService} from '../ancestry.service';
+import {Component, model} from '@angular/core';
+import {ancestryService} from '../ancestry.service';
 import {FormsModule} from '@angular/forms';
 
 @Component({
@@ -10,6 +10,6 @@ import {FormsModule} from '@angular/forms';
   styleUrl: './source.component.css',
 })
 export class SourceEditAbbrComponent {
-  readonly ancestryService = inject(AncestryService);
+  readonly ancestryService = ancestryService;
   readonly sourceModel = model.required<{abbr: string}>();
 }

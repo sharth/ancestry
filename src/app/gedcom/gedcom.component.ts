@@ -1,5 +1,5 @@
-import {Component, computed, inject} from '@angular/core';
-import {AncestryService} from '../ancestry.service';
+import {Component, computed} from '@angular/core';
+import {ancestryService} from '../ancestry.service';
 import {parseGedcomRecordsFromText} from '../../gedcom/gedcomRecord';
 
 @Component({
@@ -10,7 +10,7 @@ import {parseGedcomRecordsFromText} from '../../gedcom/gedcomRecord';
   styleUrl: './gedcom.component.css',
 })
 export class GedcomComponent {
-  ancestryService = inject(AncestryService);
+  readonly ancestryService = ancestryService;
 
   differences = computed(() => {
     const oldGedcomText = Array.from(parseGedcomRecordsFromText(this.ancestryService.originalGedcomText()))

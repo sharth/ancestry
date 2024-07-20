@@ -1,5 +1,5 @@
-import {Component, computed, inject, input} from '@angular/core';
-import {AncestryService} from '../ancestry.service';
+import {Component, computed, input} from '@angular/core';
+import {ancestryService} from '../ancestry.service';
 import {CommonModule} from '@angular/common';
 import {RouterLink} from '@angular/router';
 import type {GedcomEvent} from '../../gedcom/gedcomEvent';
@@ -13,7 +13,7 @@ import type {GedcomIndividual} from '../../gedcom/gedcomIndividual';
   styleUrl: './individual.component.css',
 })
 export class IndividualComponent {
-  ancestryService = inject(AncestryService);
+  readonly ancestryService = ancestryService;
   xref = input.required<string>();
   individual = computed(() => this.ancestryService.individual(this.xref()));
 

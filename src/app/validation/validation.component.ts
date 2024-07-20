@@ -1,5 +1,5 @@
-import {Component, computed, inject} from '@angular/core';
-import {AncestryService} from '../ancestry.service';
+import {Component, computed} from '@angular/core';
+import {ancestryService} from '../ancestry.service';
 import {sourceValidators} from '../../validators/source.validators';
 import {CommonModule} from '@angular/common';
 import {RouterModule} from '@angular/router';
@@ -12,7 +12,7 @@ import {RouterModule} from '@angular/router';
   styleUrl: './validation.component.css',
 })
 export class ValidationComponent {
-  readonly ancestryService = inject(AncestryService);
+  readonly ancestryService = ancestryService;
 
   readonly sourceScenarios = computed(() =>
     this.ancestryService.sources().toList()

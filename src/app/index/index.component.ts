@@ -1,5 +1,5 @@
-import {Component, computed, inject} from '@angular/core';
-import {AncestryService} from '../ancestry.service';
+import {Component, computed} from '@angular/core';
+import {ancestryService} from '../ancestry.service';
 
 @Component({
   selector: 'app-index',
@@ -9,7 +9,7 @@ import {AncestryService} from '../ancestry.service';
   styleUrl: './index.component.css',
 })
 export class IndexComponent {
-  ancestryService = inject(AncestryService);
+  readonly ancestryService = ancestryService;
 
   headerText = computed(() => {
     return this.ancestryService.headers()

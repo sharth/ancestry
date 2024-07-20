@@ -1,6 +1,6 @@
 import type {ElementRef, OnInit} from '@angular/core';
-import {Component, computed, inject, input, viewChild} from '@angular/core';
-import {AncestryService} from '../ancestry.service';
+import {Component, computed, input, viewChild} from '@angular/core';
+import {ancestryService} from '../ancestry.service';
 import {RouterModule} from '@angular/router';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
@@ -40,7 +40,7 @@ import {SourceViewUnknownsComponent} from './source-view-unknowns.component';
   ],
 })
 export class SourceComponent implements OnInit {
-  ancestryService = inject(AncestryService);
+  readonly ancestryService = ancestryService;
   xref = input.required<string>();
   source = computed(() => this.ancestryService.source(this.xref()));
 

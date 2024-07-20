@@ -1,5 +1,5 @@
-import {Component, inject, model} from '@angular/core';
-import {AncestryService} from '../ancestry.service';
+import {Component, model} from '@angular/core';
+import {ancestryService} from '../ancestry.service';
 import {FormsModule} from '@angular/forms';
 import {CommonModule} from '@angular/common';
 import type {GedcomRecord} from '../../gedcom/gedcomRecord';
@@ -12,7 +12,7 @@ import type {GedcomRecord} from '../../gedcom/gedcomRecord';
   styleUrl: './source.component.css',
 })
 export class SourceEditUnknownsComponent {
-  readonly ancestryService = inject(AncestryService);
+  readonly ancestryService = ancestryService;
   readonly sourceModel = model.required<{unknowns: GedcomRecord[]}>();
 
   remove(index: number) {

@@ -1,7 +1,7 @@
-import {Component, computed, inject} from '@angular/core';
+import {Component, computed} from '@angular/core';
 import {CommonModule, KeyValuePipe} from '@angular/common';
 import {RouterLink} from '@angular/router';
-import {AncestryService} from '../ancestry.service';
+import {ancestryService} from '../ancestry.service';
 
 @Component({
   selector: 'app-individuals',
@@ -11,7 +11,7 @@ import {AncestryService} from '../ancestry.service';
   styleUrl: './individuals.component.css',
 })
 export class IndividualsComponent {
-  readonly ancestryService = inject(AncestryService);
+  readonly ancestryService = ancestryService;
 
   readonly individuals = computed(() =>
     this.ancestryService.individuals()

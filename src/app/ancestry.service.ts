@@ -1,4 +1,4 @@
-import {computed, Injectable, signal} from '@angular/core';
+import {computed, signal} from '@angular/core';
 import {GedcomFamily} from '../gedcom/gedcomFamily';
 import {GedcomIndividual} from '../gedcom/gedcomIndividual';
 import {GedcomRepository} from '../gedcom/gedcomRepository';
@@ -11,7 +11,6 @@ import {OrderedMap as ImmutableOrderedMap} from 'immutable';
 import {List as ImmutableList} from 'immutable';
 import {GedcomSubmitter} from '../gedcom/gedcomSubmitter';
 
-@Injectable({providedIn: 'root'})
 export class AncestryService {
   readonly headers = signal(ImmutableList<GedcomHeader>());
   readonly trailers = signal(ImmutableList<GedcomTrailer>());
@@ -152,3 +151,5 @@ export class AncestryService {
     }
   }
 }
+
+export const ancestryService = new AncestryService;

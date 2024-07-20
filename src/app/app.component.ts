@@ -1,7 +1,7 @@
 import {CommonModule} from '@angular/common';
-import {Component, inject} from '@angular/core';
+import {Component} from '@angular/core';
 import {RouterLink, RouterOutlet} from '@angular/router';
-import {AncestryService} from './ancestry.service';
+import {ancestryService} from './ancestry.service';
 
 @Component({
   selector: 'app-root',
@@ -11,7 +11,7 @@ import {AncestryService} from './ancestry.service';
   styleUrl: './app.component.css',
 })
 export class AppComponent {
-  ancestryService = inject(AncestryService);
+  readonly ancestryService = ancestryService;
 
   ngOnInit() {
     const text = localStorage.getItem('text');

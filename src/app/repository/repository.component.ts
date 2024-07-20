@@ -1,5 +1,5 @@
-import {Component, computed, inject, input} from '@angular/core';
-import {AncestryService} from '../ancestry.service';
+import {Component, computed, input} from '@angular/core';
+import {ancestryService} from '../ancestry.service';
 import {CommonModule} from '@angular/common';
 import {RouterModule} from '@angular/router';
 
@@ -11,7 +11,7 @@ import {RouterModule} from '@angular/router';
   styleUrl: './repository.component.css',
 })
 export class RepositoryComponent {
-  ancestryService = inject(AncestryService);
+  readonly ancestryService = ancestryService;
   xref = input.required<string>();
   repository = computed(() => this.ancestryService.repository(this.xref()));
 }

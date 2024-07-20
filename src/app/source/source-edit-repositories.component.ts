@@ -1,5 +1,5 @@
-import {Component, inject, model} from '@angular/core';
-import {AncestryService} from '../ancestry.service';
+import {Component, model} from '@angular/core';
+import {ancestryService} from '../ancestry.service';
 import {FormsModule} from '@angular/forms';
 import {CommonModule} from '@angular/common';
 
@@ -11,7 +11,7 @@ import {CommonModule} from '@angular/common';
   styleUrl: './source.component.css',
 })
 export class SourceEditRepositoriesComponent {
-  readonly ancestryService = inject(AncestryService);
+  readonly ancestryService = ancestryService;
   readonly sourceModel = model.required<{repositories: {repositoryXref: string, callNumber: string}[]}>();
 
   append() {

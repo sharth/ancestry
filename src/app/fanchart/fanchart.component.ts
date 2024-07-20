@@ -1,5 +1,5 @@
-import {Component, inject, input} from '@angular/core';
-import {AncestryService} from '../ancestry.service';
+import {Component, input} from '@angular/core';
+import {ancestryService} from '../ancestry.service';
 
 @Component({
   selector: 'app-fanchart',
@@ -9,6 +9,6 @@ import {AncestryService} from '../ancestry.service';
   styleUrl: './fanchart.component.css',
 })
 export class FanchartComponent {
-  ancestryService = inject(AncestryService);
+  readonly ancestryService = ancestryService;
   xref = input.required<string>();
 }
