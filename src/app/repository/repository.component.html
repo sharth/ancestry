@@ -2,6 +2,6 @@
 
 <ul>
     <li *ngFor="let source of repository().sources()">
-        <a routerLink="/source/{{source.xref}}">{{source.abbr?.value}}</a>
+        <a routerLink="/source/{{source.xref}}">{{source.abbr ?? source.xref}}</a>
     </li>
 </ul>

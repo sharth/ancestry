@@ -13,7 +13,7 @@
 <app-source-view-repositories [source]="source()"></app-source-view-repositories>
 }
 
-@if (source().citations.length > 0) {
+@if (source().citations().length > 0) {
 <h2>Citations</h2>
 <app-source-view-citations [source]="source()"></app-source-view-citations>
 }
@@ -24,7 +24,7 @@
 }
 
 <h2>gedcom</h2>
-<pre>{{ source().gedcomRecord().text().join('\n') }}</pre>
+<pre>{{ gedcomRecord().text().join('\n') }}</pre>
 
 <div class="position-fixed bottom-0 end-0 rounded-circle m-5">
     <button type="button" class="btn btn-primary btn-lg bi-pencil" (click)="openForm()"></button>

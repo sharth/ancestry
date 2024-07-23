@@ -10,6 +10,8 @@ import {parseGedcomRecordsFromText} from '../gedcom/gedcomRecord';
 import {OrderedMap as ImmutableOrderedMap} from 'immutable';
 import {List as ImmutableList} from 'immutable';
 import {GedcomSubmitter} from '../gedcom/gedcomSubmitter';
+import {constructSourceFromGedcom} from '../gedcom/gedcomSource.parser';
+import {serializeSourceToGedcomRecord} from '../gedcom/gedcomSource.serializer';
 
 export class AncestryService {
   readonly headers = signal(ImmutableList<GedcomHeader>());
@@ -73,13 +75,14 @@ export class AncestryService {
         .filter((record) => record instanceof GedcomSource);
   }
 
-  readonly gedcomRecords = computed<GedcomRecord[]>(() => {
-    return Array.from([
-      ...this.headers(),
-      ...this.records().values(),
-      ...this.trailers(),
-    ], (gedcomObject) => gedcomObject.gedcomRecord());
-  });
+  readonly gedcomRecords = computed<GedcomRecord[]>(() => [
+    ...this.headers().map((header) => header.gedcomRecord()),
+    ...this.individuals().map((individual) => individual.gedcomRecord()),
+    ...this.families().map((family) => family.gedcomRecord()),
+    ...this.sources().map((source) => serializeSourceToGedcomRecord(source)),
+    ...this.repositories().map((repository) => repository.gedcomRecord()),
+    ...this.trailers().map((trailer) => trailer.gedcomRecord()),
+  ]);
 
   readonly gedcomText = computed<string>(() => this.gedcomRecords()
       .flatMap((record) => record.text())
@@ -125,7 +128,7 @@ export class AncestryService {
           break;
         }
         case 'SOUR': {
-          const gedcomSource = GedcomSource.constructFromGedcom(gedcomRecord);
+          const gedcomSource = constructSourceFromGedcom(gedcomRecord);
           this.records.update(
               (records) => records.set(gedcomSource.xref, gedcomSource));
           break;

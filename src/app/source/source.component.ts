@@ -16,6 +16,7 @@ import {SourceViewTextComponent} from './source-view-text.component';
 import {SourceViewRepositoriesComponent} from './source-view-repositories.component';
 import {SourceViewCitationsComponent} from './source-view-citations.component';
 import {SourceViewUnknownsComponent} from './source-view-unknowns.component';
+import {serializeSourceToGedcomRecord} from '../../gedcom/gedcomSource.serializer';
 
 @Component({
   selector: 'app-source',
@@ -43,6 +44,7 @@ export class SourceComponent implements OnInit {
   readonly ancestryService = ancestryService;
   xref = input.required<string>();
   source = computed(() => this.ancestryService.source(this.xref()));
+  gedcomRecord = computed(() => serializeSourceToGedcomRecord(this.source()));
 
   model?: {
     abbr: string
@@ -53,9 +55,9 @@ export class SourceComponent implements OnInit {
   };
   ngOnInit(): void {
     this.model = {
-      abbr: this.source().abbr?.value ?? '',
-      title: this.source().title?.value ?? '',
-      text: this.source().text?.value ?? '',
+      abbr: this.source().abbr ?? '',
+      title: this.source().title ?? '',
+      text: this.source().text ?? '',
       repositories: this.source().repositories
           .flatMap((repository) => repository.callNumbers
               .map((callNumber) => ({

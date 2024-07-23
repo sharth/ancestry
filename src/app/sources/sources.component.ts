@@ -15,5 +15,5 @@ export class SourcesComponent {
 
   readonly sources = computed(() =>
     this.ancestryService.sources()
-        .sort((lhs, rhs) => (lhs.abbr?.value ?? '').localeCompare(rhs.abbr?.value ?? '')));
+        .sort((lhs, rhs) => (lhs.abbr ?? '').localeCompare(rhs.abbr ?? '')));
 }
