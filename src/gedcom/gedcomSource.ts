@@ -16,6 +16,8 @@ export class GedcomSource {
   repositories: GedcomSourceRepository[] = [];
   unknowns: GedcomUnknown[] = [];
 
+  canonicalGedcomRecord?: GedcomRecord;
+
   readonly citations = computed<{individual: GedcomIndividual; event: GedcomEvent; citation: GedcomCitation}[]>(() => {
     const arr = [];
     for (const individual of ancestryService.individuals().values()) {
@@ -37,6 +39,7 @@ export class GedcomSource {
     cloned.text = this.text;
     cloned.repositories = this.repositories;
     cloned.unknowns = this.unknowns;
+    cloned.canonicalGedcomRecord = this.canonicalGedcomRecord;
     return cloned;
   }
 
@@ -48,6 +51,7 @@ export class GedcomSource {
     unknowns: GedcomRecord[]
   }): GedcomSource {
     const clone = this.clone();
+    clone.canonicalGedcomRecord = undefined;
     clone.abbr = changes.abbr || undefined;
     clone.title = changes.title || undefined;
     clone.text = changes.text || undefined;

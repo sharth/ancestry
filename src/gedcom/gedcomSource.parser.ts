@@ -10,6 +10,7 @@ export function constructSourceFromGedcom(record: GedcomRecord): GedcomSource {
   if (record.value != null) throw new Error();
 
   const gedcomSource = new GedcomSource(record.xref);
+  gedcomSource.canonicalGedcomRecord = record;
 
   for (const childRecord of record.children) {
     switch (childRecord.tag) {

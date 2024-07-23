@@ -2,6 +2,10 @@ import {GedcomRecord} from './gedcomRecord';
 import type {GedcomSource} from './gedcomSource';
 
 export function serializeSourceToGedcomRecord(source: GedcomSource): GedcomRecord {
+  if (source.canonicalGedcomRecord) {
+    return source.canonicalGedcomRecord;
+  }
+
   return new GedcomRecord(
       0, source.xref, 'SOUR', 'SOUR', undefined,
       [
