@@ -5,7 +5,7 @@ export class GedcomRecord {
     public tag: string,
     public abstag: string,
     public value: string | undefined,
-    public children: GedcomRecord[] = []) { }
+    public children: GedcomRecord[]) { }
 
   text(): string[] {
     const [firstValue, ...remainingValues] = this.value?.split('\n') ?? [];
@@ -37,7 +37,7 @@ export function* parseGedcomRecordsFromText(text: string): Generator<GedcomRecor
     const level = parseInt(match[1], 10);
     const [xref, tag, value] = match.slice(2);
     const abstag = [...ladder.slice(0, level).map((record) => record.tag), tag].join('.');
-    const record = new GedcomRecord(level, xref, tag, abstag, value);
+    const record = new GedcomRecord(level, xref, tag, abstag, value, []);
 
     if (level == 0) {
       if (ladder.length > 0) {
