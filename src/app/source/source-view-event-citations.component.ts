@@ -4,12 +4,12 @@ import {CommonModule} from '@angular/common';
 import {RouterModule} from '@angular/router';
 
 @Component({
-  selector: 'app-source-view-citations',
+  selector: 'app-source-view-event-citations',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  templateUrl: './source-view-citations.component.html',
+  templateUrl: './source-view-event-citations.component.html',
   styleUrl: './source.component.css',
 })
-export class SourceViewCitationsComponent {
+export class SourceViewEventCitationsComponent {
   readonly source = input.required<GedcomSource>();
 }

@@ -4,7 +4,6 @@ import type {GedcomCitation} from './gedcomCitation';
 import type {GedcomEvent} from './gedcomEvent';
 import type {GedcomIndividual} from './gedcomIndividual';
 import type {GedcomRecord} from './gedcomRecord';
-import {GedcomSourceRepository} from './gedcomSourceRepository';
 
 export class GedcomSource {
   constructor(public xref: string) {}
@@ -12,7 +11,10 @@ export class GedcomSource {
   abbr?: string;
   title?: string;
   text?: string;
-  repositories: GedcomSourceRepository[] = [];
+  repositoryCitations: {
+    repositoryXref?:string,
+    callNumbers: string[],
+  }[] = [];
   unknownRecords: GedcomRecord[] = [];
 
   canonicalGedcomRecord?: GedcomRecord;
@@ -36,9 +38,9 @@ export class GedcomSource {
     cloned.abbr = this.abbr;
     cloned.title = this.title;
     cloned.text = this.text;
-    cloned.repositories = this.repositories;
-    cloned.unknownRecords = this.unknownRecords;
-    cloned.canonicalGedcomRecord = this.canonicalGedcomRecord;
+    cloned.repositoryCitations = [...this.repositoryCitations];
+    cloned.unknownRecords = [...this.unknownRecords];
+    cloned.canonicalGedcomRecord = undefined;
     return cloned;
   }
 
@@ -46,7 +48,7 @@ export class GedcomSource {
     abbr: string
     title: string
     text: string
-    repositories: {repositoryXref: string, callNumber: string}[]
+    repositoryCitations: {repositoryXref: string, callNumbers: string[]}[]
     unknownRecords: GedcomRecord[]
   }): GedcomSource {
     const clone = this.clone();
@@ -54,10 +56,7 @@ export class GedcomSource {
     clone.abbr = changes.abbr || undefined;
     clone.title = changes.title || undefined;
     clone.text = changes.text || undefined;
-    clone.repositories = changes.repositories
-        .map((sr) => new GedcomSourceRepository(
-            sr.repositoryXref,
-            (sr.callNumber ? [sr.callNumber] : [])));
+    clone.repositoryCitations = [...changes.repositoryCitations];
     clone.unknownRecords = [...changes.unknownRecords];
 
     return clone;

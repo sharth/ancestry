@@ -8,14 +8,14 @@
 <h2>Text</h2>
 <app-source-view-text [source]="source()"></app-source-view-text>
 
-@if (source().repositories.length > 0) {
+@if (source().repositoryCitations.length > 0) {
 <h2>Repositories</h2>
-<app-source-view-repositories [source]="source()"></app-source-view-repositories>
+<app-source-view-repository-citations [source]="source()"></app-source-view-repository-citations>
 }
 
 @if (source().citations().length > 0) {
 <h2>Citations</h2>
-<app-source-view-citations [source]="source()"></app-source-view-citations>
+<app-source-view-event-citations [source]="source()"></app-source-view-event-citations>
 }
 
 @if (source().unknownRecords.length > 0) {
@@ -33,9 +33,9 @@
 <dialog #editDialog>
     <form (ngSubmit)="submitForm()" class="vstack gap-3">
         <app-source-edit-abbr [(sourceModel)]="model!"></app-source-edit-abbr>
-        <app-source-edit-title [(sourceModel)]="model!"></app-source-edit-title>
+        <app-source-edit-title [sourceModel]="model!"></app-source-edit-title>
         <app-source-edit-text [(sourceModel)]="model!"></app-source-edit-text>
-        <app-source-edit-repositories [(sourceModel)]="model!"></app-source-edit-repositories>
+        <app-source-edit-repository-citations [(sourceModel)]="model!"></app-source-edit-repository-citations>
         <app-source-edit-unknowns [(sourceModel)]="model!"></app-source-edit-unknowns>
         <input type="submit">
         <input type="button" value="Cancel" (click)="editDialog.close()">

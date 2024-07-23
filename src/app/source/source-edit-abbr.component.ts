@@ -1,6 +1,7 @@
 import {Component, model} from '@angular/core';
 import {ancestryService} from '../ancestry.service';
 import {FormsModule} from '@angular/forms';
+import type {GedcomSource} from '../../gedcom/gedcomSource';
 
 @Component({
   selector: 'app-source-edit-abbr',
@@ -11,5 +12,5 @@ import {FormsModule} from '@angular/forms';
 })
 export class SourceEditAbbrComponent {
   readonly ancestryService = ancestryService;
-  readonly sourceModel = model.required<{abbr: string}>();
+  readonly sourceModel = model.required<GedcomSource>();
 }

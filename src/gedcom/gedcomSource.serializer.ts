@@ -12,7 +12,7 @@ export function serializeSourceToGedcomRecord(source: GedcomSource): GedcomRecor
         source.abbr ? new GedcomRecord(1, undefined, 'ABBR', 'SOUR.ABBR', source.abbr, []): null,
         source.title ? new GedcomRecord(1, undefined, 'TITL', 'SOUR.TITL', source.title, []) : null,
         source.text ? new GedcomRecord(1, undefined, 'TEXT', 'SOUR.TEXT', source.text, []) : null,
-        ...source.repositories.map((repositoryCitation) =>new GedcomRecord(
+        ...source.repositoryCitations.map((repositoryCitation) =>new GedcomRecord(
             1, undefined, 'REPO', 'SOUR.REPO', repositoryCitation.repositoryXref,
             repositoryCitation.callNumbers.map((callNumber) => new GedcomRecord(
                 2, undefined, 'CALN', 'SOUR.REPO.CALN', callNumber, [])))),

@@ -35,7 +35,7 @@ export class GedcomRepository {
     const sources: GedcomSource[] = [];
     const xref = this.xref;
     for (const source of ancestryService.sources().values()) {
-      if (source.repositories.map((sr) => sr.repositoryXref).includes(xref)) {
+      if (source.repositoryCitations.map((repositoryCitation) => repositoryCitation.repositoryXref).includes(xref)) {
         sources.push(source);
       }
     }

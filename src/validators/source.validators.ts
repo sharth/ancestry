@@ -7,7 +7,7 @@ export const sourceValidators = create((source: GedcomSource, field?: string) =>
     enforce(source.unknownRecords).isEmpty();
   });
   test('repositories', 'Source is not part of any repository', () => {
-    enforce(source.repositories).isNotEmpty();
+    enforce(source.repositoryCitations).isNotEmpty();
   });
   test('citations', 'Source is not used as a citation anywhere', () => {
     enforce(source.citations()).isNotEmpty();

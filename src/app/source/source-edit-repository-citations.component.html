@@ -1,4 +1,4 @@
-<div class="input-group" *ngFor="let sr of sourceModel().repositories; index as i">
+<div class="input-group" *ngFor="let sr of sourceModel().repositoryCitations; index as i">
     <button class="btn btn-outline-secondary bi bi-trash" type="button" (click)="remove(i)"></button>
     <div class="form-floating">
         <select class="form-select" [(ngModel)]="sr.repositoryXref">
@@ -10,7 +10,7 @@
         <label>Repository</label>
     </div>
     <div class="form-floating">
-        <input class="form-control" type="text" [(ngModel)]="sr.callNumber">
+        <input class="form-control" type="text" [(ngModel)]="sr.callNumbers[0]">
         <label>Call Number</label>
     </div>
 </div>

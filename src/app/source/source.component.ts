@@ -1,22 +1,22 @@
-import type {ElementRef, OnInit} from '@angular/core';
+import type {ElementRef} from '@angular/core';
 import {Component, computed, input, viewChild} from '@angular/core';
 import {ancestryService} from '../ancestry.service';
 import {RouterModule} from '@angular/router';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
-import type {GedcomRecord} from '../../gedcom/gedcomRecord';
 import {SourceEditAbbrComponent} from './source-edit-abbr.component';
 import {SourceEditTitleComponent} from './source-edit-title.component';
 import {SourceEditTextComponent} from './source-edit-text.component';
-import {SourceEditRepositoriesComponent} from './source-edit-repositories.component';
+import {SourceEditRepositoryCitationsComponent} from './source-edit-repository-citations.component';
 import {SourceEditUnknownsComponent} from './source-edit-unknowns.component';
 import {SourceViewAbbrComponent} from './source-view-abbr.component';
 import {SourceViewTitleComponent} from './source-view-title.component';
 import {SourceViewTextComponent} from './source-view-text.component';
-import {SourceViewRepositoriesComponent} from './source-view-repositories.component';
-import {SourceViewCitationsComponent} from './source-view-citations.component';
+import {SourceViewRepositoryCitationsComponent} from './source-view-repository-citations.component';
+import {SourceViewEventCitationsComponent} from './source-view-event-citations.component';
 import {SourceViewUnknownsComponent} from './source-view-unknowns.component';
 import {serializeSourceToGedcomRecord} from '../../gedcom/gedcomSource.serializer';
+import {GedcomSource} from '../../gedcom/gedcomSource';
 
 @Component({
   selector: 'app-source',
@@ -30,58 +30,32 @@ import {serializeSourceToGedcomRecord} from '../../gedcom/gedcomSource.serialize
     SourceEditAbbrComponent,
     SourceEditTitleComponent,
     SourceEditTextComponent,
-    SourceEditRepositoriesComponent,
+    SourceEditRepositoryCitationsComponent,
     SourceEditUnknownsComponent,
     SourceViewAbbrComponent,
     SourceViewTitleComponent,
     SourceViewTextComponent,
-    SourceViewRepositoriesComponent,
-    SourceViewCitationsComponent,
+    SourceViewRepositoryCitationsComponent,
+    SourceViewEventCitationsComponent,
     SourceViewUnknownsComponent,
   ],
 })
-export class SourceComponent implements OnInit {
+export class SourceComponent {
   readonly ancestryService = ancestryService;
   xref = input.required<string>();
   source = computed(() => this.ancestryService.source(this.xref()));
   gedcomRecord = computed(() => serializeSourceToGedcomRecord(this.source()));
 
-  model?: {
-    abbr: string
-    title: string
-    text: string
-    repositories: {repositoryXref: string, callNumber: string}[]
-    unknowns: GedcomRecord[]
-  };
-  ngOnInit(): void {
-    this.model = {
-      abbr: this.source().abbr ?? '',
-      title: this.source().title ?? '',
-      text: this.source().text ?? '',
-      repositories: this.source().repositories
-          .flatMap((repository) => repository.callNumbers
-              .map((callNumber) => ({
-                repositoryXref: repository.repositoryXref,
-                callNumber: callNumber,
-              }))),
-      unknowns: this.source().unknownRecords,
-    };
-  }
-
+  model = new GedcomSource('');
   editDialog = viewChild.required<ElementRef<HTMLDialogElement>>('editDialog');
 
   openForm() {
+    this.model = this.source().clone();
     this.editDialog().nativeElement.showModal();
   }
 
   submitForm() {
-    this.ancestryService.records.update((records) => records.set(this.xref(), this.source().modify({
-      abbr: this.model!.abbr,
-      text: this.model!.text,
-      title: this.model!.title,
-      repositories: this.model!.repositories,
-      unknownRecords: this.model!.unknowns,
-    })));
+    this.ancestryService.records.update((records) => records.set(this.xref(), this.model!));
     this.editDialog().nativeElement.close();
   }
 }

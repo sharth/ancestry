@@ -1,7 +1,6 @@
 import {ancestryService} from '../app/ancestry.service';
 import type {GedcomRecord} from './gedcomRecord';
 import {GedcomSource} from './gedcomSource';
-import {GedcomSourceRepository} from './gedcomSourceRepository';
 
 export function constructSourceFromGedcom(record: GedcomRecord): GedcomSource {
   if (record.abstag !== 'SOUR') throw new Error();
@@ -26,8 +25,8 @@ export function constructSourceFromGedcom(record: GedcomRecord): GedcomSource {
         gedcomSource.title = constructSourceTitleFromGedcom(childRecord);
         break;
       case 'REPO':
-        gedcomSource.repositories.push(
-            constructSourceRepositoryFromGedcom(childRecord));
+        gedcomSource.repositoryCitations.push(
+            constructSourceRepositoryCitationFromGedcom(childRecord));
         break;
       default:
         gedcomSource.unknownRecords.push(childRecord);
@@ -65,7 +64,7 @@ function constructSourceTextFromGedcom(gedcomRecord: GedcomRecord) {
   return gedcomRecord.value;
 }
 
-function constructSourceRepositoryFromGedcom(gedcomRecord: GedcomRecord): GedcomSourceRepository {
+function constructSourceRepositoryCitationFromGedcom(gedcomRecord: GedcomRecord) {
   if (gedcomRecord.abstag !== 'SOUR.REPO') throw new Error();
   if (gedcomRecord.xref != null) throw new Error();
   if (gedcomRecord.value == null) throw new Error();
@@ -88,5 +87,5 @@ function constructSourceRepositoryFromGedcom(gedcomRecord: GedcomRecord): Gedcom
     }
   }
 
-  return new GedcomSourceRepository(repositoryXref, callNumbers);
+  return {repositoryXref, callNumbers};
 }

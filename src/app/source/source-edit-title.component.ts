@@ -1,6 +1,7 @@
-import {Component, model} from '@angular/core';
+import {Component, input} from '@angular/core';
 import {ancestryService} from '../ancestry.service';
 import {FormsModule} from '@angular/forms';
+import type {GedcomSource} from '../../gedcom/gedcomSource';
 
 @Component({
   selector: 'app-source-edit-title',
@@ -11,5 +12,5 @@ import {FormsModule} from '@angular/forms';
 })
 export class SourceEditTitleComponent {
   readonly ancestryService = ancestryService;
-  readonly sourceModel = model.required<{title: string}>();
+  readonly sourceModel = input.required<GedcomSource>();
 }

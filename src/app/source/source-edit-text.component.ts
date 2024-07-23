@@ -1,6 +1,6 @@
 import {Component, model} from '@angular/core';
-import {ancestryService} from '../ancestry.service';
 import {FormsModule} from '@angular/forms';
+import type {GedcomSource} from '../../gedcom/gedcomSource';
 
 @Component({
   selector: 'app-source-edit-text',
@@ -10,6 +10,5 @@ import {FormsModule} from '@angular/forms';
   styleUrl: './source.component.css',
 })
 export class SourceEditTextComponent {
-  readonly ancestryService = ancestryService;
-  readonly sourceModel = model.required<{text: string}>();
+  readonly sourceModel = model.required<GedcomSource>();
 }

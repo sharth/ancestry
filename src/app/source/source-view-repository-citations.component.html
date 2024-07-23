@@ -1,0 +1,24 @@
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Repository Xref</th>
+            <th scope="col">Repository</th>
+            <th scope="col">Call Number</th>
+        </tr>
+    </thead>
+    <tbody>
+        <ng-container *ngFor="let repositoryCitation of source().repositoryCitations">
+            @let repository = lookupRepository(repositoryCitation.repositoryXref);
+            <tr *ngIf="repositoryCitation.callNumbers.length == 0">
+                <td>{{repositoryCitation.repositoryXref}}</td>
+                <td>{{repository?.name}}</td>
+                <td></td>
+            </tr>
+            <tr *ngFor="let callNumber of repositoryCitation.callNumbers">
+                <td>{{repositoryCitation.repositoryXref}}</td>
+                <td>{{repository?.name}}</td>
+                <td>{{callNumber}}</td>
+            </tr>
+        </ng-container>
+    </tbody>
+</table>

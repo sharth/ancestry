@@ -5,17 +5,24 @@ import {CommonModule} from '@angular/common';
 import type {GedcomSource} from '../../gedcom/gedcomSource';
 
 @Component({
-  selector: 'app-source-edit-unknowns',
+  selector: 'app-source-edit-repository-citations',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './source-edit-unknowns.component.html',
+  templateUrl: './source-edit-repository-citations.component.html',
   styleUrl: './source.component.css',
 })
-export class SourceEditUnknownsComponent {
+export class SourceEditRepositoryCitationsComponent {
   readonly ancestryService = ancestryService;
   readonly sourceModel = model.required<GedcomSource>();
 
+  append() {
+    this.sourceModel().repositoryCitations.push({
+      repositoryXref: undefined,
+      callNumbers: [''],
+    });
+  }
+
   remove(index: number) {
-    this.sourceModel().unknownRecords.splice(index, 1);
+    this.sourceModel().repositoryCitations.splice(index, 1);
   }
 }
