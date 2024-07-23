@@ -5,7 +5,6 @@ import type {GedcomEvent} from './gedcomEvent';
 import type {GedcomIndividual} from './gedcomIndividual';
 import type {GedcomRecord} from './gedcomRecord';
 import {GedcomSourceRepository} from './gedcomSourceRepository';
-import {GedcomUnknown} from './gedcomUnknown';
 
 export class GedcomSource {
   constructor(public xref: string) {}
@@ -14,7 +13,7 @@ export class GedcomSource {
   title?: string;
   text?: string;
   repositories: GedcomSourceRepository[] = [];
-  unknowns: GedcomUnknown[] = [];
+  unknownRecords: GedcomRecord[] = [];
 
   canonicalGedcomRecord?: GedcomRecord;
 
@@ -38,7 +37,7 @@ export class GedcomSource {
     cloned.title = this.title;
     cloned.text = this.text;
     cloned.repositories = this.repositories;
-    cloned.unknowns = this.unknowns;
+    cloned.unknownRecords = this.unknownRecords;
     cloned.canonicalGedcomRecord = this.canonicalGedcomRecord;
     return cloned;
   }
@@ -48,7 +47,7 @@ export class GedcomSource {
     title: string
     text: string
     repositories: {repositoryXref: string, callNumber: string}[]
-    unknowns: GedcomRecord[]
+    unknownRecords: GedcomRecord[]
   }): GedcomSource {
     const clone = this.clone();
     clone.canonicalGedcomRecord = undefined;
@@ -59,8 +58,7 @@ export class GedcomSource {
         .map((sr) => new GedcomSourceRepository(
             sr.repositoryXref,
             (sr.callNumber ? [sr.callNumber] : [])));
-    clone.unknowns = changes.unknowns
-        .map((unknown) => new GedcomUnknown(unknown));
+    clone.unknownRecords = [...changes.unknownRecords];
 
     return clone;
   }

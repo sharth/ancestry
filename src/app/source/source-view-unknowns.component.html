@@ -5,9 +5,9 @@
         </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let unknown of source().unknowns">
+        <tr *ngFor="let unknownRecord of source().unknownRecords">
             <td>
-                <pre>{{unknown.gedcomRecord().text().join('\n')}}</pre>
+                <pre>{{unknownRecord.text().join('\n')}}</pre>
             </td>
         </tr>
     </tbody>

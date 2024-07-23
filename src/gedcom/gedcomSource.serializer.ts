@@ -16,6 +16,6 @@ export function serializeSourceToGedcomRecord(source: GedcomSource): GedcomRecor
             1, undefined, 'REPO', 'SOUR.REPO', repositoryCitation.repositoryXref,
             repositoryCitation.callNumbers.map((callNumber) => new GedcomRecord(
                 2, undefined, 'CALN', 'SOUR.REPO.CALN', callNumber, [])))),
-        ...source.unknowns.map((unknown) => unknown.gedcomRecord()),
+        ...source.unknownRecords,
       ].filter((record) => record !== null));
 }

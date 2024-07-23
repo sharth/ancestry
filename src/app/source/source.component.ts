@@ -64,8 +64,7 @@ export class SourceComponent implements OnInit {
                 repositoryXref: repository.repositoryXref,
                 callNumber: callNumber,
               }))),
-      unknowns: this.source().unknowns
-          .map((unknown) => unknown.gedcomRecord()),
+      unknowns: this.source().unknownRecords,
     };
   }
 
@@ -81,7 +80,7 @@ export class SourceComponent implements OnInit {
       text: this.model!.text,
       title: this.model!.title,
       repositories: this.model!.repositories,
-      unknowns: this.model!.unknowns,
+      unknownRecords: this.model!.unknowns,
     })));
     this.editDialog().nativeElement.close();
   }

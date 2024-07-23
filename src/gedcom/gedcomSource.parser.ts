@@ -2,7 +2,6 @@ import {ancestryService} from '../app/ancestry.service';
 import type {GedcomRecord} from './gedcomRecord';
 import {GedcomSource} from './gedcomSource';
 import {GedcomSourceRepository} from './gedcomSourceRepository';
-import {GedcomUnknown} from './gedcomUnknown';
 
 export function constructSourceFromGedcom(record: GedcomRecord): GedcomSource {
   if (record.abstag !== 'SOUR') throw new Error();
@@ -31,8 +30,7 @@ export function constructSourceFromGedcom(record: GedcomRecord): GedcomSource {
             constructSourceRepositoryFromGedcom(childRecord));
         break;
       default:
-        gedcomSource.unknowns.push(
-            new GedcomUnknown(childRecord));
+        gedcomSource.unknownRecords.push(childRecord);
         break;
     }
   }
