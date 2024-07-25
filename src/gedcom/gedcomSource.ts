@@ -12,7 +12,7 @@ export class GedcomSource {
   title?: string;
   text?: string;
   repositoryCitations: {
-    repositoryXref?:string,
+    repositoryXref: string,
     callNumbers: string[],
   }[] = [];
   unknownRecords: GedcomRecord[] = [];
@@ -35,30 +35,12 @@ export class GedcomSource {
 
   clone(): GedcomSource {
     const cloned = new GedcomSource(this.xref);
-    cloned.abbr = this.abbr;
-    cloned.title = this.title;
-    cloned.text = this.text;
-    cloned.repositoryCitations = [...this.repositoryCitations];
+    cloned.abbr = structuredClone(this.abbr);
+    cloned.title = structuredClone(this.title);
+    cloned.text = structuredClone(this.text);
+    cloned.repositoryCitations = structuredClone(this.repositoryCitations);
     cloned.unknownRecords = [...this.unknownRecords];
     cloned.canonicalGedcomRecord = undefined;
     return cloned;
-  }
-
-  modify(changes: {
-    abbr: string
-    title: string
-    text: string
-    repositoryCitations: {repositoryXref: string, callNumbers: string[]}[]
-    unknownRecords: GedcomRecord[]
-  }): GedcomSource {
-    const clone = this.clone();
-    clone.canonicalGedcomRecord = undefined;
-    clone.abbr = changes.abbr || undefined;
-    clone.title = changes.title || undefined;
-    clone.text = changes.text || undefined;
-    clone.repositoryCitations = [...changes.repositoryCitations];
-    clone.unknownRecords = [...changes.unknownRecords];
-
-    return clone;
   }
 }

@@ -1,4 +1,4 @@
-import type {ElementRef} from '@angular/core';
+import type {ElementRef, OnInit} from '@angular/core';
 import {Component, computed, input, viewChild} from '@angular/core';
 import {ancestryService} from '../ancestry.service';
 import {RouterModule} from '@angular/router';
@@ -16,7 +16,7 @@ import {SourceViewRepositoryCitationsComponent} from './source-view-repository-c
 import {SourceViewEventCitationsComponent} from './source-view-event-citations.component';
 import {SourceViewUnknownsComponent} from './source-view-unknowns.component';
 import {serializeSourceToGedcomRecord} from '../../gedcom/gedcomSource.serializer';
-import {GedcomSource} from '../../gedcom/gedcomSource';
+import type {GedcomSource} from '../../gedcom/gedcomSource';
 
 @Component({
   selector: 'app-source',
@@ -40,14 +40,18 @@ import {GedcomSource} from '../../gedcom/gedcomSource';
     SourceViewUnknownsComponent,
   ],
 })
-export class SourceComponent {
+export class SourceComponent implements OnInit {
   readonly ancestryService = ancestryService;
   xref = input.required<string>();
   source = computed(() => this.ancestryService.source(this.xref()));
   gedcomRecord = computed(() => serializeSourceToGedcomRecord(this.source()));
 
-  model = new GedcomSource('');
+  model!: GedcomSource;
   editDialog = viewChild.required<ElementRef<HTMLDialogElement>>('editDialog');
+
+  ngOnInit() {
+    this.model = this.source();
+  }
 
   openForm() {
     this.model = this.source().clone();

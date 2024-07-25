@@ -2,7 +2,7 @@
     <button class="btn btn-outline-secondary bi bi-trash" type="button" (click)="remove(i)"></button>
     <div class="form-floating">
         <select class="form-select" [(ngModel)]="sr.repositoryXref">
-            <option selected>Repositories...</option>
+            <option selected value="">Repositories...</option>
             <option *ngFor="let repository of ancestryService.repositories().toList()" value="{{repository.xref}}">
                 {{repository.name ?? repository.xref}}
             </option>

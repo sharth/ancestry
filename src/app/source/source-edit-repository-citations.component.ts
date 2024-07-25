@@ -17,7 +17,7 @@ export class SourceEditRepositoryCitationsComponent {
 
   append() {
     this.sourceModel().repositoryCitations.push({
-      repositoryXref: undefined,
+      repositoryXref: '',
       callNumbers: [''],
     });
   }
