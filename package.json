@@ -31,6 +31,7 @@
     "@types/wicg-file-system-access": "^2023.10.5",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
+    "dexie": "^4.0.8",
     "eslint": "^8.57.0",
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-markdown": "^5.1.0",
