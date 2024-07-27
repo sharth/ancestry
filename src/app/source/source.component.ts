@@ -29,11 +29,11 @@ import type {GedcomRepository} from '../../gedcom/gedcomRepository';
     SourceEditUnknownsComponent,
   ],
 })
-export class SourceComponent implements OnInit {
+export class SourceComponent {
   readonly ancestryService = ancestryService;
-  xref = input.required<string>();
-  source = computed(() => this.ancestryService.source(this.xref()));
-  gedcomRecord = computed(() => serializeSourceToGedcomRecord(this.source()));
+  readonly xref = input.required<string>();
+  readonly source = computed(() => this.ancestryService.source(this.xref()));
+  readonly gedcomRecord = computed(() => serializeSourceToGedcomRecord(this.source()));
 
   lookupRepository(repositoryXref?: string): GedcomRepository | undefined {
     if (repositoryXref == undefined) {
@@ -43,12 +43,8 @@ export class SourceComponent implements OnInit {
     }
   }
 
-  model!: GedcomSource;
+  model?: GedcomSource;
   editDialog = viewChild.required<ElementRef<HTMLDialogElement>>('editDialog');
-
-  ngOnInit() {
-    this.model = this.source();
-  }
 
   openForm() {
     this.model = this.source().clone();
