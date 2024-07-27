@@ -19,19 +19,10 @@ export class GedcomSource {
 
   canonicalGedcomRecord?: GedcomRecord;
 
-  readonly citations = computed<{individual: GedcomIndividual; event: GedcomEvent; citation: GedcomCitation}[]>(() => {
-    const arr = [];
-    for (const individual of ancestryService.individuals().values()) {
-      for (const event of individual.events) {
-        for (const citation of event.citations) {
-          if (citation.sourceXref == this.xref) {
-            arr.push({individual: individual, event: event, citation: citation});
-          }
-        }
-      }
-    }
-    return arr;
-  });
+  readonly citations = computed(() => ancestryService.individuals()
+      .flatMap((individual) => individual.events.map((event) => ({individual, event})))
+      .flatMap(({individual, event}) => event.citations.map((citation) => ({individual, event, citation})))
+      .filter(({citation}) => citation.sourceXref == this.xref));
 
   clone(): GedcomSource {
     const cloned = new GedcomSource(this.xref);
