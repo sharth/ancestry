@@ -9,14 +9,9 @@ import {SourceEditTitleComponent} from './source-edit-title.component';
 import {SourceEditTextComponent} from './source-edit-text.component';
 import {SourceEditRepositoryCitationsComponent} from './source-edit-repository-citations.component';
 import {SourceEditUnknownsComponent} from './source-edit-unknowns.component';
-import {SourceViewAbbrComponent} from './source-view-abbr.component';
-import {SourceViewTitleComponent} from './source-view-title.component';
-import {SourceViewTextComponent} from './source-view-text.component';
-import {SourceViewRepositoryCitationsComponent} from './source-view-repository-citations.component';
-import {SourceViewEventCitationsComponent} from './source-view-event-citations.component';
-import {SourceViewUnknownsComponent} from './source-view-unknowns.component';
 import {serializeSourceToGedcomRecord} from '../../gedcom/gedcomSource.serializer';
 import type {GedcomSource} from '../../gedcom/gedcomSource';
+import type {GedcomRepository} from '../../gedcom/gedcomRepository';
 
 @Component({
   selector: 'app-source',
@@ -32,12 +27,6 @@ import type {GedcomSource} from '../../gedcom/gedcomSource';
     SourceEditTextComponent,
     SourceEditRepositoryCitationsComponent,
     SourceEditUnknownsComponent,
-    SourceViewAbbrComponent,
-    SourceViewTitleComponent,
-    SourceViewTextComponent,
-    SourceViewRepositoryCitationsComponent,
-    SourceViewEventCitationsComponent,
-    SourceViewUnknownsComponent,
   ],
 })
 export class SourceComponent implements OnInit {
@@ -45,6 +34,14 @@ export class SourceComponent implements OnInit {
   xref = input.required<string>();
   source = computed(() => this.ancestryService.source(this.xref()));
   gedcomRecord = computed(() => serializeSourceToGedcomRecord(this.source()));
+
+  lookupRepository(repositoryXref?: string): GedcomRepository | undefined {
+    if (repositoryXref == undefined) {
+      return undefined;
+    } else {
+      return ancestryService.repository(repositoryXref);
+    }
+  }
 
   model!: GedcomSource;
   editDialog = viewChild.required<ElementRef<HTMLDialogElement>>('editDialog');
