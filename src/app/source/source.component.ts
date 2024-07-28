@@ -35,6 +35,32 @@ export class SourceComponent {
   readonly source = computed(() => this.ancestryService.source(this.xref()));
   readonly gedcomRecord = computed(() => serializeSourceToGedcomRecord(this.source()));
 
+  readonly vm = computed(() => {
+    const source = this.ancestryService.sources().find((source) => source.xref == this.xref());
+    const individuals = this.ancestryService.individuals();
+    const repositories = this.ancestryService.repositories();
+    if (source == undefined) {
+      return undefined;
+    }
+    return {
+      xref: this.xref(),
+      abbr: source.abbr ?? this.xref(),
+      title: source.title,
+      text: source.text,
+      citations: individuals
+          .flatMap((individual) => individual.events.map((event) => ({individual, event})))
+          .flatMap(({individual, event}) => event.citations.map((citation) => ({individual, event, citation})))
+          .filter(({citation}) => citation.sourceXref == this.xref()),
+      repositoryCitations: source.repositoryCitations.map((repositoryCitation) => ({
+        repositoryXref: repositoryCitation.repositoryXref,
+        callNumbers: repositoryCitation.callNumbers,
+        repository: repositories.find((repository) => repository.xref == repositoryCitation.repositoryXref),
+      })),
+      unknownRecords: this.source().unknownRecords,
+      gedcom: serializeSourceToGedcomRecord(source),
+    };
+  });
+
   lookupRepository(repositoryXref?: string): GedcomRepository | undefined {
     if (repositoryXref == undefined) {
       return undefined;
