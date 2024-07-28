@@ -1,4 +1,4 @@
-import type {ElementRef, OnInit} from '@angular/core';
+import type {ElementRef} from '@angular/core';
 import {Component, computed, input, viewChild} from '@angular/core';
 import {ancestryService} from '../ancestry.service';
 import {RouterModule} from '@angular/router';
