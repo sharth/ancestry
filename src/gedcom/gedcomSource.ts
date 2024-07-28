@@ -1,8 +1,5 @@
 import {computed} from '@angular/core';
 import {ancestryService} from '../app/ancestry.service';
-import type {GedcomCitation} from './gedcomCitation';
-import type {GedcomEvent} from './gedcomEvent';
-import type {GedcomIndividual} from './gedcomIndividual';
 import type {GedcomRecord} from './gedcomRecord';
 
 export class GedcomSource {
