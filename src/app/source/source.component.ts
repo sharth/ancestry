@@ -11,7 +11,6 @@ import {SourceEditRepositoryCitationsComponent} from './source-edit-repository-c
 import {SourceEditUnknownsComponent} from './source-edit-unknowns.component';
 import {serializeSourceToGedcomRecord} from '../../gedcom/gedcomSource.serializer';
 import type {GedcomSource} from '../../gedcom/gedcomSource';
-import type {GedcomRepository} from '../../gedcom/gedcomRepository';
 
 @Component({
   selector: 'app-source',
@@ -33,9 +32,8 @@ export class SourceComponent {
   readonly ancestryService = ancestryService;
   readonly xref = input.required<string>();
   readonly source = computed(() => this.ancestryService.source(this.xref()));
-  readonly gedcomRecord = computed(() => serializeSourceToGedcomRecord(this.source()));
 
-  readonly vm = computed(() => {
+  readonly vm$ = computed(() => {
     const source = this.ancestryService.sources().find((source) => source.xref == this.xref());
     const individuals = this.ancestryService.individuals();
     const repositories = this.ancestryService.repositories();
@@ -44,7 +42,7 @@ export class SourceComponent {
     }
     return {
       xref: this.xref(),
-      abbr: source.abbr ?? this.xref(),
+      abbr: source.abbr,
       title: source.title,
       text: source.text,
       citations: individuals
@@ -61,12 +59,8 @@ export class SourceComponent {
     };
   });
 
-  lookupRepository(repositoryXref?: string): GedcomRepository | undefined {
-    if (repositoryXref == undefined) {
-      return undefined;
-    } else {
-      return ancestryService.repository(repositoryXref);
-    }
+  get vm() {
+    return this.vm$();
   }
 
   model?: GedcomSource;

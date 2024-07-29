@@ -12,6 +12,7 @@ import {List as ImmutableList} from 'immutable';
 import {GedcomSubmitter} from '../gedcom/gedcomSubmitter';
 import {constructSourceFromGedcom} from '../gedcom/gedcomSource.parser';
 import {serializeSourceToGedcomRecord} from '../gedcom/gedcomSource.serializer';
+import {ancestryDatabase} from '../database/ancestry.database';
 
 export class AncestryService {
   readonly headers = signal(ImmutableList<GedcomHeader>());
@@ -125,12 +126,14 @@ export class AncestryService {
           const gedcomRepository = new GedcomRepository(gedcomRecord);
           this.records.update(
               (records) => records.set(gedcomRepository.xref, gedcomRepository ));
+          ancestryDatabase.repositories.add(gedcomRepository);
           break;
         }
         case 'SOUR': {
           const gedcomSource = constructSourceFromGedcom(gedcomRecord);
           this.records.update(
               (records) => records.set(gedcomSource.xref, gedcomSource));
+          ancestryDatabase.sources.add(gedcomSource);
           break;
         }
 

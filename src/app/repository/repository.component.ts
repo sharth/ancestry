@@ -14,4 +14,17 @@ export class RepositoryComponent {
   readonly ancestryService = ancestryService;
   xref = input.required<string>();
   repository = computed(() => this.ancestryService.repository(this.xref()));
+
+  vm = computed(() => ({
+    xref: this.xref(),
+    repository: ancestryService.repositories().find((repository) => repository.xref == this.xref()),
+    sources: ancestryService.sources()
+        .flatMap((source) => source.repositoryCitations.map((repositoryCitation) => ({source, repositoryCitation})))
+        .filter(({repositoryCitation}) => repositoryCitation.repositoryXref == this.xref())
+        .map(({source, repositoryCitation}) => ({
+          xref: this.xref(),
+          abbr: source.abbr,
+          callNumbers: repositoryCitation.callNumbers,
+        })),
+  }));
 }

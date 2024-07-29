@@ -1,7 +1,5 @@
-import {computed} from '@angular/core';
 import {ancestryService} from '../app/ancestry.service';
 import type {GedcomRecord} from './gedcomRecord';
-import type {GedcomSource} from './gedcomSource';
 
 export class GedcomRepository {
   constructor(private record: GedcomRecord) {
@@ -30,17 +28,6 @@ export class GedcomRepository {
 
   xref: string;
   name?: string;
-
-  sources = computed<GedcomSource[]>(() => {
-    const sources: GedcomSource[] = [];
-    const xref = this.xref;
-    for (const source of ancestryService.sources().values()) {
-      if (source.repositoryCitations.map((repositoryCitation) => repositoryCitation.repositoryXref).includes(xref)) {
-        sources.push(source);
-      }
-    }
-    return sources;
-  });
 
   gedcomRecord(): GedcomRecord {
     return this.record;

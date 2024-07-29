@@ -1,5 +1,3 @@
-import {computed} from '@angular/core';
-import {ancestryService} from '../app/ancestry.service';
 import type {GedcomRecord} from './gedcomRecord';
 
 export class GedcomSource {
@@ -15,11 +13,6 @@ export class GedcomSource {
   unknownRecords: GedcomRecord[] = [];
 
   canonicalGedcomRecord?: GedcomRecord;
-
-  readonly citations = computed(() => ancestryService.individuals()
-      .flatMap((individual) => individual.events.map((event) => ({individual, event})))
-      .flatMap(({individual, event}) => event.citations.map((citation) => ({individual, event, citation})))
-      .filter(({citation}) => citation.sourceXref == this.xref));
 
   clone(): GedcomSource {
     const cloned = new GedcomSource(this.xref);

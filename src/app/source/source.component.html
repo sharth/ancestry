@@ -1,12 +1,12 @@
-<h1>{{ source().abbr ?? source().xref }}</h1>
+@if (vm != null) {
+<h1>{{ vm.abbr ?? vm.xref }}</h1>
 
 <h2>Title</h2>
-<div>{{ source().title }}</div>
+<div>{{ vm.title }}</div>
 
 <h2>Text</h2>
-<div>{{ source().text }}</div>
+<div>{{ vm.text }}</div>
 
-@if (source().repositoryCitations.length > 0) {
 <h2>Repositories</h2>
 <table class="table table-striped">
     <thead>
@@ -17,24 +17,16 @@
         </tr>
     </thead>
     <tbody>
-        <ng-container *ngFor="let repositoryCitation of source().repositoryCitations">
-            @let repository = lookupRepository(repositoryCitation.repositoryXref);
-            <tr *ngIf="repositoryCitation.callNumbers.length == 0">
-                <td>{{repositoryCitation.repositoryXref}}</td>
-                <td>{{repository?.name}}</td>
-                <td></td>
-            </tr>
-            <tr *ngFor="let callNumber of repositoryCitation.callNumbers">
-                <td>{{repositoryCitation.repositoryXref}}</td>
-                <td>{{repository?.name}}</td>
-                <td>{{callNumber}}</td>
-            </tr>
-        </ng-container>
+        @for (repositoryCitation of vm.repositoryCitations; track repositoryCitation) {
+        <tr>
+            <td>{{repositoryCitation.repositoryXref}}</td>
+            <td>{{repositoryCitation.repository?.name}}</td>
+            <td>{{repositoryCitation.callNumbers.join("\n")}}</td>
+        </tr>
+        }
     </tbody>
 </table>
-}
 
-@if (source().citations().size > 0) {
 <h2>Citations</h2>
 <table class="table table-striped">
     <thead>
@@ -45,17 +37,18 @@
         </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let ref of source().citations()">
+        @for (ref of vm.citations; track ref) {
+        <tr>
             <td><a routerLink="/individual/{{ ref.individual.xref }}">{{ ref.individual.name }}</a></td>
             <td>{{ ref.event.type }}</td>
             <td>
                 <pre>{{ ref.citation.text }}</pre>
             </td>
         </tr>
+        }
     </tbody>
-</table>}
+</table>
 
-@if (source().unknownRecords.length > 0) {
 <h2>Unknown Records</h2>
 <table class="table table-striped">
     <thead>
@@ -64,17 +57,18 @@
         </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let unknownRecord of source().unknownRecords">
+        @for (unknownRecord of vm.unknownRecords; track unknownRecord) {
+        <tr>
             <td>
                 <pre>{{unknownRecord.text().join('\n')}}</pre>
             </td>
         </tr>
+        }
     </tbody>
 </table>
-}
 
 <h2>Gedcom</h2>
-<pre>{{ gedcomRecord().text().join('\n') }}</pre>
+<pre>{{ vm.gedcom.text().join('\n') }}</pre>
 
 <div class="position-fixed bottom-0 end-0 rounded-circle m-5">
     <button type="button" class="btn btn-primary btn-lg bi-pencil" (click)="openForm()"></button>
@@ -89,7 +83,7 @@
         <app-source-edit-unknowns [(sourceModel)]="model!"></app-source-edit-unknowns>
         <input type="submit">
         <input type="button" value="Cancel" (click)="editDialog.close()">
-
         <pre>{{ model | json }}</pre>
     </form>
 </dialog>
+}

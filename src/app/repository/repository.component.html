@@ -1,7 +1,18 @@
 <h1>{{repository().name ?? repository().xref}}</h1>
 
-<ul>
-    <li *ngFor="let source of repository().sources()">
-        <a routerLink="/source/{{source.xref}}">{{source.abbr ?? source.xref}}</a>
-    </li>
-</ul>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Source</th>
+            <th>Call Numbers</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for(source of vm().sources; track source) {
+        <tr>
+            <td><a routerLink="/source/{{source.xref}}">{{ source.abbr ?? source.xref }}</a></td>
+            <td>{{ source.callNumbers }}</td>
+        </tr>
+        }
+    </tbody>
+</table>

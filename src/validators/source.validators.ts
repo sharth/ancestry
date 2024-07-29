@@ -9,7 +9,7 @@ export const sourceValidators = create((source: GedcomSource, field?: string) =>
   test('repositories', 'Source is not part of any repository', () => {
     enforce(source.repositoryCitations).isNotEmpty();
   });
-  test('citations', 'Source is not used as a citation anywhere', () => {
-    enforce(source.citations()).isNotEmpty();
-  });
+  // test('citations', 'Source is not used as a citation anywhere', () => {
+  //  enforce(source.citations()).isNotEmpty();
+  // });
 });
