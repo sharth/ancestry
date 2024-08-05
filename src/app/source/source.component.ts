@@ -29,14 +29,13 @@ import type {GedcomSource} from '../../gedcom/gedcomSource';
   ],
 })
 export class SourceComponent {
-  readonly ancestryService = ancestryService;
   readonly xref = input.required<string>();
-  readonly source = computed(() => this.ancestryService.source(this.xref()));
+  readonly source = computed(() => ancestryService.source(this.xref()));
 
   readonly vm$ = computed(() => {
-    const source = this.ancestryService.sources().find((source) => source.xref == this.xref());
-    const individuals = this.ancestryService.individuals();
-    const repositories = this.ancestryService.repositories();
+    const source = ancestryService.sources().find((source) => source.xref == this.xref());
+    const individuals = ancestryService.individuals();
+    const repositories = ancestryService.repositories();
     if (source == undefined) {
       return undefined;
     }
@@ -72,7 +71,7 @@ export class SourceComponent {
   }
 
   submitForm() {
-    this.ancestryService.records.update((records) => records.set(this.xref(), this.model!));
+    ancestryService.records.update((records) => records.set(this.xref(), this.model!));
     this.editDialog().nativeElement.close();
   }
 }
