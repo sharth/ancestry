@@ -8,7 +8,7 @@ export function* parseGedcomRecordsFromText(text: string): Generator<GedcomRecor
     if (line == '') {
       continue;
     }
-    const match = line.match(/^([0-9]+) *(@[^@]+@)? *([A-Za-z0-9_]+) *(.+)?$/);
+    const match = /^([0-9]+) *(@[^@]+@)? *([A-Za-z0-9_]+) *(.+)?$/.exec(line);
     if (match == null) {
       throw new Error();
     }
