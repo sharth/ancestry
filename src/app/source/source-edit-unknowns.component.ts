@@ -3,6 +3,7 @@ import {ancestryService} from '../ancestry.service';
 import {FormsModule} from '@angular/forms';
 import {CommonModule} from '@angular/common';
 import type {GedcomSource} from '../../gedcom/gedcomSource';
+import {serializeGedcomRecordToText} from '../../gedcom/gedcomRecord.serializer';
 
 @Component({
   selector: 'app-source-edit-unknowns',
@@ -14,6 +15,8 @@ import type {GedcomSource} from '../../gedcom/gedcomSource';
 export class SourceEditUnknownsComponent {
   readonly ancestryService = ancestryService;
   readonly sourceModel = model.required<GedcomSource>();
+
+  readonly serializeGedcomRecordToText = serializeGedcomRecordToText;
 
   remove(index: number) {
     this.sourceModel().unknownRecords.splice(index, 1);

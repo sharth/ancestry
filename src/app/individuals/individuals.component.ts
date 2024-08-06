@@ -2,6 +2,10 @@ import {Component, computed} from '@angular/core';
 import {CommonModule, KeyValuePipe} from '@angular/common';
 import {RouterLink} from '@angular/router';
 import {ancestryService} from '../ancestry.service';
+import {liveQuery} from 'dexie';
+import {toSignal} from '@angular/core/rxjs-interop';
+import {ancestryDatabase} from '../../database/ancestry.database';
+import {combineLatest, map} from 'rxjs';
 
 @Component({
   selector: 'app-individuals',
@@ -11,6 +15,12 @@ import {ancestryService} from '../ancestry.service';
   styleUrl: './individuals.component.css',
 })
 export class IndividualsComponent {
+  readonly vm$ = toSignal(combineLatest([
+    liveQuery(() => ancestryDatabase.individuals.toArray()),
+  ]).pipe(
+      map(([individuals]) => ({individuals})),
+  ));
+
   readonly ancestryService = ancestryService;
 
   readonly individuals = computed(() =>

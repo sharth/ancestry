@@ -2,7 +2,7 @@ import {ancestryService} from '../app/ancestry.service';
 import type {GedcomRecord} from './gedcomRecord';
 import {GedcomSource} from './gedcomSource';
 
-export function constructSourceFromGedcom(record: GedcomRecord): GedcomSource {
+export function constructSourceFromGedcomRecord(record: GedcomRecord): GedcomSource {
   if (record.abstag !== 'SOUR') throw new Error();
   if (record.xref == null) throw new Error();
   if (record.value != null) throw new Error();

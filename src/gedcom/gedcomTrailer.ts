@@ -1,14 +1,10 @@
 import type {GedcomRecord} from './gedcomRecord';
 
 export class GedcomTrailer {
-  constructor(private record: GedcomRecord) {
-    if (record.abstag !== 'TRLR') throw new Error();
-    if (record.xref != null) throw new Error();
-    if (record.value != null) throw new Error();
-    if (record.children.length != 0) throw new Error();
-  }
-
-  gedcomRecord() : GedcomRecord {
-    return this.record;
+  constructor(public gedcomRecord: GedcomRecord) {
+    if (gedcomRecord.abstag !== 'TRLR') throw new Error();
+    if (gedcomRecord.xref != null) throw new Error();
+    if (gedcomRecord.value != null) throw new Error();
+    if (gedcomRecord.children.length != 0) throw new Error();
   }
 };

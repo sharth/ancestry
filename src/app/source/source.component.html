@@ -60,7 +60,7 @@
         @for (unknownRecord of vm.unknownRecords; track unknownRecord) {
         <tr>
             <td>
-                <pre>{{unknownRecord.text().join('\n')}}</pre>
+                <pre>{{ unknownRecord.gedcom }}</pre>
             </td>
         </tr>
         }
@@ -68,7 +68,7 @@
 </table>
 
 <h2>Gedcom</h2>
-<pre>{{ vm.gedcom.text().join('\n') }}</pre>
+<pre>{{ vm.gedcom }}</pre>
 
 <div class="position-fixed bottom-0 end-0 rounded-circle m-5">
     <button type="button" class="btn btn-primary btn-lg bi-pencil" (click)="openForm()"></button>

@@ -1,5 +1,9 @@
+@let vm = vm$();
+@if (vm == null) {}
+@else {
+
 <h2>Name</h2>
-<p>{{ individual().name }}</p>
+<p>{{ vm.individual.name }}</p>
 
 <h2>Relatives</h2>
 <table class="table table-striped">
@@ -10,10 +14,34 @@
         </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let relative of relatives()">
-            <td>{{ relative.relationship }}</td>
-            <td><a routerLink="/individual/{{ relative.individual.xref }}">{{ relative.individual.name }}</a></td>
+        @for (parent of vm.parents; track parent.xref) {
+        <tr>
+            <td>
+                @switch(parent.sex) {
+                @case('Male') { Father }
+                @case('Female') { Mother }
+                @default { Parent }
+                }
+            </td>
+            <td>
+                <a routerLink="/individual/{{ parent.xref }}">{{ parent.name }}</a>
+            </td>
         </tr>
+        }
+        @for (sibling of vm.siblings; track sibling.xref) {
+        <tr>
+            <td>
+                @switch(sibling.sex) {
+                @case('Male') { Brother }
+                @case('Female') { Sister }
+                @default { Sibling }
+                }
+            </td>
+            <td>
+                <a routerLink="/individual/{{ sibling.xref }}">{{ sibling.name }}</a>
+            </td>
+        </tr>
+        }
     </tbody>
 </table>
 
@@ -53,7 +81,7 @@
             </td>
             <td>
                 <button (click)="toggleGedcom(event)">Toggle Gedcom</button><br>
-                <pre *ngIf="showGedcom(event)">{{ event.gedcomRecord().text().join("\n") }}</pre>
+                <pre *ngIf="showGedcom(event)">{{ serializeGedcomEventToText(event) }}</pre>
             </td>
         </tr>
     </tbody>
@@ -61,14 +89,17 @@
 
 <h2>Ancestors</h2>
 <ol>
-    <ng-container *ngFor="let ancestor of ancestors(); index as ahnentafel;">
-        <li *ngIf="ancestor" value="{{ahnentafel}}">
-            <a routerLink="/individual/{{ancestor.xref}}">{{ancestor.name}}</a>
-        </li>
-    </ng-container>
+    @for (ancestor of vm.ancestors; let ahnentafel = $index; track $index) {
+    @if (ancestor != null) {
+    <li *ngIf="ancestor" value="{{ahnentafel}}">
+        <a routerLink="/individual/{{ancestor.xref}}">{{ancestor.name}}</a>
+    </li>
+    }
+    }
 </ol>
 
-<h2>Census Table</h2>
+
+<!-- <h2>Census Table</h2>
 <table class="table table-striped">
     <thead>
         <tr>
@@ -84,7 +115,9 @@
             </td>
         </tr>
     </tbody>
-</table>
+</table> -->
 
 <h2>Gedcom</h2>
-<pre>{{ individual().gedcomRecord().text().join("\n") }}
+<pre>{{ vm.gedcom }}</pre>
+
+}

@@ -11,7 +11,7 @@
                 <button class="btn btn-outline-secondary bi bi-trash" type="button" (click)="remove(i)"></button>
             </td>
             <td>
-                <pre>{{ unknown.text().join("\n") }}</pre>
+                <pre>{{ serializeGedcomRecordToText(unknown) }}</pre>
             </td>
         </tr>
     </tbody>

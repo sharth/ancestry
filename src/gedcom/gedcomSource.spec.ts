@@ -1,7 +1,7 @@
 import {provideExperimentalZonelessChangeDetection} from '@angular/core';
 import {TestBed} from '@angular/core/testing';
 import {AncestryService} from '../app/ancestry.service';
-import {parseGedcomRecordsFromText} from './gedcomRecord';
+import {parseGedcomRecordsFromText} from './gedcomRecord.parser';
 import {GedcomSource} from './gedcomSource';
 
 describe('GedcomSource', () => {
@@ -104,49 +104,5 @@ describe('GedcomSource', () => {
     expect(ancestryService.source('@S4@').citations()).toStrictEqual([
       {individual: individual, event: deathEvent, citation: deathEvent.citations[0]},
     ]);
-  });
-
-  test('clone', () => {
-    const gedcomSource = new GedcomSource('@S1@', ancestryService).updateAbbr('abbr');
-    const clonedSource = gedcomSource.clone();
-    expect(gedcomSource).not.toBe(clonedSource);
-    expect(gedcomSource.abbr).toBe(clonedSource.abbr);
-  });
-
-  test('Change abbr from null to null', () => {
-    const gedcomSource = new GedcomSource('@S1@', ancestryService);
-    const changedSource = gedcomSource.updateAbbr(null);
-    expect(changedSource).toBe(gedcomSource);
-    expect(changedSource.abbr).toBeUndefined();
-  });
-
-  test('Change abbr from null to value', () => {
-    const gedcomSource = new GedcomSource('@S1@', ancestryService);
-    const changedSource = gedcomSource.updateAbbr('new value');
-    expect(changedSource).not.toBe(gedcomSource);
-    expect(changedSource.abbr?.value).toStrictEqual('new value');
-    expect(gedcomSource.abbr).toBeUndefined();
-  });
-
-  test('Change abbr from value to null', () => {
-    const gedcomSource = new GedcomSource('@S1@', ancestryService).updateAbbr('old');
-    const changedSource = gedcomSource.updateAbbr(null);
-    expect(changedSource).not.toBe(gedcomSource);
-    expect(changedSource.abbr).toBeUndefined();
-    expect(gedcomSource.abbr?.value).toStrictEqual('old');
-  });
-
-  test('Change abbr from value to another value', () => {
-    const gedcomSource = new GedcomSource('@S1@', ancestryService).updateAbbr('old');
-    const changedSource = gedcomSource.updateAbbr('new');
-    expect(changedSource).not.toBe(gedcomSource);
-    expect(changedSource.abbr?.value).toStrictEqual('new');
-    expect(gedcomSource.abbr?.value).toStrictEqual('old');
-  });
-
-  test('Change abbr from value to an identical value', () => {
-    const gedcomSource = new GedcomSource('@S1@', ancestryService).updateAbbr('value');
-    const changedSource = gedcomSource.updateAbbr('value');
-    expect(changedSource).toBe(gedcomSource);
   });
 });

@@ -9,8 +9,13 @@ import {SourceEditTitleComponent} from './source-edit-title.component';
 import {SourceEditTextComponent} from './source-edit-text.component';
 import {SourceEditRepositoryCitationsComponent} from './source-edit-repository-citations.component';
 import {SourceEditUnknownsComponent} from './source-edit-unknowns.component';
-import {serializeSourceToGedcomRecord} from '../../gedcom/gedcomSource.serializer';
 import type {GedcomSource} from '../../gedcom/gedcomSource';
+import {serializeGedcomRecordToText} from '../../gedcom/gedcomRecord.serializer';
+import {serializeGedcomSourceToGedcomRecord} from '../../gedcom/gedcomSource.serializer';
+import {combineLatest, map} from 'rxjs';
+import {liveQuery} from 'dexie';
+import {toObservable, toSignal} from '@angular/core/rxjs-interop';
+import {ancestryDatabase} from '../../database/ancestry.database';
 
 @Component({
   selector: 'app-source',
@@ -32,31 +37,35 @@ export class SourceComponent {
   readonly xref = input.required<string>();
   readonly source = computed(() => ancestryService.source(this.xref()));
 
-  readonly vm$ = computed(() => {
-    const source = ancestryService.sources().find((source) => source.xref == this.xref());
-    const individuals = ancestryService.individuals();
-    const repositories = ancestryService.repositories();
-    if (source == undefined) {
-      return undefined;
-    }
-    return {
-      xref: this.xref(),
-      abbr: source.abbr,
-      title: source.title,
-      text: source.text,
-      citations: individuals
-          .flatMap((individual) => individual.events.map((event) => ({individual, event})))
-          .flatMap(({individual, event}) => event.citations.map((citation) => ({individual, event, citation})))
-          .filter(({citation}) => citation.sourceXref == this.xref()),
-      repositoryCitations: source.repositoryCitations.map((repositoryCitation) => ({
-        repositoryXref: repositoryCitation.repositoryXref,
-        callNumbers: repositoryCitation.callNumbers,
-        repository: repositories.find((repository) => repository.xref == repositoryCitation.repositoryXref),
+  readonly vm$ = toSignal(combineLatest([
+    toObservable(this.xref),
+    liveQuery(() => ancestryDatabase.sources.get(this.xref())), // weird. depends on the signal.
+    liveQuery(() => ancestryDatabase.individuals.toArray()),
+    liveQuery(() => ancestryDatabase.repositories.toArray()),
+  ]).pipe(
+      map(([xref, source, individuals, repositories]) => ({xref, source, individuals, repositories})),
+      map(({xref, source, individuals, repositories}) => (source == null ? null : {
+        xref,
+        abbr: source.abbr,
+        title: source.title,
+        text: source.text,
+        citations: individuals
+            .flatMap((individual) => individual.events.map((event) => ({individual, event})))
+            .flatMap(({individual, event}) => event.citations.map((citation) => ({individual, event, citation})))
+            .filter(({citation}) => citation.sourceXref == xref),
+        repositoryCitations: source.repositoryCitations.map((repositoryCitation) => ({
+          repositoryXref: repositoryCitation.repositoryXref,
+          callNumbers: repositoryCitation.callNumbers,
+          repository: repositories.find((repository) => repository.xref == repositoryCitation.repositoryXref),
+        })),
+        unknownRecords: this.source().unknownRecords.map((unknownRecord) => ({
+          ...unknownRecord,
+          gedcom: serializeGedcomRecordToText(unknownRecord),
+        })),
+        gedcom: serializeGedcomRecordToText(serializeGedcomSourceToGedcomRecord(source)),
       })),
-      unknownRecords: this.source().unknownRecords,
-      gedcom: serializeSourceToGedcomRecord(source),
-    };
-  });
+  ));
+
 
   get vm() {
     return this.vm$();
@@ -66,7 +75,7 @@ export class SourceComponent {
   editDialog = viewChild.required<ElementRef<HTMLDialogElement>>('editDialog');
 
   openForm() {
-    this.model = this.source().clone();
+    this.model = structuredClone(this.source());
     this.editDialog().nativeElement.showModal();
   }
 

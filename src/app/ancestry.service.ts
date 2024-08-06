@@ -6,13 +6,18 @@ import {GedcomSource} from '../gedcom/gedcomSource';
 import {GedcomHeader} from '../gedcom/gedcomHeader';
 import {GedcomTrailer} from '../gedcom/gedcomTrailer';
 import type {GedcomRecord} from '../gedcom/gedcomRecord';
-import {parseGedcomRecordsFromText} from '../gedcom/gedcomRecord';
+import {parseGedcomRecordsFromText} from '../gedcom/gedcomRecord.parser';
 import {OrderedMap as ImmutableOrderedMap} from 'immutable';
 import {List as ImmutableList} from 'immutable';
 import {GedcomSubmitter} from '../gedcom/gedcomSubmitter';
-import {constructSourceFromGedcom} from '../gedcom/gedcomSource.parser';
-import {serializeSourceToGedcomRecord} from '../gedcom/gedcomSource.serializer';
+import {constructSourceFromGedcomRecord} from '../gedcom/gedcomSource.parser';
+import {serializeGedcomSourceToGedcomRecord} from '../gedcom/gedcomSource.serializer';
 import {ancestryDatabase} from '../database/ancestry.database';
+import {serializeGedcomRecordToText} from '../gedcom/gedcomRecord.serializer';
+import {parseGedcomIndividualFromGedcomRecord} from '../gedcom/gedcomIndividual.parser';
+import {serializeGedcomIndividualToGedcomRecord} from '../gedcom/gedcomIndividual.serializer';
+import {parseGedcomFamilyFromGedcomRecord} from '../gedcom/gedcomFamily.parser';
+import {serializeGedcomFamilyToGedcomRecord} from '../gedcom/gedcomFamily.serializer';
 
 export class AncestryService {
   readonly headers = signal(ImmutableList<GedcomHeader>());
@@ -78,17 +83,16 @@ export class AncestryService {
 
   readonly gedcomRecords = computed<GedcomRecord[]>(() => [
     ...this.headers().map((header) => header.gedcomRecord()),
-    ...this.individuals().map((individual) => individual.gedcomRecord()),
-    ...this.families().map((family) => family.gedcomRecord()),
-    ...this.sources().map((source) => serializeSourceToGedcomRecord(source)),
-    ...this.repositories().map((repository) => repository.gedcomRecord()),
-    ...this.trailers().map((trailer) => trailer.gedcomRecord()),
+    ...this.individuals().map(serializeGedcomIndividualToGedcomRecord),
+    ...this.families().map(serializeGedcomFamilyToGedcomRecord),
+    ...this.sources().map((source) => serializeGedcomSourceToGedcomRecord(source)),
+    ...this.repositories().map((repository) => repository.gedcomRecord),
+    ...this.trailers().map((trailer) => trailer.gedcomRecord),
   ]);
 
   readonly gedcomText = computed<string>(() => this.gedcomRecords()
-      .flatMap((record) => record.text())
-      .map((record) => record + '\n')
-      .join(''));
+      .flatMap(serializeGedcomRecordToText)
+      .join('\n'));
 
   parseText(text: string) {
     this.headers.set(ImmutableList());
@@ -111,15 +115,17 @@ export class AncestryService {
           break;
         }
         case 'INDI': {
-          const gedcomIndividual = new GedcomIndividual(gedcomRecord);
+          const gedcomIndividual = parseGedcomIndividualFromGedcomRecord(gedcomRecord);
           this.records.update(
               (records) => records.set(gedcomIndividual.xref, gedcomIndividual));
+          ancestryDatabase.individuals.add(gedcomIndividual);
           break;
         }
         case 'FAM': {
-          const gedcomFamily = new GedcomFamily(gedcomRecord);
+          const gedcomFamily = parseGedcomFamilyFromGedcomRecord(gedcomRecord);
           this.records.update(
               (records) => records.set(gedcomFamily.xref, gedcomFamily));
+          ancestryDatabase.families.add(gedcomFamily);
           break;
         }
         case 'REPO': {
@@ -130,7 +136,7 @@ export class AncestryService {
           break;
         }
         case 'SOUR': {
-          const gedcomSource = constructSourceFromGedcom(gedcomRecord);
+          const gedcomSource = constructSourceFromGedcomRecord(gedcomRecord);
           this.records.update(
               (records) => records.set(gedcomSource.xref, gedcomSource));
           ancestryDatabase.sources.add(gedcomSource);

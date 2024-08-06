@@ -1,5 +1,7 @@
+import type {Signal} from '@angular/core';
 import {Component, computed} from '@angular/core';
 import {ancestryService} from '../ancestry.service';
+import {serializeGedcomRecordToText} from '../../gedcom/gedcomRecord.serializer';
 
 @Component({
   selector: 'app-index',
@@ -11,15 +13,15 @@ import {ancestryService} from '../ancestry.service';
 export class IndexComponent {
   readonly ancestryService = ancestryService;
 
-  headerText = computed(() => {
-    return this.ancestryService.headers()
-        .flatMap((header) => header.gedcomRecord().text())
-        .join('\n');
-  });
+  headerText: Signal<string> = computed(() =>
+    this.ancestryService.headers()
+        .map((header) => header.gedcomRecord())
+        .flatMap(serializeGedcomRecordToText)
+        .join('\n'));
 
-  trailerText = computed(() => {
-    return this.ancestryService.trailers()
-        .flatMap((trailer) => trailer.gedcomRecord().text())
-        .join('\n');
-  });
+  trailerText: Signal<string> = computed(() =>
+    this.ancestryService.trailers()
+        .map((header) => header.gedcomRecord)
+        .flatMap(serializeGedcomRecordToText)
+        .join('\n'));
 }

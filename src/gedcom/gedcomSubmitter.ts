@@ -2,14 +2,14 @@ import {ancestryService} from '../app/ancestry.service';
 import type {GedcomRecord} from './gedcomRecord';
 
 export class GedcomSubmitter {
-  constructor(private record: GedcomRecord) {
-    if (record.abstag !== 'SUBM') throw new Error();
-    if (record.xref == null) throw new Error();
-    if (record.value != null) throw new Error();
+  constructor(public gedcomRecord: GedcomRecord) {
+    if (gedcomRecord.abstag !== 'SUBM') throw new Error();
+    if (gedcomRecord.xref == null) throw new Error();
+    if (gedcomRecord.value != null) throw new Error();
 
-    this.xref = record.xref;
+    this.xref = gedcomRecord.xref;
 
-    for (const childRecord of record.children) {
+    for (const childRecord of gedcomRecord.children) {
       switch (childRecord.tag) {
         case 'NAME':
           if (childRecord.xref != null) throw new Error();
@@ -31,8 +31,4 @@ export class GedcomSubmitter {
   readonly xref: string;
   readonly name?: string;
   readonly email?: string;
-
-  gedcomRecord(): GedcomRecord {
-    return this.record;
-  }
 };

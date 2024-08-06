@@ -1,6 +1,7 @@
 import {Component, computed} from '@angular/core';
 import {ancestryService} from '../ancestry.service';
-import {parseGedcomRecordsFromText} from '../../gedcom/gedcomRecord';
+import {parseGedcomRecordsFromText} from '../../gedcom/gedcomRecord.parser';
+import {serializeGedcomRecordToText} from '../../gedcom/gedcomRecord.serializer';
 
 @Component({
   selector: 'app-gedcom',
@@ -13,10 +14,10 @@ export class GedcomComponent {
   readonly ancestryService = ancestryService;
 
   differences = computed(() => {
-    const oldGedcomText = Array.from(parseGedcomRecordsFromText(this.ancestryService.originalGedcomText()))
-        .map((record) => record.text().join('\n'));
+    const oldGedcomText = Array.from(parseGedcomRecordsFromText(ancestryService.originalGedcomText()))
+        .map(serializeGedcomRecordToText);
     const newGedcomText = this.ancestryService.gedcomRecords()
-        .map((record) => record.text().join('\n'));
+        .map(serializeGedcomRecordToText);
 
     const differences = [];
     let oldGedcomIndex = 0;
