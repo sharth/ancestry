@@ -39,6 +39,6 @@
     "ng-packagr": "^18.1.0",
     "typescript": "^5.5.4",
     "typescript-eslint": "^8.0.1",
-    "vest": "^5.4.0"
+    "vest": "^5.4.1"
   }
 }
