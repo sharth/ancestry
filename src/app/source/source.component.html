@@ -38,7 +38,7 @@
         </tr>
     </thead>
     <tbody>
-        @for (ref of vm.citations; track ref) {
+        @for (ref of vm.citations; track $index) {
         <tr>
             <td><a routerLink="/individual/{{ ref.individual.xref }}">{{ ref.individual.name }}</a></td>
             <td>{{ ref.event.type }}</td>
@@ -76,6 +76,7 @@
 </div>
 
 <dialog #editDialog>
+    @let model = model$();
     @if (model != null) {
     <form (ngSubmit)="submitForm()" class="vstack gap-3">
         <app-source-edit-abbr [sourceModel]="model"></app-source-edit-abbr>

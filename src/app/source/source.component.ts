@@ -1,4 +1,5 @@
 import type { ElementRef} from '@angular/core';
+import { signal} from '@angular/core';
 import {Component, input, viewChild} from '@angular/core';
 import {RouterModule} from '@angular/router';
 import {CommonModule} from '@angular/common';
@@ -67,19 +68,18 @@ export class SourceComponent {
     }),
   );
 
-  model?: GedcomSource;
+  readonly model$ = signal<GedcomSource | undefined>(undefined);
   readonly editDialog = viewChild.required<ElementRef<HTMLDialogElement>>('editDialog');
 
   openForm() {
     rxjs.firstValueFrom(this.source$).then((source) => {
-      console.log(source);
-      this.model = source;
+      this.model$.set(source);
       this.editDialog().nativeElement.showModal();
     })
   }
 
   submitForm() {
-    ancestryDatabase.sources.put(this.model!);
+    ancestryDatabase.sources.put(this.model$()!);
     this.editDialog().nativeElement.close();
   }
 }
