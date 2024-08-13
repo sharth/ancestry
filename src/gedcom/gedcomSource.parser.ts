@@ -41,7 +41,7 @@ function constructSourceAbbreviationFromGedcom(gedcomRecord: GedcomRecord): stri
   if (gedcomRecord.abstag !== 'SOUR.ABBR') throw new Error();
   if (gedcomRecord.xref != null) throw new Error();
   if (gedcomRecord.value == null) throw new Error();
-  gedcomRecord.children.forEach(ancestryService.reportUnparsedRecord);
+  gedcomRecord.children.forEach(ancestryService.reportUnparsedRecord.bind(ancestryService));
 
   return gedcomRecord.value;
 }
@@ -50,7 +50,7 @@ function constructSourceTitleFromGedcom(gedcomRecord: GedcomRecord): string {
   if (gedcomRecord.abstag !== 'SOUR.TITL') throw new Error();
   if (gedcomRecord.xref != null) throw new Error();
   if (gedcomRecord.value == null) throw new Error();
-  gedcomRecord.children.forEach(ancestryService.reportUnparsedRecord);
+  gedcomRecord.children.forEach(ancestryService.reportUnparsedRecord.bind(ancestryService));
 
   return gedcomRecord.value;
 }
@@ -59,7 +59,7 @@ function constructSourceTextFromGedcom(gedcomRecord: GedcomRecord) {
   if (gedcomRecord.abstag !== 'SOUR.TEXT') throw new Error();
   if (gedcomRecord.xref != null) throw new Error();
   if (gedcomRecord.value == null) throw new Error();
-  gedcomRecord.children.forEach(ancestryService.reportUnparsedRecord);
+  gedcomRecord.children.forEach(ancestryService.reportUnparsedRecord.bind(ancestryService));
 
   return gedcomRecord.value;
 }

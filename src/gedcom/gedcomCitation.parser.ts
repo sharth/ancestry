@@ -44,19 +44,19 @@ export function parseGedcomCitationFromGedcomRecord(gedcomRecord: GedcomRecord):
   return gedcomCitation;
 }
 
-function parseCitationData(gedcomRecord: GedcomRecord ): string|undefined {
+function parseCitationData(gedcomRecord: GedcomRecord ): string {
   if (gedcomRecord.tag !== 'DATA') throw new Error();
   if (gedcomRecord.xref != null) throw new Error();
   if (gedcomRecord.value != null) throw new Error();
 
-  let text: undefined|string = undefined;
+  let text = '';
 
   for (const childRecord of gedcomRecord.children) {
     switch (childRecord.tag) {
       case 'TEXT':
+        if (childRecord.value)
+          text += childRecord.value;
         childRecord.children.forEach(ancestryService.reportUnparsedRecord.bind(ancestryService));
-        text ??= '';
-        text += childRecord.value;
         break;
       default:
         ancestryService.reportUnparsedRecord(childRecord);

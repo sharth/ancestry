@@ -61,7 +61,7 @@ function parseIndividualFamilySearchId(gedcomRecord: GedcomRecord): string {
   if (gedcomRecord.xref != null) throw new Error();
   if (gedcomRecord.value == null) throw new Error();
 
-  gedcomRecord.children.forEach(ancestryService.reportUnparsedRecord);
+  gedcomRecord.children.forEach(ancestryService.reportUnparsedRecord.bind(ancestryService));
   return gedcomRecord.value;
 }
 
