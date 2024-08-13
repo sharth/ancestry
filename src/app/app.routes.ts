@@ -6,19 +6,19 @@ import {SourcesComponent} from './sources/sources.component';
 import {SourceComponent} from './source/source.component';
 import {RepositoriesComponent} from './repositories/repositories.component';
 import {RepositoryComponent} from './repository/repository.component';
-import {GedcomComponent} from './gedcom/gedcom.component';
-import {ValidationComponent} from './validation/validation.component';
+// import {GedcomComponent} from './gedcom/gedcom.component';
+// import {ValidationComponent} from './validation/validation.component';
 import {PageNotFoundComponent} from './page-not-found/page-not-found.component';
 
 export const routes: Routes = [
   {path: '', component: IndexComponent},
-  {path: 'gedcom', component: GedcomComponent},
+  // {path: 'gedcom', component: GedcomComponent},
   {path: 'individuals', component: IndividualsComponent},
   {path: 'individual/:xref', component: IndividualComponent},
   {path: 'repositories', component: RepositoriesComponent},
   {path: 'repository/:xref', component: RepositoryComponent},
   {path: 'sources', component: SourcesComponent},
   {path: 'source/:xref', component: SourceComponent},
-  {path: 'validation', component: ValidationComponent},
+  // {path: 'validation', component: ValidationComponent},
   {path: '**', component: PageNotFoundComponent},
 ];

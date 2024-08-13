@@ -1,3 +1,4 @@
+@let vm = vm$ | async;
 @if (vm != null) {
 <h1>{{ vm.abbr ?? vm.xref }}</h1>
 
@@ -75,15 +76,17 @@
 </div>
 
 <dialog #editDialog>
+    @if (model != null) {
     <form (ngSubmit)="submitForm()" class="vstack gap-3">
-        <app-source-edit-abbr [(sourceModel)]="model!"></app-source-edit-abbr>
-        <app-source-edit-title [sourceModel]="model!"></app-source-edit-title>
-        <app-source-edit-text [(sourceModel)]="model!"></app-source-edit-text>
-        <app-source-edit-repository-citations [(sourceModel)]="model!"></app-source-edit-repository-citations>
-        <app-source-edit-unknowns [(sourceModel)]="model!"></app-source-edit-unknowns>
+        <app-source-edit-abbr [sourceModel]="model"></app-source-edit-abbr>
+        <app-source-edit-title [sourceModel]="model"></app-source-edit-title>
+        <app-source-edit-text [sourceModel]="model"></app-source-edit-text>
+        <app-source-edit-repository-citations [sourceModel]="model"></app-source-edit-repository-citations>
+        <app-source-edit-unknowns [sourceModel]="model"></app-source-edit-unknowns>
         <input type="submit">
         <input type="button" value="Cancel" (click)="editDialog.close()">
         <pre>{{ model | json }}</pre>
     </form>
+    }
 </dialog>
 }

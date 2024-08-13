@@ -1,5 +1,12 @@
-<h1> {{ individuals().size }} Individuals</h1>
+<h1> {{ vm()?.individuals?.length }} Individuals</h1>
 <ul>
+    @for(individual of vm()?.individuals; track individual.xref) {
+    <li>
+        <a routerLink="/individual/{{ individual.xref }}">{{ individual.name }}</a>
+    </li>
+    }
+</ul>
+<!-- <ul>
     <li *ngFor="let group of individualsBySurname()">
         {{ group.surname || "&nbsp;" }}
         <ul>
@@ -8,4 +15,4 @@
             </li>
         </ul>
     </li>
-</ul>
+</ul> -->

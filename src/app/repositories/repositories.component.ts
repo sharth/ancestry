@@ -1,7 +1,11 @@
-import {Component, computed} from '@angular/core';
+import type { Signal} from '@angular/core';
+import {Component} from '@angular/core';
 import {ancestryService} from '../ancestry.service';
 import {CommonModule} from '@angular/common';
 import {RouterLink} from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import type { GedcomRepository } from '../../gedcom/gedcomRepository';
+import type * as rxjs from 'rxjs';
 
 @Component({
   selector: 'app-repositories',
@@ -11,6 +15,6 @@ import {RouterLink} from '@angular/router';
   styleUrl: './repositories.component.css',
 })
 export class RepositoriesComponent {
-  readonly ancestryService = ancestryService;
-  repositories = computed(() => this.ancestryService.repositories());
+  readonly repositories$: rxjs.Observable<GedcomRepository[]> = ancestryService.repositories();
+  readonly repositories: Signal<GedcomRepository[]> = toSignal(ancestryService.repositories(), {initialValue: []});
 }

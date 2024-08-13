@@ -1,7 +1,11 @@
-import {Component, computed, input} from '@angular/core';
+import {Component, input} from '@angular/core';
 import {ancestryService} from '../ancestry.service';
 import {CommonModule} from '@angular/common';
 import {RouterModule} from '@angular/router';
+import { toObservable } from '@angular/core/rxjs-interop';
+import * as rxjs from 'rxjs';
+import * as dexie from 'dexie';
+import { ancestryDatabase } from '../../database/ancestry.database';
 
 @Component({
   selector: 'app-repository',
@@ -11,14 +15,19 @@ import {RouterModule} from '@angular/router';
   styleUrl: './repository.component.css',
 })
 export class RepositoryComponent {
-  readonly ancestryService = ancestryService;
   xref = input.required<string>();
-  repository = computed(() => this.ancestryService.repository(this.xref()));
 
-  vm = computed(() => ({
-    xref: this.xref(),
-    repository: ancestryService.repositories().find((repository) => repository.xref == this.xref()),
-    sources: ancestryService.sources()
+  readonly vm$ = toObservable(this.xref).pipe(
+    rxjs.switchMap((xref) => dexie.liveQuery(() => ancestryDatabase.repositories.get(xref))),
+    rxjs.combineLatestWith(
+      ancestryService.sources(),
+    ),
+    rxjs.map(([repository, sources]) => {
+      if (repository == null)
+        return null;
+      return {
+        repository,
+        sources: sources
         .flatMap((source) => source.repositoryCitations.map((repositoryCitation) => ({source, repositoryCitation})))
         .filter(({repositoryCitation}) => repositoryCitation.repositoryXref == this.xref())
         .map(({source, repositoryCitation}) => ({
@@ -26,5 +35,7 @@ export class RepositoryComponent {
           abbr: source.abbr,
           callNumbers: repositoryCitation.callNumbers,
         })),
-  }));
+      }
+    })
+  );
 }

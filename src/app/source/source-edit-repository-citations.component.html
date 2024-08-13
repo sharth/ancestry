@@ -3,7 +3,7 @@
     <div class="form-floating">
         <select class="form-select" [(ngModel)]="sr.repositoryXref">
             <option selected value="">Repositories...</option>
-            <option *ngFor="let repository of ancestryService.repositories().toList()" value="{{repository.xref}}">
+            <option *ngFor="let repository of ancestryService.repositories() | async" value="{{repository.xref}}">
                 {{repository.name ?? repository.xref}}
             </option>
         </select>

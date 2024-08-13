@@ -1,13 +1,13 @@
 <h1>Hello!</h1>
 <ul>
-    <li>{{ ancestryService.individuals().size }} Individuals
-    <li>{{ ancestryService.families().size }} Families
-    <li>{{ ancestryService.sources().size }} Sources
-    <li>{{ ancestryService.repositories().size }} Repositories
+    <li>{{ vm()?.individuals?.length }} Individuals
+    <li>{{ vm()?.families?.length }} Families
+    <li>{{ vm()?.sources?.length }} Sources
+    <li>{{ vm()?.repositories?.length }} Repositories
 </ul>
 
 <h2>Header</h2>
-<pre>{{ headerText() }}</pre>
+<pre>{{ vm()?.headerText }}</pre>
 
 <h2>Trailer</h2>
-<pre>{{ trailerText() }}</pre>
+<pre>{{ vm()?.trailerText }}</pre>

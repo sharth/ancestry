@@ -1,4 +1,4 @@
-<h1>{{ sources().size }} Sources</h1>
+<h1>{{ sources().length }} Sources</h1>
 <ul>
     <li *ngFor="let source of sources()">
         <a routerLink="/source/{{ source.xref }}">{{ source.abbr ?? source.xref }}</a>

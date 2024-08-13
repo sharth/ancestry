@@ -1,7 +1,8 @@
-import type {Signal} from '@angular/core';
-import {Component, computed} from '@angular/core';
+import {Component} from '@angular/core';
 import {ancestryService} from '../ancestry.service';
 import {serializeGedcomRecordToText} from '../../gedcom/gedcomRecord.serializer';
+import * as rxjs from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-index',
@@ -11,17 +12,31 @@ import {serializeGedcomRecordToText} from '../../gedcom/gedcomRecord.serializer'
   styleUrl: './index.component.css',
 })
 export class IndexComponent {
-  readonly ancestryService = ancestryService;
-
-  headerText: Signal<string> = computed(() =>
-    this.ancestryService.headers()
+  readonly vm$ = rxjs.combineLatest([
+    ancestryService.headers(),
+    ancestryService.trailers(),
+    ancestryService.individuals(),
+    ancestryService.families(),
+    ancestryService.repositories(),
+    ancestryService.sources(),
+  ]).pipe(
+    rxjs.map(([headers, trailers, individuals, families, repositories, sources]) => ({
+      headers: headers,
+      headerText: headers
         .map((header) => header.gedcomRecord())
         .flatMap(serializeGedcomRecordToText)
-        .join('\n'));
-
-  trailerText: Signal<string> = computed(() =>
-    this.ancestryService.trailers()
-        .map((header) => header.gedcomRecord)
+        .join('\n'),
+      trailers: trailers,
+      trailerText: trailers
+        .map((trailer) => trailer.gedcomRecord)
         .flatMap(serializeGedcomRecordToText)
-        .join('\n'));
+        .join('\n'),
+      individuals,
+      families,
+      repositories,
+      sources,
+    }))
+  )
+  
+  readonly vm = toSignal(this.vm$);
 }
