@@ -1,5 +1,5 @@
 import type { ElementRef} from '@angular/core';
-import { signal} from '@angular/core';
+import {signal} from '@angular/core';
 import {Component, input, viewChild} from '@angular/core';
 import {RouterModule} from '@angular/router';
 import {CommonModule} from '@angular/common';
@@ -72,14 +72,17 @@ export class SourceComponent {
   readonly editDialog = viewChild.required<ElementRef<HTMLDialogElement>>('editDialog');
 
   openForm() {
-    rxjs.firstValueFrom(this.source$).then((source) => {
+    void rxjs.firstValueFrom(this.source$).then((source) => {
+      if (source == null) throw new Error();
       this.model$.set(source);
       this.editDialog().nativeElement.showModal();
     })
   }
 
   submitForm() {
-    ancestryDatabase.sources.put(this.model$()!);
+    const model = this.model$();
+    if (model != null)
+      void ancestryDatabase.sources.put(model);
     this.editDialog().nativeElement.close();
   }
 }
