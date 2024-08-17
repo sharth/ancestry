@@ -76,14 +76,67 @@
 </div>
 
 <dialog #editDialog>
-    @let model = model$();
-    @if (model != null) {
+    @let source = formModel();
+    @if (source != null) {
     <form (ngSubmit)="submitForm()" class="vstack gap-3">
-        <app-source-edit-abbr [sourceModel]="model"></app-source-edit-abbr>
-        <app-source-edit-title [sourceModel]="model"></app-source-edit-title>
-        <app-source-edit-text [sourceModel]="model"></app-source-edit-text>
-        <app-source-edit-repository-citations [sourceModel]="model"></app-source-edit-repository-citations>
-        <app-source-edit-unknowns [sourceModel]="model"></app-source-edit-unknowns>
+        <div class="form-floating">
+            <textarea class="form-control h-auto" [(ngModel)]="source.abbr" name="abbr"></textarea>
+            <label>Short Title</label>
+        </div>
+        <div class="form-floating">
+            <textarea class="form-control h-auto" [(ngModel)]="source.title" name="title"></textarea>
+            <label>Title</label>
+        </div>
+        <div class="form-floating">
+            <textarea class="form-control h-auto" [(ngModel)]="source.text" name="text"></textarea>
+            <label>Text</label>
+        </div>
+        @for (repositoryCitation of source.repositoryCitations; track $index; let i = $index) {
+        <div class="input-group" ngModelGroup="repositoryCitations">
+            <button class="btn btn-outline-secondary bi bi-trash" type="button"
+                (click)="removeRepositoryCitation(i)"></button>
+            <div class="form-floating">
+                <select class="form-select" [(ngModel)]="repositoryCitation.repositoryXref" name="xref">
+                    <option selected value="">Repositories...</option>
+                    @for (repository of vm.repositories; track repository.xref) {
+                    <option value="{{repository.xref}}">{{repository.name ?? repository.xref}}</option>
+                    }
+                </select>
+                <label>Repository</label>
+            </div>
+            <div class="form-floating">
+                <input class="form-control" type="text" [(ngModel)]="repositoryCitation.callNumbers[0]"
+                    name="callNumber">
+                <label>Call Number</label>
+            </div>
+        </div>
+        }
+        <div class="input-group">
+            <button class="btn btn-outline-secondary bi bi-plus" type="button"
+                (click)="addRepositoryCitation()"></button>
+            <span class="input-group-text">Associate with another repository</span>
+        </div>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col">Unknown Gedcom Record</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (unknown of source.unknownRecords; track $index; let i = $index) {
+                <tr>
+                    <td>
+                        <button class="btn btn-outline-secondary bi bi-trash" type="button"
+                            (click)="removeUnknownRecord(i)"></button>
+                    </td>
+                    <td>
+                        <pre>{{ serializeGedcomRecordToText(unknown) }}</pre>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
         <input type="submit">
         <input type="button" value="Cancel" (click)="editDialog.close()">
     </form>
