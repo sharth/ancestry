@@ -8,26 +8,6 @@
 <h2>Text</h2>
 <div>{{ vm.text }}</div>
 
-<h2>Repositories</h2>
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th scope="col">Repository Xref</th>
-            <th scope="col">Repository</th>
-            <th scope="col">Call Number</th>
-        </tr>
-    </thead>
-    <tbody>
-        @for (repositoryCitation of vm.repositoryCitations; track repositoryCitation) {
-        <tr>
-            <td>{{repositoryCitation.repositoryXref}}</td>
-            <td>{{repositoryCitation.repository?.name}}</td>
-            <td>{{repositoryCitation.callNumbers.join("\n")}}</td>
-        </tr>
-        }
-    </tbody>
-</table>
-
 <h2>Citations</h2>
 <table class="table table-striped">
     <thead>
@@ -50,6 +30,26 @@
     </tbody>
 </table>
 
+<h2>Repositories</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Repository Xref</th>
+            <th scope="col">Repository</th>
+            <th scope="col">Call Number</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (repositoryCitation of vm.repositoryCitations; track repositoryCitation) {
+        <tr>
+            <td>{{repositoryCitation.repositoryXref}}</td>
+            <td>{{repositoryCitation.repository?.name}}</td>
+            <td>{{repositoryCitation.callNumbers.join("\n")}}</td>
+        </tr>
+        }
+    </tbody>
+</table>
+
 <h2>Unknown Records</h2>
 <table class="table table-striped">
     <thead>
@@ -58,10 +58,10 @@
         </tr>
     </thead>
     <tbody>
-        @for (unknownRecord of vm.unknownRecords; track unknownRecord) {
+        @for (unknownRecord of vm.unknownRecords; track $index) {
         <tr>
             <td>
-                <pre>{{ unknownRecord.gedcom }}</pre>
+                <pre>{{ serializeGedcomRecordToText(unknownRecord) }}</pre>
             </td>
         </tr>
         }
@@ -76,46 +76,62 @@
 </div>
 
 <dialog #editDialog>
-    @let source = formModel();
-    @if (source != null) {
-    <form (ngSubmit)="submitForm()" class="vstack gap-3">
+    <form [formGroup]="reactiveForm" (ngSubmit)="submitForm()" class="vstack gap-3">
         <div class="form-floating">
-            <textarea class="form-control h-auto" [(ngModel)]="source.abbr" name="abbr"></textarea>
+            <textarea class="form-control h-auto" formControlName="abbr"></textarea>
             <label>Short Title</label>
         </div>
         <div class="form-floating">
-            <textarea class="form-control h-auto" [(ngModel)]="source.title" name="title"></textarea>
+            <textarea class="form-control h-auto" formControlName="title"></textarea>
             <label>Title</label>
         </div>
         <div class="form-floating">
-            <textarea class="form-control h-auto" [(ngModel)]="source.text" name="text"></textarea>
+            <textarea class="form-control h-auto" formControlName="text"></textarea>
             <label>Text</label>
         </div>
-        @for (repositoryCitation of source.repositoryCitations; track $index; let i = $index) {
-        <div class="input-group" ngModelGroup="repositoryCitations">
-            <button class="btn btn-outline-secondary bi bi-trash" type="button"
-                (click)="removeRepositoryCitation(i)"></button>
-            <div class="form-floating">
-                <select class="form-select" [(ngModel)]="repositoryCitation.repositoryXref" name="xref">
-                    <option selected value="">Repositories...</option>
-                    @for (repository of vm.repositories; track repository.xref) {
-                    <option value="{{repository.xref}}">{{repository.name ?? repository.xref}}</option>
-                    }
-                </select>
-                <label>Repository</label>
-            </div>
-            <div class="form-floating">
-                <input class="form-control" type="text" [(ngModel)]="repositoryCitation.callNumbers[0]"
-                    name="callNumber">
-                <label>Call Number</label>
-            </div>
-        </div>
-        }
+        <table formArrayName="repositoryCitations">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Repository</th>
+                    <th>Call Number</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (repositoryCitation of reactiveForm.controls.repositoryCitations.controls; track $index; let i =
+                $index) {
+                <tr [formGroupName]=i>
+                    <td>
+                        <button class="btn btn-outline-secondary bi bi-trash" type="button"
+                            (click)="removeRepositoryCitation(i)"></button>
+                    </td>
+                    <td>
+                        <div class="form-floating">
+                            <select class="form-select" formControlName="repositoryXref">
+                                <option selected value="">Repositories...</option>
+                                @for (repository of vm.repositories; track repository.xref) {
+                                <option value="{{repository.xref}}">{{repository.name ?? repository.xref}}</option>
+                                }
+                            </select>
+                            <label>Repository</label>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-floating">
+                            <input class="form-control" type="text" formControlName="callNumber">
+                            <label>Call Number</label>
+                        </div>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
         <div class="input-group">
             <button class="btn btn-outline-secondary bi bi-plus" type="button"
                 (click)="addRepositoryCitation()"></button>
             <span class="input-group-text">Associate with another repository</span>
         </div>
+
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -124,14 +140,14 @@
                 </tr>
             </thead>
             <tbody>
-                @for (unknown of source.unknownRecords; track $index; let i = $index) {
-                <tr>
+                @for (unknown of reactiveForm.controls.unknownRecords.controls; track $index; let i = $index) {
+                <tr formArrayName="unknownRecords">
                     <td>
                         <button class="btn btn-outline-secondary bi bi-trash" type="button"
                             (click)="removeUnknownRecord(i)"></button>
                     </td>
                     <td>
-                        <pre>{{ serializeGedcomRecordToText(unknown) }}</pre>
+                        <pre>{{ serializeGedcomRecordToText(unknown.value) }}</pre>
                     </td>
                 </tr>
                 }
@@ -139,7 +155,7 @@
         </table>
         <input type="submit">
         <input type="button" value="Cancel" (click)="editDialog.close()">
+        <pre>{{ reactiveForm.getRawValue() | json }}</pre>
     </form>
-    }
 </dialog>
 }
