@@ -21,12 +21,12 @@
     "experimentalDecorators": true,
     "moduleResolution": "node",
     "importHelpers": true,
-    "target": "ES2022",
-    "module": "ES2022",
+    "target": "es2023",
+    "module": "esnext",
     "useDefineForClassFields": false,
     "lib": [
-      "ES2023.Array",
-      "ES2022",
+      "es2023",
+      "ESNext.Collection",
       "dom"
     ]
   },

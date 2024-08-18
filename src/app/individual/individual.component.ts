@@ -25,8 +25,8 @@ export class IndividualComponent {
   readonly vm$ = toObservable(this.xref).pipe(
     rxjs.switchMap((xref) => dexie.liveQuery(() => ancestryDatabase.individuals.get(xref))),
     rxjs.combineLatestWith(
-      ancestryService.individuals(),
-      ancestryService.families(),
+      dexie.liveQuery(() => ancestryDatabase.individuals.toArray()),
+      dexie.liveQuery(() => ancestryDatabase.families.toArray()),
     ),
     rxjs.map(([individual, individuals, families]) => {
       if (individual == null) {

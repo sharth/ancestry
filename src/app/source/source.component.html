@@ -34,7 +34,6 @@
 <table class="table table-striped">
     <thead>
         <tr>
-            <th scope="col">Repository Xref</th>
             <th scope="col">Repository</th>
             <th scope="col">Call Number</th>
         </tr>
@@ -42,9 +41,32 @@
     <tbody>
         @for (repositoryCitation of vm.repositoryCitations; track repositoryCitation) {
         <tr>
-            <td>{{repositoryCitation.repositoryXref}}</td>
-            <td>{{repositoryCitation.repository?.name}}</td>
+            <td>
+                <a routerLink="/repository/{{repositoryCitation.repositoryXref}}">
+                    {{repositoryCitation.repository?.name ?? repositoryCitation.repositoryXref}}
+                </a>
+            </td>
             <td>{{repositoryCitation.callNumbers.join("\n")}}</td>
+        </tr>
+        }
+    </tbody>
+</table>
+
+<h2>Multimedia</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Xref</th>
+            <th>filePath</th>
+            <th>mediaType</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (multimedia of vm.multimedia; track multimedia.xref) {
+        <tr>
+            <td><a routerLink="/multimedia/{{multimedia.xref}}">{{multimedia.xref}}</a></td>
+            <td>{{multimedia.filePath}}</td>
+            <td>{{multimedia.mediaType}}</td>
         </tr>
         }
     </tbody>
@@ -69,7 +91,7 @@
 </table>
 
 <h2>Gedcom</h2>
-<pre>{{ vm.gedcom }}</pre>
+<pre>{{ serializeGedcomRecordToText(vm.gedcomRecord) }}</pre>
 
 <div class="position-fixed bottom-0 end-0 rounded-circle m-5">
     <button type="button" class="btn btn-primary btn-lg bi-pencil" (click)="openForm()"></button>

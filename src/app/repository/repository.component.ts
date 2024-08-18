@@ -1,5 +1,4 @@
 import {Component, input} from '@angular/core';
-import {ancestryService} from '../ancestry.service';
 import {CommonModule} from '@angular/common';
 import {RouterModule} from '@angular/router';
 import { toObservable } from '@angular/core/rxjs-interop';
@@ -20,7 +19,7 @@ export class RepositoryComponent {
   readonly vm$ = toObservable(this.xref).pipe(
     rxjs.switchMap((xref) => dexie.liveQuery(() => ancestryDatabase.repositories.get(xref))),
     rxjs.combineLatestWith(
-      ancestryService.sources(),
+      dexie.liveQuery(() => ancestryDatabase.sources.toArray()),
     ),
     rxjs.map(([repository, sources]) => {
       if (repository == null)
@@ -28,13 +27,13 @@ export class RepositoryComponent {
       return {
         repository,
         sources: sources
-        .flatMap((source) => source.repositoryCitations.map((repositoryCitation) => ({source, repositoryCitation})))
-        .filter(({repositoryCitation}) => repositoryCitation.repositoryXref == this.xref())
-        .map(({source, repositoryCitation}) => ({
-          xref: this.xref(),
-          abbr: source.abbr,
-          callNumbers: repositoryCitation.callNumbers,
-        })),
+          .flatMap((source) => source.repositoryCitations.map((repositoryCitation) => ({source, repositoryCitation})))
+          .filter(({repositoryCitation}) => repositoryCitation.repositoryXref == this.xref())
+          .map(({source, repositoryCitation}) => ({
+            xref: source.xref,
+            abbr: source.abbr,
+            callNumbers: repositoryCitation.callNumbers,
+          })),
       }
     })
   );

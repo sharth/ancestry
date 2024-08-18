@@ -11,6 +11,7 @@ export class GedcomSource {
     callNumbers: string[],
   }[] = [];
   unknownRecords: GedcomRecord[] = [];
+  multimediaXrefs: string[] = [];
 
   canonicalGedcomRecord?: GedcomRecord;
 }

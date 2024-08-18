@@ -28,6 +28,9 @@ export function constructSourceFromGedcomRecord(record: GedcomRecord): GedcomSou
         gedcomSource.repositoryCitations.push(
             constructSourceRepositoryCitationFromGedcom(childRecord));
         break;
+      case 'OBJE':
+        gedcomSource.multimediaXrefs.push(constructMultimediaLink(childRecord));
+        break;
       default:
         gedcomSource.unknownRecords.push(childRecord);
         break;
@@ -88,4 +91,12 @@ function constructSourceRepositoryCitationFromGedcom(gedcomRecord: GedcomRecord)
   }
 
   return {repositoryXref, callNumbers};
+}
+
+function constructMultimediaLink(gedcomRecord: GedcomRecord): string {
+  if (gedcomRecord.abstag !== 'SOUR.OBJE') throw new Error();
+  if (gedcomRecord.xref != null) throw new Error();
+  if (gedcomRecord.value == null) throw new Error();
+
+  return gedcomRecord.value;
 }

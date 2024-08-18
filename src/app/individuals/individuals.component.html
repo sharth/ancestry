@@ -1,18 +1,14 @@
-<h1> {{ vm()?.individuals?.length }} Individuals</h1>
+@let vm = vm$ | async;
+<h1> {{ vm?.individuals?.length }} Individuals</h1>
 <ul>
-    @for(individual of vm()?.individuals; track individual.xref) {
-    <li>
-        <a routerLink="/individual/{{ individual.xref }}">{{ individual.name }}</a>
-    </li>
+    @for (group of vm?.individualsBySurname; track group.surname) {
+    <li>{{group.surname}}</li>
+    <ul>
+        @for (individual of group.individuals; track individual.xref) {
+        <li>
+            <a routerLink="/individual/{{ individual.xref }}">{{ individual.name }}</a>
+        </li>
+        }
+    </ul>
     }
 </ul>
-<!-- <ul>
-    <li *ngFor="let group of individualsBySurname()">
-        {{ group.surname || "&nbsp;" }}
-        <ul>
-            <li *ngFor="let individual of group.individuals">
-                <a routerLink="/individual/{{ individual.xref }}">{{ individual.name }}</a>
-            </li>
-        </ul>
-    </li>
-</ul> -->

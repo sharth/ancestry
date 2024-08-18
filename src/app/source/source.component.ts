@@ -30,8 +30,9 @@ export class SourceComponent {
     rxjs.combineLatestWith(
       dexie.liveQuery(() => ancestryDatabase.individuals.toArray()),
       dexie.liveQuery(() => ancestryDatabase.repositories.toArray()),
+      dexie.liveQuery(() => ancestryDatabase.multimedia.toArray()),
     ),
-    rxjs.map(([source, individuals, repositories]) => {
+    rxjs.map(([source, individuals, repositories, multimedia]) => {
       if (source == null)
         return null;
       return {
@@ -45,11 +46,11 @@ export class SourceComponent {
           callNumbers: repositoryCitation.callNumbers,
           repository: repositories.find((repository) => repository.xref == repositoryCitation.repositoryXref),
         })),
-        unknownRecords: source.unknownRecords.map((unknownRecord) => ({
-          ...unknownRecord,
-          gedcom: serializeGedcomRecordToText(unknownRecord),
+        multimedia: source.multimediaXrefs.map((multimediaXref) => ({
+          ...multimedia.find((multimedia) => multimedia.xref == multimediaXref),
+          xref: multimediaXref,
         })),
-        gedcom: serializeGedcomRecordToText(serializeGedcomSourceToGedcomRecord(source)),
+        gedcomRecord: serializeGedcomSourceToGedcomRecord(source),
         repositories,
       }
     }),

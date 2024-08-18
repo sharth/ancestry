@@ -11,15 +11,6 @@ import {ancestryService} from './ancestry.service';
   styleUrl: './app.component.css',
 })
 export class AppComponent {
-  readonly ancestryService = ancestryService;
-
-  ngOnInit() {
-    const text = localStorage.getItem('text');
-    if (text != null) {
-      this.parseSomeText(text);
-    }
-  }
-
   async openFile(): Promise<void> {
     const [fileHandle] = await window.showOpenFilePicker({
       types: [{
@@ -29,11 +20,6 @@ export class AppComponent {
     });
     const file = await fileHandle.getFile();
     const text = await file.text();
-    this.parseSomeText(text);
-  }
-
-  parseSomeText(text: string): void {
-    localStorage.setItem('text', text);
-    this.ancestryService.parseText(text);
+    ancestryService.parseText(text);
   }
 }

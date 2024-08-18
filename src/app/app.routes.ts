@@ -9,6 +9,8 @@ import {RepositoryComponent} from './repository/repository.component';
 // import {GedcomComponent} from './gedcom/gedcom.component';
 // import {ValidationComponent} from './validation/validation.component';
 import {PageNotFoundComponent} from './page-not-found/page-not-found.component';
+import { MultimediasComponent } from './multimedias/multimedias.component';
+import { MultimediaComponent } from './multimedia/multimedia.component';
 
 export const routes: Routes = [
   {path: '', component: IndexComponent},
@@ -19,6 +21,8 @@ export const routes: Routes = [
   {path: 'repository/:xref', component: RepositoryComponent},
   {path: 'sources', component: SourcesComponent},
   {path: 'source/:xref', component: SourceComponent},
+  {path: 'multimedias', component: MultimediasComponent},
+  {path: 'multimedia/:xref', component: MultimediaComponent},
   // {path: 'validation', component: ValidationComponent},
   {path: '**', component: PageNotFoundComponent},
 ];
