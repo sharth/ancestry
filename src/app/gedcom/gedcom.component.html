@@ -1,21 +1,6 @@
-<h2>Gedcom Differences</h2>
-<table>
-    <colgroup>
-        <col>
-        <col>
-    </colgroup>
-    <thead>
-        <tr>
-            <th>New Gedcom</th>
-            <th>Original Gedcom</th>
-        </tr>
-    </thead>
-    <tbody>
-        @for (difference of differences(); track difference) {
-        <tr>
-            <td>{{ difference.newText }}</td>
-            <td>{{ difference.oldText }}</td>
-        </tr>
-        }
-    </tbody>
-</table>
+@let vm = vm$ | async;
+@if (vm != null) {
+
+<app-gedcom-diff [oldGedcomText]=vm.oldGedcomText [newGedcomText]=vm.newGedcomText></app-gedcom-diff>
+
+}

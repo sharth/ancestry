@@ -1,80 +1,79 @@
-import {signal} from '@angular/core';
 import {ancestryDatabase} from '../database/ancestry.database';
 import * as dexie from 'dexie';
 import * as rxjs from 'rxjs';
 import * as gedcom from '../gedcom';
 
 export class AncestryService {
-  readonly originalGedcomText = signal<string>('');
-
   private readonly unparsedTags = new Set<string>();
 
-  gedcomRecords(): rxjs.Observable<gedcom.GedcomRecord[]> {
-    return rxjs.combineLatest([
-      dexie.liveQuery(() => ancestryDatabase.headers.toArray()),
-      dexie.liveQuery(() => ancestryDatabase.submitters.toArray()),
-      dexie.liveQuery(() => ancestryDatabase.individuals.toArray()),
-      dexie.liveQuery(() => ancestryDatabase.families.toArray()),
-      dexie.liveQuery(() => ancestryDatabase.sources.toArray()),
-      dexie.liveQuery(() => ancestryDatabase.repositories.toArray()),
-      dexie.liveQuery(() => ancestryDatabase.trailers.toArray()),
-    ]).pipe(
-      rxjs.map(([headers, submitters, individuals, families, sources, repositories, trailers]) => [
-        ...headers.map(gedcom.serializeGedcomHeaderToGedcomRecord),
-        ...submitters.map((submitter) => submitter.gedcomRecord),
-        ...individuals.map(gedcom.serializeGedcomIndividualToGedcomRecord),
-        ...families.map(gedcom.serializeGedcomFamilyToGedcomRecord),
-        ...sources.map(gedcom.serializeGedcomSourceToGedcomRecord),
-        ...repositories.map((repository) => repository.gedcomRecord),
-        ...trailers.map(gedcom.serializeGedcomTrailerToGedcomRecord),
-      ])
-    )
-  }
-
-  gedcomText(): rxjs.Observable<string> {
-    return this.gedcomRecords().pipe(
-      rxjs.map((records) => records.flatMap(gedcom.serializeGedcomRecordToText).join('\n'))
-    )
-  }
-
   parseText(text: string) {
-    // Clear the database.
-    ancestryDatabase.delete({disableAutoOpen: false});
-
-    // Remember the gedcomText that was passed in.
-    ancestryDatabase.originalText.add({text: text});
-
+    const headers: gedcom.GedcomHeader[] = [];
+    const submitters: gedcom.GedcomSubmitter[] = [];
+    const trailers: gedcom.GedcomTrailer[] = [];
+    const individuals: gedcom.GedcomIndividual[] = [];
+    const families: gedcom.GedcomFamily[] = [];
+    const repositories: gedcom.GedcomRepository[] = [];
+    const sources: gedcom.GedcomSource[] = [];
+    const multimedia: gedcom.GedcomMultimedia[] = [];
+    
     for (const gedcomRecord of gedcom.parseGedcomRecordsFromText(text)) {
       switch (gedcomRecord.tag) {
         case 'HEAD':
-          ancestryDatabase.headers.add(new gedcom.GedcomHeader(gedcomRecord));
+          headers.push(new gedcom.GedcomHeader(gedcomRecord));
           break;
         case 'SUBM':
-          ancestryDatabase.submitters.add(new gedcom.GedcomSubmitter(gedcomRecord));
+          submitters.push(gedcom.constructGedcomSubmitterFromGedcomRecord(gedcomRecord));
           break;
         case 'TRLR':
-          ancestryDatabase.trailers.add(new gedcom.GedcomTrailer(gedcomRecord));
+          trailers.push(new gedcom.GedcomTrailer(gedcomRecord));
           break;
         case 'INDI':
-          ancestryDatabase.individuals.add(gedcom.parseGedcomIndividualFromGedcomRecord(gedcomRecord));
+          individuals.push(gedcom.parseGedcomIndividualFromGedcomRecord(gedcomRecord));
           break;
         case 'FAM':
-          ancestryDatabase.families.add(gedcom.parseGedcomFamilyFromGedcomRecord(gedcomRecord));
+          families.push(gedcom.parseGedcomFamilyFromGedcomRecord(gedcomRecord));
           break;
         case 'REPO':
-          ancestryDatabase.repositories.add(new gedcom.GedcomRepository(gedcomRecord));
+          repositories.push(new gedcom.GedcomRepository(gedcomRecord));
           break;
         case 'SOUR':
-          ancestryDatabase.sources.add(gedcom.constructSourceFromGedcomRecord(gedcomRecord));
+          sources.push(gedcom.constructSourceFromGedcomRecord(gedcomRecord));
           break;
         case 'OBJE':
-          ancestryDatabase.multimedia.add(gedcom.constructGedcomMultimediaFromGedcomRecord(gedcomRecord));
+          multimedia.push(gedcom.constructGedcomMultimediaFromGedcomRecord(gedcomRecord));
           break;
         default:
           this.reportUnparsedRecord(gedcomRecord);
           break;
       }
     }
+
+    ancestryDatabase.transaction(
+      "readwrite",
+      ["originalText", "headers", "submitters", "trailers", "individuals", "families", "repositories", "sources", "multimedia"],
+      async () => {
+        await ancestryDatabase.originalText.clear();
+        await ancestryDatabase.originalText.add({text: text});
+        await ancestryDatabase.headers.clear();
+        await ancestryDatabase.headers.bulkAdd(headers);
+        await ancestryDatabase.submitters.clear();
+        await ancestryDatabase.submitters.bulkAdd(submitters);
+        await ancestryDatabase.trailers.clear();
+        await ancestryDatabase.trailers.bulkAdd(trailers);
+        await ancestryDatabase.individuals.clear();
+        await ancestryDatabase.individuals.bulkAdd(individuals);
+        await ancestryDatabase.families.clear();
+        await ancestryDatabase.families.bulkAdd(families);
+        await ancestryDatabase.repositories.clear();
+        await ancestryDatabase.repositories.bulkAdd(repositories);
+        await ancestryDatabase.sources.clear();
+        await ancestryDatabase.sources.bulkAdd(sources);
+        await ancestryDatabase.multimedia.clear();
+        await ancestryDatabase.multimedia.bulkAdd(multimedia);
+      }).catch((err: unknown) => {
+        if (err instanceof dexie.Dexie.BulkError)
+          console.log(err.stack);
+      });
   }
 
   reportUnparsedRecord(gedcomRecord: gedcom.GedcomRecord): void {

@@ -1,43 +1,69 @@
-import {Component, computed} from '@angular/core';
-import {ancestryService} from '../ancestry.service';
-import {parseGedcomRecordsFromText} from '../../gedcom/gedcomRecord.parser';
-import {serializeGedcomRecordToText} from '../../gedcom/gedcomRecord.serializer';
+import { CommonModule } from '@angular/common';
+import {Component} from '@angular/core';
+import { ancestryDatabase } from '../../database/ancestry.database';
+import * as dexie from 'dexie';
+import * as rxjs from 'rxjs';
+import * as gedcom from '../../gedcom';
+import { GedcomDiffComponent } from '../../util/gedcom-diff.component';
 
 @Component({
   selector: 'app-gedcom',
   standalone: true,
-  imports: [],
+  imports: [CommonModule, GedcomDiffComponent],
   templateUrl: './gedcom.component.html',
   styleUrl: './gedcom.component.css',
 })
 export class GedcomComponent {
-  readonly ancestryService = ancestryService;
+  readonly vm$ = rxjs.combineLatest([
+    this.oldGedcomText(),
+    this.newGedcomRecords(),
+  ]).pipe(
+    rxjs.map(([oldGedcomText, newGedcomRecords]) => ({
+      oldGedcomText: oldGedcomText,
+      newGedcomText: newGedcomRecords.map(gedcom.serializeGedcomRecordToText).join("\n"),
+    })),
+  );
 
-  differences = computed(() => {
-    const oldGedcomText = Array.from(parseGedcomRecordsFromText(ancestryService.originalGedcomText()))
-        .map(serializeGedcomRecordToText);
-    const newGedcomText = this.ancestryService.gedcomRecords()
-        .map(serializeGedcomRecordToText);
+  oldGedcomText(): rxjs.Observable<string> {
+    return rxjs.from(dexie.liveQuery(async () => {
+      const [{text: originalText}] = await ancestryDatabase.originalText.toArray();
+      return originalText;
+    }))
+  }
 
-    const differences = [];
-    let oldGedcomIndex = 0;
-    let newGedcomIndex = 0;
-    while (newGedcomIndex < newGedcomText.length) {
-      if (oldGedcomText[oldGedcomIndex] == newGedcomText[newGedcomIndex]) {
-        oldGedcomIndex += 1;
-        newGedcomIndex += 1;
-      } else if (oldGedcomText.includes(newGedcomText[newGedcomIndex], oldGedcomIndex)) {
-        differences.push({oldText: oldGedcomText[oldGedcomIndex], newText: ''});
-        oldGedcomIndex += 1;
-      } else {
-        differences.push({oldText: '', newText: newGedcomText[newGedcomIndex]});
-        newGedcomIndex += 1;
-      }
-    }
-    while (oldGedcomIndex < oldGedcomText.length) {
-      differences.push({oldText: oldGedcomText[oldGedcomIndex], newText: ''});
-      oldGedcomIndex += 1;
-    }
-    return differences;
-  });
+  // Current set of GedcomRecords, but organized similarly to the text that came in from the user.
+  newGedcomRecords(): rxjs.Observable<gedcom.GedcomRecord[]> {
+    return rxjs.from(dexie.liveQuery(async () => {
+      const newGedcomRecords = [
+        ...(await ancestryDatabase.headers.toArray()).map(gedcom.serializeGedcomHeaderToGedcomRecord),
+        ...(await ancestryDatabase.submitters.toArray()).map((submitter) => submitter.gedcomRecord),
+        ...(await ancestryDatabase.trailers.toArray()).map((trailer) => trailer.record),
+        ...(await ancestryDatabase.individuals.toArray()).map(gedcom.serializeGedcomIndividualToGedcomRecord),
+        ...(await ancestryDatabase.families.toArray()).map(gedcom.serializeGedcomFamilyToGedcomRecord),
+        ...(await ancestryDatabase.sources.toArray()).map(gedcom.serializeGedcomSourceToGedcomRecord),
+        ...(await ancestryDatabase.repositories.toArray()).map((repository) => repository.gedcomRecord),
+        ...(await ancestryDatabase.multimedia.toArray()).map(gedcom.serializeGedcomMultimediaToGedcomRecord),
+      ];
+
+      // We'd like to reorder the gedcom records more or less in the order that we received the file.
+      const [{text: oldGedcomText}] = await ancestryDatabase.originalText.toArray();
+      const oldGedcomRecords = Array.from(gedcom.parseGedcomRecordsFromText(oldGedcomText));
+
+      const orderedRecords = new Map<string, gedcom.GedcomRecord[]>();
+      oldGedcomRecords
+        .filter((gedcomRecord) => gedcomRecord.abstag != 'TRLR')
+        .forEach((gedcomRecord) => {
+          const order = `${gedcomRecord.tag} ${gedcomRecord.xref ?? ''} ${gedcomRecord.value ?? ''}`;
+          orderedRecords.set(order, []);
+        });
+      newGedcomRecords
+        .forEach((gedcomRecord) => {
+          const order = `${gedcomRecord.tag} ${gedcomRecord.xref ?? ''} ${gedcomRecord.value ?? ''}`;
+          if (!orderedRecords.get(order)?.push(gedcomRecord))
+            orderedRecords.set(order, [gedcomRecord]);
+        });
+
+      return Array.from(orderedRecords.values()).flat();
+    }));
+  }
 }

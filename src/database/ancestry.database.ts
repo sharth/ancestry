@@ -5,7 +5,7 @@ import * as gedcom from '../gedcom'
 class AncestryDatabase extends dexie.Dexie {
   originalText!: dexie.Dexie.Table<{text: string}>;
   headers!: dexie.Dexie.Table<gedcom.GedcomHeader>;
-  submitters!: dexie.Dexie.Table<gedcom.GedcomSubmitter>;
+  submitters!: dexie.Dexie.Table<gedcom.GedcomSubmitter, string>;
   trailers!: dexie.Dexie.Table<gedcom.GedcomTrailer>;
   repositories!: dexie.Dexie.Table<gedcom.GedcomRepository, string>;
   sources!: dexie.Dexie.Table<gedcom.GedcomSource, string>;
@@ -28,9 +28,9 @@ class AncestryDatabase extends dexie.Dexie {
     this.version(2).upgrade((tx) => tx.table('sources').toCollection().modify((source) => {
       (source as gedcom.GedcomSource).multimediaXrefs = [];
     }));
-    this.version(3).stores({
-      'submitters': '++',
-    })  
+    this.version(4).stores({
+      'submitters': 'xref',
+    })
 
     this.headers.mapToClass(gedcom.GedcomHeader);
     this.submitters.mapToClass(gedcom.GedcomSubmitter);

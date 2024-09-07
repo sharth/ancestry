@@ -1,0 +1,12 @@
+table {
+    width: 50em;
+    table-layout: fixed;
+}
+
+th {
+    width: 20em;
+}
+
+td {
+    font-family: monospace;
+}

@@ -10,7 +10,7 @@ export function* parseGedcomRecordsFromText(text: string): Generator<GedcomRecor
     }
     const match = /^([0-9]+) *(@[^@]+@)? *([A-Za-z0-9_]+) *(.+)?$/.exec(line);
     if (match == null) {
-      throw new Error();
+      throw new Error(`Failed to parse: ${line}`);
     }
     const level = parseInt(match[1], 10);
     const [xref, tag, value] = match.slice(2);

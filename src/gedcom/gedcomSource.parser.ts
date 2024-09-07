@@ -28,9 +28,9 @@ export function constructSourceFromGedcomRecord(record: GedcomRecord): GedcomSou
         gedcomSource.repositoryCitations.push(
             constructSourceRepositoryCitationFromGedcom(childRecord));
         break;
-      case 'OBJE':
-        gedcomSource.multimediaXrefs.push(constructMultimediaLink(childRecord));
-        break;
+      // case 'OBJE':
+      //   gedcomSource.multimediaXrefs.push(constructMultimediaLink(childRecord));
+      //   break;
       default:
         gedcomSource.unknownRecords.push(childRecord);
         break;

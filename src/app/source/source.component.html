@@ -91,7 +91,8 @@
 </table>
 
 <h2>Gedcom</h2>
-<pre>{{ serializeGedcomRecordToText(vm.gedcomRecord) }}</pre>
+<app-gedcom-diff [oldGedcomText]=vm.oldGedcomText [newGedcomText]=vm.newGedcomText></app-gedcom-diff>
+<pre>{{ vm.newGedcomText }}</pre>
 
 <div class="position-fixed bottom-0 end-0 rounded-circle m-5">
     <button type="button" class="btn btn-primary btn-lg bi-pencil" (click)="openForm()"></button>

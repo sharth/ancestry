@@ -9,15 +9,17 @@ import {toObservable} from '@angular/core/rxjs-interop';
 import {ancestryDatabase} from '../../database/ancestry.database';
 import * as rxjs from 'rxjs';
 import * as dexie from 'dexie';
+import * as gedcom from '../../gedcom';
 import { GedcomSource } from '../../gedcom/gedcomSource';
 import { GedcomRecord } from '../../gedcom/gedcomRecord';
+import { GedcomDiffComponent } from "../../util/gedcom-diff.component";
 
 @Component({
   selector: 'app-source',
   standalone: true,
   templateUrl: './source.component.html',
   styleUrl: './source.component.css',
-  imports: [CommonModule,RouterModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, GedcomDiffComponent],
 })
 export class SourceComponent {
   readonly xref = input.required<string>();
@@ -31,8 +33,9 @@ export class SourceComponent {
       dexie.liveQuery(() => ancestryDatabase.individuals.toArray()),
       dexie.liveQuery(() => ancestryDatabase.repositories.toArray()),
       dexie.liveQuery(() => ancestryDatabase.multimedia.toArray()),
+      dexie.liveQuery(() => ancestryDatabase.originalText.toArray()),
     ),
-    rxjs.map(([source, individuals, repositories, multimedia]) => {
+    rxjs.map(([source, individuals, repositories, multimedia, originalText]) => {
       if (source == null)
         return null;
       return {
@@ -50,8 +53,14 @@ export class SourceComponent {
           ...multimedia.find((multimedia) => multimedia.xref == multimediaXref),
           xref: multimediaXref,
         })),
-        gedcomRecord: serializeGedcomSourceToGedcomRecord(source),
         repositories,
+        oldGedcomText: originalText
+          .map((originalText) => originalText.text)
+          .flatMap((originalText) => Array.from(gedcom.parseGedcomRecordsFromText(originalText)))
+          .filter((gedcomRecord) => gedcomRecord.tag == 'SOUR' && gedcomRecord.xref == source.xref)
+          .map(serializeGedcomRecordToText)
+          .join("\n"),
+        newGedcomText: serializeGedcomRecordToText(serializeGedcomSourceToGedcomRecord(source)),
       }
     }),
   );
