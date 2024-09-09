@@ -14,7 +14,7 @@ import {RouterModule} from '@angular/router';
 export class ValidationComponent {
   readonly ancestryService = ancestryService;
 
-  readonly sourceScenarios = computed(() =>
-    this.ancestryService.sources().toList()
-        .map((source) => ({source: source, result: sourceValidators(source)})));
+  // readonly sourceScenarios = computed(() =>
+  //   this.ancestryService.sources().toList()
+  //       .map((source) => ({source: source, result: sourceValidators(source)})));
 }

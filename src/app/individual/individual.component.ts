@@ -36,11 +36,11 @@ export class IndividualComponent {
         ...individual,
         events: individual.events.map((event) => ({
           ...event,
-          gedcom: serializeGedcomRecordToText(serializeGedcomEventToGedcomRecord(event)),
+          gedcom: serializeGedcomRecordToText(serializeGedcomEventToGedcomRecord(event)).join('\n'),
         })),
         ancestors: this.ancestors(individual, individuals, families),
         relatives: this.relatives(individual, individuals, families),
-        gedcom: serializeGedcomRecordToText(serializeGedcomIndividualToGedcomRecord(individual)),
+        gedcom: serializeGedcomRecordToText(serializeGedcomIndividualToGedcomRecord(individual)).join('\n'),
       };
     }),
   )

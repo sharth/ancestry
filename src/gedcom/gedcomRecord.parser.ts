@@ -1,6 +1,10 @@
 import {GedcomRecord} from './gedcomRecord';
 
-export function* parseGedcomRecordsFromText(text: string): Generator<GedcomRecord> {
+export function parseGedcomRecordsFromText(text: string): GedcomRecord[] {
+  return Array.from(generateGedcomRecordsFromText(text));
+}
+
+function* generateGedcomRecordsFromText(text: string): Generator<GedcomRecord> {
   const lines = text.split(/\r?\n/);
   let ladder: GedcomRecord[] = [];
 

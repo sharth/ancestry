@@ -1,77 +1,77 @@
-import {GedcomRecord, parseGedcomRecordsFromText} from './gedcomRecord';
+import * as gedcom from './';
 
-it('validate merging of conc and cont', () => {
-  const gedcomText =
-    '0 @I1@ INDI\n' +
-    '1 NAME john \n' +
-    '2 CONC doe\n' +
-    '2 CONT senior\n';
-  const gedcomRecords = Array.from(parseGedcomRecordsFromText(gedcomText));
-  expect(gedcomRecords).toStrictEqual([
-    new GedcomRecord(0, '@I1@', 'INDI', 'INDI', undefined, [
-      new GedcomRecord(1, undefined, 'NAME', 'INDI.NAME', 'john doe\nsenior', []),
-    ]),
-  ]);
-  expect(gedcomRecords.flatMap((record) => record.text())).toStrictEqual([
-    '0 @I1@ INDI',
-    '1 NAME john doe',
-    '2 CONT senior',
-  ]);
+describe('GedcomRecord Parsing', () => {
+  test('conc is merged into the previous record', () => {
+    const gedcomText = [
+      '0 @I1@ INDI',
+      '1 NAME john ',
+      '2 CONC doe',
+      '2 CONT senior'
+    ];
+    const gedcomRecords = gedcom.parseGedcomRecordsFromText(gedcomText.join('\n'));
+    expect(gedcomRecords).toStrictEqual([
+      new gedcom.GedcomRecord(0, '@I1@', 'INDI', 'INDI', undefined, [
+        new gedcom.GedcomRecord(1, undefined, 'NAME', 'INDI.NAME', 'john doe\nsenior', []),
+      ]),
+    ]);
+  });
+
+  test('conc onto the empty string', () => {
+    const gedcomText = [
+      '0 TAG',
+      '1 CONC value',
+    ];
+    const gedcomRecords = gedcom.parseGedcomRecordsFromText(gedcomText.join('\n'));
+    expect(gedcomRecords).toStrictEqual([
+      new gedcom.GedcomRecord(0, undefined, 'TAG', 'TAG', 'value', []),
+    ]);
+  });
+
+  test('cont onto the empty string', () => {
+    const gedcomText = [
+      '0 TAG',
+      '1 CONT value',
+    ];
+    const gedcomRecords = gedcom.parseGedcomRecordsFromText(gedcomText.join('\n'));
+    expect(gedcomRecords).toStrictEqual([
+      new gedcom.GedcomRecord(0, undefined, 'TAG', 'TAG', '\nvalue', []),
+    ]);
+  });
+
+  test('empty lines presented correctly', () => {
+    const gedcomText = [
+      '0 TAG',
+      '1 CONC',
+      '1 CONT',
+      '1 CONT',
+    ];
+    const gedcomRecords = gedcom.parseGedcomRecordsFromText(gedcomText.join('\n'));
+    expect(gedcomRecords).toStrictEqual([
+      new gedcom.GedcomRecord(0, undefined, 'TAG', 'TAG', '\n\n', []),
+    ]);
+  });
+
+  test('conc records disappear', () => {
+    const gedcomText = [
+      '0 TAG abc',
+      '1 CONC def',
+    ];
+    const gedcomRecords = gedcom.parseGedcomRecordsFromText(gedcomText.join('\n'));
+    expect(gedcomRecords).toStrictEqual([
+      new gedcom.GedcomRecord(0, undefined, 'TAG', 'TAG', 'abcdef', []),
+    ]);
+  });
 });
 
-it('conc onto the empty string', () => {
-  const gedcomText =
-  '0 TAG\n' +
-  '1 CONC value\n';
-  const gedcomRecords = Array.from(parseGedcomRecordsFromText(gedcomText));
-  expect(gedcomRecords).toStrictEqual([
-    new GedcomRecord(0, undefined, 'TAG', 'TAG', 'value', []),
-  ]);
-  expect(gedcomRecords.flatMap((record) => record.text())).toStrictEqual([
-    '0 TAG value',
-  ]);
-});
-
-it('cont onto the empty string', () => {
-  const gedcomText =
-  '0 TAG\n' +
-  '1 CONT value\n';
-  const gedcomRecords = Array.from(parseGedcomRecordsFromText(gedcomText));
-  expect(gedcomRecords).toStrictEqual([
-    new GedcomRecord(0, undefined, 'TAG', 'TAG', '\nvalue', []),
-  ]);
-  expect(gedcomRecords.flatMap((record) => record.text())).toStrictEqual([
-    '0 TAG',
-    '1 CONT value',
-  ]);
-});
-
-it('empty lines presented correctly', () => {
-  const gedcomText =
-  '0 TAG\n' +
-  '1 CONC\n' +
-  '1 CONT\n' +
-  '1 CONT\n';
-  const gedcomRecords = Array.from(parseGedcomRecordsFromText(gedcomText));
-  expect(gedcomRecords).toStrictEqual([
-    new GedcomRecord(0, undefined, 'TAG', 'TAG', '\n\n', []),
-  ]);
-  expect(gedcomRecords.flatMap((record) => record.text())).toStrictEqual([
-    '0 TAG',
-    '1 CONT',
-    '1 CONT',
-  ]);
-});
-
-it('conc records disappear', () => {
-  const gedcomText =
-  '0 TAG abc\n' +
-  '1 CONC def\n';
-  const gedcomRecords = Array.from(parseGedcomRecordsFromText(gedcomText));
-  expect(gedcomRecords).toStrictEqual([
-    new GedcomRecord(0, undefined, 'TAG', 'TAG', 'abcdef', []),
-  ]);
-  expect(gedcomRecords.flatMap((record) => record.text())).toStrictEqual([
-    '0 TAG abcdef',
-  ]);
+describe('GedcomRecord Serializing', () => {
+  test('serialize individual', () => {
+    const gedcomRecord = new gedcom.GedcomRecord(0, '@I1@', 'INDI', 'INDI', undefined, [
+      new gedcom.GedcomRecord(1, undefined, 'NAME', 'INDI.NAME', 'john doe \n senior', [])
+    ]);
+    expect(gedcom.serializeGedcomRecordToText(gedcomRecord)).toStrictEqual([
+      '0 @I1@ INDI',
+      '1 NAME john doe ',
+      '2 CONT  senior',
+    ]); 
+  });
 });

@@ -83,7 +83,7 @@
         @for (unknownRecord of vm.unknownRecords; track $index) {
         <tr>
             <td>
-                <pre>{{ serializeGedcomRecordToText(unknownRecord) }}</pre>
+                <pre>{{ serializeGedcomRecordToText(unknownRecord).join('\n') }}</pre>
             </td>
         </tr>
         }
@@ -170,7 +170,7 @@
                             (click)="removeUnknownRecord(i)"></button>
                     </td>
                     <td>
-                        <pre>{{ serializeGedcomRecordToText(unknown.value) }}</pre>
+                        <pre>{{ serializeGedcomRecordToText(unknown.value).join('\n') }}</pre>
                     </td>
                 </tr>
                 }

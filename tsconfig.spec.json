@@ -3,7 +3,10 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/spec",
-    "types": ["jest"]
+    "types": [
+      "@types/wicg-file-system-access",
+      "jest",
+    ]
   },
   "include": [
     "src/**/*.spec.ts",

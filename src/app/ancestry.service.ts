@@ -1,6 +1,5 @@
 import {ancestryDatabase} from '../database/ancestry.database';
 import * as dexie from 'dexie';
-import * as rxjs from 'rxjs';
 import * as gedcom from '../gedcom';
 
 export class AncestryService {

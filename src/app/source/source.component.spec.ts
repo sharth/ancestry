@@ -1,6 +1,6 @@
 import {type ComponentFixture, TestBed} from '@angular/core/testing';
 import {SourceComponent} from './source.component';
-import {AncestryService} from '../ancestry.service';
+import {ancestryService} from '../ancestry.service';
 import {provideExperimentalZonelessChangeDetection} from '@angular/core';
 
 describe('SourceComponent', () => {
@@ -12,7 +12,6 @@ describe('SourceComponent', () => {
       providers: [provideExperimentalZonelessChangeDetection()],
     }).compileComponents();
 
-    const ancestryService = TestBed.inject(AncestryService);
     ancestryService.parseText([
       '0 @S1@ SOUR',
     ].join('\n'));

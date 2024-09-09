@@ -16,7 +16,3 @@ export function serializeGedcomCitationToGedcomRecord(gedcomCitation: GedcomCita
     ]) : null,
   ].filter((record) => record != null));
 }
-
-export function serializeGedcomCitationToText(gedcomCitation: GedcomCitation, level: number): string {
-  return serializeGedcomRecordToText(serializeGedcomCitationToGedcomRecord(gedcomCitation, level));
-}

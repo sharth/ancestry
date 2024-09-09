@@ -58,9 +58,10 @@ export class SourceComponent {
           .map((originalText) => originalText.text)
           .flatMap((originalText) => Array.from(gedcom.parseGedcomRecordsFromText(originalText)))
           .filter((gedcomRecord) => gedcomRecord.tag == 'SOUR' && gedcomRecord.xref == source.xref)
-          .map(serializeGedcomRecordToText)
+          .flatMap(serializeGedcomRecordToText)
           .join("\n"),
-        newGedcomText: serializeGedcomRecordToText(serializeGedcomSourceToGedcomRecord(source)),
+        newGedcomText: serializeGedcomRecordToText(serializeGedcomSourceToGedcomRecord(source))
+          .join('\n'),
       }
     }),
   );
@@ -138,6 +139,6 @@ export class SourceComponent {
     void ancestryDatabase.sources.put(source);
     this.editDialog().nativeElement.close();
   }
-
+  
   serializeGedcomRecordToText = serializeGedcomRecordToText;
 }

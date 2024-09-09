@@ -20,7 +20,7 @@ export class GedcomComponent {
   ]).pipe(
     rxjs.map(([oldGedcomText, newGedcomRecords]) => ({
       oldGedcomText: oldGedcomText,
-      newGedcomText: newGedcomRecords.map(gedcom.serializeGedcomRecordToText).join("\n"),
+      newGedcomText: newGedcomRecords.flatMap(gedcom.serializeGedcomRecordToText).join("\r\n"),
     })),
   );
 

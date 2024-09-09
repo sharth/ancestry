@@ -12,24 +12,27 @@ export class GedcomDiffComponent {
   readonly newGedcomText = input.required<string>();
   readonly oldGedcomText = input.required<string>();
   readonly differences = computed(() => {
-    const oldGedcomArr = this.oldGedcomText().split("\n");
-    const newGedcomArr = this.newGedcomText().split("\n");
+    const oldGedcomArr = this.oldGedcomText().split(/\r?\n/);
+    const newGedcomArr = this.newGedcomText().split(/\r?\n/);
     const diffs = [];
     let i = 0, j = 0;
     while (i < oldGedcomArr.length && j < newGedcomArr.length) {
-        const nextJ = newGedcomArr.findIndex((value) => value == oldGedcomArr[i]);
-        if (nextJ == -1) {
-            diffs.push({oldLine: oldGedcomArr[i], oldColor: 'red', newLine: '', newColor: 'gray'});
-            i += 1;
-        } else {
-            while (j < nextJ) {
-                diffs.push({oldLine: '', oldColor: 'gray', newLine: newGedcomArr[j], newColor: 'lightgreen'});
-                j += 1;
-            }
-            diffs.push({oldLine: oldGedcomArr[i], oldColor: 'gray', newLine: newGedcomArr[j], newColor: 'gray'});
-            i += 1;
-            j += 1;
+      if (i < 100 && j < 100) {
+        console.log(i, j, oldGedcomArr[i], newGedcomArr[j]);
+      }
+      if (oldGedcomArr[i] == newGedcomArr[i]) {
+        diffs.push({oldLine: oldGedcomArr[i], oldColor: 'gray', newLine: newGedcomArr[j], newColor: 'gray'});
+        i += 1;
+        j += 1;
+      } else if (newGedcomArr.includes(oldGedcomArr[i], j)) {
+        while (oldGedcomArr[i] != newGedcomArr[j]) {
+          diffs.push({oldLine: '', oldColor: 'gray', newLine: newGedcomArr[j], newColor: 'lightgreen'});
+          j += 1;
         }
+      } else {
+        diffs.push({oldLine: oldGedcomArr[i], oldColor: 'red', newLine: '', newColor: 'gray'});
+        i += 1;
+      }
     }
     while (i < oldGedcomArr.length) {
         diffs.push({oldLine: oldGedcomArr[i], oldColor: 'red', newLine: '', newColor: 'gray'});

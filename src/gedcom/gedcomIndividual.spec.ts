@@ -1,8 +1,8 @@
 import {provideExperimentalZonelessChangeDetection} from '@angular/core';
 import {TestBed} from '@angular/core/testing';
-import {AncestryService} from '../app/ancestry.service';
+import * as gedcom from './';
 
-describe('GedcomIndividual', () => {
+describe('GedcomIndividual Parser', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       providers: [
@@ -11,42 +11,42 @@ describe('GedcomIndividual', () => {
     }).compileComponents();
   });
 
-  it('Male', () => {
-    const ancestryService = TestBed.inject(AncestryService);
-    ancestryService.parseText([
+  test('Male', () => {
+    const [gedcomRecord] = gedcom.parseGedcomRecordsFromText([
       '0 @I1@ INDI',
       '1 SEX M',
     ].join('\n'));
-    expect(ancestryService.individuals().size).toEqual(1);
-    expect(ancestryService.individual('@I1@').sex).toEqual('Male');
+    const gedcomIndividual = gedcom.parseGedcomIndividualFromGedcomRecord(gedcomRecord);
+    expect(gedcomIndividual.xref).toEqual('@I1@');
+    expect(gedcomIndividual.sex).toEqual('Male');
   });
 
-  it('Female', () => {
-    const ancestryService = TestBed.inject(AncestryService);
-    ancestryService.parseText([
-      '0 @I2@ INDI',
+  test('Female', () => {
+    const [gedcomRecord] = gedcom.parseGedcomRecordsFromText([
+      '0 @I1@ INDI',
       '1 SEX F',
-    ].join('\r\n'));
-    expect(ancestryService.individuals().size).toEqual(1);
-    expect(ancestryService.individual('@I2@').sex).toEqual('Female');
+    ].join('\n'));
+    const gedcomIndividual = gedcom.parseGedcomIndividualFromGedcomRecord(gedcomRecord);
+    expect(gedcomIndividual.xref).toEqual('@I1@');
+    expect(gedcomIndividual.sex).toEqual('Female');
   });
 
-  it('UnspecifiedSex', () => {
-    const ancestryService = TestBed.inject(AncestryService);
-    ancestryService.parseText([
-      '0 @I3@ INDI',
+  it('Unspecified Sex', () => {
+    const [gedcomRecord] = gedcom.parseGedcomRecordsFromText([
+      '0 @I1@ INDI',
     ].join('\n'));
-    expect(ancestryService.individuals().size).toEqual(1);
-    expect(ancestryService.individual('@I3@').sex).toEqual(undefined);
+    const gedcomIndividual = gedcom.parseGedcomIndividualFromGedcomRecord(gedcomRecord);
+    expect(gedcomIndividual.xref).toEqual('@I1@');
+    expect(gedcomIndividual.sex).toEqual(undefined);
   });
 
   it('Family Search Id', () => {
-    const ancestryService = TestBed.inject(AncestryService);
-    ancestryService.parseText([
+    const [gedcomRecord] = gedcom.parseGedcomRecordsFromText([
       '0 @I4@ INDI',
       '1 _FSFTID abcd',
-    ].join('\r\n'));
-    expect(ancestryService.individuals().size).toEqual(1);
-    expect(ancestryService.individual('@I4@').familySearchId).toEqual('abcd');
+    ].join('\n'));
+    const gedcomIndividual = gedcom.parseGedcomIndividualFromGedcomRecord(gedcomRecord);
+    expect(gedcomIndividual.xref).toEqual('@I4@');
+    expect(gedcomIndividual.familySearchId).toEqual('abcd');
   });
 });

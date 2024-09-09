@@ -1,5 +1,6 @@
 import {TestBed} from '@angular/core/testing';
 import {provideExperimentalZonelessChangeDetection} from '@angular/core';
+import * as gedcom from '../gedcom';
 
 describe('GedcomFamily', () => {
   beforeEach(async () => {
@@ -10,18 +11,25 @@ describe('GedcomFamily', () => {
     }).compileComponents();
   });
 
-  // it('Parents', () => {
-  //   const ancestryService = TestBed.inject(AncestryService);
-  //   ancestryService.parseText([
-  //     '0 @F1@ FAM',
-  //     '0 @F2@ FAM',
-  //     '1 WIFE @I1@',
-  //     '0 @F3@ FAM',
-  //     '1 WIFE @I2@',
-  //     '1 HUSB @I3@',
-  //   ].join('\n'));
-  //   expect(ancestryService.family('@F1@').parentXrefs).toEqual([]);
-  //   expect(ancestryService.family('@F2@').parentXrefs).toEqual(['@I1@']);
-  //   expect(ancestryService.family('@F3@').parentXrefs).toEqual(['@I3@', '@I2@']);
-  // });
+  test('No Parents', () => {
+    const [gedcomRecord] = gedcom.parseGedcomRecordsFromText([
+      '0 @F1@ FAM',
+    ].join("\n"));
+    const gedcomFamily = gedcom.parseGedcomFamilyFromGedcomRecord(gedcomRecord);
+    expect(gedcomFamily.xref).toEqual('@F1@')
+    expect(gedcomFamily.husbandXref).toEqual(undefined);
+    expect(gedcomFamily.wifeXref).toEqual(undefined);
+  });
+
+  test('Parents', () => {
+    const [gedcomRecord] = gedcom.parseGedcomRecordsFromText([
+      '0 @F3@ FAM',
+      '1 WIFE @I2@',
+      '1 HUSB @I3@',
+    ].join("\n"));
+    const gedcomFamily = gedcom.parseGedcomFamilyFromGedcomRecord(gedcomRecord);
+    expect(gedcomFamily.xref).toEqual('@F3@')
+    expect(gedcomFamily.husbandXref).toEqual("@I3@");
+    expect(gedcomFamily.wifeXref).toEqual("@I2@");
+  });
 });
