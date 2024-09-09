@@ -8,13 +8,13 @@ function* generateGedcomRecordsFromText(text: string): Generator<GedcomRecord> {
   const lines = text.split(/\r?\n/);
   let ladder: GedcomRecord[] = [];
 
-  for (const line of lines) {
+  for (const [lineNumber, line] of lines.entries()) {
     if (line == '') {
       continue;
     }
     const match = /^([0-9]+) *(@[^@]+@)? *([A-Za-z0-9_]+) *(.+)?$/.exec(line);
     if (match == null) {
-      throw new Error(`Failed to parse: ${line}`);
+      throw new Error(`Failed to parse line number ${lineNumber + 1}: ${line}`);
     }
     const level = parseInt(match[1], 10);
     const [xref, tag, value] = match.slice(2);
