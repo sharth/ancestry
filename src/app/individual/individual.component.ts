@@ -48,7 +48,7 @@ export class IndividualComponent {
   ancestors(self: GedcomIndividual, individuals: GedcomIndividual[], families: GedcomFamily[]): (GedcomIndividual | undefined)[] {
     const ancestors: (GedcomIndividual | undefined)[] = [];
     ancestors[1] = self;
-    for (let i = 1; i < ancestors.length; i++) {
+    for (let i = 1; i < ancestors.length && i < 16384; i++) {
       const child = ancestors[i];
       if (child != null) {
         const family = families.find((family) => family.childXrefs.includes(child.xref));
