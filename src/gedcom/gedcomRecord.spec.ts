@@ -1,4 +1,5 @@
 import * as gedcom from './';
+import {assert} from "chai";
 
 describe('GedcomRecord Parsing', () => {
   test('conc is merged into the previous record', () => {
@@ -9,7 +10,7 @@ describe('GedcomRecord Parsing', () => {
       '2 CONT senior'
     ];
     const gedcomRecords = gedcom.parseGedcomRecordsFromText(gedcomText.join('\n'));
-    expect(gedcomRecords).toStrictEqual([
+    assert.strictEqual(gedcomRecords, [
       new gedcom.GedcomRecord(0, '@I1@', 'INDI', 'INDI', undefined, [
         new gedcom.GedcomRecord(1, undefined, 'NAME', 'INDI.NAME', 'john doe\nsenior', []),
       ]),
@@ -22,7 +23,7 @@ describe('GedcomRecord Parsing', () => {
       '1 CONC value',
     ];
     const gedcomRecords = gedcom.parseGedcomRecordsFromText(gedcomText.join('\n'));
-    expect(gedcomRecords).toStrictEqual([
+    assert.strictEqual(gedcomRecords, [
       new gedcom.GedcomRecord(0, undefined, 'TAG', 'TAG', 'value', []),
     ]);
   });
@@ -33,7 +34,7 @@ describe('GedcomRecord Parsing', () => {
       '1 CONT value',
     ];
     const gedcomRecords = gedcom.parseGedcomRecordsFromText(gedcomText.join('\n'));
-    expect(gedcomRecords).toStrictEqual([
+    assert.strictEqual(gedcomRecords, [
       new gedcom.GedcomRecord(0, undefined, 'TAG', 'TAG', '\nvalue', []),
     ]);
   });
@@ -46,7 +47,7 @@ describe('GedcomRecord Parsing', () => {
       '1 CONT',
     ];
     const gedcomRecords = gedcom.parseGedcomRecordsFromText(gedcomText.join('\n'));
-    expect(gedcomRecords).toStrictEqual([
+    assert.strictEqual(gedcomRecords, [
       new gedcom.GedcomRecord(0, undefined, 'TAG', 'TAG', '\n\n', []),
     ]);
   });
@@ -57,7 +58,7 @@ describe('GedcomRecord Parsing', () => {
       '1 CONC def',
     ];
     const gedcomRecords = gedcom.parseGedcomRecordsFromText(gedcomText.join('\n'));
-    expect(gedcomRecords).toStrictEqual([
+    assert.strictEqual(gedcomRecords, [
       new gedcom.GedcomRecord(0, undefined, 'TAG', 'TAG', 'abcdef', []),
     ]);
   });
@@ -68,7 +69,7 @@ describe('GedcomRecord Serializing', () => {
     const gedcomRecord = new gedcom.GedcomRecord(0, '@I1@', 'INDI', 'INDI', undefined, [
       new gedcom.GedcomRecord(1, undefined, 'NAME', 'INDI.NAME', 'john doe \n senior', [])
     ]);
-    expect(gedcom.serializeGedcomRecordToText(gedcomRecord)).toStrictEqual([
+    assert.strictEqual(gedcom.serializeGedcomRecordToText(gedcomRecord), [
       '0 @I1@ INDI',
       '1 NAME john doe ',
       '2 CONT  senior',

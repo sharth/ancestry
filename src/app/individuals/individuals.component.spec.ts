@@ -1,6 +1,7 @@
 import {type ComponentFixture, TestBed} from '@angular/core/testing';
 import {IndividualsComponent} from './individuals.component';
 import {provideExperimentalZonelessChangeDetection} from '@angular/core';
+import {assert} from "chai";
 
 describe('IndividualsComponent', () => {
   let component: IndividualsComponent;
@@ -17,6 +18,6 @@ describe('IndividualsComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    assert.isTrue(component);
   });
 });

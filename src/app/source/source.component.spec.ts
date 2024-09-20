@@ -2,6 +2,7 @@ import {type ComponentFixture, TestBed} from '@angular/core/testing';
 import {SourceComponent} from './source.component';
 import {ancestryService} from '../ancestry.service';
 import {provideExperimentalZonelessChangeDetection} from '@angular/core';
+import {assert} from "chai";
 
 describe('SourceComponent', () => {
   let component: SourceComponent;
@@ -23,7 +24,7 @@ describe('SourceComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    assert.isTrue(component);
   });
 
   it('open dialog', () => {

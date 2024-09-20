@@ -1,6 +1,7 @@
 import {type ComponentFixture, TestBed} from '@angular/core/testing';
 import {RepositoriesComponent} from './repositories.component';
 import {provideExperimentalZonelessChangeDetection} from '@angular/core';
+import {assert} from "chai";
 
 describe('RepositoriesComponent', () => {
   let component: RepositoriesComponent;
@@ -17,6 +18,6 @@ describe('RepositoriesComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    assert.isTrue(component);
   });
 });

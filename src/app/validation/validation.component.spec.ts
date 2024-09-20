@@ -1,8 +1,8 @@
 import type {ComponentFixture} from '@angular/core/testing';
 import {TestBed} from '@angular/core/testing';
-
 import {ValidationComponent} from './validation.component';
 import { provideExperimentalZonelessChangeDetection } from '@angular/core';
+import {assert} from "chai";
 
 describe('ValidationComponent', () => {
   let component: ValidationComponent;
@@ -19,6 +19,6 @@ describe('ValidationComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    assert.isTrue(component);
   });
 });

@@ -1,6 +1,7 @@
 import {type ComponentFixture, TestBed} from '@angular/core/testing';
 import {FanchartComponent} from './fanchart.component';
 import {provideExperimentalZonelessChangeDetection} from '@angular/core';
+import {assert} from "chai";
 
 describe('FanchartComponent', () => {
   let component: FanchartComponent;
@@ -17,6 +18,6 @@ describe('FanchartComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    assert.isTrue(component);
   });
 });

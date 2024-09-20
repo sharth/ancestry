@@ -1,6 +1,7 @@
 import {provideExperimentalZonelessChangeDetection} from '@angular/core';
 import {TestBed} from '@angular/core/testing';
 import * as gedcom from './';
+import {assert} from 'chai';
 
 describe('GedcomIndividual Parser', () => {
   beforeEach(async () => {
@@ -17,8 +18,8 @@ describe('GedcomIndividual Parser', () => {
       '1 SEX M',
     ].join('\n'));
     const gedcomIndividual = gedcom.parseGedcomIndividualFromGedcomRecord(gedcomRecord);
-    expect(gedcomIndividual.xref).toEqual('@I1@');
-    expect(gedcomIndividual.sex).toEqual('Male');
+    assert.equal(gedcomIndividual.xref, '@I1@');
+    assert.equal(gedcomIndividual.sex, 'Male');
   });
 
   test('Female', () => {
@@ -27,8 +28,8 @@ describe('GedcomIndividual Parser', () => {
       '1 SEX F',
     ].join('\n'));
     const gedcomIndividual = gedcom.parseGedcomIndividualFromGedcomRecord(gedcomRecord);
-    expect(gedcomIndividual.xref).toEqual('@I1@');
-    expect(gedcomIndividual.sex).toEqual('Female');
+    assert.equal(gedcomIndividual.xref, '@I1@');
+    assert.equal(gedcomIndividual.sex, 'Female');
   });
 
   it('Unspecified Sex', () => {
@@ -36,8 +37,8 @@ describe('GedcomIndividual Parser', () => {
       '0 @I1@ INDI',
     ].join('\n'));
     const gedcomIndividual = gedcom.parseGedcomIndividualFromGedcomRecord(gedcomRecord);
-    expect(gedcomIndividual.xref).toEqual('@I1@');
-    expect(gedcomIndividual.sex).toEqual(undefined);
+    assert.equal(gedcomIndividual.xref, '@I1@');
+    assert.equal(gedcomIndividual.sex, undefined);
   });
 
   it('Family Search Id', () => {
@@ -46,7 +47,7 @@ describe('GedcomIndividual Parser', () => {
       '1 _FSFTID abcd',
     ].join('\n'));
     const gedcomIndividual = gedcom.parseGedcomIndividualFromGedcomRecord(gedcomRecord);
-    expect(gedcomIndividual.xref).toEqual('@I4@');
-    expect(gedcomIndividual.familySearchId).toEqual('abcd');
+    assert.equal(gedcomIndividual.xref, '@I4@');
+    assert.equal(gedcomIndividual.familySearchId, 'abcd');
   });
 });

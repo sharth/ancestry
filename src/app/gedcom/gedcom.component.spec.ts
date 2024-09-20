@@ -2,6 +2,7 @@ import type {ComponentFixture} from '@angular/core/testing';
 import {TestBed} from '@angular/core/testing';
 import {GedcomComponent} from './gedcom.component';
 import {provideExperimentalZonelessChangeDetection} from '@angular/core';
+import {assert} from "chai";
 
 describe('GedcomComponent', () => {
   let component: GedcomComponent;
@@ -21,6 +22,6 @@ describe('GedcomComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    assert.isTrue(component);
   });
 });

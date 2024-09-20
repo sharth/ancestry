@@ -2,6 +2,7 @@ import {TestBed, type ComponentFixture} from '@angular/core/testing';
 import {provideExperimentalZonelessChangeDetection} from '@angular/core';
 import {AppComponent} from './app.component';
 import {RouterModule} from '@angular/router';
+import {assert} from "chai";
 
 describe('AppComponent', () => {
   let component: AppComponent;
@@ -19,6 +20,6 @@ describe('AppComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    assert.isTrue(component);
   });
 });

@@ -3,6 +3,7 @@ import {IndividualComponent} from './individual.component';
 import {ancestryService} from '../ancestry.service';
 import {provideRouter} from '@angular/router';
 import {provideExperimentalZonelessChangeDetection} from '@angular/core';
+import {assert} from "chai";
 
 describe('IndividualComponent', () => {
   let component: IndividualComponent;
@@ -28,6 +29,6 @@ describe('IndividualComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    assert.isTrue(component);
   });
 });

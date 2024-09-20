@@ -1,22 +1,15 @@
-import {type ComponentFixture, TestBed} from '@angular/core/testing';
 import {IndexComponent} from './index.component';
 import {provideExperimentalZonelessChangeDetection} from '@angular/core';
+import {render, screen} from '@testing-library/angular'
+import {assert} from "chai";
 
 describe('IndexComponent', () => {
-  let component: IndexComponent;
-  let fixture: ComponentFixture<IndexComponent>;
-
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
+  it('should render', async () => {
+    await render(IndexComponent, {
       providers: [provideExperimentalZonelessChangeDetection()],
-    }).compileComponents();
+    })
 
-    fixture = TestBed.createComponent(IndexComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    assert.isTrue(screen.getByText('Hello!'));
+    
+  })
 });
