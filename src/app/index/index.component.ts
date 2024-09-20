@@ -1,12 +1,9 @@
 import {Component} from '@angular/core';
-import {ancestryService} from '../ancestry.service';
-import {serializeGedcomRecordToText} from '../../gedcom/gedcomRecord.serializer';
-import * as rxjs from 'rxjs';
-import * as dexie from 'dexie';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ancestryDatabase } from '../../database/ancestry.database';
-import { serializeGedcomHeaderToGedcomRecord } from '../../gedcom/gedcomHeader';
-import { serializeGedcomTrailerToGedcomRecord } from '../../gedcom/gedcomTrailer';
+import * as rxjs from 'rxjs';
+import * as dexie from 'dexie';
+import * as gedcom from '../../gedcom';
 
 @Component({
   selector: 'app-index',
@@ -27,13 +24,13 @@ export class IndexComponent {
     rxjs.map(([headers, trailers, individuals, families, repositories, sources]) => ({
       headers: headers,
       headerText: headers
-        .map(serializeGedcomHeaderToGedcomRecord)
-        .flatMap(serializeGedcomRecordToText)
+        .map(gedcom.serializeGedcomHeaderToGedcomRecord)
+        .flatMap(gedcom.serializeGedcomRecordToText)
         .join('\n'),
       trailers: trailers,
       trailerText: trailers
-        .map(serializeGedcomTrailerToGedcomRecord)
-        .flatMap(serializeGedcomRecordToText)
+        .map(gedcom.serializeGedcomTrailerToGedcomRecord)
+        .flatMap(gedcom.serializeGedcomRecordToText)
         .join('\n'),
       individuals,
       families,

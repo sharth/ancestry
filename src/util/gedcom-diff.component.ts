@@ -21,25 +21,25 @@ export class GedcomDiffComponent {
         console.log(i, j, oldGedcomArr[i], newGedcomArr[j]);
       }
       if (oldGedcomArr[i] == newGedcomArr[i]) {
-        diffs.push({oldLine: oldGedcomArr[i], oldColor: 'gray', newLine: newGedcomArr[j], newColor: 'gray'});
+        diffs.push({oldLine: oldGedcomArr[i], oldColor: 'lightgray', newLine: newGedcomArr[j], newColor: 'lightgray'});
         i += 1;
         j += 1;
       } else if (newGedcomArr.includes(oldGedcomArr[i], j)) {
         while (oldGedcomArr[i] != newGedcomArr[j]) {
-          diffs.push({oldLine: '', oldColor: 'gray', newLine: newGedcomArr[j], newColor: 'lightgreen'});
+          diffs.push({oldLine: '', oldColor: 'lightgray', newLine: newGedcomArr[j], newColor: 'lightgreen'});
           j += 1;
         }
       } else {
-        diffs.push({oldLine: oldGedcomArr[i], oldColor: 'red', newLine: '', newColor: 'gray'});
+        diffs.push({oldLine: oldGedcomArr[i], oldColor: 'lightcoral', newLine: '', newColor: 'lightgray'});
         i += 1;
       }
     }
     while (i < oldGedcomArr.length) {
-        diffs.push({oldLine: oldGedcomArr[i], oldColor: 'red', newLine: '', newColor: 'gray'});
+        diffs.push({oldLine: oldGedcomArr[i], oldColor: 'lightcoral', newLine: '', newColor: 'lightgray'});
         i += 1;
     }
     while (j < newGedcomArr.length) {
-        diffs.push({oldLine: '', oldColor: 'gray', newLine: newGedcomArr[j], newColor: 'lightgreen'});
+        diffs.push({oldLine: '', oldColor: 'lightgray', newLine: newGedcomArr[j], newColor: 'lightgreen'});
         j += 1;
     }
     return diffs;
