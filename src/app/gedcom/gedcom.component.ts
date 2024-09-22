@@ -5,6 +5,8 @@ import * as dexie from 'dexie';
 import * as rxjs from 'rxjs';
 import * as gedcom from '../../gedcom';
 import { GedcomDiffComponent } from '../../util/gedcom-diff.component';
+import { parseGedcomRecordsFromText } from '../../util/gedcom-parser';
+import { serializeGedcomHeaderToGedcomRecord, serializeGedcomIndividualToGedcomRecord, serializeGedcomFamilyToGedcomRecord, serializeGedcomSourceToGedcomRecord, serializeGedcomRecordToText, serializeGedcomRepositoryToGedcomRecord } from '../../util/gedcom-serializer';
 
 @Component({
   selector: 'app-gedcom',
@@ -20,7 +22,7 @@ export class GedcomComponent {
   ]).pipe(
     rxjs.map(([oldGedcomText, newGedcomRecords]) => ({
       oldGedcomText: oldGedcomText,
-      newGedcomText: newGedcomRecords.flatMap(gedcom.serializeGedcomRecordToText).join("\r\n"),
+      newGedcomText: newGedcomRecords.flatMap(serializeGedcomRecordToText).join("\r\n"),
     })),
   );
 
@@ -35,19 +37,19 @@ export class GedcomComponent {
   newGedcomRecords(): rxjs.Observable<gedcom.GedcomRecord[]> {
     return rxjs.from(dexie.liveQuery(async () => {
       const newGedcomRecords = [
-        ...(await ancestryDatabase.headers.toArray()).map(gedcom.serializeGedcomHeaderToGedcomRecord),
+        ...(await ancestryDatabase.headers.toArray()).map(serializeGedcomHeaderToGedcomRecord),
         ...(await ancestryDatabase.submitters.toArray()).map((submitter) => submitter.gedcomRecord),
         ...(await ancestryDatabase.trailers.toArray()).map((trailer) => trailer.record),
-        ...(await ancestryDatabase.individuals.toArray()).map(gedcom.serializeGedcomIndividualToGedcomRecord),
-        ...(await ancestryDatabase.families.toArray()).map(gedcom.serializeGedcomFamilyToGedcomRecord),
-        ...(await ancestryDatabase.sources.toArray()).map(gedcom.serializeGedcomSourceToGedcomRecord),
-        ...(await ancestryDatabase.repositories.toArray()).map((repository) => repository.gedcomRecord),
+        ...(await ancestryDatabase.individuals.toArray()).map(serializeGedcomIndividualToGedcomRecord),
+        ...(await ancestryDatabase.families.toArray()).map(serializeGedcomFamilyToGedcomRecord),
+        ...(await ancestryDatabase.sources.toArray()).map(serializeGedcomSourceToGedcomRecord),
+        ...(await ancestryDatabase.repositories.toArray()).map(serializeGedcomRepositoryToGedcomRecord),
         ...(await ancestryDatabase.multimedia.toArray()).map(gedcom.serializeGedcomMultimediaToGedcomRecord),
       ];
 
       // We'd like to reorder the gedcom records more or less in the order that we received the file.
       const [{text: oldGedcomText}] = await ancestryDatabase.originalText.toArray();
-      const oldGedcomRecords = Array.from(gedcom.parseGedcomRecordsFromText(oldGedcomText));
+      const oldGedcomRecords = Array.from(parseGedcomRecordsFromText(oldGedcomText));
 
       const orderedRecords = new Map<string, gedcom.GedcomRecord[]>();
       oldGedcomRecords

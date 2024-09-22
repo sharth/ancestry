@@ -1,10 +1,10 @@
 import {ancestryDatabase} from '../database/ancestry.database';
 import * as dexie from 'dexie';
 import * as gedcom from '../gedcom';
+import { reportUnparsedRecord } from '../util/record-unparsed-records';
+import { constructGedcomMultimediaFromGedcomRecord, constructGedcomSubmitterFromGedcomRecord, constructSourceFromGedcomRecord, parseGedcomFamilyFromGedcomRecord, parseGedcomIndividualFromGedcomRecord, parseGedcomRecordsFromText, parseGedcomRepositoryFromGedcomRecord } from '../util/gedcom-parser';
 
 export class AncestryService {
-  private readonly unparsedTags = new Set<string>();
-
   parseText(text: string) {
     const headers: gedcom.GedcomHeader[] = [];
     const submitters: gedcom.GedcomSubmitter[] = [];
@@ -15,34 +15,34 @@ export class AncestryService {
     const sources: gedcom.GedcomSource[] = [];
     const multimedia: gedcom.GedcomMultimedia[] = [];
     
-    for (const gedcomRecord of gedcom.parseGedcomRecordsFromText(text)) {
+    for (const gedcomRecord of parseGedcomRecordsFromText(text)) {
       switch (gedcomRecord.tag) {
         case 'HEAD':
           headers.push(new gedcom.GedcomHeader(gedcomRecord));
           break;
         case 'SUBM':
-          submitters.push(gedcom.constructGedcomSubmitterFromGedcomRecord(gedcomRecord));
+          submitters.push(constructGedcomSubmitterFromGedcomRecord(gedcomRecord));
           break;
         case 'TRLR':
           trailers.push(new gedcom.GedcomTrailer(gedcomRecord));
           break;
         case 'INDI':
-          individuals.push(gedcom.parseGedcomIndividualFromGedcomRecord(gedcomRecord));
+          individuals.push(parseGedcomIndividualFromGedcomRecord(gedcomRecord));
           break;
         case 'FAM':
-          families.push(gedcom.parseGedcomFamilyFromGedcomRecord(gedcomRecord));
+          families.push(parseGedcomFamilyFromGedcomRecord(gedcomRecord));
           break;
         case 'REPO':
-          repositories.push(new gedcom.GedcomRepository(gedcomRecord));
+          repositories.push(parseGedcomRepositoryFromGedcomRecord(gedcomRecord));
           break;
         case 'SOUR':
-          sources.push(gedcom.constructSourceFromGedcomRecord(gedcomRecord));
+          sources.push(constructSourceFromGedcomRecord(gedcomRecord));
           break;
         case 'OBJE':
-          multimedia.push(gedcom.constructGedcomMultimediaFromGedcomRecord(gedcomRecord));
+          multimedia.push(constructGedcomMultimediaFromGedcomRecord(gedcomRecord));
           break;
         default:
-          this.reportUnparsedRecord(gedcomRecord);
+          reportUnparsedRecord(gedcomRecord);
           break;
       }
     }
@@ -73,13 +73,6 @@ export class AncestryService {
         if (err instanceof dexie.Dexie.BulkError)
           console.log(err.stack);
       });
-  }
-
-  reportUnparsedRecord(gedcomRecord: gedcom.GedcomRecord): void {
-    if (!this.unparsedTags.has(gedcomRecord.abstag)) {
-      console.warn('Unparsed tag ', gedcomRecord.abstag);
-      this.unparsedTags.add(gedcomRecord.abstag);
-    }
   }
 }
 

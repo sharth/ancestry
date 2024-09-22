@@ -12,7 +12,7 @@ describe('GedcomIndividual Parser', () => {
     }).compileComponents();
   });
 
-  test('Male', () => {
+  it('Male', () => {
     const [gedcomRecord] = gedcom.parseGedcomRecordsFromText([
       '0 @I1@ INDI',
       '1 SEX M',
@@ -22,7 +22,7 @@ describe('GedcomIndividual Parser', () => {
     assert.equal(gedcomIndividual.sex, 'Male');
   });
 
-  test('Female', () => {
+  it('Female', () => {
     const [gedcomRecord] = gedcom.parseGedcomRecordsFromText([
       '0 @I1@ INDI',
       '1 SEX F',

@@ -8,6 +8,3 @@ export class GedcomHeader {
   }
 };
 
-export function serializeGedcomHeaderToGedcomRecord(gedcomHeader: GedcomHeader): GedcomRecord {
-  return gedcomHeader.record;
-}

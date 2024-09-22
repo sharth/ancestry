@@ -1,7 +1,8 @@
 import {provideExperimentalZonelessChangeDetection} from '@angular/core';
 import {TestBed} from '@angular/core/testing';
 import { assert } from 'chai';
-import * as gedcom from './';
+import { constructSourceFromGedcomRecord, parseGedcomRecordsFromText } from '../util/gedcom-parser';
+import { serializeGedcomRecordToText, serializeGedcomSourceToGedcomRecord } from '../util/gedcom-serializer';
 
 describe('GedcomSource', () => {
   beforeEach(async () => {
@@ -10,9 +11,9 @@ describe('GedcomSource', () => {
     }).compileComponents();
   });
 
-  test('empty source has reasonable gedcom', () => {
+  it('empty source has reasonable gedcom', () => {
     const gedcomText = '0 @S1@ SOUR\n';
-    const [source] = gedcom.parseGedcomRecordsFromText(gedcomText).map(gedcom.constructSourceFromGedcomRecord);
+    const [source] = parseGedcomRecordsFromText(gedcomText).map(constructSourceFromGedcomRecord);
     assert.equal(source, {
       xref: '@S1@',
       repositoryCitations: [],
@@ -21,10 +22,10 @@ describe('GedcomSource', () => {
     });
     assert.equal(
       gedcomText,
-      gedcom.serializeGedcomRecordToText(gedcom.serializeGedcomSourceToGedcomRecord(source)).join('\n'));
+      serializeGedcomRecordToText(serializeGedcomSourceToGedcomRecord(source)).join('\n'));
   });
 
-  test('Test some fields', () => {
+  it('Test some fields', () => {
     const gedcomArray = [
       '0 @S10@ SOUR',
       '1 ABBR abbr',
@@ -48,7 +49,7 @@ describe('GedcomSource', () => {
       '2 CONT and more text',
     ];
     const gedcomText = gedcomArray.join('\n');
-    const [source] = gedcom.parseGedcomRecordsFromText(gedcomText).map(gedcom.constructSourceFromGedcomRecord);
+    const [source] = parseGedcomRecordsFromText(gedcomText).map(constructSourceFromGedcomRecord);
     assert.equal(source, {
       xref: '@S10@',
       abbr: 'abbr',
@@ -60,11 +61,11 @@ describe('GedcomSource', () => {
     });
     assert.equal(
       gedcomText,
-      gedcom.serializeGedcomRecordToText(gedcom.serializeGedcomSourceToGedcomRecord(source)).join('\n'));
+      serializeGedcomRecordToText(serializeGedcomSourceToGedcomRecord(source)).join('\n'));
   });
   
 
-  // test.each([
+  // it.each([
   //   {gedcomArray: [
   //     '0 @S1@ SOUR',
   //   ]},
@@ -109,7 +110,7 @@ describe('GedcomSource', () => {
   //   expect(generatedText).toStrictEqual(gedcomArray);
   // });
 
-  // test('citations', () => {
+  // it('citations', () => {
   //   const gedcomArray = [
   //     '0 @I0@ INDI',
   //     '0 @I1@ INDI',

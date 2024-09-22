@@ -3,7 +3,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ancestryDatabase } from '../../database/ancestry.database';
 import * as rxjs from 'rxjs';
 import * as dexie from 'dexie';
-import * as gedcom from '../../gedcom';
+import { serializeGedcomHeaderToGedcomRecord, serializeGedcomRecordToText, serializeGedcomTrailerToGedcomRecord } from '../../util/gedcom-serializer';
 
 @Component({
   selector: 'app-index',
@@ -24,13 +24,13 @@ export class IndexComponent {
     rxjs.map(([headers, trailers, individuals, families, repositories, sources]) => ({
       headers: headers,
       headerText: headers
-        .map(gedcom.serializeGedcomHeaderToGedcomRecord)
-        .flatMap(gedcom.serializeGedcomRecordToText)
+        .map(serializeGedcomHeaderToGedcomRecord)
+        .flatMap(serializeGedcomRecordToText)
         .join('\n'),
       trailers: trailers,
       trailerText: trailers
-        .map(gedcom.serializeGedcomTrailerToGedcomRecord)
-        .flatMap(gedcom.serializeGedcomRecordToText)
+        .map(serializeGedcomTrailerToGedcomRecord)
+        .flatMap(serializeGedcomRecordToText)
         .join('\n'),
       individuals,
       families,

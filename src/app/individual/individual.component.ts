@@ -1,11 +1,10 @@
 import {Component, input} from '@angular/core';
-import {ancestryService} from '../ancestry.service';
 import {CommonModule} from '@angular/common';
 import {RouterLink} from '@angular/router';
 import type {GedcomEvent} from '../../gedcom/gedcomEvent';
-import {serializeGedcomRecordToText} from '../../gedcom/gedcomRecord.serializer';
-import {serializeGedcomIndividualToGedcomRecord} from '../../gedcom/gedcomIndividual.serializer';
-import {serializeGedcomEventToGedcomRecord} from '../../gedcom/gedcomEvent.serializer';
+import {serializeGedcomRecordToText} from '../../util/gedcom-serializer';
+import {serializeGedcomIndividualToGedcomRecord} from '../../util/gedcom-serializer';
+import {serializeGedcomEventToGedcomRecord} from '../../util/gedcom-serializer';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {ancestryDatabase} from '../../database/ancestry.database';
 import * as rxjs from 'rxjs';

@@ -8,7 +8,3 @@ export class GedcomTrailer {
     if (record.children.length != 0) throw new Error();
   }
 };
-
-export function serializeGedcomTrailerToGedcomRecord(gedcomTrailer: GedcomTrailer): GedcomRecord {
-  return gedcomTrailer.record;
-}

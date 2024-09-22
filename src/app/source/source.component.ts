@@ -3,8 +3,8 @@ import {Component, input, viewChild} from '@angular/core';
 import {RouterModule} from '@angular/router';
 import {CommonModule} from '@angular/common';
 import {FormArray, FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
-import {serializeGedcomRecordToText} from '../../gedcom/gedcomRecord.serializer';
-import {serializeGedcomSourceToGedcomRecord} from '../../gedcom/gedcomSource.serializer';
+import {serializeGedcomRecordToText} from '../../util/gedcom-serializer';
+import {serializeGedcomSourceToGedcomRecord} from '../../util/gedcom-serializer';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {ancestryDatabase} from '../../database/ancestry.database';
 import * as rxjs from 'rxjs';
@@ -13,6 +13,7 @@ import * as gedcom from '../../gedcom';
 import { GedcomSource } from '../../gedcom/gedcomSource';
 import { GedcomRecord } from '../../gedcom/gedcomRecord';
 import { GedcomDiffComponent } from "../../util/gedcom-diff.component";
+import { parseGedcomRecordsFromText } from '../../util/gedcom-parser';
 
 @Component({
   selector: 'app-source',
@@ -56,7 +57,7 @@ export class SourceComponent {
         repositories,
         oldGedcomText: originalText
           .map((originalText) => originalText.text)
-          .flatMap((originalText) => Array.from(gedcom.parseGedcomRecordsFromText(originalText)))
+          .flatMap((originalText) => Array.from(parseGedcomRecordsFromText(originalText)))
           .filter((gedcomRecord) => gedcomRecord.tag == 'SOUR' && gedcomRecord.xref == source.xref)
           .flatMap(serializeGedcomRecordToText)
           .join("\n"),

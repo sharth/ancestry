@@ -12,7 +12,7 @@ describe('GedcomFamily', () => {
     }).compileComponents();
   });
 
-  test('No Parents', () => {
+  it('No Parents', () => {
     const [gedcomRecord] = gedcom.parseGedcomRecordsFromText([
       '0 @F1@ FAM',
     ].join("\n"));
@@ -24,15 +24,17 @@ describe('GedcomFamily', () => {
     });
   });
   
-  test('Parents', () => {
+  it('Parents', () => {
     const [gedcomRecord] = gedcom.parseGedcomRecordsFromText([
       '0 @F3@ FAM',
       '1 WIFE @I2@',
       '1 HUSB @I3@',
     ].join("\n"));
     const gedcomFamily = gedcom.parseGedcomFamilyFromGedcomRecord(gedcomRecord);
-    assert.equal(gedcomFamily, {
+    gedcomFamily.gedcomRecord = undefined;
+    expect(gedcomFamily).toEqual({
       xref: '@F1@',
+      wifeXref: '@I2@',
       husbandXref: '@I3@',
       childXrefs: [],
       events: [],
