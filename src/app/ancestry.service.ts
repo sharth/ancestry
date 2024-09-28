@@ -2,10 +2,14 @@ import {ancestryDatabase} from '../database/ancestry.database';
 import * as dexie from 'dexie';
 import * as gedcom from '../gedcom';
 import { reportUnparsedRecord } from '../util/record-unparsed-records';
-import { constructGedcomMultimediaFromGedcomRecord, constructGedcomSubmitterFromGedcomRecord, constructSourceFromGedcomRecord, parseGedcomFamilyFromGedcomRecord, parseGedcomIndividualFromGedcomRecord, parseGedcomRecordsFromText, parseGedcomRepositoryFromGedcomRecord } from '../util/gedcom-parser';
+import { GedcomParser } from '../util/gedcom-parser';
+import { GedcomLexer } from '../util/gedcom-lexer';
 
 export class AncestryService {
   parseText(text: string) {
+    const lexer = new GedcomLexer;
+    const parser = new GedcomParser;
+
     const headers: gedcom.GedcomHeader[] = [];
     const submitters: gedcom.GedcomSubmitter[] = [];
     const trailers: gedcom.GedcomTrailer[] = [];
@@ -15,31 +19,31 @@ export class AncestryService {
     const sources: gedcom.GedcomSource[] = [];
     const multimedia: gedcom.GedcomMultimedia[] = [];
     
-    for (const gedcomRecord of parseGedcomRecordsFromText(text)) {
+    for (const gedcomRecord of lexer.generateGedcomRecords(text)) {
       switch (gedcomRecord.tag) {
         case 'HEAD':
           headers.push(new gedcom.GedcomHeader(gedcomRecord));
           break;
         case 'SUBM':
-          submitters.push(constructGedcomSubmitterFromGedcomRecord(gedcomRecord));
+          submitters.push(parser.parseGedcomSubmitter(gedcomRecord));
           break;
         case 'TRLR':
           trailers.push(new gedcom.GedcomTrailer(gedcomRecord));
           break;
         case 'INDI':
-          individuals.push(parseGedcomIndividualFromGedcomRecord(gedcomRecord));
+          individuals.push(parser.parseGedcomIndividual(gedcomRecord));
           break;
         case 'FAM':
-          families.push(parseGedcomFamilyFromGedcomRecord(gedcomRecord));
+          families.push(parser.parseGedcomFamily(gedcomRecord));
           break;
         case 'REPO':
-          repositories.push(parseGedcomRepositoryFromGedcomRecord(gedcomRecord));
+          repositories.push(parser.parseGedcomRepository(gedcomRecord));
           break;
         case 'SOUR':
-          sources.push(constructSourceFromGedcomRecord(gedcomRecord));
+          sources.push(parser.parseGedcomSource(gedcomRecord));
           break;
         case 'OBJE':
-          multimedia.push(constructGedcomMultimediaFromGedcomRecord(gedcomRecord));
+          multimedia.push(parser.parseGedcomMultimedia(gedcomRecord));
           break;
         default:
           reportUnparsedRecord(gedcomRecord);

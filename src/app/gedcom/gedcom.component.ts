@@ -5,8 +5,8 @@ import * as dexie from 'dexie';
 import * as rxjs from 'rxjs';
 import * as gedcom from '../../gedcom';
 import { GedcomDiffComponent } from '../../util/gedcom-diff.component';
-import { parseGedcomRecordsFromText } from '../../util/gedcom-parser';
 import { serializeGedcomHeaderToGedcomRecord, serializeGedcomIndividualToGedcomRecord, serializeGedcomFamilyToGedcomRecord, serializeGedcomSourceToGedcomRecord, serializeGedcomRecordToText, serializeGedcomRepositoryToGedcomRecord } from '../../util/gedcom-serializer';
+import { GedcomLexer } from '../../util/gedcom-lexer';
 
 @Component({
   selector: 'app-gedcom',
@@ -49,7 +49,7 @@ export class GedcomComponent {
 
       // We'd like to reorder the gedcom records more or less in the order that we received the file.
       const [{text: oldGedcomText}] = await ancestryDatabase.originalText.toArray();
-      const oldGedcomRecords = Array.from(parseGedcomRecordsFromText(oldGedcomText));
+      const oldGedcomRecords = new GedcomLexer().parseGedcomRecords(oldGedcomText);
 
       const orderedRecords = new Map<string, gedcom.GedcomRecord[]>();
       oldGedcomRecords

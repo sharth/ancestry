@@ -10,10 +10,8 @@ import {ancestryDatabase} from '../../database/ancestry.database';
 import * as rxjs from 'rxjs';
 import * as dexie from 'dexie';
 import * as gedcom from '../../gedcom';
-import { GedcomSource } from '../../gedcom/gedcomSource';
-import { GedcomRecord } from '../../gedcom/gedcomRecord';
 import { GedcomDiffComponent } from "../../util/gedcom-diff.component";
-import { parseGedcomRecordsFromText } from '../../util/gedcom-parser';
+import { GedcomLexer } from '../../util/gedcom-lexer';
 
 @Component({
   selector: 'app-source',
@@ -57,7 +55,7 @@ export class SourceComponent {
         repositories,
         oldGedcomText: originalText
           .map((originalText) => originalText.text)
-          .flatMap((originalText) => Array.from(parseGedcomRecordsFromText(originalText)))
+          .flatMap((originalText) => new GedcomLexer().parseGedcomRecords(originalText))
           .filter((gedcomRecord) => gedcomRecord.tag == 'SOUR' && gedcomRecord.xref == source.xref)
           .flatMap(serializeGedcomRecordToText)
           .join("\n"),
@@ -75,7 +73,7 @@ export class SourceComponent {
       repositoryXref: FormControl<string>,
       callNumber: FormControl<string>
     }>>([]),
-    unknownRecords: new FormArray<FormControl<GedcomRecord>>([]),
+    unknownRecords: new FormArray<FormControl<gedcom.GedcomRecord>>([]),
   });
 
   readonly editDialog = viewChild.required<ElementRef<HTMLDialogElement>>('editDialog');
@@ -93,7 +91,7 @@ export class SourceComponent {
 
   addUnknownRecord() {
     this.reactiveForm.controls.unknownRecords.push(
-      new FormControl(new GedcomRecord(0, undefined, '', '', undefined, []), {nonNullable: true}),
+      new FormControl(new gedcom.GedcomRecord(0, undefined, '', '', undefined, []), {nonNullable: true}),
     );
   }
 
@@ -128,7 +126,7 @@ export class SourceComponent {
   }
 
   submitForm() {
-    const source = new GedcomSource(this.xref())
+    const source = new gedcom.GedcomSource(this.xref())
     source.abbr = this.reactiveForm.controls.abbr.value ?? undefined;
     source.title = this.reactiveForm.controls.title.value ?? undefined;
     source.text = this.reactiveForm.controls.text.value ?? undefined;
