@@ -6,6 +6,37 @@ export function serializeGedcomTrailerToGedcomRecord(
   return new gedcom.GedcomRecord(0, undefined, "TRLR", "TRLR", undefined, []);
 }
 
+export function serializeGedcomMultimediaToGedcomRecord(
+  gedcomMultimedia: gedcom.GedcomMultimedia
+): gedcom.GedcomRecord {
+  return new gedcom.GedcomRecord(
+    0,
+    gedcomMultimedia.xref,
+    "OBJE",
+    "OBJE",
+    undefined,
+    [
+      new gedcom.GedcomRecord(
+        1,
+        undefined,
+        "FILE",
+        "OBJE.FILE",
+        gedcomMultimedia.filePath,
+        [
+          new gedcom.GedcomRecord(
+            2,
+            undefined,
+            "FORM",
+            "OBJE.FILE.FORM",
+            gedcomMultimedia.mediaType,
+            []
+          ),
+        ]
+      ),
+    ]
+  );
+}
+
 export function serializeGedcomSourceToGedcomRecord(
   source: gedcom.GedcomSource
 ): gedcom.GedcomRecord {

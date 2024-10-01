@@ -13,6 +13,7 @@ import {
   serializeGedcomRecordToText,
   serializeGedcomRepositoryToGedcomRecord,
   serializeGedcomTrailerToGedcomRecord,
+  serializeGedcomMultimediaToGedcomRecord,
 } from "../../util/gedcom-serializer";
 import { GedcomLexer } from "../../util/gedcom-lexer";
 
@@ -72,7 +73,7 @@ export class GedcomComponent {
             serializeGedcomRepositoryToGedcomRecord
           ),
           ...(await ancestryDatabase.multimedia.toArray()).map(
-            gedcom.serializeGedcomMultimediaToGedcomRecord
+            serializeGedcomMultimediaToGedcomRecord
           ),
         ];
 
