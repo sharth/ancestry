@@ -44,7 +44,19 @@ export class GedcomParser {
           gedcomCitation.page = childRecord.value;
           break;
         case "DATA":
-          gedcomCitation.text = this.parseGedcomCitationData(childRecord);
+          if (childRecord.xref != null) throw new Error();
+          if (childRecord.value != null) throw new Error();
+          for (const grandchildRecord of childRecord.children) {
+            switch (grandchildRecord.tag) {
+              case "TEXT":
+                if (grandchildRecord.xref != null) throw new Error();
+                if (grandchildRecord.value == null) throw new Error();
+                gedcomCitation.text = grandchildRecord.value;
+                break;
+              default:
+                reportUnparsedRecord(childRecord);
+            }
+          }
           break;
         default:
           reportUnparsedRecord(childRecord);
@@ -53,27 +65,6 @@ export class GedcomParser {
     }
 
     return gedcomCitation;
-  }
-
-  parseGedcomCitationData(gedcomRecord: gedcom.GedcomRecord): string {
-    if (gedcomRecord.tag !== "DATA") throw new Error();
-    if (gedcomRecord.xref != null) throw new Error();
-    if (gedcomRecord.value != null) throw new Error();
-
-    let text = "";
-
-    for (const childRecord of gedcomRecord.children) {
-      switch (childRecord.tag) {
-        case "TEXT":
-          if (childRecord.value) text += childRecord.value;
-          childRecord.children.forEach(reportUnparsedRecord);
-          break;
-        default:
-          reportUnparsedRecord(childRecord);
-          break;
-      }
-    }
-    return text;
   }
 
   parseGedcomEvent(record: gedcom.GedcomRecord): gedcom.GedcomEvent {
