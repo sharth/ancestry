@@ -28,7 +28,7 @@ export class AncestryService {
           submitters.push(parser.parseGedcomSubmitter(gedcomRecord));
           break;
         case "TRLR":
-          trailers.push(new gedcom.GedcomTrailer(gedcomRecord));
+          trailers.push(parser.parseGedcomTrailer(gedcomRecord));
           break;
         case "INDI":
           individuals.push(parser.parseGedcomIndividual(gedcomRecord));
@@ -84,7 +84,7 @@ export class AncestryService {
           await ancestryDatabase.sources.bulkAdd(sources);
           await ancestryDatabase.multimedia.clear();
           await ancestryDatabase.multimedia.bulkAdd(multimedia);
-        },
+        }
       )
       .catch((err: unknown) => {
         if (err instanceof dexie.Dexie.BulkError) console.log(err.stack);

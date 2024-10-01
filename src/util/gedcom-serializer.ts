@@ -1,13 +1,13 @@
 import * as gedcom from "../gedcom";
 
 export function serializeGedcomTrailerToGedcomRecord(
-  gedcomTrailer: gedcom.GedcomTrailer,
+  gedcomTrailer: gedcom.GedcomTrailer
 ): gedcom.GedcomRecord {
-  return gedcomTrailer.record;
+  return new gedcom.GedcomRecord(0, undefined, "TRLR", "TRLR", undefined, []);
 }
 
 export function serializeGedcomSourceToGedcomRecord(
-  source: gedcom.GedcomSource,
+  source: gedcom.GedcomSource
 ): gedcom.GedcomRecord {
   if (source.canonicalGedcomRecord) {
     return source.canonicalGedcomRecord;
@@ -27,7 +27,7 @@ export function serializeGedcomSourceToGedcomRecord(
             "ABBR",
             "SOUR.ABBR",
             source.abbr,
-            [],
+            []
           )
         : null,
       source.title
@@ -37,7 +37,7 @@ export function serializeGedcomSourceToGedcomRecord(
             "TITL",
             "SOUR.TITL",
             source.title,
-            [],
+            []
           )
         : null,
       source.text
@@ -47,7 +47,7 @@ export function serializeGedcomSourceToGedcomRecord(
             "TEXT",
             "SOUR.TEXT",
             source.text,
-            [],
+            []
           )
         : null,
       ...source.repositoryCitations.map(
@@ -66,18 +66,18 @@ export function serializeGedcomSourceToGedcomRecord(
                   "CALN",
                   "SOUR.REPO.CALN",
                   callNumber,
-                  [],
-                ),
-            ),
-          ),
+                  []
+                )
+            )
+          )
       ),
       ...source.unknownRecords,
-    ].filter((record) => record !== null),
+    ].filter((record) => record !== null)
   );
 }
 
 export function serializeGedcomRecordToText(
-  gedcomRecord: gedcom.GedcomRecord,
+  gedcomRecord: gedcom.GedcomRecord
 ): string[] {
   const [firstValue, ...remainingValues] =
     gedcomRecord.value?.split("\n") ?? [];
@@ -88,14 +88,14 @@ export function serializeGedcomRecordToText(
       (firstValue ? ` ${firstValue}` : ""),
     ...remainingValues.map(
       (nextValue) =>
-        `${gedcomRecord.level + 1} CONT` + (nextValue ? ` ${nextValue}` : ""),
+        `${gedcomRecord.level + 1} CONT` + (nextValue ? ` ${nextValue}` : "")
     ),
     ...gedcomRecord.children.flatMap(serializeGedcomRecordToText),
   ];
 }
 
 export function serializeGedcomIndividualToGedcomRecord(
-  gedcomIndividual: gedcom.GedcomIndividual,
+  gedcomIndividual: gedcom.GedcomIndividual
 ): gedcom.GedcomRecord {
   if (gedcomIndividual.gedcomRecord) {
     return gedcomIndividual.gedcomRecord;
@@ -111,12 +111,12 @@ export function serializeGedcomIndividualToGedcomRecord(
       serializeFamilySearchIdToGedcomRecord(gedcomIndividual),
       serializeSexToGedcomRecord(gedcomIndividual),
       // TODO: Serialize events, name, surname
-    ].filter((record) => record !== null),
+    ].filter((record) => record !== null)
   );
 }
 
 function serializeFamilySearchIdToGedcomRecord(
-  gedcomIndividual: gedcom.GedcomIndividual,
+  gedcomIndividual: gedcom.GedcomIndividual
 ): gedcom.GedcomRecord | null {
   if (gedcomIndividual.familySearchId == null) {
     return null;
@@ -127,13 +127,13 @@ function serializeFamilySearchIdToGedcomRecord(
       "_FSFTID",
       "INDI._FSFTID",
       gedcomIndividual.familySearchId,
-      [],
+      []
     );
   }
 }
 
 function serializeSexToGedcomRecord(
-  gedcomIndividual: gedcom.GedcomIndividual,
+  gedcomIndividual: gedcom.GedcomIndividual
 ): gedcom.GedcomRecord | null {
   switch (gedcomIndividual.sex) {
     case undefined:
@@ -146,7 +146,7 @@ function serializeSexToGedcomRecord(
 }
 
 export function serializeGedcomFamilyToGedcomRecord(
-  gedcomFamily: gedcom.GedcomFamily,
+  gedcomFamily: gedcom.GedcomFamily
 ) {
   if (gedcomFamily.gedcomRecord) {
     return gedcomFamily.gedcomRecord;
@@ -159,14 +159,14 @@ export function serializeGedcomFamilyToGedcomRecord(
       undefined,
       [
         // TODO: Fill in.
-      ],
+      ]
     );
   }
 }
 
 export function serializeGedcomCitationToGedcomRecord(
   gedcomCitation: gedcom.GedcomCitation,
-  level: number,
+  level: number
 ): gedcom.GedcomRecord {
   if (gedcomCitation.gedcomRecord) {
     return gedcomCitation.gedcomRecord;
@@ -185,7 +185,7 @@ export function serializeGedcomCitationToGedcomRecord(
             "OBJE",
             "",
             gedcomCitation.obje,
-            [],
+            []
           )
         : null,
       gedcomCitation.name
@@ -195,7 +195,7 @@ export function serializeGedcomCitationToGedcomRecord(
             "NAME",
             "",
             gedcomCitation.name,
-            [],
+            []
           )
         : null,
       gedcomCitation.note
@@ -205,7 +205,7 @@ export function serializeGedcomCitationToGedcomRecord(
             "NOTE",
             "",
             gedcomCitation.note,
-            [],
+            []
           )
         : null,
       gedcomCitation.page
@@ -215,7 +215,7 @@ export function serializeGedcomCitationToGedcomRecord(
             "PAGE",
             "",
             gedcomCitation.page,
-            [],
+            []
           )
         : null,
       gedcomCitation.text
@@ -226,16 +226,16 @@ export function serializeGedcomCitationToGedcomRecord(
               "TEXT",
               "",
               gedcomCitation.text,
-              [],
+              []
             ),
           ])
         : null,
-    ].filter((record) => record != null),
+    ].filter((record) => record != null)
   );
 }
 
 export function serializeGedcomEventToGedcomRecord(
-  gedcomEvent: gedcom.GedcomEvent,
+  gedcomEvent: gedcom.GedcomEvent
 ): gedcom.GedcomRecord {
   if (gedcomEvent.gedcomRecord) {
     return gedcomEvent.gedcomRecord;
@@ -246,13 +246,13 @@ export function serializeGedcomEventToGedcomRecord(
 }
 
 export function serializeGedcomHeaderToGedcomRecord(
-  gedcomHeader: gedcom.GedcomHeader,
+  gedcomHeader: gedcom.GedcomHeader
 ): gedcom.GedcomRecord {
   return gedcomHeader.record;
 }
 
 export function serializeGedcomRepositoryToGedcomRecord(
-  gedcomRepository: gedcom.GedcomRepository,
+  gedcomRepository: gedcom.GedcomRepository
 ): gedcom.GedcomRecord {
   return new gedcom.GedcomRecord(
     0,
@@ -268,9 +268,9 @@ export function serializeGedcomRepositoryToGedcomRecord(
             "NAME",
             "REPO.NAME",
             gedcomRepository.name,
-            [],
+            []
           )
         : null,
-    ].filter((record) => record != null),
+    ].filter((record) => record != null)
   );
 }

@@ -12,6 +12,7 @@ import {
   serializeGedcomSourceToGedcomRecord,
   serializeGedcomRecordToText,
   serializeGedcomRepositoryToGedcomRecord,
+  serializeGedcomTrailerToGedcomRecord,
 } from "../../util/gedcom-serializer";
 import { GedcomLexer } from "../../util/gedcom-lexer";
 
@@ -31,7 +32,7 @@ export class GedcomComponent {
         newGedcomText: newGedcomRecords
           .flatMap(serializeGedcomRecordToText)
           .join("\r\n"),
-      })),
+      }))
     );
 
   oldGedcomText(): rxjs.Observable<string> {
@@ -40,7 +41,7 @@ export class GedcomComponent {
         const [{ text: originalText }] =
           await ancestryDatabase.originalText.toArray();
         return originalText;
-      }),
+      })
     );
   }
 
@@ -50,28 +51,28 @@ export class GedcomComponent {
       dexie.liveQuery(async () => {
         const newGedcomRecords = [
           ...(await ancestryDatabase.headers.toArray()).map(
-            serializeGedcomHeaderToGedcomRecord,
+            serializeGedcomHeaderToGedcomRecord
           ),
           ...(await ancestryDatabase.submitters.toArray()).map(
-            (submitter) => submitter.gedcomRecord,
+            (submitter) => submitter.gedcomRecord
           ),
           ...(await ancestryDatabase.trailers.toArray()).map(
-            (trailer) => trailer.record,
+            serializeGedcomTrailerToGedcomRecord
           ),
           ...(await ancestryDatabase.individuals.toArray()).map(
-            serializeGedcomIndividualToGedcomRecord,
+            serializeGedcomIndividualToGedcomRecord
           ),
           ...(await ancestryDatabase.families.toArray()).map(
-            serializeGedcomFamilyToGedcomRecord,
+            serializeGedcomFamilyToGedcomRecord
           ),
           ...(await ancestryDatabase.sources.toArray()).map(
-            serializeGedcomSourceToGedcomRecord,
+            serializeGedcomSourceToGedcomRecord
           ),
           ...(await ancestryDatabase.repositories.toArray()).map(
-            serializeGedcomRepositoryToGedcomRecord,
+            serializeGedcomRepositoryToGedcomRecord
           ),
           ...(await ancestryDatabase.multimedia.toArray()).map(
-            gedcom.serializeGedcomMultimediaToGedcomRecord,
+            gedcom.serializeGedcomMultimediaToGedcomRecord
           ),
         ];
 
@@ -79,7 +80,7 @@ export class GedcomComponent {
         const [{ text: oldGedcomText }] =
           await ancestryDatabase.originalText.toArray();
         const oldGedcomRecords = new GedcomLexer().parseGedcomRecords(
-          oldGedcomText,
+          oldGedcomText
         );
 
         const orderedRecords = new Map<string, gedcom.GedcomRecord[]>();
@@ -96,7 +97,7 @@ export class GedcomComponent {
         });
 
         return Array.from(orderedRecords.values()).flat();
-      }),
+      })
     );
   }
 }
