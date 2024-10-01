@@ -1,15 +1,15 @@
 div {
-    white-space: pre-wrap;
+  white-space: pre-wrap;
 }
 
 dialog {
-    width: 80%;
+  width: 80%;
 }
 
 mat-form-field {
-    width: 100%;
+  width: 100%;
 }
 
 textarea {
-    field-sizing: content
+  field-sizing: content;
 }

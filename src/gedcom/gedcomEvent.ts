@@ -1,5 +1,5 @@
-import type {GedcomCitation} from './gedcomCitation';
-import type {GedcomRecord} from './gedcomRecord';
+import type { GedcomCitation } from "./gedcomCitation";
+import type { GedcomRecord } from "./gedcomRecord";
 
 export class GedcomEvent {
   constructor(public type: string) {}

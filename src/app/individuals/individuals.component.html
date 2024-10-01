@@ -1,14 +1,16 @@
 @let vm = vm$ | async;
-<h1> {{ vm?.individuals?.length }} Individuals</h1>
+<h1>{{ vm?.individuals?.length }} Individuals</h1>
 <ul>
-    @for (group of vm?.individualsBySurname; track group.surname) {
-    <li>{{group.surname}}</li>
+  @for (group of vm?.individualsBySurname; track group.surname) {
+    <li>{{ group.surname }}</li>
     <ul>
-        @for (individual of group.individuals; track individual.xref) {
+      @for (individual of group.individuals; track individual.xref) {
         <li>
-            <a routerLink="/individual/{{ individual.xref }}">{{ individual.name }}</a>
+          <a routerLink="/individual/{{ individual.xref }}">{{
+            individual.name
+          }}</a>
         </li>
-        }
+      }
     </ul>
-    }
+  }
 </ul>

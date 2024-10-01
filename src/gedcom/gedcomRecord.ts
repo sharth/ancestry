@@ -5,5 +5,6 @@ export class GedcomRecord {
     public tag: string,
     public abstag: string,
     public value: string | undefined,
-    public children: GedcomRecord[]) { }
-};
+    public children: GedcomRecord[],
+  ) {}
+}

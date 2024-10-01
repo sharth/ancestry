@@ -1,23 +1,26 @@
 @let vm = vm$ | async;
 @if (vm == null) {
 } @else {
+  <h1>{{ vm.repository.name ?? vm.repository.xref }}</h1>
 
-<h1>{{vm.repository.name ?? vm.repository.xref}}</h1>
-
-<table class="table table-striped">
+  <table class="table table-striped">
     <thead>
-        <tr>
-            <th>Source</th>
-            <th>Call Numbers</th>
-        </tr>
+      <tr>
+        <th>Source</th>
+        <th>Call Numbers</th>
+      </tr>
     </thead>
     <tbody>
-        @for(source of vm.sources; track source) {
+      @for (source of vm.sources; track source) {
         <tr>
-            <td><a routerLink="/source/{{source.xref}}">{{ source.abbr ?? source.xref }}</a></td>
-            <td>{{ source.callNumbers }}</td>
+          <td>
+            <a routerLink="/source/{{ source.xref }}">{{
+              source.abbr ?? source.xref
+            }}</a>
+          </td>
+          <td>{{ source.callNumbers }}</td>
         </tr>
-        }
+      }
     </tbody>
-</table>
+  </table>
 }

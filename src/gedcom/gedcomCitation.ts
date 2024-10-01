@@ -1,4 +1,4 @@
-import type {GedcomRecord} from './gedcomRecord';
+import type { GedcomRecord } from "./gedcomRecord";
 
 export class GedcomCitation {
   constructor(public sourceXref: string) {}

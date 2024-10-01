@@ -1,6 +1,7 @@
 @let vm = vm$ | async;
 @if (vm != null) {
-
-<app-gedcom-diff [oldGedcomText]=vm.oldGedcomText [newGedcomText]=vm.newGedcomText></app-gedcom-diff>
-
+  <app-gedcom-diff
+    [oldGedcomText]="vm.oldGedcomText"
+    [newGedcomText]="vm.newGedcomText"
+  ></app-gedcom-diff>
 }

@@ -1,5 +1,5 @@
-import type {GedcomEvent} from './gedcomEvent';
-import type {GedcomRecord} from './gedcomRecord';
+import type { GedcomEvent } from "./gedcomEvent";
+import type { GedcomRecord } from "./gedcomRecord";
 
 export class GedcomFamily {
   constructor(public xref: string) {}
@@ -10,4 +10,4 @@ export class GedcomFamily {
   events: GedcomEvent[] = [];
 
   gedcomRecord?: GedcomRecord;
-};
+}

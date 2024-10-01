@@ -1,84 +1,98 @@
 @let vm = vm$ | async;
-@if (vm == null) {}
-@else {
+@if (vm == null) {
+} @else {
+  <h2>Name</h2>
+  <p>{{ vm.name }}</p>
 
-<h2>Name</h2>
-<p>{{ vm.name }}</p>
-
-<h2>Relatives</h2>
-<table class="table table-striped">
+  <h2>Relatives</h2>
+  <table class="table table-striped">
     <thead>
-        <tr>
-            <th scope="col">Relation</th>
-            <th scope="col">Name</th>
-        </tr>
+      <tr>
+        <th scope="col">Relation</th>
+        <th scope="col">Name</th>
+      </tr>
     </thead>
     <tbody>
-        @for (relative of vm.relatives; track relative.individual.xref) {
+      @for (relative of vm.relatives; track relative.individual.xref) {
         <tr>
-            <td> {{ relative.relationship }} </td>
-            <td>
-                <a routerLink="/individual/{{ relative.individual.xref }}">{{ relative.individual.name }}</a>
-            </td>
+          <td>{{ relative.relationship }}</td>
+          <td>
+            <a routerLink="/individual/{{ relative.individual.xref }}">{{
+              relative.individual.name
+            }}</a>
+          </td>
         </tr>
-        }
+      }
     </tbody>
-</table>
+  </table>
 
-<h2>Events</h2>
-<table class="table table-striped">
+  <h2>Events</h2>
+  <table class="table table-striped">
     <thead>
-        <tr>
-            <th scope="col">Event</th>
-            <th scope="col">Date</th>
-            <th scope="col">Location</th>
-            <th scope="col">Detail</th>
-            <th scope="col">Sources</th>
-            <th scope="col">Gedcom</th>
-        </tr>
+      <tr>
+        <th scope="col">Event</th>
+        <th scope="col">Date</th>
+        <th scope="col">Location</th>
+        <th scope="col">Detail</th>
+        <th scope="col">Sources</th>
+        <th scope="col">Gedcom</th>
+      </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let event of vm.events">
-            <td>
-                {{ event.type }}
-            </td>
-            <td>
-                {{ event.dateDescriptive }}
-            </td>
-            <td>
-                <ng-container *ngIf="event.address">{{event.address}}<br></ng-container>
-                <ng-container *ngIf="event.place">{{event.place}}<br></ng-container>
-            </td>
-            <td>
-                <ng-container *ngIf="event.cause">{{ event.cause }}<br></ng-container>
-                <ng-container *ngIf="event.value">{{ event.value }}<br></ng-container>
-            </td>
-            <td>
-                <ng-container *ngFor="let citation of event.citations; let last = last">
-                    <a routerLink="/source/{{citation.sourceXref}}">{{ citation.sourceXref }}</a>
-                    {{ ' ' }}
-                </ng-container>
-            </td>
-            <td>
-                <button (click)="toggleGedcom(event)">Toggle Gedcom</button><br>
-                <pre *ngIf="showGedcom(event)">{{ event.gedcom }}</pre>
-            </td>
-        </tr>
+      <tr *ngFor="let event of vm.events">
+        <td>
+          {{ event.type }}
+        </td>
+        <td>
+          {{ event.dateDescriptive }}
+        </td>
+        <td>
+          <ng-container *ngIf="event.address"
+            >{{ event.address }}<br
+          /></ng-container>
+          <ng-container *ngIf="event.place"
+            >{{ event.place }}<br
+          /></ng-container>
+        </td>
+        <td>
+          <ng-container *ngIf="event.cause"
+            >{{ event.cause }}<br
+          /></ng-container>
+          <ng-container *ngIf="event.value"
+            >{{ event.value }}<br
+          /></ng-container>
+        </td>
+        <td>
+          <ng-container
+            *ngFor="let citation of event.citations; let last = last"
+          >
+            <a routerLink="/source/{{ citation.sourceXref }}">{{
+              citation.sourceXref
+            }}</a>
+            {{ " " }}
+          </ng-container>
+        </td>
+        <td>
+          <button (click)="toggleGedcom(event)">Toggle Gedcom</button><br />
+          <pre *ngIf="showGedcom(event)">{{ event.gedcom }}</pre>
+        </td>
+      </tr>
     </tbody>
-</table>
+  </table>
 
-<h2>Ancestors</h2>
-<ol>
+  <h2>Ancestors</h2>
+  <ol>
     @for (ancestor of vm.ancestors; let ahnentafel = $index; track $index) {
-    @if (ancestor != null) {
-    <li value="{{ahnentafel}}">
-        <a routerLink="/individual/{{ancestor.xref}}">{{ancestor.name}}</a>
-    </li>
+      @if (ancestor != null) {
+        <li value="{{ ahnentafel }}">
+          <a routerLink="/individual/{{ ancestor.xref }}">{{
+            ancestor.name
+          }}</a>
+        </li>
+      }
     }
-    }
-</ol>
+  </ol>
 
-<h2>Gedcom</h2>
-<pre>{{ vm.gedcom }}</pre>
-
+  <h2>Gedcom</h2>
+  <pre>{{ vm.gedcom }}</pre>
 }

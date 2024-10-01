@@ -1,24 +1,24 @@
 table {
-    table-layout: fixed;
-    border-collapse: collapse;
-    width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  width: 100%;
 }
 
 th {
-    background-color: gainsboro;
+  background-color: gainsboro;
 }
 
 td {
-    font-family: monospace;
-    white-space: pre-wrap;
-    overflow: hidden;
-    vertical-align: top;
-    width: 50em;
+  font-family: monospace;
+  white-space: pre-wrap;
+  overflow: hidden;
+  vertical-align: top;
+  width: 50em;
 }
 
 table,
 tr,
 th,
 td {
-    border: 1px solid black;
+  border: 1px solid black;
 }

@@ -1,4 +1,4 @@
-import type {GedcomRecord} from './gedcomRecord';
+import type { GedcomRecord } from "./gedcomRecord";
 
 export class GedcomSource {
   constructor(public xref: string) {}
@@ -7,8 +7,8 @@ export class GedcomSource {
   title?: string;
   text?: string;
   repositoryCitations: {
-    repositoryXref: string,
-    callNumbers: string[],
+    repositoryXref: string;
+    callNumbers: string[];
   }[] = [];
   unknownRecords: GedcomRecord[] = [];
   multimediaXrefs: string[] = [];
