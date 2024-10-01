@@ -1,25 +1,33 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
-import * as gedcom from "../gedcom";
-import { GedcomRecord, GedcomRepository, GedcomSubmitter } from "../gedcom";
+import type { GedcomRecord } from "../gedcom";
+import {
+  GedcomCitation,
+  GedcomEvent,
+  GedcomFamily,
+  GedcomIndividual,
+  GedcomMultimedia,
+  GedcomRepository,
+  GedcomSource,
+  GedcomSubmitter,
+  GedcomTrailer,
+} from "../gedcom";
 
 export class GedcomParser {
-  parseGedcomTrailer(gedcomRecord: gedcom.GedcomRecord): gedcom.GedcomTrailer {
+  parseGedcomTrailer(gedcomRecord: GedcomRecord): GedcomTrailer {
     if (gedcomRecord.abstag !== "TRLR") throw new Error();
     if (gedcomRecord.xref != null) throw new Error();
     if (gedcomRecord.value != null) throw new Error();
     if (gedcomRecord.children.length != 0) throw new Error();
 
-    return new gedcom.GedcomTrailer();
+    return new GedcomTrailer();
   }
 
-  parseGedcomCitation(
-    gedcomRecord: gedcom.GedcomRecord
-  ): gedcom.GedcomCitation {
+  parseGedcomCitation(gedcomRecord: GedcomRecord): GedcomCitation {
     if (gedcomRecord.tag !== "SOUR") throw new Error();
     if (gedcomRecord.xref != null) throw new Error();
     if (gedcomRecord.value == null) throw new Error();
 
-    const gedcomCitation = new gedcom.GedcomCitation(gedcomRecord.value);
+    const gedcomCitation = new GedcomCitation(gedcomRecord.value);
     gedcomCitation.gedcomRecord = gedcomRecord;
 
     for (const childRecord of gedcomRecord.children) {
@@ -55,7 +63,7 @@ export class GedcomParser {
                 gedcomCitation.text = grandchildRecord.value;
                 break;
               default:
-                reportUnparsedRecord(childRecord);
+                reportUnparsedRecord(grandchildRecord);
             }
           }
           break;
@@ -68,7 +76,7 @@ export class GedcomParser {
     return gedcomCitation;
   }
 
-  parseGedcomEvent(record: gedcom.GedcomRecord): gedcom.GedcomEvent {
+  parseGedcomEvent(record: GedcomRecord): GedcomEvent {
     if (record.xref != null) throw new Error();
 
     const type =
@@ -97,42 +105,54 @@ export class GedcomParser {
         ["WILL", "Will"],
       ]).get(record.tag) ?? record.tag;
 
-    const gedcomEvent = new gedcom.GedcomEvent(type);
+    const gedcomEvent = new GedcomEvent(type);
     gedcomEvent.value = record.value;
 
     for (const childRecord of record.children) {
       switch (childRecord.tag) {
         case "_SHAR":
-          gedcomEvent.sharedWithXrefs.push(
-            this.parseGedcomEventShare(childRecord)
-          );
+          if (childRecord.xref != null) throw new Error();
+          if (childRecord.value == null) throw new Error();
+          childRecord.children.forEach(reportUnparsedRecord);
+          gedcomEvent.sharedWithXrefs.push(childRecord.value);
           break;
         case "SOUR":
           gedcomEvent.citations.push(this.parseGedcomCitation(childRecord));
           break;
         case "DATE":
-          this.parseGedcomEventDate(gedcomEvent, childRecord);
+          if (childRecord.xref != null) throw new Error();
+          if (childRecord.value == null) throw new Error();
+          childRecord.children.forEach(reportUnparsedRecord);
+          gedcomEvent.date = childRecord.value;
           break;
         case "TYPE":
-          gedcomEvent.type = this.parseGedcomEventType(childRecord);
+          if (childRecord.xref != null) throw new Error();
+          if (childRecord.value == null) throw new Error();
+          childRecord.children.forEach(reportUnparsedRecord);
+          gedcomEvent.type = childRecord.value;
           break;
         case "ADDR":
-          gedcomEvent.address = this.parseGedcomEventAddress(childRecord);
+          if (childRecord.xref != null) throw new Error();
+          if (childRecord.value == null) throw new Error();
+          childRecord.children.forEach(reportUnparsedRecord);
+          gedcomEvent.address = childRecord.value;
           break;
         case "PLAC":
-          gedcomEvent.place = this.parseGedcomEventPlace(childRecord);
+          if (childRecord.xref != null) throw new Error();
+          if (childRecord.value == null) throw new Error();
+          childRecord.children.forEach(reportUnparsedRecord);
+          gedcomEvent.place = childRecord.value;
           break;
         case "CAUS":
-          gedcomEvent.cause = this.parseGedcomEventCause(childRecord);
+          if (childRecord.xref != null) throw new Error();
+          if (childRecord.value == null) throw new Error();
+          childRecord.children.forEach(reportUnparsedRecord);
+          gedcomEvent.cause = childRecord.value;
           break;
         case "_SENT":
-          break;
         case "_SDATE":
-          break;
         case "_PRIM":
-          break;
         case "_PROOF":
-          break;
         case "NOTE":
           break;
         default:
@@ -144,138 +164,33 @@ export class GedcomParser {
     return gedcomEvent;
   }
 
-  parseGedcomEventAddress(gedcomRecord: gedcom.GedcomRecord): string {
-    if (gedcomRecord.tag !== "ADDR") throw new Error();
-    if (gedcomRecord.xref != null) throw new Error();
-    if (gedcomRecord.value == null) throw new Error();
-
-    gedcomRecord.children.forEach(reportUnparsedRecord);
-    return gedcomRecord.value;
-  }
-
-  parseGedcomEventPlace(gedcomRecord: gedcom.GedcomRecord): string {
-    if (gedcomRecord.tag !== "PLAC") throw new Error();
-    if (gedcomRecord.xref != null) throw new Error();
-    if (gedcomRecord.value == null) throw new Error();
-
-    gedcomRecord.children.forEach(reportUnparsedRecord);
-    return gedcomRecord.value;
-  }
-
-  parseGedcomEventCause(gedcomRecord: gedcom.GedcomRecord): string {
-    if (gedcomRecord.tag !== "CAUS") throw new Error();
-    if (gedcomRecord.xref != null) throw new Error();
-    if (gedcomRecord.value == null) throw new Error();
-
-    gedcomRecord.children.forEach(reportUnparsedRecord);
-    return gedcomRecord.value;
-  }
-
-  parseGedcomEventDate(
-    gedcomEvent: gedcom.GedcomEvent,
-    gedcomRecord: gedcom.GedcomRecord
-  ): void {
-    if (gedcomRecord.tag !== "DATE") throw new Error();
-    if (gedcomRecord.xref != null) throw new Error();
-    if (gedcomRecord.value == null) throw new Error();
-
-    gedcomEvent.date = gedcomRecord.value;
-    gedcomEvent.dateDescriptive = gedcomRecord.value
-      .replaceAll(/\w+/g, (s: string) => {
-        switch (s) {
-          case "JAN":
-            return "January";
-          case "FEB":
-            return "February";
-          case "MAR":
-            return "March";
-          case "APR":
-            return "April";
-          case "MAY":
-            return "May";
-          case "JUN":
-            return "June";
-          case "JUL":
-            return "July";
-          case "AUG":
-            return "August";
-          case "SEP":
-            return "September";
-          case "OCT":
-            return "October";
-          case "NOV":
-            return "November";
-          case "DEC":
-            return "December";
-          case "AFT":
-            return "after";
-          case "BET":
-            return "between";
-          case "BEF":
-            return "before";
-          case "ABT":
-            return "about";
-          case "CAL":
-            return "calculated";
-          case "EST":
-            return "estimated";
-          default:
-            return s.toLowerCase();
-        }
-      })
-      .replace(/^\w/, (s) => s.toUpperCase());
-
-    // const dateHelper = '(?:(?:(\\d+) +)?(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC) +)(\\d+)'
-    // const dateValue = new RegExp(`^${dateHelper}$`)
-    // const datePeriod = new RegExp(`^FROM +${dateHelper} +TO +${dateHelper}$`)
-    // const dateRange = new RegExp(`^BET +${dateHelper} +AND +${dateHelper}$`)
-    // const dateApprox = new RegExp(`^(FROM|TO|AFT|BEF|ABT|CAL|EST) +${dateHelper}$`)
-
-    for (const childRecord of gedcomRecord.children) {
-      switch (childRecord.tag) {
-        default:
-          reportUnparsedRecord(childRecord);
-          break;
-      }
-    }
-  }
-
-  parseGedcomEventShare(gedcomRecord: gedcom.GedcomRecord): string {
-    if (gedcomRecord.tag !== "_SHAR") throw new Error();
-    if (gedcomRecord.xref != null) throw new Error();
-    if (gedcomRecord.value == null) throw new Error();
-
-    gedcomRecord.children.forEach(reportUnparsedRecord);
-    return gedcomRecord.value;
-  }
-
-  parseGedcomEventType(gedcomRecord: gedcom.GedcomRecord): string {
-    if (gedcomRecord.tag !== "TYPE") throw new Error();
-    if (gedcomRecord.xref != null) throw new Error();
-    if (gedcomRecord.value == null) throw new Error();
-
-    gedcomRecord.children.forEach(reportUnparsedRecord);
-    return gedcomRecord.value;
-  }
-
-  parseGedcomFamily(record: gedcom.GedcomRecord): gedcom.GedcomFamily {
+  parseGedcomFamily(record: GedcomRecord): GedcomFamily {
     if (record.abstag !== "FAM") throw new Error();
     if (record.xref == null) throw new Error();
     if (record.value != null) throw new Error();
 
-    const gedcomFamily = new gedcom.GedcomFamily(record.xref);
+    const gedcomFamily = new GedcomFamily(record.xref);
     gedcomFamily.gedcomRecord = record;
 
     for (const childRecord of record.children) {
       switch (childRecord.tag) {
         case "CHIL":
-          this.parseGedcomFamilyChild(gedcomFamily, childRecord);
+          if (childRecord.xref != null) throw new Error();
+          if (childRecord.value == null) throw new Error();
+          childRecord.children.forEach(reportUnparsedRecord);
+          gedcomFamily.childXrefs.push(childRecord.value);
           break;
         case "HUSB":
-          this.parseGedcomFamilyHusband(gedcomFamily, childRecord);
+          if (childRecord.xref != null) throw new Error();
+          if (childRecord.value == null) throw new Error();
+          childRecord.children.forEach(reportUnparsedRecord);
+          gedcomFamily.husbandXref = childRecord.value;
           break;
         case "WIFE":
-          this.parseGedcomFamilyWife(gedcomFamily, childRecord);
+          if (childRecord.xref != null) throw new Error();
+          if (childRecord.value == null) throw new Error();
+          childRecord.children.forEach(reportUnparsedRecord);
+          gedcomFamily.wifeXref = childRecord.value;
           break;
         case "DIV":
         case "EVEN":
@@ -292,78 +207,12 @@ export class GedcomParser {
     return gedcomFamily;
   }
 
-  parseGedcomFamilyChild(
-    gedcomFamily: gedcom.GedcomFamily,
-    gedcomRecord: gedcom.GedcomRecord
-  ): void {
-    if (gedcomRecord.abstag !== "FAM.CHIL") throw new Error();
-    if (gedcomRecord.xref != null) throw new Error();
-    if (gedcomRecord.value == null) throw new Error();
-
-    const childXref = gedcomRecord.value;
-    // const individual = this.gedcomDatabase.individual(gedcomRecord.value);
-    // individual.childOfFamilyXref = gedcomFamily.xref;
-    gedcomFamily.childXrefs.push(childXref);
-
-    for (const childRecord of gedcomRecord.children) {
-      switch (childRecord.tag) {
-        default:
-          reportUnparsedRecord(childRecord);
-          break;
-      }
-    }
-  }
-
-  parseGedcomFamilyHusband(
-    gedcomFamily: gedcom.GedcomFamily,
-    gedcomRecord: gedcom.GedcomRecord
-  ): void {
-    if (gedcomRecord.abstag !== "FAM.HUSB") throw new Error();
-    if (gedcomRecord.xref != null) throw new Error();
-    if (gedcomRecord.value == null) throw new Error();
-
-    const husbandXref = gedcomRecord.value;
-    // const individual = this.gedcomDatabase.individual(gedcomRecord.value);
-    // individual.parentOfFamilyXrefs.push(gedcomFamily.xref);
-    gedcomFamily.husbandXref = husbandXref;
-
-    for (const childRecord of gedcomRecord.children) {
-      switch (childRecord.tag) {
-        default:
-          reportUnparsedRecord(childRecord);
-          break;
-      }
-    }
-  }
-
-  parseGedcomFamilyWife(
-    gedcomFamily: gedcom.GedcomFamily,
-    gedcomRecord: gedcom.GedcomRecord
-  ): void {
-    if (gedcomRecord.abstag !== "FAM.WIFE") throw new Error();
-    if (gedcomRecord.xref != null) throw new Error();
-    if (gedcomRecord.value == null) throw new Error();
-
-    const wifeXref = gedcomRecord.value;
-    // const individual = this.gedcomDatabase.individual(gedcomRecord.value);
-    // individual.parentOfFamilyXrefs.push(gedcomFamily.xref);
-    gedcomFamily.wifeXref = wifeXref;
-
-    for (const childRecord of gedcomRecord.children) {
-      switch (childRecord.tag) {
-        default:
-          reportUnparsedRecord(childRecord);
-          break;
-      }
-    }
-  }
-
-  parseGedcomIndividual(record: gedcom.GedcomRecord): gedcom.GedcomIndividual {
+  parseGedcomIndividual(record: GedcomRecord): GedcomIndividual {
     if (record.abstag !== "INDI") throw new Error();
     if (record.xref == null) throw new Error();
     if (record.value != null) throw new Error();
 
-    const gedcomIndividual = new gedcom.GedcomIndividual(record.xref);
+    const gedcomIndividual = new GedcomIndividual(record.xref);
     gedcomIndividual.gedcomRecord = record;
 
     for (const childRecord of record.children) {
@@ -413,9 +262,7 @@ export class GedcomParser {
     return gedcomIndividual;
   }
 
-  parseGedcomIndividualFamilySearchId(
-    gedcomRecord: gedcom.GedcomRecord
-  ): string {
+  parseGedcomIndividualFamilySearchId(gedcomRecord: GedcomRecord): string {
     if (gedcomRecord.abstag !== "INDI._FSFTID") throw new Error();
     if (gedcomRecord.xref != null) throw new Error();
     if (gedcomRecord.value == null) throw new Error();
@@ -425,8 +272,8 @@ export class GedcomParser {
   }
 
   parseGedcomIndividualName(
-    gedcomIndividual: gedcom.GedcomIndividual,
-    gedcomRecord: gedcom.GedcomRecord
+    gedcomIndividual: GedcomIndividual,
+    gedcomRecord: GedcomRecord
   ): void {
     if (gedcomRecord.abstag !== "INDI.NAME") throw new Error();
     if (gedcomRecord.xref != null) throw new Error();
@@ -456,9 +303,9 @@ export class GedcomParser {
   }
 
   parseGedcomIndividualSex(
-    gedcomIndividual: gedcom.GedcomIndividual,
-    gedcomRecord: gedcom.GedcomRecord
-  ): void {
+    gedcomIndividual: GedcomIndividual,
+    gedcomRecord: GedcomRecord
+  ) {
     if (gedcomRecord.abstag !== "INDI.SEX") throw new Error();
     if (gedcomRecord.xref != null) throw new Error();
     if (gedcomRecord.value == null) throw new Error();
@@ -487,27 +334,36 @@ export class GedcomParser {
     }
   }
 
-  parseGedcomSource(record: gedcom.GedcomRecord): gedcom.GedcomSource {
+  parseGedcomSource(record: GedcomRecord): GedcomSource {
     if (record.abstag !== "SOUR") throw new Error();
     if (record.xref == null) throw new Error();
     if (record.value != null) throw new Error();
 
-    const gedcomSource = new gedcom.GedcomSource(record.xref);
+    const gedcomSource = new GedcomSource(record.xref);
     gedcomSource.canonicalGedcomRecord = record;
 
     for (const childRecord of record.children) {
       switch (childRecord.tag) {
         case "ABBR":
+          if (childRecord.xref != null) throw new Error();
+          if (childRecord.value == null) throw new Error();
           if (gedcomSource.abbr != null) throw new Error();
-          gedcomSource.abbr = this.parseGedcomSourceAbbreviation(childRecord);
+          childRecord.children.forEach(reportUnparsedRecord);
+          gedcomSource.abbr = childRecord.value;
           break;
         case "TEXT":
+          if (childRecord.xref != null) throw new Error();
+          if (childRecord.value == null) throw new Error();
           if (gedcomSource.text != null) throw new Error();
-          gedcomSource.text = this.parseGedcomSourceText(childRecord);
+          childRecord.children.forEach(reportUnparsedRecord);
+          gedcomSource.text = childRecord.value;
           break;
         case "TITL":
+          if (childRecord.xref != null) throw new Error();
+          if (childRecord.value == null) throw new Error();
           if (gedcomSource.title != null) throw new Error();
-          gedcomSource.title = this.parseGedcomSourceTitle(childRecord);
+          childRecord.children.forEach(reportUnparsedRecord);
+          gedcomSource.title = childRecord.value;
           break;
         case "REPO":
           gedcomSource.repositoryCitations.push(
@@ -526,34 +382,7 @@ export class GedcomParser {
     return gedcomSource;
   }
 
-  parseGedcomSourceAbbreviation(gedcomRecord: gedcom.GedcomRecord): string {
-    if (gedcomRecord.abstag !== "SOUR.ABBR") throw new Error();
-    if (gedcomRecord.xref != null) throw new Error();
-    if (gedcomRecord.value == null) throw new Error();
-    gedcomRecord.children.forEach(reportUnparsedRecord);
-
-    return gedcomRecord.value;
-  }
-
-  parseGedcomSourceTitle(gedcomRecord: gedcom.GedcomRecord): string {
-    if (gedcomRecord.abstag !== "SOUR.TITL") throw new Error();
-    if (gedcomRecord.xref != null) throw new Error();
-    if (gedcomRecord.value == null) throw new Error();
-    gedcomRecord.children.forEach(reportUnparsedRecord);
-
-    return gedcomRecord.value;
-  }
-
-  parseGedcomSourceText(gedcomRecord: gedcom.GedcomRecord) {
-    if (gedcomRecord.abstag !== "SOUR.TEXT") throw new Error();
-    if (gedcomRecord.xref != null) throw new Error();
-    if (gedcomRecord.value == null) throw new Error();
-    gedcomRecord.children.forEach(reportUnparsedRecord);
-
-    return gedcomRecord.value;
-  }
-
-  parseGedcomSourceRepositoryCitation(gedcomRecord: gedcom.GedcomRecord) {
+  parseGedcomSourceRepositoryCitation(gedcomRecord: GedcomRecord) {
     if (gedcomRecord.abstag !== "SOUR.REPO") throw new Error();
     if (gedcomRecord.xref != null) throw new Error();
     if (gedcomRecord.value == null) throw new Error();
@@ -579,7 +408,7 @@ export class GedcomParser {
     return { repositoryXref, callNumbers };
   }
 
-  parseGedcomSourceMultimediaLink(gedcomRecord: gedcom.GedcomRecord): string {
+  parseGedcomSourceMultimediaLink(gedcomRecord: GedcomRecord): string {
     if (gedcomRecord.abstag !== "SOUR.OBJE") throw new Error();
     if (gedcomRecord.xref != null) throw new Error();
     if (gedcomRecord.value == null) throw new Error();
@@ -587,12 +416,12 @@ export class GedcomParser {
     return gedcomRecord.value;
   }
 
-  parseGedcomMultimedia(record: gedcom.GedcomRecord): gedcom.GedcomMultimedia {
+  parseGedcomMultimedia(record: GedcomRecord): GedcomMultimedia {
     if (record.abstag !== "OBJE") throw new Error();
     if (record.xref == null) throw new Error();
     if (record.value != null) throw new Error();
 
-    const gedcomMultimedia = new gedcom.GedcomMultimedia(record.xref);
+    const gedcomMultimedia = new GedcomMultimedia(record.xref);
 
     for (const childRecord of record.children) {
       switch (childRecord.tag) {
@@ -662,7 +491,7 @@ export class GedcomParser {
     if (gedcomRecord.xref == null) throw new Error();
     if (gedcomRecord.value != null) throw new Error();
 
-    const gedcomRepository = new gedcom.GedcomRepository(gedcomRecord.xref);
+    const gedcomRepository = new GedcomRepository(gedcomRecord.xref);
 
     for (const childRecord of gedcomRecord.children) {
       switch (childRecord.tag) {

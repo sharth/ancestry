@@ -40,35 +40,31 @@
     </thead>
     <tbody>
       <tr *ngFor="let event of vm.events">
+        <td>{{ event.type }}</td>
+        <td>{{ event.date }}</td>
         <td>
-          {{ event.type }}
+          <ng-container *ngIf="event.address">
+            {{ event.address }} <br />
+          </ng-container>
+          <ng-container *ngIf="event.place">
+            {{ event.place }} <br />
+          </ng-container>
         </td>
         <td>
-          {{ event.dateDescriptive }}
-        </td>
-        <td>
-          <ng-container *ngIf="event.address"
-            >{{ event.address }}<br
-          /></ng-container>
-          <ng-container *ngIf="event.place"
-            >{{ event.place }}<br
-          /></ng-container>
-        </td>
-        <td>
-          <ng-container *ngIf="event.cause"
-            >{{ event.cause }}<br
-          /></ng-container>
-          <ng-container *ngIf="event.value"
-            >{{ event.value }}<br
-          /></ng-container>
+          <ng-container *ngIf="event.cause">
+            {{ event.cause }}<br />
+          </ng-container>
+          <ng-container *ngIf="event.value">
+            {{ event.value }}<br />
+          </ng-container>
         </td>
         <td>
           <ng-container
             *ngFor="let citation of event.citations; let last = last"
           >
-            <a routerLink="/source/{{ citation.sourceXref }}">{{
-              citation.sourceXref
-            }}</a>
+            <a routerLink="/source/{{ citation.sourceXref }}">
+              {{ citation.sourceXref }}
+            </a>
             {{ " " }}
           </ng-container>
         </td>
@@ -85,9 +81,9 @@
     @for (ancestor of vm.ancestors; let ahnentafel = $index; track $index) {
       @if (ancestor != null) {
         <li value="{{ ahnentafel }}">
-          <a routerLink="/individual/{{ ancestor.xref }}">{{
-            ancestor.name
-          }}</a>
+          <a routerLink="/individual/{{ ancestor.xref }}">
+            {{ ancestor.name }}
+          </a>
         </li>
       }
     }

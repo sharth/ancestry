@@ -8,7 +8,6 @@ export class GedcomEvent {
   place?: string;
   cause?: string;
   date?: string;
-  dateDescriptive?: string;
   value?: string;
   citations: GedcomCitation[] = [];
   sharedWithXrefs: string[] = [];
