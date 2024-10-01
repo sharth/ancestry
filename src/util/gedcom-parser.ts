@@ -1,5 +1,6 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import * as gedcom from "../gedcom";
+import { GedcomRecord, GedcomRepository, GedcomSubmitter } from "../gedcom";
 
 export class GedcomParser {
   parseGedcomTrailer(gedcomRecord: gedcom.GedcomRecord): gedcom.GedcomTrailer {
@@ -625,14 +626,12 @@ export class GedcomParser {
     return gedcomMultimedia;
   }
 
-  parseGedcomSubmitter(
-    gedcomRecord: gedcom.GedcomRecord
-  ): gedcom.GedcomSubmitter {
-    if (gedcomRecord.abstag !== "SUBM") throw new Error();
+  parseGedcomSubmitter(gedcomRecord: GedcomRecord): GedcomSubmitter {
+    if (gedcomRecord.tag !== "SUBM") throw new Error();
     if (gedcomRecord.xref == null) throw new Error();
     if (gedcomRecord.value != null) throw new Error();
 
-    const gedcomSubmitter = new gedcom.GedcomSubmitter(
+    const gedcomSubmitter = new GedcomSubmitter(
       gedcomRecord.xref,
       gedcomRecord
     );
@@ -658,10 +657,8 @@ export class GedcomParser {
     return gedcomSubmitter;
   }
 
-  parseGedcomRepository(
-    gedcomRecord: gedcom.GedcomRecord
-  ): gedcom.GedcomRepository {
-    if (gedcomRecord.abstag !== "REPO") throw new Error();
+  parseGedcomRepository(gedcomRecord: GedcomRecord): GedcomRepository {
+    if (gedcomRecord.tag !== "REPO") throw new Error();
     if (gedcomRecord.xref == null) throw new Error();
     if (gedcomRecord.value != null) throw new Error();
 
@@ -670,7 +667,6 @@ export class GedcomParser {
     for (const childRecord of gedcomRecord.children) {
       switch (childRecord.tag) {
         case "NAME":
-          if (childRecord.abstag !== "REPO.NAME") throw new Error();
           if (childRecord.xref != null) throw new Error();
           if (childRecord.value == null) throw new Error();
           if (childRecord.children.length != 0) throw new Error();
