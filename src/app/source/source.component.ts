@@ -34,19 +34,19 @@ export class SourceComponent {
   readonly xref = input.required<string>();
   readonly source$ = toObservable(this.xref).pipe(
     rxjs.switchMap((xref) =>
-      dexie.liveQuery(() => ancestryDatabase.sources.get(xref)),
-    ),
+      dexie.liveQuery(() => ancestryDatabase.sources.get(xref))
+    )
   );
 
   readonly vm$ = toObservable(this.xref).pipe(
     rxjs.switchMap((xref) =>
-      dexie.liveQuery(() => ancestryDatabase.sources.get(xref)),
+      dexie.liveQuery(() => ancestryDatabase.sources.get(xref))
     ),
     rxjs.combineLatestWith(
       dexie.liveQuery(() => ancestryDatabase.individuals.toArray()),
       dexie.liveQuery(() => ancestryDatabase.repositories.toArray()),
       dexie.liveQuery(() => ancestryDatabase.multimedia.toArray()),
-      dexie.liveQuery(() => ancestryDatabase.originalText.toArray()),
+      dexie.liveQuery(() => ancestryDatabase.originalText.toArray())
     ),
     rxjs.map(
       ([source, individuals, repositories, multimedia, originalText]) => {
@@ -55,14 +55,14 @@ export class SourceComponent {
           ...source,
           citations: individuals
             .flatMap((individual) =>
-              individual.events.map((event) => ({ individual, event })),
+              individual.events.map((event) => ({ individual, event }))
             )
             .flatMap(({ individual, event }) =>
               event.citations.map((citation) => ({
                 individual,
                 event,
                 citation,
-              })),
+              }))
             )
             .filter(({ citation }) => citation.sourceXref == source.xref),
           repositoryCitations: source.repositoryCitations.map(
@@ -71,13 +71,13 @@ export class SourceComponent {
               callNumbers: repositoryCitation.callNumbers,
               repository: repositories.find(
                 (repository) =>
-                  repository.xref == repositoryCitation.repositoryXref,
+                  repository.xref == repositoryCitation.repositoryXref
               ),
-            }),
+            })
           ),
           multimedia: source.multimediaXrefs.map((multimediaXref) => ({
             ...multimedia.find(
-              (multimedia) => multimedia.xref == multimediaXref,
+              (multimedia) => multimedia.xref == multimediaXref
             ),
             xref: multimediaXref,
           })),
@@ -85,20 +85,20 @@ export class SourceComponent {
           oldGedcomText: originalText
             .map((originalText) => originalText.text)
             .flatMap((originalText) =>
-              new GedcomLexer().parseGedcomRecords(originalText),
+              new GedcomLexer().parseGedcomRecords(originalText)
             )
             .filter(
               (gedcomRecord) =>
-                gedcomRecord.tag == "SOUR" && gedcomRecord.xref == source.xref,
+                gedcomRecord.tag == "SOUR" && gedcomRecord.xref == source.xref
             )
             .flatMap(serializeGedcomRecordToText)
             .join("\n"),
           newGedcomText: serializeGedcomRecordToText(
-            serializeGedcomSourceToGedcomRecord(source),
+            serializeGedcomSourceToGedcomRecord(source)
           ).join("\n"),
         };
-      },
-    ),
+      }
+    )
   );
 
   readonly reactiveForm = new FormGroup({
@@ -122,7 +122,7 @@ export class SourceComponent {
       new FormGroup({
         repositoryXref: new FormControl("", { nonNullable: true }),
         callNumber: new FormControl("", { nonNullable: true }),
-      }),
+      })
     );
   }
 
@@ -133,9 +133,9 @@ export class SourceComponent {
   addUnknownRecord() {
     this.reactiveForm.controls.unknownRecords.push(
       new FormControl(
-        new gedcom.GedcomRecord(0, undefined, "", "", undefined, []),
-        { nonNullable: true },
-      ),
+        new gedcom.GedcomRecord(undefined, "", "", undefined, []),
+        { nonNullable: true }
+      )
     );
   }
 
@@ -165,7 +165,7 @@ export class SourceComponent {
           (repositoryCitation) => ({
             repositoryXref: repositoryCitation.repositoryXref,
             callNumber: repositoryCitation.callNumbers.at(0) ?? "",
-          }),
+          })
         ),
         unknownRecords: source.unknownRecords,
       });
@@ -185,7 +185,7 @@ export class SourceComponent {
         (repositoryCitation) => ({
           repositoryXref: repositoryCitation.controls.repositoryXref.value,
           callNumbers: [repositoryCitation.controls.callNumber.value],
-        }),
+        })
       );
     source.unknownRecords = this.reactiveForm.controls.unknownRecords.value;
     void ancestryDatabase.sources.put(source);

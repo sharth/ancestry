@@ -175,8 +175,8 @@ describe("GedcomSource", () => {
         text: "text and more text",
         repositoryCitations: [],
         unknownRecords: [
-          new GedcomRecord(1, undefined, "_TMPLT", "SOUR._TMPLT", undefined, [
-            new GedcomRecord(2, undefined, "TID", "SOUR._TMPLT.TID", "72", []),
+          new GedcomRecord(undefined, "_TMPLT", "SOUR._TMPLT", undefined, [
+            new GedcomRecord(undefined, "TID", "SOUR._TMPLT.TID", "72", []),
           ]),
         ],
         multimediaXrefs: [],

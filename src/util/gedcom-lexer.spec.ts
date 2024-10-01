@@ -15,16 +15,15 @@ describe("GedcomRecord Parsing", () => {
     const [gedcomRecord] = lexer.parseGedcomRecords(gedcomText.join("\n"));
     assert.deepEqual(
       gedcomRecord,
-      new gedcom.GedcomRecord(0, "@I1@", "INDI", "INDI", undefined, [
+      new gedcom.GedcomRecord("@I1@", "INDI", "INDI", undefined, [
         new gedcom.GedcomRecord(
-          1,
           undefined,
           "NAME",
           "INDI.NAME",
           "john doe\nsenior",
-          [],
+          []
         ),
-      ]),
+      ])
     );
   });
 
@@ -33,7 +32,7 @@ describe("GedcomRecord Parsing", () => {
     const [gedcomRecord] = lexer.parseGedcomRecords(gedcomText.join("\n"));
     assert.deepEqual(
       gedcomRecord,
-      new gedcom.GedcomRecord(0, undefined, "TAG", "TAG", "value", []),
+      new gedcom.GedcomRecord(undefined, "TAG", "TAG", "value", [])
     );
   });
 
@@ -42,7 +41,7 @@ describe("GedcomRecord Parsing", () => {
     const [gedcomRecord] = lexer.parseGedcomRecords(gedcomText.join("\n"));
     assert.deepEqual(
       gedcomRecord,
-      new gedcom.GedcomRecord(0, undefined, "TAG", "TAG", "\nvalue", []),
+      new gedcom.GedcomRecord(undefined, "TAG", "TAG", "\nvalue", [])
     );
   });
 
@@ -50,7 +49,7 @@ describe("GedcomRecord Parsing", () => {
     const gedcomText = ["0 TAG", "1 CONC", "1 CONT", "1 CONT"];
     const gedcomRecords = lexer.parseGedcomRecords(gedcomText.join("\n"));
     assert.deepEqual(gedcomRecords, [
-      new gedcom.GedcomRecord(0, undefined, "TAG", "TAG", "\n\n", []),
+      new gedcom.GedcomRecord(undefined, "TAG", "TAG", "\n\n", []),
     ]);
   });
 
@@ -59,7 +58,7 @@ describe("GedcomRecord Parsing", () => {
     const [gedcomRecord] = lexer.parseGedcomRecords(gedcomText.join("\n"));
     assert.deepEqual(
       gedcomRecord,
-      new gedcom.GedcomRecord(0, undefined, "TAG", "TAG", "abcdef", []),
+      new gedcom.GedcomRecord(undefined, "TAG", "TAG", "abcdef", [])
     );
   });
 });
