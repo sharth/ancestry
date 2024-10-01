@@ -1,6 +1,7 @@
 import * as gedcom from "../gedcom";
 
 export function serializeGedcomTrailerToGedcomRecord(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   gedcomTrailer: gedcom.GedcomTrailer
 ): gedcom.GedcomRecord {
   return new gedcom.GedcomRecord(0, undefined, "TRLR", "TRLR", undefined, []);
