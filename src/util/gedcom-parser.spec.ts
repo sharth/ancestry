@@ -1,15 +1,16 @@
 import { assert } from "chai";
-import { GedcomParser } from "./gedcom-parser";
-import { GedcomLexer } from "./gedcom-lexer";
+import {
+  parseGedcomFamily,
+  parseGedcomIndividual,
+  parseGedcomSource,
+} from "./gedcom-parser";
+import { parseGedcomRecords } from "./gedcom-lexer";
 import { GedcomRecord } from "../gedcom";
 
 describe("GedcomFamily", () => {
-  const lexer = new GedcomLexer();
-  const parser = new GedcomParser();
-
   it("No Parents", () => {
-    const [gedcomRecord] = lexer.parseGedcomRecords(["0 @F1@ FAM"].join("\n"));
-    const gedcomFamily = parser.parseGedcomFamily(gedcomRecord);
+    const [gedcomRecord] = parseGedcomRecords(["0 @F1@ FAM"].join("\n"));
+    const gedcomFamily = parseGedcomFamily(gedcomRecord);
     assert.deepEqual(
       {
         ...gedcomFamily,
@@ -25,10 +26,10 @@ describe("GedcomFamily", () => {
   });
 
   it("Parents", () => {
-    const [gedcomRecord] = lexer.parseGedcomRecords(
+    const [gedcomRecord] = parseGedcomRecords(
       ["0 @F3@ FAM", "1 WIFE @I2@", "1 HUSB @I3@"].join("\n")
     );
-    const gedcomFamily = parser.parseGedcomFamily(gedcomRecord);
+    const gedcomFamily = parseGedcomFamily(gedcomRecord);
     assert.deepEqual(
       {
         ...gedcomFamily,
@@ -47,12 +48,9 @@ describe("GedcomFamily", () => {
 });
 
 describe("GedcomIndividual", () => {
-  const lexer = new GedcomLexer();
-  const parser = new GedcomParser();
-
   it("No Fields", () => {
-    const [gedcomRecord] = lexer.parseGedcomRecords(["0 @I1@ INDI"].join("\n"));
-    const gedcomIndividual = parser.parseGedcomIndividual(gedcomRecord);
+    const [gedcomRecord] = parseGedcomRecords(["0 @I1@ INDI"].join("\n"));
+    const gedcomIndividual = parseGedcomIndividual(gedcomRecord);
     assert.deepEqual(
       {
         ...gedcomIndividual,
@@ -67,10 +65,10 @@ describe("GedcomIndividual", () => {
   });
 
   it("Male", () => {
-    const [gedcomRecord] = lexer.parseGedcomRecords(
+    const [gedcomRecord] = parseGedcomRecords(
       ["0 @I1@ INDI", "1 SEX M"].join("\n")
     );
-    const gedcomIndividual = parser.parseGedcomIndividual(gedcomRecord);
+    const gedcomIndividual = parseGedcomIndividual(gedcomRecord);
     assert.deepEqual(
       {
         ...gedcomIndividual,
@@ -88,10 +86,10 @@ describe("GedcomIndividual", () => {
   });
 
   it("Female", () => {
-    const [gedcomRecord] = lexer.parseGedcomRecords(
+    const [gedcomRecord] = parseGedcomRecords(
       ["0 @I1@ INDI", "1 SEX F"].join("\n")
     );
-    const gedcomIndividual = parser.parseGedcomIndividual(gedcomRecord);
+    const gedcomIndividual = parseGedcomIndividual(gedcomRecord);
     assert.deepEqual(
       {
         ...gedcomIndividual,
@@ -109,10 +107,10 @@ describe("GedcomIndividual", () => {
   });
 
   it("Family Search Id", () => {
-    const [gedcomRecord] = lexer.parseGedcomRecords(
+    const [gedcomRecord] = parseGedcomRecords(
       ["0 @I4@ INDI", "1 _FSFTID abcd"].join("\n")
     );
-    const gedcomIndividual = parser.parseGedcomIndividual(gedcomRecord);
+    const gedcomIndividual = parseGedcomIndividual(gedcomRecord);
     assert.deepEqual(
       {
         ...gedcomIndividual,
@@ -129,13 +127,10 @@ describe("GedcomIndividual", () => {
 });
 
 describe("GedcomSource", () => {
-  const lexer = new GedcomLexer();
-  const parser = new GedcomParser();
-
   it("No Fields", () => {
     const gedcomText = "0 @S1@ SOUR\n";
-    const [gedcomRecord] = lexer.parseGedcomRecords(gedcomText);
-    const gedcomSource = parser.parseGedcomSource(gedcomRecord);
+    const [gedcomRecord] = parseGedcomRecords(gedcomText);
+    const gedcomSource = parseGedcomSource(gedcomRecord);
     assert.deepEqual(
       {
         ...gedcomSource,
@@ -161,8 +156,8 @@ describe("GedcomSource", () => {
       "1 TEXT text ",
       "2 CONC and more text",
     ].join("\n");
-    const [gedcomRecord] = lexer.parseGedcomRecords(gedcomText);
-    const gedcomSource = parser.parseGedcomSource(gedcomRecord);
+    const [gedcomRecord] = parseGedcomRecords(gedcomText);
+    const gedcomSource = parseGedcomSource(gedcomRecord);
     assert.deepEqual(
       {
         ...gedcomSource,

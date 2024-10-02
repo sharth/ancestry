@@ -1,90 +1,75 @@
-import * as gedcom from "../gedcom";
+import type {
+  GedcomCitation,
+  GedcomEvent,
+  GedcomFamily,
+  GedcomHeader,
+  GedcomIndividual,
+  GedcomMultimedia,
+  GedcomRepository,
+  GedcomSource,
+  GedcomTrailer,
+} from "../gedcom";
+import { GedcomRecord } from "../gedcom";
 
-export function serializeGedcomTrailerToGedcomRecord(
+export function serializeGedcomTrailer(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  gedcomTrailer: gedcom.GedcomTrailer
-): gedcom.GedcomRecord {
-  return new gedcom.GedcomRecord(undefined, "TRLR", "TRLR", undefined, []);
+  gedcomTrailer: GedcomTrailer
+): GedcomRecord {
+  return new GedcomRecord(undefined, "TRLR", "TRLR", undefined, []);
 }
 
-export function serializeGedcomMultimediaToGedcomRecord(
-  gedcomMultimedia: gedcom.GedcomMultimedia
-): gedcom.GedcomRecord {
-  return new gedcom.GedcomRecord(
-    gedcomMultimedia.xref,
-    "OBJE",
-    "OBJE",
-    undefined,
-    [
-      new gedcom.GedcomRecord(
-        undefined,
-        "FILE",
-        "OBJE.FILE",
-        gedcomMultimedia.filePath,
-        [
-          new gedcom.GedcomRecord(
-            undefined,
-            "FORM",
-            "OBJE.FILE.FORM",
-            gedcomMultimedia.mediaType,
-            []
-          ),
-        ]
-      ),
-    ]
-  );
+export function serializeGedcomMultimedia(
+  gedcomMultimedia: GedcomMultimedia
+): GedcomRecord {
+  return new GedcomRecord(gedcomMultimedia.xref, "OBJE", "OBJE", undefined, [
+    new GedcomRecord(
+      undefined,
+      "FILE",
+      "OBJE.FILE",
+      gedcomMultimedia.filePath,
+      [
+        new GedcomRecord(
+          undefined,
+          "FORM",
+          "OBJE.FILE.FORM",
+          gedcomMultimedia.mediaType,
+          []
+        ),
+      ]
+    ),
+  ]);
 }
 
-export function serializeGedcomSourceToGedcomRecord(
-  source: gedcom.GedcomSource
-): gedcom.GedcomRecord {
+export function serializeGedcomSource(source: GedcomSource): GedcomRecord {
   if (source.canonicalGedcomRecord) {
     return source.canonicalGedcomRecord;
   }
 
-  return new gedcom.GedcomRecord(
+  return new GedcomRecord(
     source.xref,
     "SOUR",
     "SOUR",
     undefined,
     [
       source.abbr
-        ? new gedcom.GedcomRecord(
-            undefined,
-            "ABBR",
-            "SOUR.ABBR",
-            source.abbr,
-            []
-          )
+        ? new GedcomRecord(undefined, "ABBR", "SOUR.ABBR", source.abbr, [])
         : null,
       source.title
-        ? new gedcom.GedcomRecord(
-            undefined,
-            "TITL",
-            "SOUR.TITL",
-            source.title,
-            []
-          )
+        ? new GedcomRecord(undefined, "TITL", "SOUR.TITL", source.title, [])
         : null,
       source.text
-        ? new gedcom.GedcomRecord(
-            undefined,
-            "TEXT",
-            "SOUR.TEXT",
-            source.text,
-            []
-          )
+        ? new GedcomRecord(undefined, "TEXT", "SOUR.TEXT", source.text, [])
         : null,
       ...source.repositoryCitations.map(
         (repositoryCitation) =>
-          new gedcom.GedcomRecord(
+          new GedcomRecord(
             undefined,
             "REPO",
             "SOUR.REPO",
             repositoryCitation.repositoryXref,
             repositoryCitation.callNumbers.map(
               (callNumber) =>
-                new gedcom.GedcomRecord(
+                new GedcomRecord(
                   undefined,
                   "CALN",
                   "SOUR.REPO.CALN",
@@ -100,7 +85,7 @@ export function serializeGedcomSourceToGedcomRecord(
 }
 
 export function serializeGedcomRecordToText(
-  gedcomRecord: gedcom.GedcomRecord,
+  gedcomRecord: GedcomRecord,
   level = 0
 ): string[] {
   const [firstValue, ...remainingValues] =
@@ -119,33 +104,33 @@ export function serializeGedcomRecordToText(
   ];
 }
 
-export function serializeGedcomIndividualToGedcomRecord(
-  gedcomIndividual: gedcom.GedcomIndividual
-): gedcom.GedcomRecord {
+export function serializeGedcomIndividual(
+  gedcomIndividual: GedcomIndividual
+): GedcomRecord {
   if (gedcomIndividual.gedcomRecord) {
     return gedcomIndividual.gedcomRecord;
   }
 
-  return new gedcom.GedcomRecord(
+  return new GedcomRecord(
     gedcomIndividual.xref,
     "INDI",
     "INDI",
     undefined,
     [
-      serializeFamilySearchIdToGedcomRecord(gedcomIndividual),
-      serializeSexToGedcomRecord(gedcomIndividual),
+      serializeFamilySearchId(gedcomIndividual),
+      serializeSex(gedcomIndividual),
       // TODO: Serialize events, name, surname
     ].filter((record) => record !== null)
   );
 }
 
-function serializeFamilySearchIdToGedcomRecord(
-  gedcomIndividual: gedcom.GedcomIndividual
-): gedcom.GedcomRecord | null {
+function serializeFamilySearchId(
+  gedcomIndividual: GedcomIndividual
+): GedcomRecord | null {
   if (gedcomIndividual.familySearchId == null) {
     return null;
   } else {
-    return new gedcom.GedcomRecord(
+    return new GedcomRecord(
       undefined,
       "_FSFTID",
       "INDI._FSFTID",
@@ -155,122 +140,86 @@ function serializeFamilySearchIdToGedcomRecord(
   }
 }
 
-function serializeSexToGedcomRecord(
-  gedcomIndividual: gedcom.GedcomIndividual
-): gedcom.GedcomRecord | null {
+function serializeSex(gedcomIndividual: GedcomIndividual): GedcomRecord | null {
   switch (gedcomIndividual.sex) {
     case undefined:
       return null;
     case "Male":
-      return new gedcom.GedcomRecord(undefined, "SEX", "INDI.SEX", "M", []);
+      return new GedcomRecord(undefined, "SEX", "INDI.SEX", "M", []);
     case "Female":
-      return new gedcom.GedcomRecord(undefined, "SEX", "INDI.SEX", "F", []);
+      return new GedcomRecord(undefined, "SEX", "INDI.SEX", "F", []);
   }
 }
 
-export function serializeGedcomFamilyToGedcomRecord(
-  gedcomFamily: gedcom.GedcomFamily
-) {
+export function serializeGedcomFamily(gedcomFamily: GedcomFamily) {
   if (gedcomFamily.gedcomRecord) {
     return gedcomFamily.gedcomRecord;
   } else {
-    return new gedcom.GedcomRecord(gedcomFamily.xref, "FAM", "FAM", undefined, [
+    return new GedcomRecord(gedcomFamily.xref, "FAM", "FAM", undefined, [
       // TODO: Fill in.
     ]);
   }
 }
 
-export function serializeGedcomCitationToGedcomRecord(
-  gedcomCitation: gedcom.GedcomCitation
-): gedcom.GedcomRecord {
+export function serializeGedcomCitation(
+  gedcomCitation: GedcomCitation
+): GedcomRecord {
   if (gedcomCitation.gedcomRecord) {
     return gedcomCitation.gedcomRecord;
   }
-  return new gedcom.GedcomRecord(
+  return new GedcomRecord(
     undefined,
     "SOUR",
     "",
     gedcomCitation.sourceXref,
     [
       gedcomCitation.obje
-        ? new gedcom.GedcomRecord(
-            undefined,
-            "OBJE",
-            "",
-            gedcomCitation.obje,
-            []
-          )
+        ? new GedcomRecord(undefined, "OBJE", "", gedcomCitation.obje, [])
         : null,
       gedcomCitation.name
-        ? new gedcom.GedcomRecord(
-            undefined,
-            "NAME",
-            "",
-            gedcomCitation.name,
-            []
-          )
+        ? new GedcomRecord(undefined, "NAME", "", gedcomCitation.name, [])
         : null,
       gedcomCitation.note
-        ? new gedcom.GedcomRecord(
-            undefined,
-            "NOTE",
-            "",
-            gedcomCitation.note,
-            []
-          )
+        ? new GedcomRecord(undefined, "NOTE", "", gedcomCitation.note, [])
         : null,
       gedcomCitation.page
-        ? new gedcom.GedcomRecord(
-            undefined,
-            "PAGE",
-            "",
-            gedcomCitation.page,
-            []
-          )
+        ? new GedcomRecord(undefined, "PAGE", "", gedcomCitation.page, [])
         : null,
       gedcomCitation.text
-        ? new gedcom.GedcomRecord(undefined, "DATA", "", undefined, [
-            new gedcom.GedcomRecord(
-              undefined,
-              "TEXT",
-              "",
-              gedcomCitation.text,
-              []
-            ),
+        ? new GedcomRecord(undefined, "DATA", "", undefined, [
+            new GedcomRecord(undefined, "TEXT", "", gedcomCitation.text, []),
           ])
         : null,
     ].filter((record) => record != null)
   );
 }
 
-export function serializeGedcomEventToGedcomRecord(
-  gedcomEvent: gedcom.GedcomEvent
-): gedcom.GedcomRecord {
+export function serializeGedcomEvent(gedcomEvent: GedcomEvent): GedcomRecord {
   if (gedcomEvent.gedcomRecord) {
     return gedcomEvent.gedcomRecord;
   } else {
     // TODO: Build something useful.
-    return new gedcom.GedcomRecord(undefined, "EVEN", "EVEN", undefined, []);
+    return new GedcomRecord(undefined, "EVEN", "EVEN", undefined, []);
   }
 }
 
-export function serializeGedcomHeaderToGedcomRecord(
-  gedcomHeader: gedcom.GedcomHeader
-): gedcom.GedcomRecord {
+export function serializeGedcomHeader(
+  gedcomHeader: GedcomHeader
+): GedcomRecord {
   return gedcomHeader.record;
 }
 
-export function serializeGedcomRepositoryToGedcomRecord(
-  gedcomRepository: gedcom.GedcomRepository
-): gedcom.GedcomRecord {
-  return new gedcom.GedcomRecord(
+export function serializeGedcomRepository(
+  gedcomRepository: GedcomRepository
+): GedcomRecord {
+  return new GedcomRecord(
     gedcomRepository.xref,
     "REPO",
     "REPO",
     undefined,
     [
       gedcomRepository.name
-        ? new gedcom.GedcomRecord(
+        ? new GedcomRecord(
             undefined,
             "NAME",
             "REPO.NAME",

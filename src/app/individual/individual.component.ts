@@ -3,8 +3,8 @@ import { CommonModule } from "@angular/common";
 import { RouterLink } from "@angular/router";
 import type { GedcomEvent } from "../../gedcom/gedcomEvent";
 import { serializeGedcomRecordToText } from "../../util/gedcom-serializer";
-import { serializeGedcomIndividualToGedcomRecord } from "../../util/gedcom-serializer";
-import { serializeGedcomEventToGedcomRecord } from "../../util/gedcom-serializer";
+import { serializeGedcomIndividual } from "../../util/gedcom-serializer";
+import { serializeGedcomEvent } from "../../util/gedcom-serializer";
 import { toObservable } from "@angular/core/rxjs-interop";
 import { ancestryDatabase } from "../../database/ancestry.database";
 import * as rxjs from "rxjs";
@@ -23,11 +23,11 @@ export class IndividualComponent {
   readonly xref = input.required<string>();
   readonly vm$ = toObservable(this.xref).pipe(
     rxjs.switchMap((xref) =>
-      dexie.liveQuery(() => ancestryDatabase.individuals.get(xref)),
+      dexie.liveQuery(() => ancestryDatabase.individuals.get(xref))
     ),
     rxjs.combineLatestWith(
       dexie.liveQuery(() => ancestryDatabase.individuals.toArray()),
-      dexie.liveQuery(() => ancestryDatabase.families.toArray()),
+      dexie.liveQuery(() => ancestryDatabase.families.toArray())
     ),
     rxjs.map(([individual, individuals, families]) => {
       if (individual == null) {
@@ -37,23 +37,23 @@ export class IndividualComponent {
         ...individual,
         events: individual.events.map((event) => ({
           ...event,
-          gedcom: serializeGedcomRecordToText(
-            serializeGedcomEventToGedcomRecord(event),
-          ).join("\n"),
+          gedcom: serializeGedcomRecordToText(serializeGedcomEvent(event)).join(
+            "\n"
+          ),
         })),
         ancestors: this.ancestors(individual, individuals, families),
         relatives: this.relatives(individual, individuals, families),
         gedcom: serializeGedcomRecordToText(
-          serializeGedcomIndividualToGedcomRecord(individual),
+          serializeGedcomIndividual(individual)
         ).join("\n"),
       };
-    }),
+    })
   );
 
   ancestors(
     self: GedcomIndividual,
     individuals: GedcomIndividual[],
-    families: GedcomFamily[],
+    families: GedcomFamily[]
   ): (GedcomIndividual | undefined)[] {
     const ancestors: (GedcomIndividual | undefined)[] = [];
     ancestors[1] = self;
@@ -61,16 +61,16 @@ export class IndividualComponent {
       const child = ancestors[i];
       if (child != null) {
         const family = families.find((family) =>
-          family.childXrefs.includes(child.xref),
+          family.childXrefs.includes(child.xref)
         );
         if (family?.husbandXref) {
           ancestors[2 * i + 0] = individuals.find(
-            (individual) => individual.xref == family.husbandXref,
+            (individual) => individual.xref == family.husbandXref
           );
         }
         if (family?.wifeXref) {
           ancestors[2 * i + 1] = individuals.find(
-            (individual) => individual.xref == family.wifeXref,
+            (individual) => individual.xref == family.wifeXref
           );
         }
       }
@@ -81,40 +81,40 @@ export class IndividualComponent {
   relatives(
     self: GedcomIndividual,
     individuals: GedcomIndividual[],
-    families: GedcomFamily[],
+    families: GedcomFamily[]
   ): { relationship: string; individual: GedcomIndividual }[] {
     const parents: GedcomIndividual[] = families
       .filter((family) => family.childXrefs.includes(self.xref))
       .flatMap((family) => [family.husbandXref, family.wifeXref])
       .filter((parentXref) => parentXref != null)
       .map((parentXref) =>
-        individuals.find((parent) => parent.xref == parentXref),
+        individuals.find((parent) => parent.xref == parentXref)
       )
       .filter((parent) => parent != null);
     const siblings: GedcomIndividual[] = families
       .filter((family) => family.childXrefs.includes(self.xref))
       .flatMap((family) => family.childXrefs)
       .map((siblingXref) =>
-        individuals.find((sibling) => sibling.xref == siblingXref),
+        individuals.find((sibling) => sibling.xref == siblingXref)
       )
       .filter((sibling) => sibling != null)
       .filter((sibling) => self.xref != sibling.xref);
     const spouses: GedcomIndividual[] = families
       .filter(
         (family) =>
-          family.husbandXref == self.xref || family.wifeXref == self.xref,
+          family.husbandXref == self.xref || family.wifeXref == self.xref
       )
       .flatMap((family) => [family.husbandXref, family.wifeXref])
       .filter((spouseXref) => spouseXref != null)
       .filter((spouseXref) => spouseXref != self.xref)
       .map((spouseXref) =>
-        individuals.find((spouse) => spouseXref == spouse.xref),
+        individuals.find((spouse) => spouseXref == spouse.xref)
       )
       .filter((spouse) => spouse != null);
     const children: GedcomIndividual[] = families
       .filter(
         (family) =>
-          family.husbandXref == self.xref || family.wifeXref == self.xref,
+          family.husbandXref == self.xref || family.wifeXref == self.xref
       )
       .flatMap((family) => family.childXrefs)
       .map((childXref) => individuals.find((child) => child.xref == childXref))

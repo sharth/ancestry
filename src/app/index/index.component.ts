@@ -4,9 +4,9 @@ import { ancestryDatabase } from "../../database/ancestry.database";
 import * as rxjs from "rxjs";
 import * as dexie from "dexie";
 import {
-  serializeGedcomHeaderToGedcomRecord,
+  serializeGedcomHeader,
   serializeGedcomRecordToText,
-  serializeGedcomTrailerToGedcomRecord,
+  serializeGedcomTrailer,
 } from "../../util/gedcom-serializer";
 
 @Component({
@@ -38,20 +38,20 @@ export class IndexComponent {
         ]) => ({
           headers: headers,
           headerText: headers
-            .map(serializeGedcomHeaderToGedcomRecord)
+            .map(serializeGedcomHeader)
             .flatMap(serializeGedcomRecordToText)
             .join("\n"),
           trailers: trailers,
           trailerText: trailers
-            .map(serializeGedcomTrailerToGedcomRecord)
+            .map(serializeGedcomTrailer)
             .flatMap(serializeGedcomRecordToText)
             .join("\n"),
           individuals,
           families,
           repositories,
           sources,
-        }),
-      ),
+        })
+      )
     );
 
   readonly vm = toSignal(this.vm$);

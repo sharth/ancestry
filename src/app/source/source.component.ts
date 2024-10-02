@@ -9,14 +9,14 @@ import {
   ReactiveFormsModule,
 } from "@angular/forms";
 import { serializeGedcomRecordToText } from "../../util/gedcom-serializer";
-import { serializeGedcomSourceToGedcomRecord } from "../../util/gedcom-serializer";
+import { serializeGedcomSource } from "../../util/gedcom-serializer";
 import { toObservable } from "@angular/core/rxjs-interop";
 import { ancestryDatabase } from "../../database/ancestry.database";
 import * as rxjs from "rxjs";
 import * as dexie from "dexie";
 import * as gedcom from "../../gedcom";
 import { GedcomDiffComponent } from "../../util/gedcom-diff.component";
-import { GedcomLexer } from "../../util/gedcom-lexer";
+import { parseGedcomRecords } from "../../util/gedcom-lexer";
 
 @Component({
   selector: "app-source",
@@ -84,9 +84,7 @@ export class SourceComponent {
           repositories,
           oldGedcomText: originalText
             .map((originalText) => originalText.text)
-            .flatMap((originalText) =>
-              new GedcomLexer().parseGedcomRecords(originalText)
-            )
+            .flatMap(parseGedcomRecords)
             .filter(
               (gedcomRecord) =>
                 gedcomRecord.tag == "SOUR" && gedcomRecord.xref == source.xref
@@ -94,7 +92,7 @@ export class SourceComponent {
             .flatMap(serializeGedcomRecordToText)
             .join("\n"),
           newGedcomText: serializeGedcomRecordToText(
-            serializeGedcomSourceToGedcomRecord(source)
+            serializeGedcomSource(source)
           ).join("\n"),
         };
       }
