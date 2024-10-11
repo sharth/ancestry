@@ -190,6 +190,9 @@ export function serializeGedcomCitation(
             new GedcomRecord(undefined, "TEXT", "", gedcomCitation.text, []),
           ])
         : null,
+      gedcomCitation.quality
+        ? new GedcomRecord(undefined, "QUAY", "", gedcomCitation.quality, [])
+        : null,
     ].filter((record) => record != null)
   );
 }

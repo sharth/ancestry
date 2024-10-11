@@ -35,7 +35,10 @@ export function parseGedcomCitation(
     switch (childRecord.tag) {
       case "_TMPLT":
       case "_QUAL":
+        break;
       case "QUAY":
+        childRecord.children.forEach(reportUnparsedRecord);
+        gedcomCitation.quality = childRecord.value;
         break;
       case "OBJE":
         childRecord.children.forEach(reportUnparsedRecord);

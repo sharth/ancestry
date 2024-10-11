@@ -8,6 +8,7 @@ export class GedcomCitation {
   note?: string;
   text?: string;
   page?: string;
+  quality?: string;
 
   gedcomRecord?: GedcomRecord;
 }
