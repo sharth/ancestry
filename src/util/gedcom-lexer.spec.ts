@@ -1,10 +1,8 @@
 import * as gedcom from "../gedcom";
 import { assert } from "chai";
-import { GedcomLexer } from "./gedcom-lexer";
+import { parseGedcomRecords } from "./gedcom-lexer";
 
 describe("GedcomRecord Parsing", () => {
-  const lexer = new GedcomLexer();
-
   it("conc is merged into the previous record", () => {
     const gedcomText = [
       "0 @I1@ INDI",
@@ -12,7 +10,7 @@ describe("GedcomRecord Parsing", () => {
       "2 CONC doe",
       "2 CONT senior",
     ];
-    const [gedcomRecord] = lexer.parseGedcomRecords(gedcomText.join("\n"));
+    const [gedcomRecord] = parseGedcomRecords(gedcomText.join("\n"));
     assert.deepEqual(
       gedcomRecord,
       new gedcom.GedcomRecord("@I1@", "INDI", "INDI", undefined, [
@@ -29,7 +27,7 @@ describe("GedcomRecord Parsing", () => {
 
   it("conc onto the empty string", () => {
     const gedcomText = ["0 TAG", "1 CONC value"];
-    const [gedcomRecord] = lexer.parseGedcomRecords(gedcomText.join("\n"));
+    const [gedcomRecord] = parseGedcomRecords(gedcomText.join("\n"));
     assert.deepEqual(
       gedcomRecord,
       new gedcom.GedcomRecord(undefined, "TAG", "TAG", "value", [])
@@ -38,7 +36,7 @@ describe("GedcomRecord Parsing", () => {
 
   it("cont onto the empty string", () => {
     const gedcomText = ["0 TAG", "1 CONT value"];
-    const [gedcomRecord] = lexer.parseGedcomRecords(gedcomText.join("\n"));
+    const [gedcomRecord] = parseGedcomRecords(gedcomText.join("\n"));
     assert.deepEqual(
       gedcomRecord,
       new gedcom.GedcomRecord(undefined, "TAG", "TAG", "\nvalue", [])
@@ -47,7 +45,7 @@ describe("GedcomRecord Parsing", () => {
 
   it("empty lines presented correctly", () => {
     const gedcomText = ["0 TAG", "1 CONC", "1 CONT", "1 CONT"];
-    const gedcomRecords = lexer.parseGedcomRecords(gedcomText.join("\n"));
+    const gedcomRecords = parseGedcomRecords(gedcomText.join("\n"));
     assert.deepEqual(gedcomRecords, [
       new gedcom.GedcomRecord(undefined, "TAG", "TAG", "\n\n", []),
     ]);
@@ -55,7 +53,7 @@ describe("GedcomRecord Parsing", () => {
 
   it("conc records disappear", () => {
     const gedcomText = ["0 TAG abc", "1 CONC def"];
-    const [gedcomRecord] = lexer.parseGedcomRecords(gedcomText.join("\n"));
+    const [gedcomRecord] = parseGedcomRecords(gedcomText.join("\n"));
     assert.deepEqual(
       gedcomRecord,
       new gedcom.GedcomRecord(undefined, "TAG", "TAG", "abcdef", [])
