@@ -1,14 +1,12 @@
-import * as gedcom from "../gedcom";
+import { GedcomRecord } from "./gedcomRecord";
 
-export function parseGedcomRecords(text: string): gedcom.GedcomRecord[] {
+export function parseGedcomRecords(text: string): GedcomRecord[] {
   return Array.from(generateGedcomRecords(text));
 }
 
-export function* generateGedcomRecords(
-  text: string
-): Generator<gedcom.GedcomRecord> {
+export function* generateGedcomRecords(text: string): Generator<GedcomRecord> {
   const lines = text.split(/\r?\n/);
-  let ladder: gedcom.GedcomRecord[] = [];
+  let ladder: GedcomRecord[] = [];
 
   for (const [lineNumber, line] of lines.entries()) {
     if (line == "") {
@@ -24,7 +22,7 @@ export function* generateGedcomRecords(
       ...ladder.slice(0, level).map((record) => record.tag),
       tag,
     ].join(".");
-    const record = new gedcom.GedcomRecord(xref, tag, abstag, value, []);
+    const record = new GedcomRecord(xref, tag, abstag, value, []);
 
     if (level == 0) {
       if (ladder.length > 0) {

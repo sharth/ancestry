@@ -8,15 +8,18 @@ import {
   FormGroup,
   ReactiveFormsModule,
 } from "@angular/forms";
-import { serializeGedcomRecordToText } from "../../util/gedcom-serializer";
-import { serializeGedcomSource } from "../../util/gedcom-serializer";
+import {
+  GedcomRecord,
+  GedcomSource,
+  serializeGedcomRecordToText,
+  serializeGedcomSource,
+  parseGedcomRecords,
+} from "../../gedcom";
 import { toObservable } from "@angular/core/rxjs-interop";
 import { ancestryDatabase } from "../../database/ancestry.database";
 import * as rxjs from "rxjs";
 import * as dexie from "dexie";
-import * as gedcom from "../../gedcom";
 import { GedcomDiffComponent } from "../../util/gedcom-diff.component";
-import { parseGedcomRecords } from "../../util/gedcom-lexer";
 
 @Component({
   selector: "app-source",
@@ -109,7 +112,7 @@ export class SourceComponent {
         callNumber: FormControl<string>;
       }>
     >([]),
-    unknownRecords: new FormArray<FormControl<gedcom.GedcomRecord>>([]),
+    unknownRecords: new FormArray<FormControl<GedcomRecord>>([]),
   });
 
   readonly editDialog =
@@ -130,10 +133,9 @@ export class SourceComponent {
 
   addUnknownRecord() {
     this.reactiveForm.controls.unknownRecords.push(
-      new FormControl(
-        new gedcom.GedcomRecord(undefined, "", "", undefined, []),
-        { nonNullable: true }
-      )
+      new FormControl(new GedcomRecord(undefined, "", "", undefined, []), {
+        nonNullable: true,
+      })
     );
   }
 
@@ -174,7 +176,7 @@ export class SourceComponent {
   }
 
   submitForm() {
-    const source = new gedcom.GedcomSource(this.xref());
+    const source = new GedcomSource(this.xref());
     source.abbr = this.reactiveForm.controls.abbr.value ?? undefined;
     source.title = this.reactiveForm.controls.title.value ?? undefined;
     source.text = this.reactiveForm.controls.text.value ?? undefined;

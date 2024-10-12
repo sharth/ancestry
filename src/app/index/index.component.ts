@@ -7,7 +7,7 @@ import {
   serializeGedcomHeader,
   serializeGedcomRecordToText,
   serializeGedcomTrailer,
-} from "../../util/gedcom-serializer";
+} from "../../gedcom";
 
 @Component({
   selector: "app-index",

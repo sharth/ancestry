@@ -3,8 +3,8 @@ import { Component } from "@angular/core";
 import { ancestryDatabase } from "../../database/ancestry.database";
 import * as dexie from "dexie";
 import * as rxjs from "rxjs";
-import type * as gedcom from "../../gedcom";
 import { GedcomDiffComponent } from "../../util/gedcom-diff.component";
+import type { GedcomRecord } from "../../gedcom";
 import {
   serializeGedcomHeader,
   serializeGedcomIndividual,
@@ -14,8 +14,8 @@ import {
   serializeGedcomRepository,
   serializeGedcomTrailer,
   serializeGedcomMultimedia,
-} from "../../util/gedcom-serializer";
-import { parseGedcomRecords } from "../../util/gedcom-lexer";
+  parseGedcomRecords,
+} from "../../gedcom";
 
 @Component({
   selector: "app-gedcom",
@@ -47,7 +47,7 @@ export class GedcomComponent {
   }
 
   // Current set of GedcomRecords, but organized similarly to the text that came in from the user.
-  newGedcomRecords(): rxjs.Observable<gedcom.GedcomRecord[]> {
+  newGedcomRecords(): rxjs.Observable<GedcomRecord[]> {
     return rxjs.from(
       dexie.liveQuery(async () => {
         const newGedcomRecords = [
@@ -82,7 +82,7 @@ export class GedcomComponent {
           await ancestryDatabase.originalText.toArray();
         const oldGedcomRecords = parseGedcomRecords(oldGedcomText);
 
-        const orderedRecords = new Map<string, gedcom.GedcomRecord[]>();
+        const orderedRecords = new Map<string, GedcomRecord[]>();
         oldGedcomRecords
           .filter((gedcomRecord) => gedcomRecord.abstag != "TRLR")
           .forEach((gedcomRecord) => {

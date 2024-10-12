@@ -1,16 +1,16 @@
 import { Component, input } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterLink } from "@angular/router";
-import type { GedcomEvent } from "../../gedcom/gedcomEvent";
-import { serializeGedcomRecordToText } from "../../util/gedcom-serializer";
-import { serializeGedcomIndividual } from "../../util/gedcom-serializer";
-import { serializeGedcomEvent } from "../../util/gedcom-serializer";
+import {
+  serializeGedcomIndividual,
+  serializeGedcomRecordToText,
+  serializeGedcomEvent,
+} from "../../gedcom";
 import { toObservable } from "@angular/core/rxjs-interop";
 import { ancestryDatabase } from "../../database/ancestry.database";
 import * as rxjs from "rxjs";
 import * as dexie from "dexie";
-import type { GedcomIndividual } from "../../gedcom/gedcomIndividual";
-import type { GedcomFamily } from "../../gedcom/gedcomFamily";
+import type { GedcomIndividual, GedcomEvent, GedcomFamily } from "../../gedcom";
 
 @Component({
   selector: "app-individual",

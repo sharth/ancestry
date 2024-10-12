@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import { parseGedcomCitation } from "./gedcomCitationParser";
-import { parseGedcomRecords } from "../util/gedcom-lexer";
+import { parseGedcomRecords } from "./gedcomRecordParser";
 
 it("SimpleCitation", () => {
   const [gedcomRecord] = parseGedcomRecords(

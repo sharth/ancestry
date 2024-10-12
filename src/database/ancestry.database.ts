@@ -1,17 +1,26 @@
 import * as rxjs from "rxjs";
 import * as dexie from "dexie";
-import * as gedcom from "../gedcom";
+import {
+  GedcomHeader,
+  GedcomSubmitter,
+  GedcomTrailer,
+  GedcomRepository,
+  GedcomSource,
+  GedcomIndividual,
+  GedcomFamily,
+  GedcomMultimedia,
+} from "../gedcom";
 
 class AncestryDatabase extends dexie.Dexie {
   originalText!: dexie.Dexie.Table<{ text: string }>;
-  headers!: dexie.Dexie.Table<gedcom.GedcomHeader>;
-  submitters!: dexie.Dexie.Table<gedcom.GedcomSubmitter, string>;
-  trailers!: dexie.Dexie.Table<gedcom.GedcomTrailer>;
-  repositories!: dexie.Dexie.Table<gedcom.GedcomRepository, string>;
-  sources!: dexie.Dexie.Table<gedcom.GedcomSource, string>;
-  individuals!: dexie.Dexie.Table<gedcom.GedcomIndividual, string>;
-  families!: dexie.Dexie.Table<gedcom.GedcomFamily, string>;
-  multimedia!: dexie.Dexie.Table<gedcom.GedcomMultimedia, string>;
+  headers!: dexie.Dexie.Table<GedcomHeader>;
+  submitters!: dexie.Dexie.Table<GedcomSubmitter, string>;
+  trailers!: dexie.Dexie.Table<GedcomTrailer>;
+  repositories!: dexie.Dexie.Table<GedcomRepository, string>;
+  sources!: dexie.Dexie.Table<GedcomSource, string>;
+  individuals!: dexie.Dexie.Table<GedcomIndividual, string>;
+  families!: dexie.Dexie.Table<GedcomFamily, string>;
+  multimedia!: dexie.Dexie.Table<GedcomMultimedia, string>;
 
   constructor() {
     super("AncestryDatabase");
@@ -30,29 +39,29 @@ class AncestryDatabase extends dexie.Dexie {
         .table("sources")
         .toCollection()
         .modify((source) => {
-          (source as gedcom.GedcomSource).multimediaXrefs = [];
+          (source as GedcomSource).multimediaXrefs = [];
         })
     );
     this.version(4).stores({
       submitters: "xref",
     });
 
-    this.headers.mapToClass(gedcom.GedcomHeader);
-    this.submitters.mapToClass(gedcom.GedcomSubmitter);
-    this.trailers.mapToClass(gedcom.GedcomTrailer);
-    this.repositories.mapToClass(gedcom.GedcomRepository);
-    this.sources.mapToClass(gedcom.GedcomSource);
-    this.individuals.mapToClass(gedcom.GedcomIndividual);
-    this.families.mapToClass(gedcom.GedcomFamily);
-    this.multimedia.mapToClass(gedcom.GedcomMultimedia);
+    this.headers.mapToClass(GedcomHeader);
+    this.submitters.mapToClass(GedcomSubmitter);
+    this.trailers.mapToClass(GedcomTrailer);
+    this.repositories.mapToClass(GedcomRepository);
+    this.sources.mapToClass(GedcomSource);
+    this.individuals.mapToClass(GedcomIndividual);
+    this.families.mapToClass(GedcomFamily);
+    this.multimedia.mapToClass(GedcomMultimedia);
   }
 }
 
 export const ancestryDatabase = new AncestryDatabase();
 
 export function parentsOfGedcomFamily(
-  gedcomFamily: gedcom.GedcomFamily
-): rxjs.Observable<gedcom.GedcomIndividual[]> {
+  gedcomFamily: GedcomFamily
+): rxjs.Observable<GedcomIndividual[]> {
   return rxjs.of([gedcomFamily.husbandXref, gedcomFamily.wifeXref]).pipe(
     rxjs.map((parentXrefs) =>
       parentXrefs.filter((parentXref) => parentXref != null)
@@ -70,8 +79,8 @@ export function parentsOfGedcomFamily(
 }
 
 export function childrenOfGedcomFamily(
-  gedcomFamily: gedcom.GedcomFamily
-): rxjs.Observable<gedcom.GedcomIndividual[]> {
+  gedcomFamily: GedcomFamily
+): rxjs.Observable<GedcomIndividual[]> {
   return rxjs.of(gedcomFamily.childXrefs).pipe(
     rxjs.map((childXrefs) =>
       childXrefs.map((childXref) =>

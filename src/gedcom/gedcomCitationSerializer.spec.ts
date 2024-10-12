@@ -1,7 +1,7 @@
 import { assert } from "chai";
 import { GedcomCitation } from "./gedcomCitation";
 import { serializeGedcomCitation } from "./gedcomCitationSerializer";
-import { serializeGedcomRecordToText } from "../util/gedcom-serializer";
+import { serializeGedcomRecordToText } from "./gedcomRecordSerializer";
 
 it("GedcomCitation", () => {
   const gedcomCitation = new GedcomCitation("@S1@");

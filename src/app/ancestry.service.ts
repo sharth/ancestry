@@ -1,33 +1,42 @@
 import { ancestryDatabase } from "../database/ancestry.database";
 import * as dexie from "dexie";
-import * as gedcom from "../gedcom";
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
-import { generateGedcomRecords } from "../util/gedcom-lexer";
+import type {
+  GedcomSubmitter,
+  GedcomTrailer,
+  GedcomIndividual,
+  GedcomFamily,
+  GedcomRepository,
+  GedcomSource,
+  GedcomMultimedia,
+} from "../gedcom";
 import {
-  parseGedcomFamily,
-  parseGedcomIndividual,
-  parseGedcomMultimedia,
-  parseGedcomRepository,
-  parseGedcomSource,
+  GedcomHeader,
+  generateGedcomRecords,
   parseGedcomSubmitter,
   parseGedcomTrailer,
-} from "../util/gedcom-parser";
+  parseGedcomIndividual,
+  parseGedcomFamily,
+  parseGedcomRepository,
+  parseGedcomSource,
+  parseGedcomMultimedia,
+} from "../gedcom";
 
 export class AncestryService {
   parseText(text: string) {
-    const headers: gedcom.GedcomHeader[] = [];
-    const submitters: gedcom.GedcomSubmitter[] = [];
-    const trailers: gedcom.GedcomTrailer[] = [];
-    const individuals: gedcom.GedcomIndividual[] = [];
-    const families: gedcom.GedcomFamily[] = [];
-    const repositories: gedcom.GedcomRepository[] = [];
-    const sources: gedcom.GedcomSource[] = [];
-    const multimedia: gedcom.GedcomMultimedia[] = [];
+    const headers: GedcomHeader[] = [];
+    const submitters: GedcomSubmitter[] = [];
+    const trailers: GedcomTrailer[] = [];
+    const individuals: GedcomIndividual[] = [];
+    const families: GedcomFamily[] = [];
+    const repositories: GedcomRepository[] = [];
+    const sources: GedcomSource[] = [];
+    const multimedia: GedcomMultimedia[] = [];
 
     for (const gedcomRecord of generateGedcomRecords(text)) {
       switch (gedcomRecord.tag) {
         case "HEAD":
-          headers.push(new gedcom.GedcomHeader(gedcomRecord));
+          headers.push(new GedcomHeader(gedcomRecord));
           break;
         case "SUBM":
           submitters.push(parseGedcomSubmitter(gedcomRecord));
