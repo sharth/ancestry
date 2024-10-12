@@ -10,3 +10,5 @@ export * from "./gedcomSource";
 export * from "./gedcomSubmitter";
 export * from "./gedcomTrailer";
 export * from "./gedcomUnknown";
+export * from "./gedcomCitationParser";
+export * from "./gedcomCitationSerializer";

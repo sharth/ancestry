@@ -1,5 +1,4 @@
 import type {
-  GedcomCitation,
   GedcomEvent,
   GedcomFamily,
   GedcomHeader,
@@ -159,42 +158,6 @@ export function serializeGedcomFamily(gedcomFamily: GedcomFamily) {
       // TODO: Fill in.
     ]);
   }
-}
-
-export function serializeGedcomCitation(
-  gedcomCitation: GedcomCitation
-): GedcomRecord {
-  if (gedcomCitation.gedcomRecord) {
-    return gedcomCitation.gedcomRecord;
-  }
-  return new GedcomRecord(
-    undefined,
-    "SOUR",
-    "",
-    gedcomCitation.sourceXref,
-    [
-      gedcomCitation.obje
-        ? new GedcomRecord(undefined, "OBJE", "", gedcomCitation.obje, [])
-        : null,
-      gedcomCitation.name
-        ? new GedcomRecord(undefined, "NAME", "", gedcomCitation.name, [])
-        : null,
-      gedcomCitation.note
-        ? new GedcomRecord(undefined, "NOTE", "", gedcomCitation.note, [])
-        : null,
-      gedcomCitation.page
-        ? new GedcomRecord(undefined, "PAGE", "", gedcomCitation.page, [])
-        : null,
-      gedcomCitation.text
-        ? new GedcomRecord(undefined, "DATA", "", undefined, [
-            new GedcomRecord(undefined, "TEXT", "", gedcomCitation.text, []),
-          ])
-        : null,
-      gedcomCitation.quality
-        ? new GedcomRecord(undefined, "QUAY", "", gedcomCitation.quality, [])
-        : null,
-    ].filter((record) => record != null)
-  );
 }
 
 export function serializeGedcomEvent(gedcomEvent: GedcomEvent): GedcomRecord {

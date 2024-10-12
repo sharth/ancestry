@@ -1,5 +1,3 @@
-import type { GedcomRecord } from "./gedcomRecord";
-
 export class GedcomCitation {
   constructor(public sourceXref: string) {}
 
@@ -9,6 +7,4 @@ export class GedcomCitation {
   text?: string;
   page?: string;
   quality?: string;
-
-  gedcomRecord?: GedcomRecord;
 }
