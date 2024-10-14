@@ -1,5 +1,4 @@
-import * as rxjs from "rxjs";
-import * as dexie from "dexie";
+import { Dexie } from "dexie";
 import {
   GedcomHeader,
   GedcomSubmitter,
@@ -11,16 +10,16 @@ import {
   GedcomMultimedia,
 } from "../gedcom";
 
-class AncestryDatabase extends dexie.Dexie {
-  originalText!: dexie.Dexie.Table<{ text: string }>;
-  headers!: dexie.Dexie.Table<GedcomHeader>;
-  submitters!: dexie.Dexie.Table<GedcomSubmitter, string>;
-  trailers!: dexie.Dexie.Table<GedcomTrailer>;
-  repositories!: dexie.Dexie.Table<GedcomRepository, string>;
-  sources!: dexie.Dexie.Table<GedcomSource, string>;
-  individuals!: dexie.Dexie.Table<GedcomIndividual, string>;
-  families!: dexie.Dexie.Table<GedcomFamily, string>;
-  multimedia!: dexie.Dexie.Table<GedcomMultimedia, string>;
+class AncestryDatabase extends Dexie {
+  originalText!: Dexie.Table<{ text: string }>;
+  headers!: Dexie.Table<GedcomHeader>;
+  submitters!: Dexie.Table<GedcomSubmitter, string>;
+  trailers!: Dexie.Table<GedcomTrailer>;
+  repositories!: Dexie.Table<GedcomRepository, string>;
+  sources!: Dexie.Table<GedcomSource, string>;
+  individuals!: Dexie.Table<GedcomIndividual, string>;
+  families!: Dexie.Table<GedcomFamily, string>;
+  multimedia!: Dexie.Table<GedcomMultimedia, string>;
 
   constructor() {
     super("AncestryDatabase");
@@ -58,36 +57,3 @@ class AncestryDatabase extends dexie.Dexie {
 }
 
 export const ancestryDatabase = new AncestryDatabase();
-
-export function parentsOfGedcomFamily(
-  gedcomFamily: GedcomFamily
-): rxjs.Observable<GedcomIndividual[]> {
-  return rxjs.of([gedcomFamily.husbandXref, gedcomFamily.wifeXref]).pipe(
-    rxjs.map((parentXrefs) =>
-      parentXrefs.filter((parentXref) => parentXref != null)
-    ),
-    rxjs.map((parentXrefs) =>
-      parentXrefs.map((parentXref) =>
-        dexie.liveQuery(() => ancestryDatabase.individuals.get(parentXref))
-      )
-    ),
-    rxjs.switchMap((parentObservables) =>
-      rxjs.combineLatest(parentObservables)
-    ),
-    rxjs.map((parents) => parents.filter((parent) => parent != null))
-  );
-}
-
-export function childrenOfGedcomFamily(
-  gedcomFamily: GedcomFamily
-): rxjs.Observable<GedcomIndividual[]> {
-  return rxjs.of(gedcomFamily.childXrefs).pipe(
-    rxjs.map((childXrefs) =>
-      childXrefs.map((childXref) =>
-        dexie.liveQuery(() => ancestryDatabase.individuals.get(childXref))
-      )
-    ),
-    rxjs.switchMap((childObservables) => rxjs.combineLatest(childObservables)),
-    rxjs.map((children) => children.filter((child) => child != null))
-  );
-}
