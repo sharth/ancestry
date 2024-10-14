@@ -9,7 +9,7 @@ export function parseGedcomSubmitter(
   if (gedcomRecord.xref == null) throw new Error();
   if (gedcomRecord.value != null) throw new Error();
 
-  const gedcomSubmitter = new GedcomSubmitter(gedcomRecord.xref, gedcomRecord);
+  const gedcomSubmitter = new GedcomSubmitter(gedcomRecord.xref);
 
   for (const childRecord of gedcomRecord.children) {
     switch (childRecord.tag) {

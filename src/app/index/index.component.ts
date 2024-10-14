@@ -25,6 +25,7 @@ export class IndexComponent {
       dexie.liveQuery(() => ancestryDatabase.families.toArray()),
       dexie.liveQuery(() => ancestryDatabase.repositories.toArray()),
       dexie.liveQuery(() => ancestryDatabase.sources.toArray()),
+      dexie.liveQuery(() => ancestryDatabase.submitters.toArray()),
     ])
     .pipe(
       rxjs.map(
@@ -35,6 +36,7 @@ export class IndexComponent {
           families,
           repositories,
           sources,
+          submitters,
         ]) => ({
           headers: headers,
           headerText: headers
@@ -50,6 +52,7 @@ export class IndexComponent {
           families,
           repositories,
           sources,
+          submitters,
         })
       )
     );

@@ -16,6 +16,7 @@ import {
   serializeGedcomMultimedia,
   parseGedcomRecords,
 } from "../../gedcom";
+import { serializeGedcomSubmitter } from "../../gedcom/gedcomSubmitterSerializer";
 
 @Component({
   selector: "app-gedcom",
@@ -55,7 +56,7 @@ export class GedcomComponent {
             serializeGedcomHeader
           ),
           ...(await ancestryDatabase.submitters.toArray()).map(
-            (submitter) => submitter.gedcomRecord
+            serializeGedcomSubmitter
           ),
           ...(await ancestryDatabase.trailers.toArray()).map(
             serializeGedcomTrailer
