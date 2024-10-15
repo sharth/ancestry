@@ -41,7 +41,7 @@
     "dexie": "^4.0.8",
     "eslint": "^9.12.0",
     "eslint-plugin-markdown": "^5.1.0",
-    "jasmine": "^5.3.1",
+    "jasmine": "^5.4.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "karma": "^6.4.4",
@@ -52,7 +52,7 @@
     "ng-packagr": "^18.2.1",
     "prettier": "^3.3.3",
     "typescript": "^5.5.4",
-    "typescript-eslint": "^8.8.1",
+    "typescript-eslint": "^8.9.0",
     "vest": "^5.4.3"
   }
 }
