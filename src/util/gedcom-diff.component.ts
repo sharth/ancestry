@@ -18,10 +18,7 @@ export class GedcomDiffComponent {
     let i = 0;
     let j = 0;
     while (i < oldGedcomArr.length && j < newGedcomArr.length) {
-      if (i < 100 && j < 100) {
-        console.log(i, j, oldGedcomArr[i], newGedcomArr[j]);
-      }
-      if (oldGedcomArr[i] == newGedcomArr[i]) {
+      if (oldGedcomArr[i] == newGedcomArr[j]) {
         diffs.push({
           oldLine: oldGedcomArr[i],
           oldColor: "lightgray",
