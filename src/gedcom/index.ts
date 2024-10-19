@@ -25,6 +25,7 @@ export * from "./gedcomSourceParser";
 export * from "./gedcomSourceSerializer";
 export * from "./gedcomSource";
 export * from "./gedcomSubmitterParser";
+export * from "./gedcomSubmitterSerializer";
 export * from "./gedcomSubmitter";
 export * from "./gedcomTrailerParser";
 export * from "./gedcomTrailerSerializer";
