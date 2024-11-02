@@ -1,11 +1,7 @@
 name: main
 on:
   push:
-    branches:
-      - "main"
-    paths-ignore:
-      - ".github/**"
-      - ".vscode/**"
+    branches: ["main"]
 jobs:
   build:
     runs-on: ubuntu-latest
