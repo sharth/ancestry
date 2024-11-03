@@ -7,6 +7,7 @@ export * from "./gedcomEvent";
 export * from "./gedcomFamilyParser";
 export * from "./gedcomFamilySerializer";
 export * from "./gedcomFamily";
+export * from "./gedcomHeaderParser";
 export * from "./gedcomHeaderSerializer";
 export * from "./gedcomHeader";
 export * from "./gedcomIndividualParser";

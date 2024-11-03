@@ -1,5 +1,4 @@
 import { Component } from "@angular/core";
-import { ancestryService } from "../ancestry.service";
 import { CommonModule } from "@angular/common";
 import { RouterModule } from "@angular/router";
 
@@ -11,8 +10,6 @@ import { RouterModule } from "@angular/router";
   styleUrl: "./validation.component.css",
 })
 export class ValidationComponent {
-  readonly ancestryService = ancestryService;
-
   // readonly sourceScenarios = computed(() =>
   //   this.ancestryService.sources().toList()
   //       .map((source) => ({source: source, result: sourceValidators(source)})));
