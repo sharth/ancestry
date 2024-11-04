@@ -43,8 +43,9 @@ export function parseGedcomCitation(
           switch (grandchildRecord.tag) {
             case "TEXT":
               if (grandchildRecord.xref != null) throw new Error();
-              if (grandchildRecord.value == null) throw new Error();
-              gedcomCitation.text = grandchildRecord.value;
+              if (grandchildRecord.value != null) {
+                gedcomCitation.text = grandchildRecord.value;
+              }
               break;
             default:
               reportUnparsedRecord(grandchildRecord);

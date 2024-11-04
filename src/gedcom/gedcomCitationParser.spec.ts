@@ -27,3 +27,11 @@ it("SimpleCitation", () => {
     }
   );
 });
+
+it("Support empty citation reason", () => {
+  const [gedcomRecord] = parseGedcomRecords(
+    ["0 SOUR @S1@", "1 DATA", "2 TEXT"].join("\n")
+  );
+  const gedcomCitation = parseGedcomCitation(gedcomRecord);
+  assert.deepEqual({ ...gedcomCitation }, { sourceXref: "@S1@" });
+});
