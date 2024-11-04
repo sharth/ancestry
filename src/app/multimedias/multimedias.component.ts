@@ -20,7 +20,7 @@ export class MultimediasComponent {
     .pipe(
       rxjs.map((multimedias) => ({
         multimedias: multimedias,
-      })),
+      }))
     );
 
   readonly reactiveForm = new FormGroup({
@@ -49,7 +49,7 @@ export class MultimediasComponent {
           });
         const xrefMatch = /^(@.*)([0-9]+)(@)$/.exec(xref)!;
         return xrefMatch[1] + String(Number(xrefMatch[2]) + 1) + xrefMatch[3];
-      },
+      }
     );
   }
 

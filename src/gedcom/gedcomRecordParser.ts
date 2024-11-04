@@ -12,7 +12,7 @@ export function* generateGedcomRecords(text: string): Generator<GedcomRecord> {
     if (line == "") {
       continue;
     }
-    const match = /^([0-9]+) *(@[^@]+@)? *([A-Za-z0-9_]+) *(.+)?$/.exec(line);
+    const match = /^([0-9]+) *(@[^@]+@)? *([A-Za-z0-9_]+) *(.*)$/.exec(line);
     if (match == null) {
       throw new Error(`Failed to parse line number ${lineNumber + 1}: ${line}`);
     }
@@ -22,24 +22,31 @@ export function* generateGedcomRecords(text: string): Generator<GedcomRecord> {
       ...ladder.slice(0, level).map((record) => record.tag),
       tag,
     ].join(".");
-    const record = new GedcomRecord(xref, tag, abstag, value, []);
+    const record = new GedcomRecord(xref, tag, abstag, value || undefined, []);
 
     if (level == 0) {
       if (ladder.length > 0) {
         yield ladder[0];
       }
       ladder = [record];
-    } else if (tag === "CONC") {
-      ladder.at(-1)!.value ??= "";
-      ladder.at(-1)!.value += value ?? "";
-    } else if (tag === "CONT") {
-      ladder.at(-1)!.value ??= "";
-      ladder.at(-1)!.value += "\n";
-      ladder.at(-1)!.value += value ?? "";
-    } else {
+    } else if (level <= ladder.length) {
+      const parent = ladder[level - 1];
       ladder.length = level;
-      ladder.at(-1)!.children.push(record);
-      ladder.push(record);
+      if (tag === "CONC") {
+        parent.value ??= "";
+        parent.value += value;
+      } else if (tag === "CONT") {
+        parent.value ??= "";
+        parent.value += "\n";
+        parent.value += value;
+      } else {
+        parent.children.push(record);
+        ladder.push(record);
+      }
+    } else {
+      throw new Error(
+        `Skipped parent level on line number ${lineNumber + 1}: ${line}`
+      );
     }
   }
   if (ladder.length > 0) {

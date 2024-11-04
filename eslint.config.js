@@ -19,6 +19,11 @@ export default tseslint.config(
       "max-len": ["error", { code: 120 }],
       "@typescript-eslint/consistent-type-imports": "error",
       "@typescript-eslint/no-import-type-side-effects": "error",
+      "@typescript-eslint/restrict-template-expressions": [
+        "error",
+        { allowNumber: true },
+      ],
+      "@typescript-eslint/no-extraneous-class": "off",
     },
-  },
+  }
 );
