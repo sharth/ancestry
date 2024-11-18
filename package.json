@@ -39,7 +39,7 @@
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
     "chai": "^5.1.2",
-    "dexie": "^4.0.9",
+    "dexie": "^4.0.10",
     "diff": "^7.0.0",
     "eslint": "^9.15.0",
     "eslint-plugin-markdown": "^5.1.0",
