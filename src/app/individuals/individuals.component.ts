@@ -8,7 +8,7 @@ import * as dexie from "dexie";
 @Component({
   selector: "app-individuals",
   standalone: true,
-  imports: [CommonModule, RouterLink, KeyValuePipe],
+  imports: [CommonModule, RouterLink],
   templateUrl: "./individuals.component.html",
   styleUrl: "./individuals.component.css",
 })

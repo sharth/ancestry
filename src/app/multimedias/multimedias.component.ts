@@ -10,7 +10,7 @@ import { GedcomMultimedia } from "../../gedcom/gedcomMultimedia";
 @Component({
   selector: "app-multimedias",
   standalone: true,
-  imports: [CommonModule, RouterLink, KeyValuePipe, ReactiveFormsModule],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule],
   templateUrl: "./multimedias.component.html",
   styleUrl: "./multimedias.component.css",
 })
