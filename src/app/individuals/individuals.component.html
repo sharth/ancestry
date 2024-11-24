@@ -1,7 +1,6 @@
-@let vm = vm$ | async;
-<h1>{{ vm?.individuals?.length }} Individuals</h1>
+<h1>{{ individuals().length }} Individuals</h1>
 <ul>
-  @for (group of vm?.individualsBySurname; track group.surname) {
+  @for (group of individualsBySurname(); track group.surname) {
     <li>{{ group.surname }}</li>
     <ul>
       @for (individual of group.individuals; track individual.xref) {

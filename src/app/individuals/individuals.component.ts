@@ -1,9 +1,9 @@
-import { Component } from "@angular/core";
-import { CommonModule, KeyValuePipe } from "@angular/common";
+import type { ResourceRef } from "@angular/core";
+import { resource, Component, computed } from "@angular/core";
+import { CommonModule } from "@angular/common";
 import { RouterLink } from "@angular/router";
 import { ancestryDatabase } from "../../database/ancestry.database";
-import * as rxjs from "rxjs";
-import * as dexie from "dexie";
+import type { GedcomIndividual } from "../../gedcom";
 
 @Component({
   selector: "app-individuals",
@@ -13,24 +13,34 @@ import * as dexie from "dexie";
   styleUrl: "./individuals.component.css",
 })
 export class IndividualsComponent {
-  readonly vm$ = rxjs
-    .from(dexie.liveQuery(() => ancestryDatabase.individuals.toArray()))
-    .pipe(
-      rxjs.map((individuals) => ({
-        individuals: individuals,
-        individualsBySurname: Array.from(
-          Map.groupBy(individuals, (individual) => individual.surname).entries()
-        )
-          .map(([surname, individuals]) => ({ surname, individuals }))
-          .map(({ surname, individuals }) => ({
-            surname,
-            individuals: individuals.sort((lhs, rhs) =>
-              (lhs.name ?? "").localeCompare(rhs.name ?? "")
-            ),
-          }))
-          .sort((lhs, rhs) =>
-            (lhs.surname ?? "").localeCompare(rhs.surname ?? "")
-          ),
-      }))
+  readonly resource: ResourceRef<{ individuals: GedcomIndividual[] }> =
+    resource({
+      request: () => ({
+        ancestryDatabaseIteration: ancestryDatabase.iteration(),
+      }),
+      loader: async () => ({
+        individuals: await ancestryDatabase.individuals.toArray(),
+      }),
+    });
+
+  readonly individuals = computed<GedcomIndividual[]>(
+    () => this.resource.value()?.individuals ?? []
+  );
+
+  readonly individualsBySurname = computed<
+    { surname?: string; individuals: GedcomIndividual[] }[]
+  >(() => {
+    const individuals = this.individuals().toSorted(
+      (lhs, rhs) =>
+        (lhs.surname ?? "").localeCompare(rhs.surname ?? "") ||
+        (lhs.name ?? "").localeCompare(rhs.name ?? "")
     );
+    const individualsMap = Map.groupBy(
+      individuals,
+      (individual) => individual.surname
+    );
+    return Array.from(individualsMap.entries()).map(
+      ([surname, individuals]) => ({ surname, individuals })
+    );
+  });
 }
