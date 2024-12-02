@@ -13,7 +13,7 @@ import type { GedcomIndividual } from "../../gedcom";
   styleUrl: "./individuals.component.css",
 })
 export class IndividualsComponent {
-  readonly resource: ResourceRef<{ individuals: GedcomIndividual[] }> =
+  readonly database: ResourceRef<{ individuals: GedcomIndividual[] }> =
     resource({
       request: () => ({
         ancestryDatabaseIteration: ancestryDatabase.iteration(),
@@ -23,14 +23,21 @@ export class IndividualsComponent {
       }),
     });
 
-  readonly individuals = computed<GedcomIndividual[]>(
-    () => this.resource.value()?.individuals ?? []
-  );
+  readonly vm = computed(() => {
+    const database = this.database.value();
+    if (database === undefined) {
+      return undefined;
+    }
+    return {
+      individuals: database.individuals,
+      individualsBySurname: this.individualsBySurname(database.individuals),
+    };
+  });
 
-  readonly individualsBySurname = computed<
-    { surname?: string; individuals: GedcomIndividual[] }[]
-  >(() => {
-    const individuals = this.individuals().toSorted(
+  private individualsBySurname(
+    individuals: GedcomIndividual[]
+  ): { surname?: string; individuals: GedcomIndividual[] }[] {
+    individuals = individuals.toSorted(
       (lhs, rhs) =>
         (lhs.surname ?? "").localeCompare(rhs.surname ?? "") ||
         (lhs.name ?? "").localeCompare(rhs.name ?? "")
@@ -42,5 +49,5 @@ export class IndividualsComponent {
     return Array.from(individualsMap.entries()).map(
       ([surname, individuals]) => ({ surname, individuals })
     );
-  });
+  }
 }

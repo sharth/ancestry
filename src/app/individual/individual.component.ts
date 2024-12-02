@@ -1,4 +1,5 @@
-import { Component, input } from "@angular/core";
+import type { ResourceRef } from "@angular/core";
+import { Component, computed, input, resource } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterLink } from "@angular/router";
 import {
@@ -6,10 +7,7 @@ import {
   serializeGedcomRecordToText,
   serializeGedcomEvent,
 } from "../../gedcom";
-import { toObservable } from "@angular/core/rxjs-interop";
 import { ancestryDatabase } from "../../database/ancestry.database";
-import * as rxjs from "rxjs";
-import * as dexie from "dexie";
 import type { GedcomIndividual, GedcomEvent, GedcomFamily } from "../../gedcom";
 
 @Component({
@@ -21,36 +19,65 @@ import type { GedcomIndividual, GedcomEvent, GedcomFamily } from "../../gedcom";
 })
 export class IndividualComponent {
   readonly xref = input.required<string>();
-  readonly vm$ = toObservable(this.xref).pipe(
-    rxjs.switchMap((xref) =>
-      dexie.liveQuery(() => ancestryDatabase.individuals.get(xref))
-    ),
-    rxjs.combineLatestWith(
-      dexie.liveQuery(() => ancestryDatabase.individuals.toArray()),
-      dexie.liveQuery(() => ancestryDatabase.families.toArray())
-    ),
-    rxjs.map(([individual, individuals, families]) => {
-      if (individual == null) {
-        return null;
-      }
-      return {
-        ...individual,
-        events: individual.events.map((event) => ({
-          ...event,
-          gedcom: serializeGedcomRecordToText(serializeGedcomEvent(event)).join(
-            "\n"
-          ),
-        })),
-        ancestors: this.ancestors(individual, individuals, families),
-        relatives: this.relatives(individual, individuals, families),
-        gedcom: serializeGedcomRecordToText(
-          serializeGedcomIndividual(individual)
-        ).join("\n"),
-      };
-    })
-  );
 
-  ancestors(
+  readonly database: ResourceRef<{
+    individual?: GedcomIndividual;
+    individuals: GedcomIndividual[];
+    families: GedcomFamily[];
+  }> = resource({
+    request: () => ({
+      ancestryDatabaseIteration: ancestryDatabase.iteration(),
+      xref: this.xref(),
+    }),
+    loader: async ({ request }) => {
+      return await ancestryDatabase.transaction(
+        "r",
+        ["individuals", "families"],
+        async () => {
+          return {
+            individual: await ancestryDatabase.individuals.get(request.xref),
+            individuals: await ancestryDatabase.individuals.toArray(),
+            families: await ancestryDatabase.families.toArray(),
+          };
+        }
+      );
+    },
+  });
+
+  readonly vm = computed(() => {
+    const database = this.database.value();
+    if (database === undefined) {
+      return undefined;
+    }
+    const individual = database.individual;
+    if (individual === undefined) {
+      return undefined;
+    }
+    return {
+      ...individual,
+      events: individual.events.map((event) => ({
+        ...event,
+        gedcom: serializeGedcomRecordToText(serializeGedcomEvent(event)).join(
+          "\n"
+        ),
+      })),
+      ancestors: this.ancestors(
+        individual,
+        database.individuals,
+        database.families
+      ),
+      relatives: this.relatives(
+        individual,
+        database.individuals,
+        database.families
+      ),
+      gedcom: serializeGedcomRecordToText(
+        serializeGedcomIndividual(individual)
+      ).join("\n"),
+    };
+  });
+
+  private ancestors(
     self: GedcomIndividual,
     individuals: GedcomIndividual[],
     families: GedcomFamily[]
@@ -78,7 +105,7 @@ export class IndividualComponent {
     return ancestors;
   }
 
-  relatives(
+  private relatives(
     self: GedcomIndividual,
     individuals: GedcomIndividual[],
     families: GedcomFamily[]
