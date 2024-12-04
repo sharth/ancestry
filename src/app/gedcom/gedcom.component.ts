@@ -41,16 +41,16 @@ export class GedcomComponent {
     }),
   });
 
-  private readonly originalGedcomText = computed<string[]>(() => {
+  private readonly originalGedcomText = computed<string>(() => {
     const originalText = this.database.value()?.originalText;
     if (originalText == undefined) {
-      return [];
+      return "";
     }
-    return originalText.flatMap((row) => row.text.split(/\r?\n/));
+    return originalText.flatMap((row) => row.text).join("\n");
   });
 
   private readonly originalGedcomRecords = computed<GedcomRecord[]>(() =>
-    parseGedcomRecords(this.originalGedcomText().join("\n"))
+    parseGedcomRecords(this.originalGedcomText())
   );
 
   private readonly currentGedcomRecords = computed<GedcomRecord[]>(() => {
@@ -84,14 +84,14 @@ export class GedcomComponent {
     return Array.from(orderedRecords.values()).flat();
   });
 
-  private readonly orderedGedcomText = computed<string[]>(() => {
-    return this.orderedGedcomRecords().flatMap((record) =>
-      serializeGedcomRecordToText(record)
-    );
+  private readonly orderedGedcomText = computed<string>(() => {
+    return this.orderedGedcomRecords()
+      .flatMap((record) => serializeGedcomRecordToText(record))
+      .join("\n");
   });
 
   readonly vm = computed(() => ({
-    oldGedcomText: this.originalGedcomText().join("\n"),
-    newGedcomText: this.orderedGedcomText().join("\n"),
+    oldGedcomText: this.originalGedcomText(),
+    newGedcomText: this.orderedGedcomText(),
   }));
 }
