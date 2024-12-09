@@ -2,11 +2,16 @@ import { Component, computed, inject, input } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterModule } from "@angular/router";
 import { AncestryService } from "../../database/ancestry.service";
+import { RepositorySourcesComponent } from "../repository-sources/repository-sources.component";
+import {
+  serializeGedcomRecordToText,
+  serializeGedcomRepository,
+} from "../../gedcom";
 
 @Component({
   selector: "app-repository",
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, RepositorySourcesComponent],
   templateUrl: "./repository.component.html",
   styleUrl: "./repository.component.css",
 })
@@ -24,26 +29,11 @@ export class RepositoryComponent {
       return undefined;
     }
 
-    const sources = [...ancestry.sources.values()];
-
     return {
-      repository,
-      sources: sources
-        .flatMap((source) =>
-          source.repositoryCitations.map((repositoryCitation) => ({
-            source,
-            repositoryCitation,
-          }))
-        )
-        .filter(
-          ({ repositoryCitation }) =>
-            repositoryCitation.repositoryXref == this.xref()
-        )
-        .map(({ source, repositoryCitation }) => ({
-          xref: source.xref,
-          abbr: source.abbr,
-          callNumbers: repositoryCitation.callNumbers,
-        })),
+      name: repository.name,
+      gedcom: serializeGedcomRecordToText(
+        serializeGedcomRepository(repository)
+      ).join("\n"),
     };
   });
 }

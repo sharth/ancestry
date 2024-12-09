@@ -1,0 +1,22 @@
+@if (vm(); as vm) {
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Source</th>
+        <th>Call Numbers</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (source of vm.sources; track source) {
+        <tr>
+          <td>
+            <a routerLink="/source/{{ source.xref }}">{{
+              source.abbr ?? source.xref
+            }}</a>
+          </td>
+          <td>{{ source.callNumbers }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

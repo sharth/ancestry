@@ -1,25 +1,9 @@
 @if (vm(); as vm) {
-  <h1>{{ vm.repository.name ?? vm.repository.xref }}</h1>
+  <h1>{{ vm.name ?? xref() }}</h1>
 
   <h2>Sources</h2>
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>Source</th>
-        <th>Call Numbers</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (source of vm.sources; track source) {
-        <tr>
-          <td>
-            <a routerLink="/source/{{ source.xref }}">{{
-              source.abbr ?? source.xref
-            }}</a>
-          </td>
-          <td>{{ source.callNumbers }}</td>
-        </tr>
-      }
-    </tbody>
-  </table>
+  <app-repository-sources [xref]="xref()"></app-repository-sources>
+
+  <h2>Gedcom</h2>
+  <pre>{{ vm.gedcom }}</pre>
 }
