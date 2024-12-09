@@ -23,6 +23,7 @@ import { GedcomDiffComponent } from "../../util/gedcom-diff.component";
 import { AncestryService } from "../../database/ancestry.service";
 import { SourceCitationsComponent } from "../source-citations/source-citations.component";
 import { SourceRepositoriesComponent } from "../source-repositories/source-repositories.component";
+import { SourceMultimediaComponent } from "../source-multimedia/source-multimedia.component";
 
 @Component({
   selector: "app-source",
@@ -36,6 +37,7 @@ import { SourceRepositoriesComponent } from "../source-repositories/source-repos
     GedcomDiffComponent,
     SourceCitationsComponent,
     SourceRepositoriesComponent,
+    SourceMultimediaComponent,
   ],
 })
 export class SourceComponent {
@@ -59,11 +61,11 @@ export class SourceComponent {
     }
 
     return {
-      ...source,
-      multimedia: source.multimediaXrefs.map((multimediaXref) => ({
-        ...ancestry.multimedia.get(multimediaXref),
-        xref: multimediaXref,
-      })),
+      xref: this.xref(),
+      abbr: source.abbr,
+      title: source.title,
+      text: source.text,
+      unknownRecords: source.unknownRecords,
       repositories: [...ancestry.repositories.values()],
       oldGedcomText: [ancestry.originalText]
         .flatMap((text) => parseGedcomRecords(text))

@@ -14,28 +14,7 @@
   <app-source-repositories [xref]="xref()"></app-source-repositories>
 
   <h2>Multimedia</h2>
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>Xref</th>
-        <th>filePath</th>
-        <th>mediaType</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (multimedia of vm.multimedia; track multimedia.xref) {
-        <tr>
-          <td>
-            <a routerLink="/multimedia/{{ multimedia.xref }}">{{
-              multimedia.xref
-            }}</a>
-          </td>
-          <td>{{ multimedia.filePath }}</td>
-          <td>{{ multimedia.mediaType }}</td>
-        </tr>
-      }
-    </tbody>
-  </table>
+  <app-source-multimedia [xref]="xref()"></app-source-multimedia>
 
   <h2>Unknown Records</h2>
   <table class="table table-striped">
