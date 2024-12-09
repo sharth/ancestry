@@ -1,10 +1,7 @@
-import { Component, input } from "@angular/core";
+import { Component, computed, inject, input } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterModule } from "@angular/router";
-import { toObservable } from "@angular/core/rxjs-interop";
-import * as rxjs from "rxjs";
-import * as dexie from "dexie";
-import { ancestryDatabase } from "../../database/ancestry.database";
+import { AncestryService } from "../../database/ancestry.service";
 
 @Component({
   selector: "app-repository",
@@ -14,36 +11,39 @@ import { ancestryDatabase } from "../../database/ancestry.database";
   styleUrl: "./repository.component.css",
 })
 export class RepositoryComponent {
-  xref = input.required<string>();
+  readonly xref = input.required<string>();
+  private readonly ancestryService = inject(AncestryService);
 
-  readonly vm$ = toObservable(this.xref).pipe(
-    rxjs.switchMap((xref) =>
-      dexie.liveQuery(() => ancestryDatabase.repositories.get(xref)),
-    ),
-    rxjs.combineLatestWith(
-      dexie.liveQuery(() => ancestryDatabase.sources.toArray()),
-    ),
-    rxjs.map(([repository, sources]) => {
-      if (repository == null) return null;
-      return {
-        repository,
-        sources: sources
-          .flatMap((source) =>
-            source.repositoryCitations.map((repositoryCitation) => ({
-              source,
-              repositoryCitation,
-            })),
-          )
-          .filter(
-            ({ repositoryCitation }) =>
-              repositoryCitation.repositoryXref == this.xref(),
-          )
-          .map(({ source, repositoryCitation }) => ({
-            xref: source.xref,
-            abbr: source.abbr,
-            callNumbers: repositoryCitation.callNumbers,
-          })),
-      };
-    }),
-  );
+  readonly vm = computed(() => {
+    const ancestry = this.ancestryService.ancestryResource.value();
+    if (ancestry == undefined) {
+      return undefined;
+    }
+    const repository = ancestry.repositories.get(this.xref());
+    if (repository == undefined) {
+      return undefined;
+    }
+
+    const sources = [...ancestry.sources.values()];
+
+    return {
+      repository,
+      sources: sources
+        .flatMap((source) =>
+          source.repositoryCitations.map((repositoryCitation) => ({
+            source,
+            repositoryCitation,
+          }))
+        )
+        .filter(
+          ({ repositoryCitation }) =>
+            repositoryCitation.repositoryXref == this.xref()
+        )
+        .map(({ source, repositoryCitation }) => ({
+          xref: source.xref,
+          abbr: source.abbr,
+          callNumbers: repositoryCitation.callNumbers,
+        })),
+    };
+  });
 }

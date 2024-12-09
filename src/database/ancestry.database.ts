@@ -1,5 +1,3 @@
-import { signal } from "@angular/core";
-import type { ObservabilitySet } from "dexie";
 import { Dexie } from "dexie";
 import {
   GedcomHeader,
@@ -22,9 +20,6 @@ class AncestryDatabase extends Dexie {
   individuals!: Dexie.Table<GedcomIndividual, string>;
   families!: Dexie.Table<GedcomFamily, string>;
   multimedia!: Dexie.Table<GedcomMultimedia, string>;
-
-  // A signal that counts the number of times the IndexedDB has changed.
-  iteration = signal(0);
 
   constructor() {
     super("AncestryDatabase");
@@ -58,10 +53,6 @@ class AncestryDatabase extends Dexie {
     this.individuals.mapToClass(GedcomIndividual);
     this.families.mapToClass(GedcomFamily);
     this.multimedia.mapToClass(GedcomMultimedia);
-
-    Dexie.on("storagemutated", (changedParts: ObservabilitySet) => {
-      this.iteration.update((value) => value + 1);
-    });
   }
 }
 

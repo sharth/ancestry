@@ -1,20 +1,17 @@
 import { CommonModule } from "@angular/common";
-import { Component, computed, resource } from "@angular/core";
-import { ancestryDatabase } from "../../database/ancestry.database";
+import { Component, computed, inject } from "@angular/core";
 import { GedcomDiffComponent } from "../../util/gedcom-diff.component";
-import type { GedcomRecord } from "../../gedcom";
+import { GedcomRecord, serializeGedcomRecordToText } from "../../gedcom";
 import {
-  serializeGedcomHeader,
   serializeGedcomIndividual,
   serializeGedcomFamily,
   serializeGedcomSource,
-  serializeGedcomRecordToText,
   serializeGedcomRepository,
-  serializeGedcomTrailer,
   serializeGedcomSubmitter,
   serializeGedcomMultimedia,
   parseGedcomRecords,
 } from "../../gedcom";
+import { AncestryService } from "../../database/ancestry.service";
 
 @Component({
   selector: "app-gedcom",
@@ -24,47 +21,74 @@ import {
   styleUrl: "./gedcom.component.css",
 })
 export class GedcomComponent {
-  private readonly database = resource({
-    request: () => ({
-      ancestryDatabaseIteration: ancestryDatabase.iteration(),
-    }),
-    loader: async ({ request }) => ({
-      originalText: await ancestryDatabase.originalText.toArray(),
-      headers: await ancestryDatabase.headers.toArray(),
-      submitters: await ancestryDatabase.submitters.toArray(),
-      individuals: await ancestryDatabase.individuals.toArray(),
-      families: await ancestryDatabase.families.toArray(),
-      sources: await ancestryDatabase.sources.toArray(),
-      repositories: await ancestryDatabase.repositories.toArray(),
-      multimedia: await ancestryDatabase.multimedia.toArray(),
-      trailers: await ancestryDatabase.trailers.toArray(),
-    }),
-  });
+  private ancestryService = inject(AncestryService);
 
-  private readonly originalGedcomText = computed<string>(() => {
-    const originalText = this.database.value()?.originalText;
-    if (originalText == undefined) {
-      return "";
+  private readonly originalGedcomRecords = computed<GedcomRecord[]>(() => {
+    const ancestry = this.ancestryService.ancestryResource.value();
+    if (ancestry === undefined) {
+      return [];
     }
-    return originalText.flatMap((row) => row.text).join("\n");
+    return parseGedcomRecords(ancestry.originalText);
   });
 
-  private readonly originalGedcomRecords = computed<GedcomRecord[]>(() =>
-    parseGedcomRecords(this.originalGedcomText())
-  );
+  readonly vmm = computed(() => {
+    const ancestry = this.ancestryService.ancestryResource.value();
+    if (ancestry === undefined) {
+      return [];
+    }
+    // Copy the existing objects in the database, so that we can mutate them.
+    const individuals = new Map(ancestry.individuals);
+
+    // For each record in the original database, find the matching record in the current database.
+    const deltas = [];
+    for (const originalRecord of parseGedcomRecords(ancestry.originalText)) {
+      if (originalRecord.tag == "INDI") {
+        const xref = originalRecord.xref;
+        if (xref == undefined) {
+          deltas.push({ originalRecord, newRecord: undefined });
+          continue;
+        }
+        const individual = individuals.get(xref);
+        if (individual == undefined) {
+          deltas.push({ originalRecord, newRecord: undefined });
+          continue;
+        }
+        individuals.delete(xref);
+        const newRecord = serializeGedcomIndividual(individual);
+        deltas.push({ originalRecord, newRecord });
+      } else {
+        deltas.push({ originalRecord, newRecord: undefined });
+      }
+    }
+    for (const individual of individuals.values()) {
+      deltas.push({
+        originalRecord: undefined,
+        newRecord: serializeGedcomIndividual(individual),
+      });
+    }
+    // For each record in originalGedcomRecords...
+    // - Lookup the new object.
+    // - Prepare a diff object for each one, passing the originalGedcomRecord, and newGedcomRecord
+    // For each remaining record in newGedcomRecords
+    // - Prepare a diff object for each one, passing undefined, and newGedcomRecord
+
+    return {};
+  });
 
   private readonly currentGedcomRecords = computed<GedcomRecord[]>(() => {
-    const database = this.database.value();
-    if (database === undefined) return [];
+    const ancestry = this.ancestryService.ancestryResource.value();
+    if (ancestry === undefined) {
+      return [];
+    }
     return [
-      ...database.headers.map(serializeGedcomHeader),
-      ...database.submitters.map(serializeGedcomSubmitter),
-      ...database.individuals.map(serializeGedcomIndividual),
-      ...database.families.map(serializeGedcomFamily),
-      ...database.sources.map(serializeGedcomSource),
-      ...database.repositories.map(serializeGedcomRepository),
-      ...database.multimedia.map(serializeGedcomMultimedia),
-      ...database.trailers.map(serializeGedcomTrailer),
+      new GedcomRecord(undefined, "HEAD", "HEAD", undefined, []),
+      ...[...ancestry.submitters.values()].map(serializeGedcomSubmitter),
+      ...[...ancestry.individuals.values()].map(serializeGedcomIndividual),
+      ...[...ancestry.families.values()].map(serializeGedcomFamily),
+      ...[...ancestry.sources.values()].map(serializeGedcomSource),
+      ...[...ancestry.repositories.values()].map(serializeGedcomRepository),
+      ...[...ancestry.multimedia.values()].map(serializeGedcomMultimedia),
+      new GedcomRecord(undefined, "TRLR", "TRLR", undefined, []),
     ];
   });
 
@@ -84,14 +108,12 @@ export class GedcomComponent {
     return Array.from(orderedRecords.values()).flat();
   });
 
-  private readonly orderedGedcomText = computed<string>(() => {
-    return this.orderedGedcomRecords()
-      .flatMap((record) => serializeGedcomRecordToText(record))
-      .join("\n");
-  });
-
   readonly vm = computed(() => ({
-    oldGedcomText: this.originalGedcomText(),
-    newGedcomText: this.orderedGedcomText(),
+    oldGedcomText: this.originalGedcomRecords()
+      .flatMap((record) => serializeGedcomRecordToText(record))
+      .join("\n"),
+    newGedcomText: this.orderedGedcomRecords()
+      .flatMap((record) => serializeGedcomRecordToText(record))
+      .join("\n"),
   }));
 }

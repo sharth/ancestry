@@ -1,5 +1,4 @@
-@let vm = vm$ | async;
-@if (vm != null) {
+@if (vm(); as vm) {
   <h1>{{ vm.abbr ?? vm.xref }}</h1>
 
   <h2>Title</h2>
@@ -9,58 +8,10 @@
   <div>{{ vm.text }}</div>
 
   <h2>Citations</h2>
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th scope="col">Individual</th>
-        <th scope="col">Event</th>
-        <th scope="col">Citation</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (ref of vm.citations; track $index) {
-        <tr>
-          <td>
-            <a routerLink="/individual/{{ ref.individual.xref }}">{{
-              ref.individual.name
-            }}</a>
-          </td>
-          <td>{{ ref.event.type }}</td>
-          <td>
-            <pre>{{ ref.citation.text }}</pre>
-          </td>
-        </tr>
-      }
-    </tbody>
-  </table>
+  <app-source-citations [xref]="xref()"></app-source-citations>
 
   <h2>Repositories</h2>
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th scope="col">Repository</th>
-        <th scope="col">Call Number</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (
-        repositoryCitation of vm.repositoryCitations;
-        track repositoryCitation
-      ) {
-        <tr>
-          <td>
-            <a routerLink="/repository/{{ repositoryCitation.repositoryXref }}">
-              {{
-                repositoryCitation.repository?.name ??
-                  repositoryCitation.repositoryXref
-              }}
-            </a>
-          </td>
-          <td>{{ repositoryCitation.callNumbers.join("\n") }}</td>
-        </tr>
-      }
-    </tbody>
-  </table>
+  <app-source-repositories [xref]="xref()"></app-source-repositories>
 
   <h2>Multimedia</h2>
   <table class="table table-striped">
@@ -111,7 +62,6 @@
     [oldGedcomText]="vm.oldGedcomText"
     [newGedcomText]="vm.newGedcomText"
   ></app-gedcom-diff>
-  <pre>{{ vm.newGedcomText }}</pre>
 
   <div class="position-fixed bottom-0 end-0 rounded-circle m-5">
     <button

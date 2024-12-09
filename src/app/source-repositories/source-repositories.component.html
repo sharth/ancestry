@@ -1,0 +1,23 @@
+@if (vm(); as vm) {
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Repository</th>
+        <th scope="col">Call Number</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (citation of vm.citations; track citation) {
+        @let repository = citation.repository;
+        <tr>
+          <td>
+            <a routerLink="/repository/{{ citation.repositoryXref }}">
+              {{ repository?.name ?? citation.repositoryXref }}
+            </a>
+          </td>
+          <td>{{ citation.callNumbers.join("\n") }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

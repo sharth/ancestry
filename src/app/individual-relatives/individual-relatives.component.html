@@ -1,0 +1,22 @@
+@if (vm(); as vm) {
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Relation</th>
+        <th scope="col">Name</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (relative of vm.relatives; track relative.individual.xref) {
+        <tr>
+          <td>{{ relative.relationship }}</td>
+          <td>
+            <a routerLink="/individual/{{ relative.individual.xref }}">{{
+              relative.individual.name
+            }}</a>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

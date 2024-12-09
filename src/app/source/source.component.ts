@@ -1,5 +1,5 @@
 import type { ElementRef } from "@angular/core";
-import { Component, input, viewChild } from "@angular/core";
+import { Component, computed, inject, input, viewChild } from "@angular/core";
 import { RouterModule } from "@angular/router";
 import { CommonModule } from "@angular/common";
 import {
@@ -20,6 +20,9 @@ import { ancestryDatabase } from "../../database/ancestry.database";
 import * as rxjs from "rxjs";
 import * as dexie from "dexie";
 import { GedcomDiffComponent } from "../../util/gedcom-diff.component";
+import { AncestryService } from "../../database/ancestry.service";
+import { SourceCitationsComponent } from "../source-citations/source-citations.component";
+import { SourceRepositoriesComponent } from "../source-repositories/source-repositories.component";
 
 @Component({
   selector: "app-source",
@@ -31,76 +34,47 @@ import { GedcomDiffComponent } from "../../util/gedcom-diff.component";
     RouterModule,
     ReactiveFormsModule,
     GedcomDiffComponent,
+    SourceCitationsComponent,
+    SourceRepositoriesComponent,
   ],
 })
 export class SourceComponent {
   readonly xref = input.required<string>();
+  private readonly ancestryService = inject(AncestryService);
+
   readonly source$ = toObservable(this.xref).pipe(
     rxjs.switchMap((xref) =>
       dexie.liveQuery(() => ancestryDatabase.sources.get(xref))
     )
   );
 
-  readonly vm$ = toObservable(this.xref).pipe(
-    rxjs.switchMap((xref) =>
-      dexie.liveQuery(() => ancestryDatabase.sources.get(xref))
-    ),
-    rxjs.combineLatestWith(
-      dexie.liveQuery(() => ancestryDatabase.individuals.toArray()),
-      dexie.liveQuery(() => ancestryDatabase.repositories.toArray()),
-      dexie.liveQuery(() => ancestryDatabase.multimedia.toArray()),
-      dexie.liveQuery(() => ancestryDatabase.originalText.toArray())
-    ),
-    rxjs.map(
-      ([source, individuals, repositories, multimedia, originalText]) => {
-        if (source == null) return null;
-        return {
-          ...source,
-          citations: individuals
-            .flatMap((individual) =>
-              individual.events.map((event) => ({ individual, event }))
-            )
-            .flatMap(({ individual, event }) =>
-              event.citations.map((citation) => ({
-                individual,
-                event,
-                citation,
-              }))
-            )
-            .filter(({ citation }) => citation.sourceXref == source.xref),
-          repositoryCitations: source.repositoryCitations.map(
-            (repositoryCitation) => ({
-              repositoryXref: repositoryCitation.repositoryXref,
-              callNumbers: repositoryCitation.callNumbers,
-              repository: repositories.find(
-                (repository) =>
-                  repository.xref == repositoryCitation.repositoryXref
-              ),
-            })
-          ),
-          multimedia: source.multimediaXrefs.map((multimediaXref) => ({
-            ...multimedia.find(
-              (multimedia) => multimedia.xref == multimediaXref
-            ),
-            xref: multimediaXref,
-          })),
-          repositories,
-          oldGedcomText: originalText
-            .map((originalText) => originalText.text)
-            .flatMap(parseGedcomRecords)
-            .filter(
-              (gedcomRecord) =>
-                gedcomRecord.tag == "SOUR" && gedcomRecord.xref == source.xref
-            )
-            .flatMap(serializeGedcomRecordToText)
-            .join("\n"),
-          newGedcomText: serializeGedcomRecordToText(
-            serializeGedcomSource(source)
-          ).join("\n"),
-        };
-      }
-    )
-  );
+  readonly vm = computed(() => {
+    const ancestry = this.ancestryService.ancestryResource.value();
+    if (ancestry == undefined) {
+      return undefined;
+    }
+    const source = ancestry.sources.get(this.xref());
+    if (source == undefined) {
+      return undefined;
+    }
+
+    return {
+      ...source,
+      multimedia: source.multimediaXrefs.map((multimediaXref) => ({
+        ...ancestry.multimedia.get(multimediaXref),
+        xref: multimediaXref,
+      })),
+      repositories: [...ancestry.repositories.values()],
+      oldGedcomText: [ancestry.originalText]
+        .flatMap((text) => parseGedcomRecords(text))
+        .filter((r) => r.tag == "SOUR" && r.xref == source.xref)
+        .flatMap((record) => serializeGedcomRecordToText(record))
+        .join("\n"),
+      newGedcomText: serializeGedcomRecordToText(
+        serializeGedcomSource(source)
+      ).join("\n"),
+    };
+  });
 
   readonly reactiveForm = new FormGroup({
     abbr: new FormControl<string>(""),

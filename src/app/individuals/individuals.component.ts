@@ -1,9 +1,8 @@
-import type { ResourceRef } from "@angular/core";
-import { resource, Component, computed } from "@angular/core";
+import { Component, computed, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterLink } from "@angular/router";
-import { ancestryDatabase } from "../../database/ancestry.database";
 import type { GedcomIndividual } from "../../gedcom";
+import { AncestryService } from "../../database/ancestry.service";
 
 @Component({
   selector: "app-individuals",
@@ -13,24 +12,18 @@ import type { GedcomIndividual } from "../../gedcom";
   styleUrl: "./individuals.component.css",
 })
 export class IndividualsComponent {
-  readonly database: ResourceRef<{ individuals: GedcomIndividual[] }> =
-    resource({
-      request: () => ({
-        ancestryDatabaseIteration: ancestryDatabase.iteration(),
-      }),
-      loader: async () => ({
-        individuals: await ancestryDatabase.individuals.toArray(),
-      }),
-    });
+  private ancestryService = inject(AncestryService);
 
   readonly vm = computed(() => {
-    const database = this.database.value();
-    if (database === undefined) {
+    const ancestry = this.ancestryService.ancestryResource.value();
+    if (ancestry === undefined) {
       return undefined;
     }
     return {
-      individuals: database.individuals,
-      individualsBySurname: this.individualsBySurname(database.individuals),
+      individuals: ancestry.individuals,
+      individualsBySurname: this.individualsBySurname(
+        Array.from(ancestry.individuals.values())
+      ),
     };
   });
 

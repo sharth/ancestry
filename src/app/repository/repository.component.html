@@ -1,8 +1,7 @@
-@let vm = vm$ | async;
-@if (vm == null) {
-} @else {
+@if (vm(); as vm) {
   <h1>{{ vm.repository.name ?? vm.repository.xref }}</h1>
 
+  <h2>Sources</h2>
   <table class="table table-striped">
     <thead>
       <tr>

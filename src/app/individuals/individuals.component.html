@@ -1,5 +1,5 @@
 @if (vm(); as vm) {
-  <h1>{{ vm.individuals.length }} Individuals</h1>
+  <h1>{{ vm.individuals.size }} Individuals</h1>
   <ul>
     @for (group of vm.individualsBySurname; track group.surname) {
       <li>{{ group.surname }}</li>
