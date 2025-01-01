@@ -21,32 +21,39 @@ export class IndividualRelativesComponent {
       return undefined;
     }
     const xref = this.xref();
-    const families = [...ancestry.families.values()];
 
-    const parents: GedcomIndividual[] = families
+    const parents: GedcomIndividual[] = ancestry.families
+      .values()
       .filter((family) => family.childXrefs.includes(xref))
       .flatMap((family) => [family.husbandXref, family.wifeXref])
       .filter((parentXref) => parentXref != null)
       .map((parentXref) => ancestry.individuals.get(parentXref))
-      .filter((parent) => parent != null);
-    const siblings: GedcomIndividual[] = families
+      .filter((parent) => parent != null)
+      .toArray();
+    const siblings: GedcomIndividual[] = ancestry.families
+      .values()
       .filter((family) => family.childXrefs.includes(xref))
       .flatMap((family) => family.childXrefs)
       .filter((siblingXref) => siblingXref != xref)
       .map((siblingXref) => ancestry.individuals.get(siblingXref))
-      .filter((sibling) => sibling != null);
-    const spouses: GedcomIndividual[] = families
+      .filter((sibling) => sibling != null)
+      .toArray();
+    const spouses: GedcomIndividual[] = ancestry.families
+      .values()
       .filter((family) => family.husbandXref == xref || family.wifeXref == xref)
       .flatMap((family) => [family.husbandXref, family.wifeXref])
       .filter((spouseXref) => spouseXref != null)
       .filter((spouseXref) => spouseXref != xref)
       .map((spouseXref) => ancestry.individuals.get(spouseXref))
-      .filter((spouse) => spouse != null);
-    const children: GedcomIndividual[] = families
+      .filter((spouse) => spouse != null)
+      .toArray();
+    const children: GedcomIndividual[] = ancestry.families
+      .values()
       .filter((family) => family.husbandXref == xref || family.wifeXref == xref)
       .flatMap((family) => family.childXrefs)
       .map((childXref) => ancestry.individuals.get(childXref))
-      .filter((child) => child != null);
+      .filter((child) => child != null)
+      .toArray();
     return {
       relatives: [
         ...parents.map((parent) => ({
