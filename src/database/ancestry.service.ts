@@ -1,4 +1,4 @@
-import { Injectable, resource } from "@angular/core";
+import { Injectable, resource, signal } from "@angular/core";
 import { AncestryDatabase } from "./ancestry.database";
 import Dexie from "dexie";
 
@@ -6,13 +6,21 @@ import Dexie from "dexie";
 export class AncestryService {
   readonly ancestryDatabase = new AncestryDatabase();
 
+  // A signal that increments every time the Dexie / IndexedDB database changes.
+  // This can be used in the request field for an Angular Resource.
+  readonly ancestryChanges = signal(0);
+
   constructor() {
     Dexie.on("storagemutated", () => {
-      this.ancestryResource.reload();
+      console.log("Dexie database mutated");
+      this.ancestryChanges.update((value) => value + 1);
     });
   }
 
   ancestryResource = resource({
+    request: () => ({
+      changeCount: this.ancestryChanges(),
+    }),
     loader: async () => {
       const [
         individuals,
