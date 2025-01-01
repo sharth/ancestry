@@ -2,7 +2,7 @@
   <h1>{{ vm.name ?? xref() }}</h1>
 
   <h2>Sources</h2>
-  <app-repository-sources [xref]="xref()"></app-repository-sources>
+  <app-repository-sources [xref]="xref()" />
 
   <h2>Gedcom</h2>
   <pre>{{ vm.gedcom }}</pre>

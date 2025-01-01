@@ -32,20 +32,20 @@
       [repositoryCitations]="vm.repositoryCitations"
       (addRepository)="addRepository()"
       (removeRepository)="removeRepository($event)"
-    ></app-source-editor-repositories>
+    />
 
     <h2>Multimedia</h2>
     <app-source-editor-multimedia-links
       [multimediaLinks]="vm.multimediaLinks"
       (addMultimediaLink)="addMultimediaLink()"
       (removeMultimediaLink)="removeMultimediaLink($event)"
-    ></app-source-editor-multimedia-links>
+    />
 
     <h2>Unknown Records</h2>
     <app-source-editor-unknowns
       [unknownRecords]="vm.unknownRecords"
       (removeUnknownRecord)="removeUnknownRecord($event)"
-    ></app-source-editor-unknowns>
+    />
 
     <input type="submit" />
     <input type="button" value="Cancel" (click)="cancelForm()" />

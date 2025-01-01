@@ -3,13 +3,13 @@
   <p>{{ vm.name }}</p>
 
   <h2>Relatives</h2>
-  <app-individual-relatives [xref]="xref()"></app-individual-relatives>
+  <app-individual-relatives [xref]="xref()" />
 
   <h2>Events</h2>
-  <app-individual-events [xref]="xref()"></app-individual-events>
+  <app-individual-events [xref]="xref()" />
 
   <h2>Ancestors</h2>
-  <app-individual-ancestors [xref]="xref()"></app-individual-ancestors>
+  <app-individual-ancestors [xref]="xref()" />
 
   <h2>Gedcom</h2>
   <pre>{{ vm.gedcom }}</pre>
@@ -23,9 +23,6 @@
   </div>
 
   <dialog #editDialog>
-    <app-individual-editor
-      [xref]="xref()"
-      (finished)="editDialog.close()"
-    ></app-individual-editor>
+    <app-individual-editor [xref]="xref()" (finished)="editDialog.close()" />
   </dialog>
 }

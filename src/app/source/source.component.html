@@ -8,16 +8,16 @@
   <div>{{ vm.source.text }}</div>
 
   <h2>Citations</h2>
-  <app-source-citations [xref]="xref()"></app-source-citations>
+  <app-source-citations [xref]="xref()" />
 
   <h2>Repositories</h2>
-  <app-source-repositories [xref]="xref()"></app-source-repositories>
+  <app-source-repositories [xref]="xref()" />
 
   <h2>Multimedia</h2>
-  <app-source-multimedia [xref]="xref()"></app-source-multimedia>
+  <app-source-multimedia [xref]="xref()" />
 
   <h2>Unknown Records</h2>
-  <app-source-unknowns [xref]="xref()"></app-source-unknowns>
+  <app-source-unknowns [xref]="xref()" />
 
   <h2>Gedcom</h2>
   <app-gedcom-diff
@@ -34,9 +34,6 @@
   </div>
 
   <dialog #editDialog>
-    <app-source-editor
-      [xref]="xref()"
-      (finished)="closeSourceEditor()"
-    ></app-source-editor>
+    <app-source-editor [xref]="xref()" (finished)="closeSourceEditor()" />
   </dialog>
 }

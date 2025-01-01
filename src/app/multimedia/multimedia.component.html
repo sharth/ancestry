@@ -17,9 +17,6 @@
   </div>
 
   <dialog #editDialog>
-    <app-multimedia-editor
-      [xref]="xref()"
-      (finished)="editDialog.close()"
-    ></app-multimedia-editor>
+    <app-multimedia-editor [xref]="xref()" (finished)="editDialog.close()" />
   </dialog>
 }
