@@ -1,0 +1,26 @@
+@if (vm(); as vm) {
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Xref</th>
+        <th>Title</th>
+        <th>filePath</th>
+        <th>mediaType</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (multimediaLink of vm.multimediaLinks; track multimediaLink) {
+        <tr>
+          <td>
+            <a routerLink="/multimedia/{{ multimediaLink.xref }}">{{
+              multimediaLink.xref
+            }}</a>
+          </td>
+          <td>{{ multimediaLink.title }}</td>
+          <td>{{ multimediaLink.filePath }}</td>
+          <td>{{ multimediaLink.mediaType }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

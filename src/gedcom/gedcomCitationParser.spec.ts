@@ -1,8 +1,7 @@
-import { assert } from "chai";
 import { parseGedcomCitation } from "./gedcomCitationParser";
 import { parseGedcomRecords } from "./gedcomRecordParser";
 
-it("SimpleCitation", () => {
+it("GedcomCitationParser", () => {
   const [gedcomRecord] = parseGedcomRecords(
     [
       "0 SOUR @S1@",
@@ -15,17 +14,14 @@ it("SimpleCitation", () => {
     ].join("\n")
   );
   const gedcomCitation = parseGedcomCitation(gedcomRecord);
-  assert.deepEqual(
-    { ...gedcomCitation },
-    {
-      sourceXref: "@S1@",
-      name: "name",
-      obje: "google.com",
-      text: "text",
-      page: "page",
-      quality: "3",
-    }
-  );
+  expect({ ...gedcomCitation }).toEqual({
+    sourceXref: "@S1@",
+    name: "name",
+    obje: "google.com",
+    text: "text",
+    page: "page",
+    quality: "3",
+  });
 });
 
 it("Support empty citation reason", () => {
@@ -33,5 +29,7 @@ it("Support empty citation reason", () => {
     ["0 SOUR @S1@", "1 DATA", "2 TEXT"].join("\n")
   );
   const gedcomCitation = parseGedcomCitation(gedcomRecord);
-  assert.deepEqual({ ...gedcomCitation }, { sourceXref: "@S1@" });
+  expect({ ...gedcomCitation }).toEqual({
+    sourceXref: "@S1@",
+  });
 });

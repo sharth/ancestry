@@ -2,20 +2,23 @@ import { Component, computed, inject, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
 import { CommonModule } from "@angular/common";
 import { AncestryService } from "../../database/ancestry.service";
+import { serializeGedcomRecordToText } from "../../gedcom";
 
 @Component({
-  selector: "app-source-multimedia",
+  selector: "app-source-unknowns",
   standalone: true,
-  templateUrl: "./source-multimedia.component.html",
-  styleUrl: "./source-multimedia.component.css",
+  templateUrl: "./source-unknowns.component.html",
+  styleUrl: "./source.component.css",
   imports: [CommonModule, RouterModule],
 })
-export class SourceMultimediaComponent {
+export class SourceUnknownsComponent {
   readonly xref = input.required<string>();
+
   private readonly ancestryService = inject(AncestryService);
+  private readonly ancestryResource = this.ancestryService.ancestryResource;
 
   readonly vm = computed(() => {
-    const ancestry = this.ancestryService.ancestryResource.value();
+    const ancestry = this.ancestryResource.value();
     if (ancestry == undefined) {
       return undefined;
     }
@@ -25,10 +28,9 @@ export class SourceMultimediaComponent {
     }
 
     return {
-      multimedia: source.multimediaXrefs.map((multimediaXref) => ({
-        ...ancestry.multimedia.get(multimediaXref),
-        xref: multimediaXref,
-      })),
+      unknownGedcom: source.unknownRecords.map((unknownRecord) =>
+        serializeGedcomRecordToText(unknownRecord)
+      ),
     };
   });
 }

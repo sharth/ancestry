@@ -1,10 +1,7 @@
-import { Component } from "@angular/core";
+import { Component, computed, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterLink } from "@angular/router";
-import { toSignal } from "@angular/core/rxjs-interop";
-import * as rxjs from "rxjs";
-import * as dexie from "dexie";
-import { ancestryDatabase } from "../../database/ancestry.database";
+import { AncestryService } from "../../database/ancestry.service";
 
 @Component({
   selector: "app-repositories",
@@ -14,8 +11,17 @@ import { ancestryDatabase } from "../../database/ancestry.database";
   styleUrl: "./repositories.component.css",
 })
 export class RepositoriesComponent {
-  readonly repositories$ = rxjs.from(
-    dexie.liveQuery(() => ancestryDatabase.repositories.toArray()),
-  );
-  readonly repositories = toSignal(this.repositories$, { initialValue: [] });
+  private readonly ancestryService = inject(AncestryService);
+  private readonly ancestryResource = this.ancestryService.ancestryResource;
+
+  readonly vm = computed(() => {
+    const ancestry = this.ancestryResource.value();
+    if (ancestry == undefined) {
+      return undefined;
+    }
+
+    return {
+      repositories: Array.from(ancestry.repositories.values()),
+    };
+  });
 }

@@ -1,0 +1,18 @@
+@if (vm(); as vm) {
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Unknown Record</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (unknownGedcom of vm.unknownGedcom; track $index) {
+        <tr>
+          <td>
+            <pre>{{ unknownGedcom.join("\n") }}</pre>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

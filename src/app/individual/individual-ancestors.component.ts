@@ -9,7 +9,7 @@ import { AncestryService } from "../../database/ancestry.service";
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: "./individual-ancestors.component.html",
-  styleUrl: "./individual-ancestors.component.css",
+  styleUrl: "./individual.component.css",
 })
 export class IndividualAncestorsComponent {
   readonly xref = input.required<string>();

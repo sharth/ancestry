@@ -8,7 +8,7 @@ import { AncestryService } from "../../database/ancestry.service";
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: "./repository-sources.component.html",
-  styleUrl: "./repository-sources.component.css",
+  styleUrl: "./repository.component.css",
 })
 export class RepositorySourcesComponent {
   readonly xref = input.required<string>();

@@ -9,7 +9,6 @@ updates:
         patterns:
           - "@angular/*"
           - "@angular-devkit/build-angular"
-          - "ng-packagr"
       eslint:
         patterns:
           - "@eslint/js"

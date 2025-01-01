@@ -7,15 +7,17 @@ import { AncestryService } from "../../database/ancestry.service";
   selector: "app-source-repositories",
   standalone: true,
   templateUrl: "./source-repositories.component.html",
-  styleUrl: "./source-repositories.component.css",
+  styleUrl: "./source.component.css",
   imports: [CommonModule, RouterModule],
 })
 export class SourceRepositoriesComponent {
   readonly xref = input.required<string>();
+
   private readonly ancestryService = inject(AncestryService);
+  private readonly ancestryResource = this.ancestryService.ancestryResource;
 
   readonly vm = computed(() => {
-    const ancestry = this.ancestryService.ancestryResource.value();
+    const ancestry = this.ancestryResource.value();
     if (ancestry == undefined) {
       return undefined;
     }

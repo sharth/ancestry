@@ -1,0 +1,11 @@
+div {
+  white-space: pre-wrap;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+textarea {
+  field-sizing: content;
+}

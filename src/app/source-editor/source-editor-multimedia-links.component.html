@@ -1,0 +1,66 @@
+@if (vm(); as vm) {
+  <ag-grid-angular [rowData]="vm.multimediaLinks" [gridOptions]="gridOptions" />
+
+    <table>
+    <thead>
+      <tr>
+        <th></th>
+        <th>Multimedia</th>
+        <th>Custom Title</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (link of vm.multimediaLinks; track link) {
+        <tr>
+          <td>
+            <button
+              class="btn btn-outline-secondary bi bi-trash"
+              type="button"
+              (click)="removeMultimediaLink.emit(link)"
+            ></button>
+          </td>
+          <td>
+            <div class="form-floating">
+              <select
+                class="form-select"
+                [(ngModel)]="link.multimediaXref"
+                name="multimediaXref"
+              >
+                <option selected value="">Multimedia...</option>
+                @for (
+                  multimedia of vm.multimedia.values();
+                  track multimedia.xref
+                ) {
+                  <option value="{{ multimedia.xref }}">
+                    {{ multimedia.xref }}
+                  </option>
+                }
+              </select>
+              <label>Multimedia</label>
+            </div>
+          </td>
+          <td>
+            <div class="form-floating">
+              <input
+                class="form-control"
+                type="text"
+                [(ngModel)]="link.title"
+                name="Title"
+              />
+              <label>Custom Title</label>
+            </div>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+
+  <div class="input-group">
+    <button
+      class="btn btn-outline-secondary bi bi-plus"
+      type="button"
+      (click)="addMultimediaLink.emit()"
+    ></button>
+    <span class="input-group-text">Associate with another multimedia</span>
+  </div>
+}

@@ -2,7 +2,7 @@ import { Component, computed, inject, input } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterModule } from "@angular/router";
 import { AncestryService } from "../../database/ancestry.service";
-import { RepositorySourcesComponent } from "../repository-sources/repository-sources.component";
+import { RepositorySourcesComponent } from "./repository-sources.component";
 import {
   serializeGedcomRecordToText,
   serializeGedcomRepository,

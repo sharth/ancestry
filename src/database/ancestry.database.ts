@@ -10,7 +10,7 @@ import {
   GedcomMultimedia,
 } from "../gedcom";
 
-class AncestryDatabase extends Dexie {
+export class AncestryDatabase extends Dexie {
   originalText!: Dexie.Table<{ text: string }>;
   headers!: Dexie.Table<GedcomHeader>;
   submitters!: Dexie.Table<GedcomSubmitter, string>;
@@ -38,12 +38,27 @@ class AncestryDatabase extends Dexie {
         .table("sources")
         .toCollection()
         .modify((source) => {
-          (source as GedcomSource).multimediaXrefs = [];
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          source.multimediaXrefs = [];
         })
     );
     this.version(4).stores({
       submitters: "xref",
     });
+    this.version(5).upgrade((tx) =>
+      tx
+        .table("sources")
+        .toCollection()
+        .modify((source) => {
+          // eslint-disable-next-line max-len
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+          (source as GedcomSource).multimediaLinks = source.multimediaXrefs.map(
+            (multimediaXref: string) => ({
+              multimediaXref,
+            })
+          );
+        })
+    );
 
     this.headers.mapToClass(GedcomHeader);
     this.submitters.mapToClass(GedcomSubmitter);
@@ -55,5 +70,3 @@ class AncestryDatabase extends Dexie {
     this.multimedia.mapToClass(GedcomMultimedia);
   }
 }
-
-export const ancestryDatabase = new AncestryDatabase();

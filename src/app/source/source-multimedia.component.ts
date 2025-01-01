@@ -4,33 +4,32 @@ import { CommonModule } from "@angular/common";
 import { AncestryService } from "../../database/ancestry.service";
 
 @Component({
-  selector: "app-source-citations",
+  selector: "app-source-multimedia",
   standalone: true,
-  templateUrl: "./source-citations.component.html",
-  styleUrl: "./source-citations.component.css",
+  templateUrl: "./source-multimedia.component.html",
+  styleUrl: "./source.component.css",
   imports: [CommonModule, RouterModule],
 })
-export class SourceCitationsComponent {
+export class SourceMultimediaComponent {
   readonly xref = input.required<string>();
   private readonly ancestryService = inject(AncestryService);
 
   readonly vm = computed(() => {
-    const xref = this.xref();
     const ancestry = this.ancestryService.ancestryResource.value();
     if (ancestry == undefined) {
       return undefined;
     }
+    const source = ancestry.sources.get(this.xref());
+    if (source == undefined) {
+      return undefined;
+    }
 
     return {
-      citations: Array.from(ancestry.individuals.values())
-        .flatMap((individual) =>
-          individual.events.map((event) => ({ individual, event }))
-        )
-        .flatMap(({ individual, event }) =>
-          event.citations
-            .filter((citation) => citation.sourceXref == xref)
-            .map((citation) => ({ individual, event, citation }))
-        ),
+      multimediaLinks: source.multimediaLinks.map((multimediaLink) => ({
+        ...ancestry.multimedia.get(multimediaLink.multimediaXref),
+        xref: this.xref(),
+        title: multimediaLink.title,
+      })),
     };
   });
 }

@@ -38,9 +38,11 @@ export function parseGedcomSource(record: GedcomRecord): GedcomSource {
           parseGedcomSourceRepositoryCitation(childRecord)
         );
         break;
-      // case 'OBJE':
-      //   gedcomSource.multimediaXrefs.push(parseGedcomSourceMultimediaLink(childRecord));
-      //   break;
+      case "OBJE":
+        gedcomSource.multimediaLinks.push(
+          parseGedcomSourceMultimediaLink(childRecord)
+        );
+        break;
       default:
         gedcomSource.unknownRecords.push(childRecord);
         break;
@@ -76,10 +78,20 @@ function parseGedcomSourceRepositoryCitation(gedcomRecord: GedcomRecord) {
   return { repositoryXref, callNumbers };
 }
 
-function parseGedcomSourceMultimediaLink(gedcomRecord: GedcomRecord): string {
+function parseGedcomSourceMultimediaLink(gedcomRecord: GedcomRecord): {
+  multimediaXref: string;
+  title?: string;
+} {
   if (gedcomRecord.abstag !== "SOUR.OBJE") throw new Error();
   if (gedcomRecord.xref != null) throw new Error();
   if (gedcomRecord.value == null) throw new Error();
 
-  return gedcomRecord.value;
+  for (const childRecord of gedcomRecord.children) {
+    switch (childRecord.tag) {
+      default:
+        reportUnparsedRecord(childRecord);
+    }
+  }
+
+  return { multimediaXref: gedcomRecord.value };
 }

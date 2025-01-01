@@ -1,0 +1,23 @@
+@if (vm(); as vm) {
+  @let displayedColumns = ["individual", "event"];
+  <mat-table [dataSource]="vm.citations">
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+
+    <ng-container matColumnDef="individual">
+      <mat-header-cell *matHeaderCellDef>Individual</mat-header-cell>
+      <mat-cell *matCellDef="let citation">
+        <a routerLink="/individual/{{ citation.individual.xref }}">
+          {{ citation.individual.name ?? citation.individual.xref }}
+        </a>
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="event">
+      <mat-header-cell *matHeaderCellDef>Event</mat-header-cell>
+      <mat-cell *matCellDef="let citation">
+        {{ citation.event.type }}
+      </mat-cell>
+    </ng-container>
+  </mat-table>
+}

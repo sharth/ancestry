@@ -1,13 +1,5 @@
-import { Component } from "@angular/core";
-import { toSignal } from "@angular/core/rxjs-interop";
-import { ancestryDatabase } from "../../database/ancestry.database";
-import * as rxjs from "rxjs";
-import * as dexie from "dexie";
-import {
-  serializeGedcomHeader,
-  serializeGedcomRecordToText,
-  serializeGedcomTrailer,
-} from "../../gedcom";
+import { Component, computed, inject } from "@angular/core";
+import { AncestryService } from "../../database/ancestry.service";
 
 @Component({
   selector: "app-index",
@@ -17,45 +9,19 @@ import {
   styleUrl: "./index.component.css",
 })
 export class IndexComponent {
-  readonly vm$ = rxjs
-    .combineLatest([
-      dexie.liveQuery(() => ancestryDatabase.headers.toArray()),
-      dexie.liveQuery(() => ancestryDatabase.trailers.toArray()),
-      dexie.liveQuery(() => ancestryDatabase.individuals.toArray()),
-      dexie.liveQuery(() => ancestryDatabase.families.toArray()),
-      dexie.liveQuery(() => ancestryDatabase.repositories.toArray()),
-      dexie.liveQuery(() => ancestryDatabase.sources.toArray()),
-      dexie.liveQuery(() => ancestryDatabase.submitters.toArray()),
-    ])
-    .pipe(
-      rxjs.map(
-        ([
-          headers,
-          trailers,
-          individuals,
-          families,
-          repositories,
-          sources,
-          submitters,
-        ]) => ({
-          headers: headers,
-          headerText: headers
-            .map(serializeGedcomHeader)
-            .flatMap(serializeGedcomRecordToText)
-            .join("\n"),
-          trailers: trailers,
-          trailerText: trailers
-            .map(serializeGedcomTrailer)
-            .flatMap(serializeGedcomRecordToText)
-            .join("\n"),
-          individuals,
-          families,
-          repositories,
-          sources,
-          submitters,
-        })
-      )
-    );
+  private readonly ancestryService = inject(AncestryService);
+  private readonly ancestryResource = this.ancestryService.ancestryResource;
 
-  readonly vm = toSignal(this.vm$);
+  readonly vm = computed(() => {
+    const ancestry = this.ancestryResource.value();
+    if (ancestry == undefined) return undefined;
+
+    return {
+      individuals: Array.from(ancestry.individuals.values()),
+      families: Array.from(ancestry.families.values()),
+      sources: Array.from(ancestry.sources.values()),
+      repositories: Array.from(ancestry.repositories.values()),
+      submitters: Array.from(ancestry.submitters.values()),
+    };
+  });
 }

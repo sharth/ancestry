@@ -1,10 +1,11 @@
-import { computed, Injectable, resource } from "@angular/core";
-import { ancestryDatabase } from "./ancestry.database";
+import { Injectable, resource } from "@angular/core";
+import { AncestryDatabase } from "./ancestry.database";
 import Dexie from "dexie";
-@Injectable({
-  providedIn: "root",
-})
+
+@Injectable({ providedIn: "root" })
 export class AncestryService {
+  readonly ancestryDatabase = new AncestryDatabase();
+
   constructor() {
     Dexie.on("storagemutated", () => {
       this.ancestryResource.reload();
@@ -21,7 +22,7 @@ export class AncestryService {
         multimedia,
         submitters,
         originalText,
-      ] = await ancestryDatabase.transaction(
+      ] = await this.ancestryDatabase.transaction(
         "r",
         [
           "individuals",
@@ -33,13 +34,13 @@ export class AncestryService {
           "originalText",
         ],
         async () => [
-          await ancestryDatabase.individuals.orderBy("xref").toArray(),
-          await ancestryDatabase.sources.orderBy("xref").toArray(),
-          await ancestryDatabase.families.orderBy("xref").toArray(),
-          await ancestryDatabase.repositories.orderBy("xref").toArray(),
-          await ancestryDatabase.multimedia.orderBy("xref").toArray(),
-          await ancestryDatabase.submitters.orderBy("xref").toArray(),
-          await ancestryDatabase.originalText.toArray(),
+          await this.ancestryDatabase.individuals.orderBy("xref").toArray(),
+          await this.ancestryDatabase.sources.orderBy("xref").toArray(),
+          await this.ancestryDatabase.families.orderBy("xref").toArray(),
+          await this.ancestryDatabase.repositories.orderBy("xref").toArray(),
+          await this.ancestryDatabase.multimedia.orderBy("xref").toArray(),
+          await this.ancestryDatabase.submitters.orderBy("xref").toArray(),
+          await this.ancestryDatabase.originalText.toArray(),
         ]
       );
       return {
@@ -53,6 +54,4 @@ export class AncestryService {
       };
     },
   });
-
-  individuals = computed(() => this.ancestryResource.value()?.individuals);
 }

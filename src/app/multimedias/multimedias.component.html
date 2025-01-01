@@ -1,45 +1,26 @@
-@let vm = vm$ | async;
-<h1>{{ vm?.multimedias?.length }} Multimedias</h1>
-<ul>
-  @for (multimedia of vm?.multimedias; track multimedia.xref) {
-    <li>
-      <a routerLink="/multimedia/{{ multimedia.xref }}">{{
-        multimedia.xref
-      }}</a>
-    </li>
-  }
-</ul>
+@if (vm(); as vm) {
+  <h1>{{ vm.multimedias.length }} Multimedias</h1>
+  <ul>
+    @for (multimedia of vm.multimedias; track multimedia.xref) {
+      <li>
+        <a routerLink="/multimedia/{{ multimedia.xref }}">
+          {{ multimedia.filePath || multimedia.xref }}
+        </a>
+      </li>
+    }
+  </ul>
 
-<div class="position-fixed bottom-0 end-0 rounded-circle m-5">
-  <button
-    type="button"
-    class="btn btn-primary btn-lg bi-plus"
-    (click)="editDialog.show()"
-  ></button>
-</div>
+  <div class="position-fixed bottom-0 end-0 rounded-circle m-5">
+    <button
+      type="button"
+      class="btn btn-primary btn-lg bi-plus"
+      (click)="editDialog.showModal()"
+    ></button>
+  </div>
 
-<dialog #editDialog>
-  <form
-    [formGroup]="reactiveForm"
-    (ngSubmit)="submitForm()"
-    class="vstack gap-3"
-  >
-    <div class="form-floating">
-      <textarea
-        class="form-control h-auto"
-        formControlName="filePath"
-      ></textarea>
-      <label>File Path</label>
-    </div>
-    <div class="form-floating">
-      <textarea
-        class="form-control h-auto"
-        formControlName="mediaType"
-      ></textarea>
-      <label>MIME Type</label>
-    </div>
-    <input type="submit" />
-    <input type="button" value="Cancel" (click)="editDialog.close()" />
-    <pre>{{ reactiveForm.getRawValue() | json }}</pre>
-  </form>
-</dialog>
+  <dialog #editDialog>
+    <app-multimedia-editor
+      (finished)="editDialog.close()"
+    ></app-multimedia-editor>
+  </dialog>
+}

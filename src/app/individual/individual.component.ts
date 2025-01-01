@@ -4,10 +4,11 @@ import {
   serializeGedcomIndividual,
   serializeGedcomRecordToText,
 } from "../../gedcom";
-import { IndividualRelativesComponent } from "../individual-relatives/individual-relatives.component";
-import { IndividualAncestorsComponent } from "../individual-ancestors/individual-ancestors.component";
+import { IndividualRelativesComponent } from "./individual-relatives.component";
+import { IndividualAncestorsComponent } from "./individual-ancestors.component";
 import { AncestryService } from "../../database/ancestry.service";
-import { IndividualEventsComponent } from "../individual-events/individual-events.component";
+import { IndividualEventsComponent } from "./individual-events.component";
+import { IndividualEditorComponent } from "../individual-editor/individual-editor.component";
 
 @Component({
   selector: "app-individual",
@@ -17,7 +18,8 @@ import { IndividualEventsComponent } from "../individual-events/individual-event
     IndividualRelativesComponent,
     IndividualAncestorsComponent,
     IndividualEventsComponent,
-  ],
+    IndividualEditorComponent
+],
   templateUrl: "./individual.component.html",
   styleUrl: "./individual.component.css",
 })

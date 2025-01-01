@@ -13,7 +13,7 @@ import { AncestryService } from "../../database/ancestry.service";
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: "./individual-events.component.html",
-  styleUrl: "./individual-events.component.css",
+  styleUrl: "./individual.component.css",
 })
 export class IndividualEventsComponent {
   readonly xref = input.required<string>();

@@ -1,4 +1,3 @@
-import { assert } from "chai";
 import { parseGedcomRecords } from "./gedcomRecordParser";
 import { GedcomRecord } from "./gedcomRecord";
 import { parseGedcomSource } from "./gedcomSourceParser";
@@ -7,19 +6,16 @@ it("No Fields", () => {
   const gedcomText = "0 @S1@ SOUR\n";
   const [gedcomRecord] = parseGedcomRecords(gedcomText);
   const gedcomSource = parseGedcomSource(gedcomRecord);
-  assert.deepEqual(
-    {
-      ...gedcomSource,
-      canonicalGedcomRecord: undefined,
-    },
-    {
-      xref: "@S1@",
-      repositoryCitations: [],
-      unknownRecords: [],
-      multimediaXrefs: [],
-      canonicalGedcomRecord: undefined,
-    }
-  );
+  expect({
+    ...gedcomSource,
+    canonicalGedcomRecord: undefined,
+  }).toEqual({
+    xref: "@S1@",
+    repositoryCitations: [],
+    unknownRecords: [],
+    multimediaLinks: [],
+    canonicalGedcomRecord: undefined,
+  });
 });
 
 it("Test some fields", () => {
@@ -34,24 +30,21 @@ it("Test some fields", () => {
   ].join("\n");
   const [gedcomRecord] = parseGedcomRecords(gedcomText);
   const gedcomSource = parseGedcomSource(gedcomRecord);
-  assert.deepEqual(
-    {
-      ...gedcomSource,
-      canonicalGedcomRecord: undefined,
-    },
-    {
-      xref: "@S10@",
-      abbr: "abbr",
-      title: "title",
-      text: "text and more text",
-      repositoryCitations: [],
-      unknownRecords: [
-        new GedcomRecord(undefined, "_TMPLT", "SOUR._TMPLT", undefined, [
-          new GedcomRecord(undefined, "TID", "SOUR._TMPLT.TID", "72", []),
-        ]),
-      ],
-      multimediaXrefs: [],
-      canonicalGedcomRecord: undefined,
-    }
-  );
+  expect({
+    ...gedcomSource,
+    canonicalGedcomRecord: undefined,
+  }).toEqual({
+    xref: "@S10@",
+    abbr: "abbr",
+    title: "title",
+    text: "text and more text",
+    repositoryCitations: [],
+    unknownRecords: [
+      new GedcomRecord(undefined, "_TMPLT", "SOUR._TMPLT", undefined, [
+        new GedcomRecord(undefined, "TID", "SOUR._TMPLT.TID", "72", []),
+      ]),
+    ],
+    multimediaLinks: [],
+    canonicalGedcomRecord: undefined,
+  });
 });

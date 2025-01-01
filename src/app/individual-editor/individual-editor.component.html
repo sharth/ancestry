@@ -1,0 +1,20 @@
+@if (vm(); as vm) {
+  <form (ngSubmit)="submitForm()" class="vstack gap-3">
+    <div class="form-floating">
+      <input class="form-control h-auto" [(ngModel)]="vm.name" name="name" />
+      <label>Name</label>
+    </div>
+
+    <div class="form-floating">
+      <input
+        class="form-control h-auto"
+        [(ngModel)]="vm.surname"
+        name="surname"
+      />
+      <label>Surname</label>
+    </div>
+
+    <input type="submit" />
+    <input type="button" value="Cancel" (click)="cancelForm()" />
+  </form>
+}

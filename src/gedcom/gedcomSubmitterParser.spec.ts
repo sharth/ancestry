@@ -1,11 +1,12 @@
-import { assert } from "chai";
 import { parseGedcomRecords } from "./gedcomRecordParser";
 import { parseGedcomSubmitter } from "./gedcomSubmitterParser";
 
 it("No Fields", () => {
   const [gedcomRecord] = parseGedcomRecords(["0 @X1@ SUBM"].join("\n"));
   const gedcomSubmitter = parseGedcomSubmitter(gedcomRecord);
-  assert.deepEqual({ ...gedcomSubmitter }, { xref: "@X1@" });
+  expect({ ...gedcomSubmitter }).toEqual({
+    xref: "@X1@",
+  });
 });
 
 it("Most Fields", () => {
@@ -15,8 +16,9 @@ it("Most Fields", () => {
     )
   );
   const gedcomSubmitter = parseGedcomSubmitter(gedcomRecord);
-  assert.deepEqual(
-    { ...gedcomSubmitter },
-    { xref: "@X1@", name: "John Doe", email: "johndoe@example.com" }
-  );
+  expect({ ...gedcomSubmitter }).toEqual({
+    xref: "@X1@",
+    name: "John Doe",
+    email: "johndoe@example.com",
+  });
 });

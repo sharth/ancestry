@@ -3,27 +3,17 @@ import { Component, computed, inject, input, viewChild } from "@angular/core";
 import { RouterModule } from "@angular/router";
 import { CommonModule } from "@angular/common";
 import {
-  FormArray,
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-} from "@angular/forms";
-import {
-  GedcomRecord,
-  GedcomSource,
   serializeGedcomRecordToText,
   serializeGedcomSource,
   parseGedcomRecords,
 } from "../../gedcom";
-import { toObservable } from "@angular/core/rxjs-interop";
-import { ancestryDatabase } from "../../database/ancestry.database";
-import * as rxjs from "rxjs";
-import * as dexie from "dexie";
 import { GedcomDiffComponent } from "../../util/gedcom-diff.component";
 import { AncestryService } from "../../database/ancestry.service";
-import { SourceCitationsComponent } from "../source-citations/source-citations.component";
-import { SourceRepositoriesComponent } from "../source-repositories/source-repositories.component";
-import { SourceMultimediaComponent } from "../source-multimedia/source-multimedia.component";
+import { SourceCitationsComponent } from "./source-citations.component";
+import { SourceRepositoriesComponent } from "./source-repositories.component";
+import { SourceMultimediaComponent } from "./source-multimedia.component";
+import { SourceEditorComponent } from "../source-editor/source-editor.component";
+import { SourceUnknownsComponent } from "./source-unknowns.component";
 
 @Component({
   selector: "app-source",
@@ -33,22 +23,17 @@ import { SourceMultimediaComponent } from "../source-multimedia/source-multimedi
   imports: [
     CommonModule,
     RouterModule,
-    ReactiveFormsModule,
     GedcomDiffComponent,
     SourceCitationsComponent,
     SourceRepositoriesComponent,
     SourceMultimediaComponent,
-  ],
+    SourceEditorComponent,
+    SourceUnknownsComponent
+],
 })
 export class SourceComponent {
   readonly xref = input.required<string>();
   private readonly ancestryService = inject(AncestryService);
-
-  readonly source$ = toObservable(this.xref).pipe(
-    rxjs.switchMap((xref) =>
-      dexie.liveQuery(() => ancestryDatabase.sources.get(xref))
-    )
-  );
 
   readonly vm = computed(() => {
     const ancestry = this.ancestryService.ancestryResource.value();
@@ -61,12 +46,7 @@ export class SourceComponent {
     }
 
     return {
-      xref: this.xref(),
-      abbr: source.abbr,
-      title: source.title,
-      text: source.text,
-      unknownRecords: source.unknownRecords,
-      repositories: [...ancestry.repositories.values()],
+      source,
       oldGedcomText: [ancestry.originalText]
         .flatMap((text) => parseGedcomRecords(text))
         .filter((r) => r.tag == "SOUR" && r.xref == source.xref)
@@ -78,95 +58,14 @@ export class SourceComponent {
     };
   });
 
-  readonly reactiveForm = new FormGroup({
-    abbr: new FormControl<string>(""),
-    title: new FormControl<string>(""),
-    text: new FormControl<string>(""),
-    repositoryCitations: new FormArray<
-      FormGroup<{
-        repositoryXref: FormControl<string>;
-        callNumber: FormControl<string>;
-      }>
-    >([]),
-    unknownRecords: new FormArray<FormControl<GedcomRecord>>([]),
-  });
-
   readonly editDialog =
     viewChild.required<ElementRef<HTMLDialogElement>>("editDialog");
 
-  addRepositoryCitation() {
-    this.reactiveForm.controls.repositoryCitations.push(
-      new FormGroup({
-        repositoryXref: new FormControl("", { nonNullable: true }),
-        callNumber: new FormControl("", { nonNullable: true }),
-      })
-    );
+  openSourceEditor() {
+    this.editDialog().nativeElement.showModal();
   }
 
-  removeRepositoryCitation(index: number) {
-    this.reactiveForm.controls.repositoryCitations.removeAt(index);
-  }
-
-  addUnknownRecord() {
-    this.reactiveForm.controls.unknownRecords.push(
-      new FormControl(new GedcomRecord(undefined, "", "", undefined, []), {
-        nonNullable: true,
-      })
-    );
-  }
-
-  removeUnknownRecord(index: number) {
-    this.reactiveForm.controls.unknownRecords.removeAt(index);
-  }
-
-  openForm() {
-    void rxjs.firstValueFrom(this.source$).then((source) => {
-      console.log(source);
-      if (source == null) {
-        throw new Error();
-      }
-      this.reactiveForm.controls.repositoryCitations.clear();
-      source.repositoryCitations.forEach(() => {
-        this.addRepositoryCitation();
-      });
-      this.reactiveForm.controls.unknownRecords.clear();
-      source.unknownRecords.forEach(() => {
-        this.addUnknownRecord();
-      });
-      this.reactiveForm.setValue({
-        abbr: source.abbr ?? "",
-        title: source.title ?? "",
-        text: source.text ?? "",
-        repositoryCitations: source.repositoryCitations.map(
-          (repositoryCitation) => ({
-            repositoryXref: repositoryCitation.repositoryXref,
-            callNumber: repositoryCitation.callNumbers.at(0) ?? "",
-          })
-        ),
-        unknownRecords: source.unknownRecords,
-      });
-      this.reactiveForm.markAsDirty();
-      this.reactiveForm.updateValueAndValidity();
-      this.editDialog().nativeElement.showModal();
-    });
-  }
-
-  submitForm() {
-    const source = new GedcomSource(this.xref());
-    source.abbr = this.reactiveForm.controls.abbr.value ?? undefined;
-    source.title = this.reactiveForm.controls.title.value ?? undefined;
-    source.text = this.reactiveForm.controls.text.value ?? undefined;
-    source.repositoryCitations =
-      this.reactiveForm.controls.repositoryCitations.controls.map(
-        (repositoryCitation) => ({
-          repositoryXref: repositoryCitation.controls.repositoryXref.value,
-          callNumbers: [repositoryCitation.controls.callNumber.value],
-        })
-      );
-    source.unknownRecords = this.reactiveForm.controls.unknownRecords.value;
-    void ancestryDatabase.sources.put(source);
+  closeSourceEditor() {
     this.editDialog().nativeElement.close();
   }
-
-  serializeGedcomRecordToText = serializeGedcomRecordToText;
 }

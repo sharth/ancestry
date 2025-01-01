@@ -6,11 +6,26 @@
   <app-individual-relatives [xref]="xref()"></app-individual-relatives>
 
   <h2>Events</h2>
-  <app-individual-events [xref]="xref()"></app-individual-events>"
+  <app-individual-events [xref]="xref()"></app-individual-events>
 
   <h2>Ancestors</h2>
   <app-individual-ancestors [xref]="xref()"></app-individual-ancestors>
 
   <h2>Gedcom</h2>
   <pre>{{ vm.gedcom }}</pre>
+
+  <div class="position-fixed bottom-0 end-0 rounded-circle m-5">
+    <button
+      type="button"
+      class="btn btn-primary btn-lg bi-pencil"
+      (click)="editDialog.showModal()"
+    ></button>
+  </div>
+
+  <dialog #editDialog>
+    <app-individual-editor
+      [xref]="xref()"
+      (finished)="editDialog.close()"
+    ></app-individual-editor>
+  </dialog>
 }

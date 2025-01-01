@@ -3,11 +3,12 @@ import { CommonModule } from "@angular/common";
 import { RouterLink } from "@angular/router";
 import type { GedcomIndividual } from "../../gedcom";
 import { AncestryService } from "../../database/ancestry.service";
+import { IndividualEditorComponent } from "../individual-editor/individual-editor.component";
 
 @Component({
   selector: "app-individuals",
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, IndividualEditorComponent],
   templateUrl: "./individuals.component.html",
   styleUrl: "./individuals.component.css",
 })

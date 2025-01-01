@@ -1,21 +1,17 @@
-import { assert } from "chai";
 import { parseGedcomRecords } from "./gedcomRecordParser";
 import { parseGedcomIndividual } from "./gedcomIndividualParser";
 
 it("No Fields", () => {
   const [gedcomRecord] = parseGedcomRecords(["0 @I1@ INDI"].join("\n"));
   const gedcomIndividual = parseGedcomIndividual(gedcomRecord);
-  assert.deepEqual(
-    {
-      ...gedcomIndividual,
-      gedcomRecord: undefined,
-    },
-    {
-      xref: "@I1@",
-      events: [],
-      gedcomRecord: undefined,
-    }
-  );
+  expect({
+    ...gedcomIndividual,
+    gedcomRecord: undefined,
+  }).toEqual({
+    xref: "@I1@",
+    events: [],
+    gedcomRecord: undefined,
+  });
 });
 
 it("Male", () => {
@@ -23,18 +19,16 @@ it("Male", () => {
     ["0 @I1@ INDI", "1 SEX M"].join("\n")
   );
   const gedcomIndividual = parseGedcomIndividual(gedcomRecord);
-  assert.deepEqual(
-    {
-      ...gedcomIndividual,
-      gedcomRecord: undefined,
-    },
-    {
-      xref: "@I1@",
-      sex: "Male",
-      events: [{ type: "Sex", citations: [], sharedWithXrefs: [], value: "M" }],
-      gedcomRecord: undefined,
-    }
-  );
+  expect({
+    ...gedcomIndividual,
+    events: gedcomIndividual.events.map((event) => ({ ...event })),
+    gedcomRecord: undefined,
+  }).toEqual({
+    xref: "@I1@",
+    sex: "Male",
+    events: [{ type: "Sex", citations: [], sharedWithXrefs: [], value: "M" }],
+    gedcomRecord: undefined,
+  });
 });
 
 it("Female", () => {
@@ -42,18 +36,17 @@ it("Female", () => {
     ["0 @I1@ INDI", "1 SEX F"].join("\n")
   );
   const gedcomIndividual = parseGedcomIndividual(gedcomRecord);
-  assert.deepEqual(
-    {
-      ...gedcomIndividual,
-      gedcomRecord: undefined,
-    },
-    {
-      xref: "@I1@",
-      sex: "Female",
-      events: [{ type: "Sex", citations: [], sharedWithXrefs: [], value: "F" }],
-      gedcomRecord: undefined,
-    }
-  );
+  expect({
+    ...gedcomIndividual,
+    events: gedcomIndividual.events.map((event) => ({ ...event })),
+
+    gedcomRecord: undefined,
+  }).toEqual({
+    xref: "@I1@",
+    sex: "Female",
+    events: [{ type: "Sex", citations: [], sharedWithXrefs: [], value: "F" }],
+    gedcomRecord: undefined,
+  });
 });
 
 it("Family Search Id", () => {
@@ -61,16 +54,13 @@ it("Family Search Id", () => {
     ["0 @I4@ INDI", "1 _FSFTID abcd"].join("\n")
   );
   const gedcomIndividual = parseGedcomIndividual(gedcomRecord);
-  assert.deepEqual(
-    {
-      ...gedcomIndividual,
-      gedcomRecord: undefined,
-    },
-    {
-      xref: "@I4@",
-      familySearchId: "abcd",
-      events: [],
-      gedcomRecord: undefined,
-    }
-  );
+  expect({
+    ...gedcomIndividual,
+    gedcomRecord: undefined,
+  }).toEqual({
+    xref: "@I4@",
+    familySearchId: "abcd",
+    events: [],
+    gedcomRecord: undefined,
+  });
 });

@@ -1,30 +1,35 @@
-import { Component, input } from "@angular/core";
+import { Component, computed, inject, input } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterModule } from "@angular/router";
-import { toObservable } from "@angular/core/rxjs-interop";
-import * as rxjs from "rxjs";
-import * as dexie from "dexie";
-import { ancestryDatabase } from "../../database/ancestry.database";
+import { AncestryService } from "../../database/ancestry.service";
+import { MultimediaEditorComponent } from "../multimedia-editor/multimedia-editor.component";
 
 @Component({
   selector: "app-multimedia",
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, MultimediaEditorComponent],
   templateUrl: "./multimedia.component.html",
   styleUrl: "./multimedia.component.css",
 })
 export class MultimediaComponent {
-  xref = input.required<string>();
+  private readonly ancestryService = inject(AncestryService);
+  private readonly ancestryResource = this.ancestryService.ancestryResource;
 
-  readonly vm$ = toObservable(this.xref).pipe(
-    rxjs.switchMap((xref) =>
-      dexie.liveQuery(() => ancestryDatabase.multimedia.get(xref)),
-    ),
-    rxjs.map((multimedia) => {
-      if (multimedia == null) return null;
-      return {
-        multimedia,
-      };
-    }),
-  );
+  readonly xref = input.required<string>();
+
+  readonly vm = computed(() => {
+    const ancestry = this.ancestryResource.value();
+    if (ancestry === undefined) {
+      return undefined;
+    }
+
+    const multimedia = ancestry.multimedia.get(this.xref());
+    if (multimedia == undefined) {
+      return undefined;
+    }
+
+    return {
+      multimedia,
+    };
+  });
 }

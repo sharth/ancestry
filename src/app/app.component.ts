@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { Component } from "@angular/core";
+import { Component, inject } from "@angular/core";
 import { RouterLink, RouterOutlet } from "@angular/router";
 import type {
   GedcomFamily,
@@ -22,8 +22,9 @@ import {
   parseGedcomSubmitter,
   parseGedcomTrailer,
 } from "../gedcom";
-import { ancestryDatabase } from "../database/ancestry.database";
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
+import { AncestryService } from "../database/ancestry.service";
+import type { AncestryDatabase } from "../database/ancestry.database";
 
 @Component({
   selector: "app-root",
@@ -33,10 +34,13 @@ import { reportUnparsedRecord } from "../util/record-unparsed-records";
   styleUrl: "./app.component.css",
 })
 export class AppComponent {
+  private readonly ancestryService = inject(AncestryService);
+  private readonly ancestryDatabase = this.ancestryService.ancestryDatabase;
+
   openFile() {
     pickFileFromUser()
-      .then(readFile)
-      .then(parseText)
+      .then((file) => readFile(file))
+      .then((text) => parseText(this.ancestryDatabase, text))
       .then(() => {
         console.log("Parsing complete");
       })
@@ -62,7 +66,10 @@ function readFile(file: File): Promise<string> {
   return file.text();
 }
 
-function parseText(text: string): Promise<void> {
+function parseText(
+  ancestryDatabase: AncestryDatabase,
+  text: string
+): Promise<void> {
   const headers: GedcomHeader[] = [];
   const submitters: GedcomSubmitter[] = [];
   const trailers: GedcomTrailer[] = [];

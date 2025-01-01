@@ -1,8 +1,22 @@
-<h1>{{ sources().length }} Sources</h1>
-<ul>
-  <li *ngFor="let source of sources()">
-    <a routerLink="/source/{{ source.xref }}">{{
-      source.abbr ?? source.xref
-    }}</a>
-  </li>
-</ul>
+@if (vm(); as vm) {
+  <h1>{{ vm.sources.length }} Sources</h1>
+  <ul>
+    <li *ngFor="let source of vm.sources">
+      <a routerLink="/source/{{ source.xref }}">
+        {{ source.abbr || source.xref }}
+      </a>
+    </li>
+  </ul>
+
+  <div class="position-fixed bottom-0 end-0 rounded-circle m-5">
+    <button
+      type="button"
+      class="btn btn-primary btn-lg bi-plus"
+      (click)="editDialog.showModal()"
+    ></button>
+  </div>
+
+  <dialog #editDialog>
+    <app-source-editor (finished)="editDialog.close()"></app-source-editor>
+  </dialog>
+}
