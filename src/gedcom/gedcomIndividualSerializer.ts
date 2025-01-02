@@ -1,4 +1,7 @@
-import type { GedcomIndividual } from "./gedcomIndividual";
+import type {
+  GedcomIndividual,
+  GedcomIndividualName,
+} from "./gedcomIndividual";
 import { GedcomRecord } from "./gedcomRecord";
 
 export function serializeGedcomIndividual(
@@ -14,11 +17,18 @@ export function serializeGedcomIndividual(
     "INDI",
     undefined,
     [
+      ...gedcomIndividual.names.map((name) => serializeName(name)),
       serializeFamilySearchId(gedcomIndividual),
       serializeSex(gedcomIndividual),
       // TODO: Serialize events, name, surname
     ].filter((record) => record !== null)
   );
+}
+
+function serializeName(
+  gedcomIndividualName: GedcomIndividualName
+): GedcomRecord {
+  return new GedcomRecord(undefined, "NAME", "INDI.NAME", undefined, []);
 }
 
 function serializeFamilySearchId(

@@ -1,6 +1,7 @@
 import { Component, computed, inject, input } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import {
+  fullname,
   serializeGedcomIndividual,
   serializeGedcomRecordToText,
 } from "../../gedcom";
@@ -18,8 +19,8 @@ import { IndividualEditorComponent } from "../individual-editor/individual-edito
     IndividualRelativesComponent,
     IndividualAncestorsComponent,
     IndividualEventsComponent,
-    IndividualEditorComponent
-],
+    IndividualEditorComponent,
+  ],
   templateUrl: "./individual.component.html",
   styleUrl: "./individual.component.css",
 })
@@ -37,7 +38,7 @@ export class IndividualComponent {
       return undefined;
     }
     return {
-      name: individual.name,
+      name: fullname(individual),
       gedcom: serializeGedcomRecordToText(
         serializeGedcomIndividual(individual)
       ).join("\n"),

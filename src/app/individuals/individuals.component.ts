@@ -1,7 +1,7 @@
 import { Component, computed, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterLink } from "@angular/router";
-import type { GedcomIndividual } from "../../gedcom";
+import { fullname, GedcomIndividual, surname } from "../../gedcom";
 import { AncestryService } from "../../database/ancestry.service";
 import { IndividualEditorComponent } from "../individual-editor/individual-editor.component";
 
@@ -22,26 +22,26 @@ export class IndividualsComponent {
     }
     return {
       individuals: ancestry.individuals,
-      individualsBySurname: this.individualsBySurname(
-        Array.from(ancestry.individuals.values())
-      ),
+      individualsBySurname: this.individualsBySurname(ancestry.individuals),
     };
   });
 
   private individualsBySurname(
-    individuals: GedcomIndividual[]
+    individuals: Map<string, GedcomIndividual>
   ): { surname?: string; individuals: GedcomIndividual[] }[] {
-    individuals = individuals.toSorted(
-      (lhs, rhs) =>
-        (lhs.surname ?? "").localeCompare(rhs.surname ?? "") ||
-        (lhs.name ?? "").localeCompare(rhs.name ?? "")
-    );
-    const individualsMap = Map.groupBy(
-      individuals,
-      (individual) => individual.surname
-    );
-    return Array.from(individualsMap.entries()).map(
-      ([surname, individuals]) => ({ surname, individuals })
-    );
+    const individualsList = individuals
+      .values()
+      .toArray()
+      .sort(
+        (lhs, rhs) =>
+          surname(lhs).localeCompare(surname(rhs)) ||
+          fullname(lhs).localeCompare(fullname(rhs))
+      );
+    return Map.groupBy(individualsList, (individual) => surname(individual))
+      .entries()
+      .map(([surname, individuals]) => ({ surname, individuals }))
+      .toArray();
   }
+
+  readonly fullname = fullname;
 }

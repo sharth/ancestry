@@ -23,15 +23,16 @@ export class SourceCitationsComponent {
     }
 
     return {
-      citations: Array.from(ancestry.individuals.values())
+      citations: ancestry.individuals
+        .values()
         .flatMap((individual) =>
           individual.events.map((event) => ({ individual, event }))
         )
         .flatMap(({ individual, event }) =>
-          event.citations
-            .filter((citation) => citation.sourceXref == xref)
-            .map((citation) => ({ individual, event, citation }))
-        ),
+          event.citations.map((citation) => ({ individual, event, citation }))
+        )
+        .filter(({ citation }) => citation.sourceXref == xref)
+        .toArray(),
     };
   });
 

@@ -2,7 +2,9 @@ import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import { parseGedcomCitation } from "./gedcomCitationParser";
 import { parseGedcomEvent } from "./gedcomEventParser";
 import { GedcomIndividual } from "./gedcomIndividual";
+import type { GedcomCitation } from "./gedcomCitation";
 import type { GedcomRecord } from "./gedcomRecord";
+import type { GedcomIndividualName } from "./gedcomIndividual";
 
 export function parseGedcomIndividual(record: GedcomRecord): GedcomIndividual {
   if (record.abstag !== "INDI") throw new Error();
@@ -37,7 +39,7 @@ export function parseGedcomIndividual(record: GedcomRecord): GedcomIndividual {
         gedcomIndividual.events.push(parseGedcomEvent(childRecord));
         break;
       case "NAME":
-        parseGedcomIndividualName(gedcomIndividual, childRecord);
+        gedcomIndividual.names.push(parseGedcomIndividualName(childRecord));
         break;
       case "SEX":
         parseGedcomIndividualSex(gedcomIndividual, childRecord);
@@ -71,32 +73,89 @@ function parseGedcomIndividualFamilySearchId(
 }
 
 function parseGedcomIndividualName(
-  gedcomIndividual: GedcomIndividual,
   gedcomRecord: GedcomRecord
-): void {
+): GedcomIndividualName {
   if (gedcomRecord.abstag !== "INDI.NAME") throw new Error();
   if (gedcomRecord.xref != null) throw new Error();
   // if (gedcomRecord.value != null) throw new Error();
 
-  const gedcomEvent = parseGedcomEvent(gedcomRecord);
-  gedcomIndividual.events.push(gedcomEvent);
-  gedcomEvent.value = gedcomRecord.value;
-
-  if (gedcomIndividual.name == null) {
-    gedcomIndividual.name = gedcomRecord.value;
-    gedcomIndividual.surname = gedcomRecord.value?.match("/(.*)/")?.[1];
-  }
+  const namePrefixes: string[] = [];
+  const givenNames: string[] = [];
+  const nickNames: string[] = [];
+  const surnamePrefixes: string[] = [];
+  const surnames: string[] = [];
+  const nameSuffixes: string[] = [];
+  const citations: GedcomCitation[] = [];
 
   for (const childRecord of gedcomRecord.children) {
     switch (childRecord.tag) {
+      case "NPFX":
+        if (childRecord.xref != null) throw new Error();
+        if (childRecord.value == null) throw new Error();
+        namePrefixes.push(childRecord.value);
+        break;
+      case "GIVN":
+        if (childRecord.xref != null) throw new Error();
+        if (childRecord.value == null) throw new Error();
+        givenNames.push(childRecord.value);
+        break;
+      case "NICK":
+        if (childRecord.xref != null) throw new Error();
+        if (childRecord.value == null) throw new Error();
+        nickNames.push(childRecord.value);
+        break;
+      case "SPFX":
+        if (childRecord.xref != null) throw new Error();
+        if (childRecord.value == null) throw new Error();
+        surnamePrefixes.push(childRecord.value);
+        break;
+      case "SURN":
+        if (childRecord.xref != null) throw new Error();
+        if (childRecord.value == null) throw new Error();
+        surnames.push(childRecord.value);
+        break;
+      case "NSFX":
+        if (childRecord.xref != null) throw new Error();
+        if (childRecord.value == null) throw new Error();
+        nameSuffixes.push(childRecord.value);
+        break;
       case "SOUR":
-        gedcomEvent.citations.push(parseGedcomCitation(childRecord));
+        citations.push(parseGedcomCitation(childRecord));
         break;
       default:
         reportUnparsedRecord(childRecord);
         break;
     }
   }
+
+  if (
+    gedcomRecord.value &&
+    namePrefixes.length == 0 &&
+    givenNames.length == 0 &&
+    nickNames.length == 0 &&
+    surnamePrefixes.length == 0 &&
+    surnames.length == 0 &&
+    nameSuffixes.length == 0
+  ) {
+    const match = new RegExp(`(.*)/(.*)/(.*)`).exec(gedcomRecord.value);
+    if (match) {
+      if (match[1]) givenNames.push(match[1]);
+      if (match[2]) surnames.push(match[2]);
+      if (match[3]) nameSuffixes.push(match[3]);
+    } else {
+      givenNames.push(gedcomRecord.value);
+    }
+  }
+
+  return {
+    namePrefix: namePrefixes.join(" ") || undefined,
+    givenName: givenNames.join(" ") || undefined,
+    nickName: nickNames.join(" ") || undefined,
+    surnamePrefix: surnamePrefixes.join(" ") || undefined,
+    surname: surnames.join(" ") || undefined,
+    nameSuffix: nameSuffixes.join(" ") || undefined,
+    citations,
+  };
 }
 
 function parseGedcomIndividualSex(

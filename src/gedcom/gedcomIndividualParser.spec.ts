@@ -9,6 +9,7 @@ it("No Fields", () => {
     gedcomRecord: undefined,
   }).toEqual({
     xref: "@I1@",
+    names: [],
     events: [],
     gedcomRecord: undefined,
   });
@@ -26,6 +27,7 @@ it("Male", () => {
   }).toEqual({
     xref: "@I1@",
     sex: "Male",
+    names: [],
     events: [{ type: "Sex", citations: [], sharedWithXrefs: [], value: "M" }],
     gedcomRecord: undefined,
   });
@@ -44,6 +46,7 @@ it("Female", () => {
   }).toEqual({
     xref: "@I1@",
     sex: "Female",
+    names: [],
     events: [{ type: "Sex", citations: [], sharedWithXrefs: [], value: "F" }],
     gedcomRecord: undefined,
   });
@@ -60,6 +63,7 @@ it("Family Search Id", () => {
   }).toEqual({
     xref: "@I4@",
     familySearchId: "abcd",
+    names: [],
     events: [],
     gedcomRecord: undefined,
   });

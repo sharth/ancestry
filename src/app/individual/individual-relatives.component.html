@@ -12,7 +12,7 @@
           <td>{{ relative.relationship }}</td>
           <td>
             <a routerLink="/individual/{{ relative.individual.xref }}">{{
-              relative.individual.name
+              fullname(relative.individual) || relative.individual.xref
             }}</a>
           </td>
         </tr>

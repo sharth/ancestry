@@ -4,7 +4,7 @@
       @if (ancestor != null) {
         <li value="{{ ahnentafel }}">
           <a routerLink="/individual/{{ ancestor.xref }}">
-            {{ ancestor.name }}
+            {{ fullname(ancestor) || ancestor.xref }}
           </a>
         </li>
       }

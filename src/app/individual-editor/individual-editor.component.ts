@@ -36,8 +36,8 @@ export class IndividualEditorComponent {
       if (individual == null) return;
 
       return {
-        name: individual.name ?? "",
-        surname: individual.surname ?? "",
+        name: "", //individual.name ?? "",
+        surname: "", // individual.surname ?? "",
       };
     }
   );
@@ -65,8 +65,8 @@ export class IndividualEditorComponent {
         const xref = this.xref() ?? (await this.nextXref());
 
         const gedcomIndividual = new GedcomIndividual(xref);
-        gedcomIndividual.name = vm.name;
-        gedcomIndividual.surname = vm.surname;
+        // gedcomIndividual.name = vm.name;
+        // gedcomIndividual.surname = vm.surname;
         await this.ancestryDatabase.individuals.put(gedcomIndividual);
       }
     );

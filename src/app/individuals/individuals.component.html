@@ -7,7 +7,7 @@
         @for (individual of group.individuals; track individual.xref) {
           <li>
             <a routerLink="/individual/{{ individual.xref }}">{{
-              individual.name
+              fullname(individual) || individual.xref
             }}</a>
           </li>
         }
