@@ -79,12 +79,12 @@ function parseGedcomIndividualName(
   if (gedcomRecord.xref != null) throw new Error();
   // if (gedcomRecord.value != null) throw new Error();
 
-  const namePrefixes: string[] = [];
+  const prefixes: string[] = [];
   const givenNames: string[] = [];
   const nickNames: string[] = [];
   const surnamePrefixes: string[] = [];
   const surnames: string[] = [];
-  const nameSuffixes: string[] = [];
+  const suffixes: string[] = [];
   const citations: GedcomCitation[] = [];
 
   for (const childRecord of gedcomRecord.children) {
@@ -92,7 +92,7 @@ function parseGedcomIndividualName(
       case "NPFX":
         if (childRecord.xref != null) throw new Error();
         if (childRecord.value == null) throw new Error();
-        namePrefixes.push(childRecord.value);
+        prefixes.push(childRecord.value);
         break;
       case "GIVN":
         if (childRecord.xref != null) throw new Error();
@@ -117,7 +117,7 @@ function parseGedcomIndividualName(
       case "NSFX":
         if (childRecord.xref != null) throw new Error();
         if (childRecord.value == null) throw new Error();
-        nameSuffixes.push(childRecord.value);
+        suffixes.push(childRecord.value);
         break;
       case "SOUR":
         citations.push(parseGedcomCitation(childRecord));
@@ -130,30 +130,30 @@ function parseGedcomIndividualName(
 
   if (
     gedcomRecord.value &&
-    namePrefixes.length == 0 &&
+    prefixes.length == 0 &&
     givenNames.length == 0 &&
     nickNames.length == 0 &&
     surnamePrefixes.length == 0 &&
     surnames.length == 0 &&
-    nameSuffixes.length == 0
+    suffixes.length == 0
   ) {
     const match = new RegExp(`(.*)/(.*)/(.*)`).exec(gedcomRecord.value);
     if (match) {
       if (match[1]) givenNames.push(match[1]);
       if (match[2]) surnames.push(match[2]);
-      if (match[3]) nameSuffixes.push(match[3]);
+      if (match[3]) suffixes.push(match[3]);
     } else {
       givenNames.push(gedcomRecord.value);
     }
   }
 
   return {
-    namePrefix: namePrefixes.join(" ") || undefined,
+    prefix: prefixes.join(" ") || undefined,
     givenName: givenNames.join(" ") || undefined,
     nickName: nickNames.join(" ") || undefined,
     surnamePrefix: surnamePrefixes.join(" ") || undefined,
     surname: surnames.join(" ") || undefined,
-    nameSuffix: nameSuffixes.join(" ") || undefined,
+    suffix: suffixes.join(" ") || undefined,
     citations,
   };
 }

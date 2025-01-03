@@ -1,19 +1,18 @@
 @if (vm(); as vm) {
   <form (ngSubmit)="submitForm()" class="vstack gap-3">
-    <div class="form-floating">
-      <input class="form-control h-auto" [(ngModel)]="vm.name" name="name" />
-      <label>Name</label>
-    </div>
+    <h2>Names</h2>
+    <app-individual-editor-names
+      [names]="vm.names"
+      (addName)="addName()"
+      (removeName)="removeName($event)"
+    />
 
-    <div class="form-floating">
-      <input
-        class="form-control h-auto"
-        [(ngModel)]="vm.surname"
-        name="surname"
-      />
-      <label>Surname</label>
-    </div>
-
+    <h2>Events</h2>
+    <app-individual-editor-events
+      [events]="vm.events"
+      (addEvent)="addEvent()"
+      (removeEvent)="removeEvent($event)"
+    ></app-individual-editor-events>
     <input type="submit" />
     <input type="button" value="Cancel" (click)="cancelForm()" />
   </form>

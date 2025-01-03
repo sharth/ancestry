@@ -14,12 +14,12 @@ export class GedcomIndividual {
 }
 
 export class GedcomIndividualName {
-  namePrefix?: string;
+  prefix?: string;
   givenName?: string;
   nickName?: string;
   surnamePrefix?: string;
   surname?: string;
-  nameSuffix?: string;
+  suffix?: string;
   nameType?: string;
   citations: GedcomCitation[] = [];
 }
@@ -28,12 +28,12 @@ export function fullname(gedcomIndividual: GedcomIndividual): string {
   const gedcomIndividualName = gedcomIndividual.names.at(0);
   if (gedcomIndividualName == null) return "";
   return [
-    gedcomIndividualName.namePrefix,
+    gedcomIndividualName.prefix,
     gedcomIndividualName.givenName,
     gedcomIndividualName.nickName,
     gedcomIndividualName.surnamePrefix,
     gedcomIndividualName.surname,
-    gedcomIndividualName.nameSuffix,
+    gedcomIndividualName.suffix,
   ]
     .filter((part) => part != null)
     .join(" ");

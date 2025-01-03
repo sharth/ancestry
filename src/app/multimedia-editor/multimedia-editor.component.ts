@@ -62,10 +62,11 @@ export class MultimediaEditorComponent {
       async () => {
         const xref = this.xref() ?? (await this.nextXref());
 
-        const gedcomMultimedia = new GedcomMultimedia(xref);
-        gedcomMultimedia.filePath = vm.filePath;
-        gedcomMultimedia.mediaType = vm.mimeType;
-        await this.ancestryDatabase.multimedia.put(gedcomMultimedia);
+        await this.ancestryDatabase.multimedia.put({
+          xref,
+          filePath: vm.filePath,
+          mediaType: vm.mimeType,
+        });
       }
     );
 

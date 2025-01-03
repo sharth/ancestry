@@ -85,7 +85,7 @@ export class SourceEditorComponent {
       return {
         ...model,
         repositoryCitations: model.repositoryCitations.filter(
-          (c) => c === repositoryCitation
+          (c) => c !== repositoryCitation
         ),
       };
     });
@@ -113,7 +113,7 @@ export class SourceEditorComponent {
       return {
         ...model,
         multimediaLinks: model.multimediaLinks.filter(
-          (m) => m === multimediaLink
+          (m) => m !== multimediaLink
         ),
       };
     });
@@ -124,7 +124,7 @@ export class SourceEditorComponent {
       if (model == null) return undefined;
       return {
         ...model,
-        unknownRecords: model.unknownRecords.filter((r) => r == unknownRecord),
+        unknownRecords: model.unknownRecords.filter((r) => r !== unknownRecord),
       };
     });
   }

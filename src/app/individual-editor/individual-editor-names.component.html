@@ -1,0 +1,86 @@
+@let columns =
+  [
+    "action",
+    "prefix",
+    "givenName",
+    "nickname",
+    "surnamePrefix",
+    "surname",
+    "suffix",
+    "citations",
+  ];
+
+<mat-table [dataSource]="names()">
+  <ng-container matColumnDef="action">
+    <mat-header-cell *matHeaderCellDef>Action</mat-header-cell>
+    <mat-cell *matCellDef="let name">
+      <button
+        type="button"
+        class="btn btn-danger bi-trash"
+        (click)="removeName.emit(name)"
+      ></button>
+    </mat-cell>
+    <mat-footer-cell *matFooterCellDef>
+      <button
+        type="button"
+        class="btn btn-outline-primary bi-plus"
+        (click)="addName.emit()"
+      ></button>
+    </mat-footer-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="prefix">
+    <mat-header-cell *matHeaderCellDef>Prefix</mat-header-cell>
+    <mat-cell *matCellDef="let name">
+      <input [(ngModel)]="name.prefix" />
+    </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="givenName">
+    <mat-header-cell *matHeaderCellDef>Given Name</mat-header-cell>
+    <mat-cell *matCellDef="let name">
+      <input [(ngModel)]="name.givenName" />
+    </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="nickname">
+    <mat-header-cell *matHeaderCellDef>Nick Name</mat-header-cell>
+    <mat-cell *matCellDef="let name">
+      <input [(ngModel)]="name.nickname" />
+    </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="surnamePrefix">
+    <mat-header-cell *matHeaderCellDef>Surname Prefix</mat-header-cell>
+    <mat-cell *matCellDef="let name">
+      <input [(ngModel)]="name.surnamePrefix" />
+    </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="surname">
+    <mat-header-cell *matHeaderCellDef>Surname</mat-header-cell>
+    <mat-cell *matCellDef="let name">
+      <input [(ngModel)]="name.surname" />
+    </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="suffix">
+    <mat-header-cell *matHeaderCellDef>Suffix</mat-header-cell>
+    <mat-cell *matCellDef="let name">
+      <input [(ngModel)]="name.suffix" />
+    </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="citations">
+    <mat-header-cell *matHeaderCellDef>Citations</mat-header-cell>
+    <mat-cell *matCellDef="let name">
+      @for (citation of name.citations; track $index) {
+        {{ citation.sourceXref }}
+      }
+    </mat-cell>
+  </ng-container>
+
+  <mat-header-row *matHeaderRowDef="columns" />
+  <mat-row *matRowDef="let row; columns: columns" />
+  <mat-footer-row *matFooterRowDef="['action']" />
+</mat-table>
