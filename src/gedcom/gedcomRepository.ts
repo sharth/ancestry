@@ -1,5 +1,4 @@
-export class GedcomRepository {
-  constructor(public xref: string) {}
-
+export interface GedcomRepository {
+  xref: string;
   name?: string;
 }

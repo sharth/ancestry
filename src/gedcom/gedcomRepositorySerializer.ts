@@ -1,24 +1,20 @@
-import { GedcomRecord } from "./gedcomRecord";
+import type { GedcomRecord } from "./gedcomRecord";
 import type { GedcomRepository } from "./gedcomRepository";
 
 export function serializeGedcomRepository(
   gedcomRepository: GedcomRepository
 ): GedcomRecord {
-  return new GedcomRecord(
-    gedcomRepository.xref,
-    "REPO",
-    "REPO",
-    undefined,
-    [
-      gedcomRepository.name
-        ? new GedcomRecord(
-            undefined,
-            "NAME",
-            "REPO.NAME",
-            gedcomRepository.name,
-            []
-          )
-        : null,
-    ].filter((record) => record != null)
-  );
+  return {
+    xref: gedcomRepository.xref,
+    tag: "REPO",
+    abstag: "REPO",
+    children: [
+      {
+        tag: "NAME",
+        abstag: "REPO.NAME",
+        value: gedcomRepository.name,
+        children: [],
+      },
+    ].filter((record) => record.children.length || record.value),
+  };
 }

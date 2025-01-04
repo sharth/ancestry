@@ -1,6 +1,5 @@
-export class GedcomCitation {
-  constructor(public sourceXref: string) {}
-
+export interface GedcomCitation {
+  sourceXref: string;
   name?: string;
   obje?: string;
   note?: string;

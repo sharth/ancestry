@@ -1,4 +1,4 @@
-import { GedcomRecord } from "./gedcomRecord";
+import type { GedcomRecord } from "./gedcomRecord";
 
 export function parseGedcomRecords(text: string): GedcomRecord[] {
   return Array.from(generateGedcomRecords(text));
@@ -22,7 +22,13 @@ export function* generateGedcomRecords(text: string): Generator<GedcomRecord> {
       ...ladder.slice(0, level).map((record) => record.tag),
       tag,
     ].join(".");
-    const record = new GedcomRecord(xref, tag, abstag, value || undefined, []);
+    const record = {
+      xref,
+      tag,
+      abstag,
+      value: value || undefined,
+      children: [],
+    };
 
     if (level == 0) {
       if (ladder.length > 0) {

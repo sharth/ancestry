@@ -4,7 +4,6 @@ import { TestBed } from "@angular/core/testing";
 import { provideExperimentalZonelessChangeDetection } from "@angular/core";
 import { toObservable } from "@angular/core/rxjs-interop";
 import { AncestryService } from "../database/ancestry.service";
-import { GedcomSource } from "../gedcom";
 import * as rxjs from "rxjs";
 
 describe("AncestryService", () => {
@@ -39,7 +38,12 @@ describe("AncestryService", () => {
   it("AncestryResource notices database changes", async () => {
     expect(ancestryResource.hasValue()).toBeTrue();
     expect(Array.from(ancestryResource.value()!.sources.keys())).toEqual([]);
-    await ancestryDatabase.sources.add(new GedcomSource("@S10@"));
+    await ancestryDatabase.sources.add({
+      xref: "@S10@",
+      repositoryCitations: [],
+      unknownRecords: [],
+      multimediaLinks: [],
+    });
     await waitForAncestryResource();
     expect(Array.from(ancestryResource.value()!.sources.keys())).toEqual([
       "@S10@",

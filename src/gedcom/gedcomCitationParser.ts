@@ -1,5 +1,5 @@
 import type { GedcomRecord } from "./gedcomRecord";
-import { GedcomCitation } from "./gedcomCitation";
+import type { GedcomCitation } from "./gedcomCitation";
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
 
 export function parseGedcomCitation(
@@ -9,7 +9,9 @@ export function parseGedcomCitation(
   if (gedcomRecord.xref != null) throw new Error();
   if (gedcomRecord.value == null) throw new Error();
 
-  const gedcomCitation = new GedcomCitation(gedcomRecord.value);
+  const gedcomCitation: GedcomCitation = {
+    sourceXref: gedcomRecord.value,
+  };
 
   for (const childRecord of gedcomRecord.children) {
     switch (childRecord.tag) {

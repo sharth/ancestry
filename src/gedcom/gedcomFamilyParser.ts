@@ -1,6 +1,6 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import { parseGedcomEvent } from "./gedcomEventParser";
-import { GedcomFamily } from "./gedcomFamily";
+import type { GedcomFamily } from "./gedcomFamily";
 import type { GedcomRecord } from "./gedcomRecord";
 
 export function parseGedcomFamily(record: GedcomRecord): GedcomFamily {
@@ -8,8 +8,12 @@ export function parseGedcomFamily(record: GedcomRecord): GedcomFamily {
   if (record.xref == null) throw new Error();
   if (record.value != null) throw new Error();
 
-  const gedcomFamily = new GedcomFamily(record.xref);
-  gedcomFamily.gedcomRecord = record;
+  const gedcomFamily: GedcomFamily = {
+    xref: record.xref,
+    gedcomRecord: record,
+    childXrefs: [],
+    events: [],
+  };
 
   for (const childRecord of record.children) {
     switch (childRecord.tag) {

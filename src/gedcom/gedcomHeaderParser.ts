@@ -1,4 +1,4 @@
-import { GedcomHeader } from "./gedcomHeader";
+import type { GedcomHeader } from "./gedcomHeader";
 import type { GedcomRecord } from "./gedcomRecord";
 
 export function parseGedcomHeader(record: GedcomRecord): GedcomHeader {
@@ -6,5 +6,7 @@ export function parseGedcomHeader(record: GedcomRecord): GedcomHeader {
   if (record.xref != null) throw new Error();
   if (record.value != null) throw new Error();
 
-  return new GedcomHeader(record);
+  return {
+    record,
+  };
 }

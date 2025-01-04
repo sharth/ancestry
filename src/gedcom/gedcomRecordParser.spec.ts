@@ -1,51 +1,76 @@
 import { parseGedcomRecords } from "./gedcomRecordParser";
-import { GedcomRecord } from ".";
 
 it("conc is merged into the previous record", () => {
   const [gedcomRecord] = parseGedcomRecords(
     ["0 @I1@ INDI", "1 NAME john ", "2 CONC doe", "2 CONT senior"].join("\n")
   );
-  expect(gedcomRecord).toEqual(
-    new GedcomRecord("@I1@", "INDI", "INDI", undefined, [
-      new GedcomRecord(undefined, "NAME", "INDI.NAME", "john doe\nsenior", []),
-    ])
-  );
+  expect(gedcomRecord).toEqual({
+    xref: "@I1@",
+    tag: "INDI",
+    abstag: "INDI",
+    value: undefined,
+    children: [
+      {
+        xref: undefined,
+        tag: "NAME",
+        abstag: "INDI.NAME",
+        value: "john doe\nsenior",
+        children: [],
+      },
+    ],
+  });
 });
 
 it("conc onto the empty string", () => {
   const [gedcomRecord] = parseGedcomRecords(
     ["0 TAG", "1 CONC value"].join("\n")
   );
-  expect(gedcomRecord).toEqual(
-    new GedcomRecord(undefined, "TAG", "TAG", "value", [])
-  );
+  expect(gedcomRecord).toEqual({
+    xref: undefined,
+    tag: "TAG",
+    abstag: "TAG",
+    value: "value",
+    children: [],
+  });
 });
 
 it("cont onto the empty string", () => {
   const [gedcomRecord] = parseGedcomRecords(
     ["0 TAG", "1 CONT value"].join("\n")
   );
-  expect(gedcomRecord).toEqual(
-    new GedcomRecord(undefined, "TAG", "TAG", "\nvalue", [])
-  );
+  expect(gedcomRecord).toEqual({
+    xref: undefined,
+    tag: "TAG",
+    abstag: "TAG",
+    value: "\nvalue",
+    children: [],
+  });
 });
 
 it("empty lines presented correctly", () => {
   const [gedcomRecord] = parseGedcomRecords(
     ["0 TAG", "1 CONC", "1 CONT", "1 CONT"].join("\n")
   );
-  expect(gedcomRecord).toEqual(
-    new GedcomRecord(undefined, "TAG", "TAG", "\n\n", [])
-  );
+  expect(gedcomRecord).toEqual({
+    xref: undefined,
+    tag: "TAG",
+    abstag: "TAG",
+    value: "\n\n",
+    children: [],
+  });
 });
 
 it("conc records disappear", () => {
   const [gedcomRecord] = parseGedcomRecords(
     ["0 TAG abc", "1 CONC def"].join("\n")
   );
-  expect(gedcomRecord).toEqual(
-    new GedcomRecord(undefined, "TAG", "TAG", "abcdef", [])
-  );
+  expect(gedcomRecord).toEqual({
+    xref: undefined,
+    tag: "TAG",
+    abstag: "TAG",
+    value: "abcdef",
+    children: [],
+  });
 });
 
 it("parse an empty file", () => {

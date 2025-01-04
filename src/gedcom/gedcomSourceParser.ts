@@ -1,14 +1,19 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import type { GedcomRecord } from "./gedcomRecord";
-import { GedcomSource } from "./gedcomSource";
+import type { GedcomSource } from "./gedcomSource";
 
 export function parseGedcomSource(record: GedcomRecord): GedcomSource {
   if (record.abstag !== "SOUR") throw new Error();
   if (record.xref == null) throw new Error();
   if (record.value != null) throw new Error();
 
-  const gedcomSource = new GedcomSource(record.xref);
-  gedcomSource.canonicalGedcomRecord = record;
+  const gedcomSource: GedcomSource = {
+    xref: record.xref,
+    canonicalGedcomRecord: record,
+    repositoryCitations: [],
+    unknownRecords: [],
+    multimediaLinks: [],
+  };
 
   for (const childRecord of record.children) {
     switch (childRecord.tag) {

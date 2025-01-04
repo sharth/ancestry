@@ -1,5 +1,5 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
-import { GedcomMultimedia } from "./gedcomMultimedia";
+import type { GedcomMultimedia } from "./gedcomMultimedia";
 import type { GedcomRecord } from "./gedcomRecord";
 
 export function parseGedcomMultimedia(record: GedcomRecord): GedcomMultimedia {
@@ -7,7 +7,9 @@ export function parseGedcomMultimedia(record: GedcomRecord): GedcomMultimedia {
   if (record.xref == null) throw new Error();
   if (record.value != null) throw new Error();
 
-  const gedcomMultimedia = new GedcomMultimedia(record.xref);
+  const gedcomMultimedia: GedcomMultimedia = {
+    xref: record.xref,
+  };
 
   for (const childRecord of record.children) {
     switch (childRecord.tag) {

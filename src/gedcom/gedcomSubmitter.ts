@@ -1,5 +1,5 @@
-export class GedcomSubmitter {
-  constructor(public readonly xref: string) {}
+export interface GedcomSubmitter {
+  xref: string;
   name?: string;
   email?: string;
 }

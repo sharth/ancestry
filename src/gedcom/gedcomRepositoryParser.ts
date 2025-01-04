@@ -1,6 +1,6 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import type { GedcomRecord } from "./gedcomRecord";
-import { GedcomRepository } from "./gedcomRepository";
+import type { GedcomRepository } from "./gedcomRepository";
 
 export function parseGedcomRepository(
   gedcomRecord: GedcomRecord
@@ -9,7 +9,9 @@ export function parseGedcomRepository(
   if (gedcomRecord.xref == null) throw new Error();
   if (gedcomRecord.value != null) throw new Error();
 
-  const gedcomRepository = new GedcomRepository(gedcomRecord.xref);
+  const gedcomRepository: GedcomRepository = {
+    xref: gedcomRecord.xref,
+  };
 
   for (const childRecord of gedcomRecord.children) {
     switch (childRecord.tag) {

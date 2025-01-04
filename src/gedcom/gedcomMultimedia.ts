@@ -1,6 +1,5 @@
-export class GedcomMultimedia {
-  constructor(public xref: string) {}
-
+export interface GedcomMultimedia {
+  xref: string;
   filePath?: string;
   mediaType?: string;
 }

@@ -2,11 +2,8 @@ import { Component, inject, input, linkedSignal, output } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { AncestryService } from "../../database/ancestry.service";
-import {
-  GedcomEvent,
-  GedcomIndividual,
-  GedcomIndividualName,
-} from "../../gedcom";
+import type { GedcomEvent } from "../../gedcom";
+import type { GedcomName } from "../../gedcom";
 import { IndividualEditorNamesComponent } from "./individual-editor-names.component";
 import { IndividualEditorEventsComponent } from "./individual-editor-events.component";
 
@@ -71,17 +68,19 @@ export class IndividualEditorComponent {
       if (model == null) return undefined;
       return {
         ...model,
-        names: model.names.concat(new GedcomIndividualName()),
+        names: model.names.concat({
+          citations: [],
+        }),
       };
     });
   }
 
-  removeName(gedcomIndividualName: GedcomIndividualName) {
+  removeName(gedcomName: GedcomName) {
     this.vm.update((model) => {
       if (model == null) return undefined;
       return {
         ...model,
-        names: model.names.filter((c) => c !== gedcomIndividualName),
+        names: model.names.filter((c) => c !== gedcomName),
       };
     });
   }
@@ -91,7 +90,11 @@ export class IndividualEditorComponent {
       if (model == null) return undefined;
       return {
         ...model,
-        events: model.events.concat(new GedcomEvent("")),
+        events: model.events.concat({
+          type: "",
+          sharedWithXrefs: [],
+          citations: [],
+        }),
       };
     });
   }
@@ -101,7 +104,7 @@ export class IndividualEditorComponent {
       if (model == null) return undefined;
       return {
         ...model,
-        names: model.names.filter((c) => c !== event),
+        events: model.events.filter((c) => c !== event),
       };
     });
   }

@@ -1,5 +1,5 @@
 import type { GedcomRecord } from "./gedcomRecord";
 
-export class GedcomUnknown {
-  constructor(public gedcomRecord: GedcomRecord) {}
+export interface GedcomUnknown {
+  gedcomRecord: GedcomRecord;
 }

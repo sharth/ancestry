@@ -1,7 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { Component, computed, inject } from "@angular/core";
 import { GedcomDiffComponent } from "../../util/gedcom-diff.component";
-import { GedcomRecord, serializeGedcomRecordToText } from "../../gedcom";
+import type { GedcomRecord } from "../../gedcom";
 import {
   serializeGedcomIndividual,
   serializeGedcomFamily,
@@ -9,6 +9,7 @@ import {
   serializeGedcomRepository,
   serializeGedcomSubmitter,
   serializeGedcomMultimedia,
+  serializeGedcomRecordToText,
   parseGedcomRecords,
 } from "../../gedcom";
 import { AncestryService } from "../../database/ancestry.service";
@@ -81,14 +82,14 @@ export class GedcomComponent {
       return [];
     }
     return [
-      new GedcomRecord(undefined, "HEAD", "HEAD", undefined, []),
+      { tag: "HEAD", abstag: "HEAD", children: [] },
       ...[...ancestry.submitters.values()].map(serializeGedcomSubmitter),
       ...[...ancestry.individuals.values()].map(serializeGedcomIndividual),
       ...[...ancestry.families.values()].map(serializeGedcomFamily),
       ...[...ancestry.sources.values()].map(serializeGedcomSource),
       ...[...ancestry.repositories.values()].map(serializeGedcomRepository),
       ...[...ancestry.multimedia.values()].map(serializeGedcomMultimedia),
-      new GedcomRecord(undefined, "TRLR", "TRLR", undefined, []),
+      { tag: "TRLR", abstag: "TRLR", children: [] },
     ];
   });
 

@@ -1,6 +1,6 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import { parseGedcomCitation } from "./gedcomCitationParser";
-import { GedcomEvent } from "./gedcomEvent";
+import type { GedcomEvent } from "./gedcomEvent";
 import type { GedcomRecord } from "./gedcomRecord";
 
 export function parseGedcomEvent(record: GedcomRecord): GedcomEvent {
@@ -32,8 +32,12 @@ export function parseGedcomEvent(record: GedcomRecord): GedcomEvent {
       ["WILL", "Will"],
     ]).get(record.tag) ?? record.tag;
 
-  const gedcomEvent = new GedcomEvent(type);
-  gedcomEvent.value = record.value;
+  const gedcomEvent: GedcomEvent = {
+    type,
+    value: record.value,
+    citations: [],
+    sharedWithXrefs: [],
+  };
 
   for (const childRecord of record.children) {
     switch (childRecord.tag) {

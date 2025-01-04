@@ -1,7 +1,6 @@
 import { Component, inject, input, linkedSignal, output } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
-import { GedcomMultimedia } from "../../gedcom/gedcomMultimedia";
 import { AncestryService } from "../../database/ancestry.service";
 
 @Component({

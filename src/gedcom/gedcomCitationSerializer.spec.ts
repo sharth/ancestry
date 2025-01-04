@@ -1,9 +1,9 @@
-import { GedcomCitation } from "./gedcomCitation";
+import type { GedcomCitation } from "./gedcomCitation";
 import { serializeGedcomCitation } from "./gedcomCitationSerializer";
 import { serializeGedcomRecordToText } from "./gedcomRecordSerializer";
 
 it("GedcomCitation", () => {
-  const gedcomCitation = new GedcomCitation("@S1@");
+  const gedcomCitation: GedcomCitation = { sourceXref: "@S1@" };
   expect(
     serializeGedcomRecordToText(serializeGedcomCitation(gedcomCitation))
   ).toEqual(["0 SOUR @S1@"]);

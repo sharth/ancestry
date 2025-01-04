@@ -2,7 +2,7 @@ import { Component, input, output } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatTableModule } from "@angular/material/table";
-import type { GedcomIndividualName } from "../../gedcom";
+import type { GedcomName } from "../../gedcom";
 
 @Component({
   selector: "app-individual-editor-names",
@@ -12,7 +12,7 @@ import type { GedcomIndividualName } from "../../gedcom";
   styleUrl: "./individual-editor.component.css",
 })
 export class IndividualEditorNamesComponent {
-  readonly names = input.required<GedcomIndividualName[]>();
+  readonly names = input.required<GedcomName[]>();
   readonly addName = output();
-  readonly removeName = output<GedcomIndividualName>();
+  readonly removeName = output<GedcomName>();
 }

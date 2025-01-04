@@ -1,4 +1,4 @@
-import { GedcomRecord } from "./gedcomRecord";
+import type { GedcomRecord } from "./gedcomRecord";
 import type { GedcomSource } from "./gedcomSource";
 
 export function serializeGedcomSource(source: GedcomSource): GedcomRecord {
@@ -6,41 +6,26 @@ export function serializeGedcomSource(source: GedcomSource): GedcomRecord {
     return source.canonicalGedcomRecord;
   }
 
-  return new GedcomRecord(
-    source.xref,
-    "SOUR",
-    "SOUR",
-    undefined,
-    [
-      source.abbr
-        ? new GedcomRecord(undefined, "ABBR", "SOUR.ABBR", source.abbr, [])
-        : null,
-      source.title
-        ? new GedcomRecord(undefined, "TITL", "SOUR.TITL", source.title, [])
-        : null,
-      source.text
-        ? new GedcomRecord(undefined, "TEXT", "SOUR.TEXT", source.text, [])
-        : null,
-      ...source.repositoryCitations.map(
-        (repositoryCitation) =>
-          new GedcomRecord(
-            undefined,
-            "REPO",
-            "SOUR.REPO",
-            repositoryCitation.repositoryXref,
-            repositoryCitation.callNumbers.map(
-              (callNumber) =>
-                new GedcomRecord(
-                  undefined,
-                  "CALN",
-                  "SOUR.REPO.CALN",
-                  callNumber,
-                  []
-                )
-            )
-          )
-      ),
+  return {
+    xref: source.xref,
+    tag: "SOUR",
+    abstag: "SOUR",
+    children: [
+      { tag: "ABBR", abstag: "SOUR.ABBR", value: source.abbr, children: [] },
+      { tag: "TITL", abstag: "SOUR.TITL", value: source.title, children: [] },
+      { tag: "TEXT", abstag: "SOUR.TEXT", value: source.text, children: [] },
+      ...source.repositoryCitations.map((repositoryCitation) => ({
+        tag: "REPO",
+        abstag: "SOUR.REPO",
+        value: repositoryCitation.repositoryXref,
+        children: repositoryCitation.callNumbers.map((callNumber) => ({
+          tag: "CALN",
+          abstag: "SOUR.REPO.CALN",
+          value: callNumber,
+          children: [],
+        })),
+      })),
       ...source.unknownRecords,
-    ].filter((record) => record !== null)
-  );
+    ].filter((record) => record.children.length || record.value),
+  };
 }

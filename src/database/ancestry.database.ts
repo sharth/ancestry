@@ -1,5 +1,5 @@
 import { Dexie } from "dexie";
-import {
+import type {
   GedcomHeader,
   GedcomSubmitter,
   GedcomTrailer,
@@ -59,14 +59,5 @@ export class AncestryDatabase extends Dexie {
           );
         })
     );
-
-    this.headers.mapToClass(GedcomHeader);
-    this.submitters.mapToClass(GedcomSubmitter);
-    this.trailers.mapToClass(GedcomTrailer);
-    this.repositories.mapToClass(GedcomRepository);
-    this.sources.mapToClass(GedcomSource);
-    this.individuals.mapToClass(GedcomIndividual);
-    this.families.mapToClass(GedcomFamily);
-    this.multimedia.mapToClass(GedcomMultimedia);
   }
 }

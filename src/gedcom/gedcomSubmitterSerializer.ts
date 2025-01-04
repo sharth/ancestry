@@ -1,25 +1,26 @@
-import { GedcomRecord } from "./gedcomRecord";
+import type { GedcomRecord } from "./gedcomRecord";
 import type { GedcomSubmitter } from "./gedcomSubmitter";
 
 export function serializeGedcomSubmitter(
   gedcomSubmitter: GedcomSubmitter
 ): GedcomRecord {
-  const childRecords: GedcomRecord[] = [];
-  if (gedcomSubmitter.name) {
-    childRecords.push(
-      new GedcomRecord(undefined, "NAME", "", gedcomSubmitter.name, [])
-    );
-  }
-  if (gedcomSubmitter.email) {
-    childRecords.push(
-      new GedcomRecord(undefined, "_EMAIL", "", gedcomSubmitter.email, [])
-    );
-  }
-  return new GedcomRecord(
-    gedcomSubmitter.xref,
-    "SUBM",
-    "SUBM",
-    undefined,
-    childRecords
-  );
+  return {
+    xref: gedcomSubmitter.xref,
+    tag: "SUBM",
+    abstag: "SUBM",
+    children: [
+      {
+        tag: "NAME",
+        abstag: "SUBM.NAME",
+        value: gedcomSubmitter.name,
+        children: [],
+      },
+      {
+        tag: "_EMAIL",
+        abstag: "SUBM._EMAIL",
+        value: gedcomSubmitter.email,
+        children: [],
+      },
+    ].filter((childRecord) => childRecord.value),
+  };
 }

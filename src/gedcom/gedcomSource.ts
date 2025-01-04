@@ -1,17 +1,19 @@
 import type { GedcomRecord } from "./gedcomRecord";
 
-export class GedcomSource {
-  constructor(public xref: string) {}
-
+export interface GedcomSource {
+  xref: string;
   abbr?: string;
   title?: string;
   text?: string;
   repositoryCitations: {
     repositoryXref: string;
     callNumbers: string[];
-  }[] = [];
-  unknownRecords: GedcomRecord[] = [];
-  multimediaLinks: { multimediaXref: string; title?: string }[] = [];
+  }[];
+  unknownRecords: GedcomRecord[];
+  multimediaLinks: {
+    multimediaXref: string;
+    title?: string;
+  }[];
 
   canonicalGedcomRecord?: GedcomRecord;
 }

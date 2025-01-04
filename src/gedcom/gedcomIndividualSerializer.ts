@@ -1,8 +1,7 @@
-import type {
-  GedcomIndividual,
-  GedcomIndividualName,
-} from "./gedcomIndividual";
-import { GedcomRecord } from "./gedcomRecord";
+import type { GedcomIndividual } from "./gedcomIndividual";
+import type { GedcomRecord } from "./gedcomRecord";
+import { serializeGedcomEvent } from "./gedcomEventSerializer";
+import { serializeGedcomName } from "./gedcomNameSerializer";
 
 export function serializeGedcomIndividual(
   gedcomIndividual: GedcomIndividual
@@ -11,39 +10,34 @@ export function serializeGedcomIndividual(
     return gedcomIndividual.gedcomRecord;
   }
 
-  return new GedcomRecord(
-    gedcomIndividual.xref,
-    "INDI",
-    "INDI",
-    undefined,
-    [
-      ...gedcomIndividual.names.map((name) => serializeName(name)),
+  return {
+    xref: gedcomIndividual.xref,
+    tag: "INDI",
+    abstag: "INDI",
+    children: [
+      ...gedcomIndividual.names.map((name) => serializeGedcomName(name)),
       serializeFamilySearchId(gedcomIndividual),
       serializeSex(gedcomIndividual),
-      // TODO: Serialize events, name, surname
-    ].filter((record) => record !== null)
-  );
-}
-
-function serializeName(
-  gedcomIndividualName: GedcomIndividualName
-): GedcomRecord {
-  return new GedcomRecord(undefined, "NAME", "INDI.NAME", undefined, []);
+      ...gedcomIndividual.events.map((event) => serializeGedcomEvent(event)),
+    ]
+      .filter((record) => record !== null)
+      .filter((record) => record.children.length || record.value),
+  };
 }
 
 function serializeFamilySearchId(
   gedcomIndividual: GedcomIndividual
 ): GedcomRecord | null {
-  if (gedcomIndividual.familySearchId == null) {
-    return null;
-  } else {
-    return new GedcomRecord(
-      undefined,
-      "_FSFTID",
-      "INDI._FSFTID",
-      gedcomIndividual.familySearchId,
-      []
-    );
+  switch (gedcomIndividual.familySearchId) {
+    case undefined:
+      return null;
+    default:
+      return {
+        tag: "_FSFTID",
+        abstag: "INDI._FSFTID",
+        value: gedcomIndividual.familySearchId,
+        children: [],
+      };
   }
 }
 
@@ -52,8 +46,18 @@ function serializeSex(gedcomIndividual: GedcomIndividual): GedcomRecord | null {
     case undefined:
       return null;
     case "Male":
-      return new GedcomRecord(undefined, "SEX", "INDI.SEX", "M", []);
+      return {
+        tag: "SEX",
+        abstag: "INDI.SEX",
+        value: "M",
+        children: [],
+      };
     case "Female":
-      return new GedcomRecord(undefined, "SEX", "INDI.SEX", "F", []);
+      return {
+        tag: "SEX",
+        abstag: "INDI.SEX",
+        value: "F",
+        children: [],
+      };
   }
 }

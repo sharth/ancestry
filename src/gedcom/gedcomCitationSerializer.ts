@@ -1,35 +1,26 @@
 import type { GedcomCitation } from "./gedcomCitation";
-import { GedcomRecord } from "./gedcomRecord";
+import type { GedcomRecord } from "./gedcomRecord";
 
 export function serializeGedcomCitation(
   gedcomCitation: GedcomCitation
 ): GedcomRecord {
-  return new GedcomRecord(
-    undefined,
-    "SOUR",
-    "",
-    gedcomCitation.sourceXref,
-    [
-      gedcomCitation.obje
-        ? new GedcomRecord(undefined, "OBJE", "", gedcomCitation.obje, [])
-        : null,
-      gedcomCitation.name
-        ? new GedcomRecord(undefined, "NAME", "", gedcomCitation.name, [])
-        : null,
-      gedcomCitation.note
-        ? new GedcomRecord(undefined, "NOTE", "", gedcomCitation.note, [])
-        : null,
-      gedcomCitation.page
-        ? new GedcomRecord(undefined, "PAGE", "", gedcomCitation.page, [])
-        : null,
-      gedcomCitation.text
-        ? new GedcomRecord(undefined, "DATA", "", undefined, [
-            new GedcomRecord(undefined, "TEXT", "", gedcomCitation.text, []),
-          ])
-        : null,
-      gedcomCitation.quality
-        ? new GedcomRecord(undefined, "QUAY", "", gedcomCitation.quality, [])
-        : null,
-    ].filter((record) => record != null)
-  );
+  return {
+    tag: "SOUR",
+    abstag: "",
+    value: gedcomCitation.sourceXref,
+    children: [
+      { tag: "OBJE", abstag: "", value: gedcomCitation.obje, children: [] },
+      { tag: "NAME", abstag: "", value: gedcomCitation.name, children: [] },
+      { tag: "NOTE", abstag: "", value: gedcomCitation.note, children: [] },
+      { tag: "PAGE", abstag: "", value: gedcomCitation.page, children: [] },
+      {
+        tag: "DATA",
+        abstag: "",
+        children: [
+          { tag: "TEXT", abstag: "", value: gedcomCitation.text, children: [] },
+        ].filter((record) => record.children.length || record.value),
+      },
+      { tag: "QUAY", abstag: "", value: gedcomCitation.quality, children: [] },
+    ].filter((record) => record.children.length || record.value),
+  };
 }
