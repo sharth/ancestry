@@ -6,10 +6,6 @@ import { serializeGedcomName } from "./gedcomNameSerializer";
 export function serializeGedcomIndividual(
   gedcomIndividual: GedcomIndividual
 ): GedcomRecord {
-  if (gedcomIndividual.gedcomRecord) {
-    return gedcomIndividual.gedcomRecord;
-  }
-
   return {
     xref: gedcomIndividual.xref,
     tag: "INDI",

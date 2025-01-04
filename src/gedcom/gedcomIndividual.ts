@@ -1,6 +1,5 @@
 import type { GedcomEvent } from "./gedcomEvent";
 import type { GedcomName } from "./gedcomName";
-import type { GedcomRecord } from "./gedcomRecord";
 
 export interface GedcomIndividual {
   xref: string;
@@ -8,8 +7,6 @@ export interface GedcomIndividual {
   events: GedcomEvent[];
   sex?: "Male" | "Female";
   familySearchId?: string;
-
-  gedcomRecord?: GedcomRecord;
 }
 
 export function fullname(gedcomIndividual: GedcomIndividual): string {

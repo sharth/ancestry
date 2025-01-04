@@ -3,7 +3,6 @@ import type {
   GedcomHeader,
   GedcomIndividual,
   GedcomMultimedia,
-  GedcomRecord,
   GedcomRepository,
   GedcomSource,
   GedcomSubmitter,
@@ -37,6 +36,55 @@ const testCases: {
   database: Database;
 }[] = [
   {
+    name: "Individual",
+    gedcom: [
+      "0 @I1@ INDI",
+      "1 NAME John /Doe/",
+      "2 GIVN John",
+      "2 SURN Doe",
+      "2 SOUR @S1@",
+      "2 SOUR @S2@",
+      "3 QUAY 3",
+      "2 SOUR @S3@",
+      "3 OBJE google.com",
+      "3 NAME name",
+      "3 PAGE page",
+      "3 DATA",
+      "4 TEXT text",
+      "3 QUAY 3",
+    ],
+    database: {
+      individuals: [
+        {
+          xref: "@I1@",
+          names: [
+            {
+              prefix: undefined,
+              givenName: "John",
+              nickName: undefined,
+              surnamePrefix: undefined,
+              surname: "Doe",
+              suffix: undefined,
+              citations: [
+                { sourceXref: "@S1@" },
+                { sourceXref: "@S2@", quality: "3" },
+                {
+                  sourceXref: "@S3@",
+                  name: "name",
+                  obje: "google.com",
+                  text: "text",
+                  page: "page",
+                  quality: "3",
+                },
+              ],
+            },
+          ],
+          events: [],
+        },
+      ],
+    },
+  },
+  {
     name: "Source",
     gedcom: ["0 @S1@ SOUR"],
     database: {
@@ -46,13 +94,6 @@ const testCases: {
           repositoryCitations: [],
           unknownRecords: [],
           multimediaLinks: [],
-          canonicalGedcomRecord: {
-            xref: "@S1@",
-            tag: "SOUR",
-            abstag: "SOUR",
-            value: undefined,
-            children: [],
-          },
         },
       ],
     },
@@ -63,18 +104,18 @@ const testCases: {
       "0 @S10@ SOUR",
       "1 ABBR abbr",
       "1 TITL title",
-      "1 _TMPLT",
-      "2 TID 72",
       "1 TEXT text ",
       "2 CONC and more text",
+      "1 _TMPLT",
+      "2 TID 72",
     ],
     serializedGedcom: [
       "0 @S10@ SOUR",
       "1 ABBR abbr",
       "1 TITL title",
+      "1 TEXT text and more text",
       "1 _TMPLT",
       "2 TID 72",
-      "1 TEXT text and more text",
     ],
     database: {
       sources: [
@@ -102,50 +143,6 @@ const testCases: {
               ],
             },
           ],
-          canonicalGedcomRecord: {
-            xref: "@S10@",
-            tag: "SOUR",
-            abstag: "SOUR",
-            value: undefined,
-            children: [
-              {
-                xref: undefined,
-                tag: "ABBR",
-                abstag: "SOUR.ABBR",
-                value: "abbr",
-                children: [],
-              },
-              {
-                xref: undefined,
-                tag: "TITL",
-                abstag: "SOUR.TITL",
-                value: "title",
-                children: [],
-              },
-              {
-                xref: undefined,
-                tag: "_TMPLT",
-                abstag: "SOUR._TMPLT",
-                value: undefined,
-                children: [
-                  {
-                    xref: undefined,
-                    tag: "TID",
-                    abstag: "SOUR._TMPLT.TID",
-                    value: "72",
-                    children: [],
-                  },
-                ],
-              },
-              {
-                xref: undefined,
-                tag: "TEXT",
-                abstag: "SOUR.TEXT",
-                value: "text and more text",
-                children: [],
-              },
-            ],
-          },
         },
       ],
     },
@@ -155,26 +152,13 @@ const testCases: {
     name: "Family with no parents",
     gedcom: ["0 @F1@ FAM"],
     database: {
-      families: [
-        {
-          xref: "@F1@",
-          childXrefs: [],
-          events: [],
-          gedcomRecord: {
-            xref: "@F1@",
-            tag: "FAM",
-            abstag: "FAM",
-            value: undefined,
-            children: [],
-          },
-        },
-      ],
+      families: [{ xref: "@F1@", childXrefs: [], events: [] }],
     },
   },
 
   {
     name: "Family with both parents",
-    gedcom: ["0 @F3@ FAM", "1 WIFE @I2@", "1 HUSB @I3@"],
+    gedcom: ["0 @F3@ FAM", "1 HUSB @I3@", "1 WIFE @I2@"],
     database: {
       families: [
         {
@@ -183,28 +167,6 @@ const testCases: {
           husbandXref: "@I3@",
           childXrefs: [],
           events: [],
-          gedcomRecord: {
-            xref: "@F3@",
-            tag: "FAM",
-            abstag: "FAM",
-            value: undefined,
-            children: [
-              {
-                xref: undefined,
-                tag: "WIFE",
-                abstag: "FAM.WIFE",
-                value: "@I2@",
-                children: [],
-              },
-              {
-                xref: undefined,
-                tag: "HUSB",
-                abstag: "FAM.HUSB",
-                value: "@I3@",
-                children: [],
-              },
-            ],
-          },
         },
       ],
     },

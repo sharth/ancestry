@@ -14,6 +14,4 @@ export interface GedcomSource {
     multimediaXref: string;
     title?: string;
   }[];
-
-  canonicalGedcomRecord?: GedcomRecord;
 }

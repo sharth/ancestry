@@ -11,7 +11,6 @@ export function parseGedcomIndividual(record: GedcomRecord): GedcomIndividual {
 
   const gedcomIndividual: GedcomIndividual = {
     xref: record.xref,
-    gedcomRecord: record,
     names: [],
     events: [],
   };

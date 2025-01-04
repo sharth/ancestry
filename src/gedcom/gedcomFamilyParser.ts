@@ -10,7 +10,6 @@ export function parseGedcomFamily(record: GedcomRecord): GedcomFamily {
 
   const gedcomFamily: GedcomFamily = {
     xref: record.xref,
-    gedcomRecord: record,
     childXrefs: [],
     events: [],
   };

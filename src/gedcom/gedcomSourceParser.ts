@@ -9,7 +9,6 @@ export function parseGedcomSource(record: GedcomRecord): GedcomSource {
 
   const gedcomSource: GedcomSource = {
     xref: record.xref,
-    canonicalGedcomRecord: record,
     repositoryCitations: [],
     unknownRecords: [],
     multimediaLinks: [],

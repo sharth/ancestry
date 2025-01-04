@@ -7,6 +7,4 @@ export interface GedcomFamily {
   wifeXref?: string;
   childXrefs: string[];
   events: GedcomEvent[];
-
-  gedcomRecord?: GedcomRecord;
 }

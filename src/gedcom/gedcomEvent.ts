@@ -1,5 +1,4 @@
 import type { GedcomCitation } from "./gedcomCitation";
-import type { GedcomRecord } from "./gedcomRecord";
 
 export interface GedcomEvent {
   type: string;
@@ -10,6 +9,4 @@ export interface GedcomEvent {
   value?: string;
   citations: GedcomCitation[];
   sharedWithXrefs: string[];
-
-  gedcomRecord?: GedcomRecord;
 }
