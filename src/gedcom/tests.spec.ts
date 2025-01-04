@@ -86,31 +86,9 @@ const testCases: {
   },
   {
     name: "Source",
-    gedcom: ["0 @S1@ SOUR"],
-    database: {
-      sources: [
-        {
-          xref: "@S1@",
-          repositoryCitations: [],
-          unknownRecords: [],
-          multimediaLinks: [],
-        },
-      ],
-    },
-  },
-  {
-    name: "Source with some fields",
     gedcom: [
-      "0 @S10@ SOUR",
-      "1 ABBR abbr",
-      "1 TITL title",
-      "1 TEXT text ",
-      "2 CONC and more text",
-      "1 _TMPLT",
-      "2 TID 72",
-    ],
-    serializedGedcom: [
-      "0 @S10@ SOUR",
+      "0 @S1@ SOUR",
+      "0 @S2@ SOUR",
       "1 ABBR abbr",
       "1 TITL title",
       "1 TEXT text and more text",
@@ -120,7 +98,13 @@ const testCases: {
     database: {
       sources: [
         {
-          xref: "@S10@",
+          xref: "@S1@",
+          repositoryCitations: [],
+          unknownRecords: [],
+          multimediaLinks: [],
+        },
+        {
+          xref: "@S2@",
           abbr: "abbr",
           title: "title",
           text: "text and more text",
@@ -147,26 +131,37 @@ const testCases: {
       ],
     },
   },
-
   {
-    name: "Family with no parents",
-    gedcom: ["0 @F1@ FAM"],
-    database: {
-      families: [{ xref: "@F1@", childXrefs: [], events: [] }],
-    },
-  },
-
-  {
-    name: "Family with both parents",
-    gedcom: ["0 @F3@ FAM", "1 HUSB @I3@", "1 WIFE @I2@"],
+    name: "Family",
+    gedcom: ["0 @F1@ FAM", "0 @F3@ FAM", "1 HUSB @I3@", "1 WIFE @I2@"],
     database: {
       families: [
+        { xref: "@F1@", childXrefs: [], events: [] },
         {
           xref: "@F3@",
           wifeXref: "@I2@",
           husbandXref: "@I3@",
           childXrefs: [],
           events: [],
+        },
+      ],
+    },
+  },
+  {
+    name: "Submitter",
+    gedcom: [
+      "0 @X1@ SUBM",
+      "0 @X2@ SUBM",
+      "1 NAME John Doe",
+      "1 _EMAIL johndoe@example.com",
+    ],
+    database: {
+      submitters: [
+        { xref: "@X1@" },
+        {
+          xref: "@X2@",
+          name: "John Doe",
+          email: "johndoe@example.com",
         },
       ],
     },
