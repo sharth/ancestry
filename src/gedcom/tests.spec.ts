@@ -52,6 +52,13 @@ const testCases: {
       "3 DATA",
       "4 TEXT text",
       "3 QUAY 3",
+      "0 @I2@ INDI",
+      "1 SEX M",
+      "0 @I3@ INDI",
+      "1 SEX F",
+      "0 @I4@ INDI",
+      "0 @I5@ INDI",
+      "1 _FSFTID abcd",
     ],
     database: {
       individuals: [
@@ -81,6 +88,29 @@ const testCases: {
           ],
           events: [],
         },
+        {
+          xref: "@I2@",
+          sex: "Male",
+          names: [],
+          events: [
+            { type: "Sex", value: "M", citations: [], sharedWithXrefs: [] },
+          ],
+        },
+        {
+          xref: "@I3@",
+          sex: "Female",
+          names: [],
+          events: [
+            { type: "Sex", value: "F", citations: [], sharedWithXrefs: [] },
+          ],
+        },
+        {
+          xref: "@I4@",
+          names: [],
+          events: [],
+        },
+
+        { xref: "@I5@", names: [], events: [], familySearchId: "abcd" },
       ],
     },
   },
