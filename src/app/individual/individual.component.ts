@@ -39,6 +39,7 @@ export class IndividualComponent {
     }
     return {
       name: fullname(individual),
+      sex: individual.sex?.sex ?? "Unknown",
       gedcom: serializeGedcomRecordToText(
         serializeGedcomIndividual(individual)
       ).join("\n"),
