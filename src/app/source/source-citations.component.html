@@ -1,5 +1,5 @@
 @if (vm(); as vm) {
-  @let displayedColumns = ["individual", "event"];
+  @let displayedColumns = ["individual", "event", "citation"];
   <mat-table [dataSource]="vm.citations">
     <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
     <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
@@ -16,7 +16,14 @@
     <ng-container matColumnDef="event">
       <mat-header-cell *matHeaderCellDef>Event</mat-header-cell>
       <mat-cell *matCellDef="let citation">
-        {{ citation.event.type }}
+        {{ citation.event }}
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="citation">
+      <mat-header-cell *matHeaderCellDef>Citation</mat-header-cell>
+      <mat-cell *matCellDef="let citation">
+        {{ citation.citation.text }}
       </mat-cell>
     </ng-container>
   </mat-table>

@@ -1,8 +1,9 @@
+import type { GedcomIndividual } from "./gedcomIndividual";
+import type { GedcomRecord } from "./gedcomRecord";
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import { parseGedcomEvent } from "./gedcomEventParser";
-import type { GedcomIndividual } from "./gedcomIndividual";
 import { parseGedcomName } from "./gedcomNameParser";
-import type { GedcomRecord } from "./gedcomRecord";
+import { parseGedcomSex } from "./gedcomSexParser";
 
 export function parseGedcomIndividual(record: GedcomRecord): GedcomIndividual {
   if (record.abstag !== "INDI") throw new Error();
@@ -43,7 +44,8 @@ export function parseGedcomIndividual(record: GedcomRecord): GedcomIndividual {
         gedcomIndividual.names.push(parseGedcomName(childRecord));
         break;
       case "SEX":
-        parseGedcomIndividualSex(gedcomIndividual, childRecord);
+        if (gedcomIndividual.sex != null) throw new Error();
+        gedcomIndividual.sex = parseGedcomSex(childRecord);
         break;
       case "FAMS":
         break; // Let's just use the links inside the Family record.
@@ -71,36 +73,4 @@ function parseGedcomIndividualFamilySearchId(
 
   gedcomRecord.children.forEach(reportUnparsedRecord);
   return gedcomRecord.value;
-}
-
-function parseGedcomIndividualSex(
-  gedcomIndividual: GedcomIndividual,
-  gedcomRecord: GedcomRecord
-) {
-  if (gedcomRecord.abstag !== "INDI.SEX") throw new Error();
-  if (gedcomRecord.xref != null) throw new Error();
-  if (gedcomRecord.value == null) throw new Error();
-
-  const gedcomEvent = parseGedcomEvent(gedcomRecord);
-  gedcomIndividual.events.push(gedcomEvent);
-  gedcomEvent.value = gedcomRecord.value;
-
-  if (gedcomIndividual.sex == null) {
-    switch (gedcomRecord.value) {
-      case "M":
-        gedcomIndividual.sex = "Male";
-        break;
-      case "F":
-        gedcomIndividual.sex = "Female";
-        break;
-    }
-  }
-
-  for (const childRecord of gedcomRecord.children) {
-    switch (childRecord.tag) {
-      default:
-        reportUnparsedRecord(childRecord);
-        break;
-    }
-  }
 }

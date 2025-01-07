@@ -23,16 +23,40 @@ export class SourceCitationsComponent {
     }
 
     return {
-      citations: ancestry.individuals
-        .values()
-        .flatMap((individual) =>
-          individual.events.map((event) => ({ individual, event }))
-        )
-        .flatMap(({ individual, event }) =>
-          event.citations.map((citation) => ({ individual, event, citation }))
-        )
-        .filter(({ citation }) => citation.sourceXref == xref)
-        .toArray(),
+      citations: [
+        // Event Citations
+        ...ancestry.individuals
+          .values()
+          .flatMap((individual) =>
+            individual.events
+              .filter((event) => event.citations.length > 0)
+              .map((event) => ({ individual, event }))
+          )
+          .flatMap(({ individual, event }) =>
+            event.citations
+              .filter((citation) => citation.sourceXref == xref)
+              .map((citation) => ({ individual, event, citation }))
+          )
+          .map(({ individual, event, citation }) => ({
+            individual,
+            event: event.tag,
+            citation,
+          })),
+        // Sex Citations
+        ...ancestry.individuals
+          .values()
+          .map((individual) => ({
+            individual,
+            citations: individual.sex?.citations ?? [],
+          }))
+          .flatMap(({ individual, citations }) =>
+            citations.map((citation) => ({
+              individual,
+              event: "SEX",
+              citation,
+            }))
+          ),
+      ],
     };
   });
 

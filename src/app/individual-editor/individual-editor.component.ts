@@ -91,7 +91,7 @@ export class IndividualEditorComponent {
       return {
         ...model,
         events: model.events.concat({
-          type: "",
+          tag: "",
           sharedWithXrefs: [],
           citations: [],
         }),

@@ -56,6 +56,7 @@ const testCases: {
       "1 SEX M",
       "0 @I3@ INDI",
       "1 SEX F",
+      "2 SOUR @S50@",
       "0 @I4@ INDI",
       "0 @I5@ INDI",
       "1 _FSFTID abcd",
@@ -73,8 +74,13 @@ const testCases: {
               surname: "Doe",
               suffix: undefined,
               citations: [
-                { sourceXref: "@S1@" },
-                { sourceXref: "@S2@", quality: "3" },
+                {
+                  sourceXref: "@S1@",
+                },
+                {
+                  sourceXref: "@S2@",
+                  quality: "3",
+                },
                 {
                   sourceXref: "@S3@",
                   name: "name",
@@ -90,27 +96,27 @@ const testCases: {
         },
         {
           xref: "@I2@",
-          sex: "Male",
+          sex: { sex: "M", citations: [] },
           names: [],
-          events: [
-            { type: "Sex", value: "M", citations: [], sharedWithXrefs: [] },
-          ],
+          events: [],
         },
         {
           xref: "@I3@",
-          sex: "Female",
+          sex: { sex: "F", citations: [{ sourceXref: "@S50@" }] },
           names: [],
-          events: [
-            { type: "Sex", value: "F", citations: [], sharedWithXrefs: [] },
-          ],
+          events: [],
         },
         {
           xref: "@I4@",
           names: [],
           events: [],
         },
-
-        { xref: "@I5@", names: [], events: [], familySearchId: "abcd" },
+        {
+          xref: "@I5@",
+          names: [],
+          events: [],
+          familySearchId: "abcd",
+        },
       ],
     },
   },

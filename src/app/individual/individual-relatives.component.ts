@@ -1,7 +1,7 @@
 import { Component, computed, inject, input } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterLink } from "@angular/router";
-import { fullname, type GedcomIndividual } from "../../gedcom";
+import { fullname, GedcomSex, type GedcomIndividual } from "../../gedcom";
 import { AncestryService } from "../../database/ancestry.service";
 
 @Component({
@@ -58,19 +58,19 @@ export class IndividualRelativesComponent {
       relatives: [
         ...parents.map((parent) => ({
           individual: parent,
-          relationship: parentDescription[parent.sex ?? "Unknown"],
+          relationship: parentDescription(parent),
         })),
         ...siblings.map((sibling) => ({
           individual: sibling,
-          relationship: siblingDescription[sibling.sex ?? "Unknown"],
+          relationship: siblingDescription(sibling),
         })),
         ...spouses.map((spouse) => ({
           individual: spouse,
-          relationship: spouseDescription[spouse.sex ?? "Unknown"],
+          relationship: spouseDescription(spouse),
         })),
         ...children.map((child) => ({
           individual: child,
-          relationship: childDescription[child.sex ?? "Unknown"],
+          relationship: childDescription(child),
         })),
       ],
     };
@@ -79,26 +79,45 @@ export class IndividualRelativesComponent {
   fullname = fullname;
 }
 
-const parentDescription = {
-  Male: "Father",
-  Female: "Mother",
-  Unknown: "Parent",
-};
+function parentDescription(gedcomIndividual: GedcomIndividual): string {
+  switch (gedcomIndividual.sex?.sex) {
+    case "M":
+      return "Father";
+    case "F":
+      return "Mother";
+    default:
+      return "Parent";
+  }
+}
+function siblingDescription(gedcomIndividual: GedcomIndividual): string {
+  switch (gedcomIndividual.sex?.sex) {
+    case "M":
+      return "Brother";
+    case "F":
+      return "Sister";
+    default:
+      return "Sibling";
+  }
+}
 
-const siblingDescription = {
-  Male: "Brother",
-  Female: "Sister",
-  Unknown: "Sibling",
-};
+function spouseDescription(gedcomIndividual: GedcomIndividual): string {
+  switch (gedcomIndividual.sex?.sex) {
+    case "M":
+      return "Husband";
+    case "F":
+      return "Wife";
+    default:
+      return "Spouse";
+  }
+}
 
-const spouseDescription = {
-  Male: "Husband",
-  Female: "Wife",
-  Unknown: "Spouse",
-};
-
-const childDescription = {
-  Male: "Son",
-  Female: "Daughter",
-  Unknown: "Child",
-};
+function childDescription(gedcomIndividual: GedcomIndividual): string {
+  switch (gedcomIndividual.sex?.sex) {
+    case "M":
+      return "Son";
+    case "F":
+      return "Daughter";
+    default:
+      return "Child";
+  }
+}

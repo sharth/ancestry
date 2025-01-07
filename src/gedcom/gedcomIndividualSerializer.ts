@@ -2,6 +2,7 @@ import type { GedcomIndividual } from "./gedcomIndividual";
 import type { GedcomRecord } from "./gedcomRecord";
 import { serializeGedcomEvent } from "./gedcomEventSerializer";
 import { serializeGedcomName } from "./gedcomNameSerializer";
+import { serializeSex } from "./gedcomSexSerializer";
 
 export function serializeGedcomIndividual(
   gedcomIndividual: GedcomIndividual
@@ -12,8 +13,10 @@ export function serializeGedcomIndividual(
     abstag: "INDI",
     children: [
       ...gedcomIndividual.names.map((name) => serializeGedcomName(name)),
-      serializeFamilySearchId(gedcomIndividual),
-      serializeSex(gedcomIndividual),
+      gedcomIndividual.familySearchId
+        ? serializeFamilySearchId(gedcomIndividual.familySearchId)
+        : null,
+      gedcomIndividual.sex ? serializeSex(gedcomIndividual.sex) : null,
       ...gedcomIndividual.events.map((event) => serializeGedcomEvent(event)),
     ]
       .filter((record) => record !== null)
@@ -21,39 +24,11 @@ export function serializeGedcomIndividual(
   };
 }
 
-function serializeFamilySearchId(
-  gedcomIndividual: GedcomIndividual
-): GedcomRecord | null {
-  switch (gedcomIndividual.familySearchId) {
-    case undefined:
-      return null;
-    default:
-      return {
-        tag: "_FSFTID",
-        abstag: "INDI._FSFTID",
-        value: gedcomIndividual.familySearchId,
-        children: [],
-      };
-  }
-}
-
-function serializeSex(gedcomIndividual: GedcomIndividual): GedcomRecord | null {
-  switch (gedcomIndividual.sex) {
-    case undefined:
-      return null;
-    case "Male":
-      return {
-        tag: "SEX",
-        abstag: "INDI.SEX",
-        value: "M",
-        children: [],
-      };
-    case "Female":
-      return {
-        tag: "SEX",
-        abstag: "INDI.SEX",
-        value: "F",
-        children: [],
-      };
-  }
+function serializeFamilySearchId(familySearchId: string): GedcomRecord {
+  return {
+    tag: "_FSFTID",
+    abstag: "INDI._FSFTID",
+    value: familySearchId,
+    children: [],
+  };
 }

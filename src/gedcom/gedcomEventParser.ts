@@ -1,39 +1,14 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import { parseGedcomCitation } from "./gedcomCitationParser";
-import type { GedcomEvent } from "./gedcomEvent";
+import { gedcomEventTags, type GedcomEvent } from "./gedcomEvent";
 import type { GedcomRecord } from "./gedcomRecord";
 
 export function parseGedcomEvent(record: GedcomRecord): GedcomEvent {
+  if (!gedcomEventTags.get(record.tag)) throw new Error();
   if (record.xref != null) throw new Error();
 
-  const type =
-    new Map([
-      ["BAPM", "Baptism"],
-      ["BIRT", "Birth"],
-      ["BURI", "Burial"],
-      ["CENS", "Census"],
-      ["DEAT", "Death"],
-      ["DIV", "Divorce"],
-      ["EDUC", "Education"],
-      ["EMIG", "Emigration"],
-      ["EVEN", "Event"],
-      ["IMMI", "Immigration"],
-      ["MARB", "Marriage Banns"],
-      ["MARR", "Marriage"],
-      ["NAME", "Name"],
-      ["NATU", "Naturalization"],
-      ["OCCU", "Occupation"],
-      ["PROB", "Probate"],
-      ["RELI", "Religion"],
-      ["RESI", "Residence"],
-      ["RETI", "Retirement"],
-      ["SEX", "Sex"],
-      ["SSN", "Social Security Number"],
-      ["WILL", "Will"],
-    ]).get(record.tag) ?? record.tag;
-
   const gedcomEvent: GedcomEvent = {
-    type,
+    tag: record.tag,
     value: record.value,
     citations: [],
     sharedWithXrefs: [],

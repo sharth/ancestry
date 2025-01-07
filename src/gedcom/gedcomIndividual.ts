@@ -1,11 +1,12 @@
 import type { GedcomEvent } from "./gedcomEvent";
 import type { GedcomName } from "./gedcomName";
+import type { GedcomSex } from "./gedcomSex";
 
 export interface GedcomIndividual {
   xref: string;
   names: GedcomName[];
   events: GedcomEvent[];
-  sex?: "Male" | "Female";
+  sex?: GedcomSex;
   familySearchId?: string;
 }
 
