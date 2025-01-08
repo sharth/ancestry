@@ -1,4 +1,5 @@
 import type { GedcomCitation } from "./gedcomCitation";
+import type { GedcomDate } from "./gedcomDate";
 
 export interface GedcomEvent {
   tag: string;
@@ -6,7 +7,8 @@ export interface GedcomEvent {
   address?: string;
   place?: string;
   cause?: string;
-  date?: string;
+  date?: GedcomDate;
+  sortDate?: GedcomDate;
   value?: string;
   citations: GedcomCitation[];
   sharedWithXrefs: string[];

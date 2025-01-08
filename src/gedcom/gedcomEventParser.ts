@@ -1,5 +1,6 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import { parseGedcomCitation } from "./gedcomCitationParser";
+import { parseGedcomDate } from "./gedcomDateParser";
 import { gedcomEventTags, type GedcomEvent } from "./gedcomEvent";
 import type { GedcomRecord } from "./gedcomRecord";
 
@@ -26,10 +27,13 @@ export function parseGedcomEvent(record: GedcomRecord): GedcomEvent {
         gedcomEvent.citations.push(parseGedcomCitation(childRecord));
         break;
       case "DATE":
-        if (childRecord.xref != null) throw new Error();
-        if (childRecord.value == null) throw new Error();
-        childRecord.children.forEach(reportUnparsedRecord);
-        gedcomEvent.date = childRecord.value;
+        if (gedcomEvent.date != null) throw new Error();
+        gedcomEvent.date = parseGedcomDate(childRecord);
+        break;
+      case "SDATE":
+      case "_SDATE":
+        if (gedcomEvent.sortDate != null) throw new Error();
+        gedcomEvent.sortDate = parseGedcomDate(childRecord);
         break;
       case "TYPE":
         if (childRecord.xref != null) throw new Error();
@@ -56,7 +60,6 @@ export function parseGedcomEvent(record: GedcomRecord): GedcomEvent {
         gedcomEvent.cause = childRecord.value;
         break;
       case "_SENT":
-      case "_SDATE":
       case "_PRIM":
       case "_PROOF":
       case "NOTE":

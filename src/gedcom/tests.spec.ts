@@ -60,6 +60,13 @@ const testCases: {
       "0 @I4@ INDI",
       "0 @I5@ INDI",
       "1 _FSFTID abcd",
+      "1 BIRT",
+      "2 DATE ABT 1 Jan 2000",
+      "2 SDATE 1 Jan 2000",
+      "2 PLAC place",
+      "2 ADDR address",
+      "2 CAUS normal",
+      "2 SOUR @S1@",
     ],
     database: {
       individuals: [
@@ -114,7 +121,19 @@ const testCases: {
         {
           xref: "@I5@",
           names: [],
-          events: [],
+          events: [
+            {
+              tag: "BIRT",
+              value: undefined,
+              place: "place",
+              address: "address",
+              cause: "normal",
+              date: { value: "ABT 1 Jan 2000" },
+              sortDate: { value: "1 Jan 2000" },
+              citations: [{ sourceXref: "@S1@" }],
+              sharedWithXrefs: [],
+            },
+          ],
           familySearchId: "abcd",
         },
       ],
