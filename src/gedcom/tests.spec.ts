@@ -68,6 +68,11 @@ const testCases: {
       "2 CAUS normal",
       "2 SOUR @S1@",
       "1 OCCU Truck Driver",
+      "0 @I6@ INDI",
+      "1 NAME John /Doe/ Jr",
+      "2 GIVN John",
+      "2 SURN Doe",
+      "2 NSFX Jr",
     ],
     database: {
       individuals: [
@@ -142,6 +147,21 @@ const testCases: {
             },
           ],
           familySearchId: "abcd",
+        },
+        {
+          xref: "@I6@",
+          names: [
+            {
+              prefix: undefined,
+              givenName: "John",
+              nickName: undefined,
+              surnamePrefix: undefined,
+              surname: "Doe",
+              suffix: "Jr",
+              citations: [],
+            },
+          ],
+          events: [],
         },
       ],
     },

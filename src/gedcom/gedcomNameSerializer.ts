@@ -48,7 +48,7 @@ export function serializeGedcomName(name: GedcomName): GedcomRecord {
         children: [],
       },
       {
-        tag: "SURN",
+        tag: "NSFX",
         abstag: "INDI.NAME.NSFX",
         value: name.suffix,
         children: [],
