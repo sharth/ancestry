@@ -1,5 +1,8 @@
 import { serializeGedcomCitation } from "./gedcomCitationSerializer";
-import { serializeGedcomDate } from "./gedcomDateSerializer";
+import {
+  serializeGedcomDate,
+  serializeGedcomSortDate,
+} from "./gedcomDateSerializer";
 import type { GedcomEvent } from "./gedcomEvent";
 import type { GedcomRecord } from "./gedcomRecord";
 
@@ -9,9 +12,9 @@ export function serializeGedcomEvent(gedcomEvent: GedcomEvent): GedcomRecord {
     abstag: "",
     value: gedcomEvent.value,
     children: [
-      gedcomEvent.date ? serializeGedcomDate("DATE", gedcomEvent.date) : null,
+      gedcomEvent.date ? serializeGedcomDate(gedcomEvent.date) : null,
       gedcomEvent.sortDate
-        ? serializeGedcomDate("SDATE", gedcomEvent.sortDate)
+        ? serializeGedcomSortDate(gedcomEvent.sortDate)
         : null,
       { tag: "PLAC", abstag: "", value: gedcomEvent.place, children: [] },
       { tag: "ADDR", abstag: "", value: gedcomEvent.address, children: [] },
