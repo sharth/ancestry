@@ -67,6 +67,7 @@ const testCases: {
       "2 ADDR address",
       "2 CAUS normal",
       "2 SOUR @S1@",
+      "1 OCCU Truck Driver",
     ],
     database: {
       individuals: [
@@ -131,6 +132,12 @@ const testCases: {
               date: { value: "ABT 1 Jan 2000" },
               sortDate: { value: "1 Jan 2000" },
               citations: [{ sourceXref: "@S1@" }],
+              sharedWithXrefs: [],
+            },
+            {
+              tag: "OCCU",
+              value: "Truck Driver",
+              citations: [],
               sharedWithXrefs: [],
             },
           ],
