@@ -12,11 +12,11 @@ import type {
   GedcomTrailer,
 } from "../../gedcom";
 import {
-  generateGedcomRecords,
   parseGedcomFamily,
   parseGedcomHeader,
   parseGedcomIndividual,
   parseGedcomMultimedia,
+  parseGedcomRecords,
   parseGedcomRepository,
   parseGedcomSource,
   parseGedcomSubmitter,
@@ -79,7 +79,8 @@ function parseText(
   const sources: GedcomSource[] = [];
   const multimedia: GedcomMultimedia[] = [];
 
-  for (const gedcomRecord of generateGedcomRecords(text)) {
+  const gedcomRecords = parseGedcomRecords(text);
+  for (const gedcomRecord of gedcomRecords) {
     switch (gedcomRecord.tag) {
       case "HEAD":
         headers.push(parseGedcomHeader(gedcomRecord));
@@ -115,6 +116,7 @@ function parseText(
     "readwrite",
     [
       "originalText",
+      "originalRecords",
       "headers",
       "submitters",
       "trailers",
@@ -127,6 +129,8 @@ function parseText(
     async () => {
       await ancestryDatabase.originalText.clear();
       await ancestryDatabase.originalText.add({ text: text });
+      await ancestryDatabase.originalRecords.clear();
+      await ancestryDatabase.originalRecords.bulkAdd(gedcomRecords);
       await ancestryDatabase.headers.clear();
       await ancestryDatabase.headers.bulkAdd(headers);
       await ancestryDatabase.submitters.clear();

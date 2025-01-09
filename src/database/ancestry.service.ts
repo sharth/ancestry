@@ -29,7 +29,9 @@ export class AncestryService {
         repositories,
         multimedia,
         submitters,
+        headers,
         originalText,
+        originalRecords,
       ] = await this.ancestryDatabase.transaction(
         "r",
         [
@@ -39,7 +41,9 @@ export class AncestryService {
           "repositories",
           "multimedia",
           "submitters",
+          "headers",
           "originalText",
+          "originalRecords",
         ],
         async () => [
           await this.ancestryDatabase.individuals.orderBy("xref").toArray(),
@@ -48,7 +52,9 @@ export class AncestryService {
           await this.ancestryDatabase.repositories.orderBy("xref").toArray(),
           await this.ancestryDatabase.multimedia.orderBy("xref").toArray(),
           await this.ancestryDatabase.submitters.orderBy("xref").toArray(),
+          await this.ancestryDatabase.headers.toArray(),
           await this.ancestryDatabase.originalText.toArray(),
+          await this.ancestryDatabase.originalRecords.toArray(),
         ]
       );
       return {
@@ -58,7 +64,9 @@ export class AncestryService {
         repositories: new Map(repositories.map((repo) => [repo.xref, repo])),
         multimedia: new Map(multimedia.map((media) => [media.xref, media])),
         submitters: new Map(submitters.map((s) => [s.xref, s])),
+        headers,
         originalText: originalText.map((o) => o.text).join("\n"),
+        originalRecords,
       };
     },
   });

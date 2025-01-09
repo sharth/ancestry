@@ -8,10 +8,12 @@ import type {
   GedcomIndividual,
   GedcomFamily,
   GedcomMultimedia,
+  GedcomRecord,
 } from "../gedcom";
 
 export class AncestryDatabase extends Dexie {
   originalText!: Dexie.Table<{ text: string }>;
+  originalRecords!: Dexie.Table<GedcomRecord>;
   headers!: Dexie.Table<GedcomHeader>;
   submitters!: Dexie.Table<GedcomSubmitter, string>;
   trailers!: Dexie.Table<GedcomTrailer>;
@@ -59,5 +61,8 @@ export class AncestryDatabase extends Dexie {
           );
         })
     );
+    this.version(6).stores({
+      originalRecords: "++, tag, xref",
+    });
   }
 }
