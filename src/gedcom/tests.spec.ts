@@ -74,6 +74,7 @@ const testCases: {
       "2 GIVN John",
       "2 SURN Doe",
       "2 NSFX Jr",
+      "2 TYPE Traditional",
       "0 @I7@ INDI",
       "1 CHAN",
       "2 DATE 1 Jan 2000",
@@ -90,6 +91,7 @@ const testCases: {
               surnamePrefix: undefined,
               surname: "Doe",
               suffix: undefined,
+              nameType: undefined,
               citations: [
                 {
                   sourceXref: "@S1@",
@@ -163,6 +165,7 @@ const testCases: {
               surnamePrefix: undefined,
               surname: "Doe",
               suffix: "Jr",
+              nameType: "Traditional",
               citations: [],
             },
           ],

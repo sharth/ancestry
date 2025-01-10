@@ -53,6 +53,12 @@ export function serializeGedcomName(name: GedcomName): GedcomRecord {
         value: name.suffix,
         children: [],
       },
+      {
+        tag: "TYPE",
+        abstag: "INDI.NAME.TYPE",
+        value: name.nameType,
+        children: [],
+      },
       ...name.citations.map((citation) => serializeGedcomCitation(citation)),
     ].filter((record) => record.children.length || record.value),
   };

@@ -15,6 +15,7 @@ export function parseGedcomName(gedcomRecord: GedcomRecord): GedcomName {
   const surnames: string[] = [];
   const suffixes: string[] = [];
   const citations: GedcomCitation[] = [];
+  let nameType: string | undefined = undefined;
 
   for (const childRecord of gedcomRecord.children) {
     switch (childRecord.tag) {
@@ -51,6 +52,13 @@ export function parseGedcomName(gedcomRecord: GedcomRecord): GedcomName {
       case "SOUR":
         citations.push(parseGedcomCitation(childRecord));
         break;
+      case "TYPE":
+        if (childRecord.xref != null) throw new Error();
+        if (childRecord.value == null) throw new Error();
+        if (nameType != null) throw new Error();
+        childRecord.children.forEach(reportUnparsedRecord);
+        nameType = childRecord.value;
+        break;
       default:
         reportUnparsedRecord(childRecord);
         break;
@@ -83,6 +91,7 @@ export function parseGedcomName(gedcomRecord: GedcomRecord): GedcomName {
     surnamePrefix: surnamePrefixes.join(" ") || undefined,
     surname: surnames.join(" ") || undefined,
     suffix: suffixes.join(" ") || undefined,
+    nameType,
     citations,
   };
 }
