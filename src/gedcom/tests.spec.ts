@@ -248,6 +248,40 @@ const testCases: {
       ],
     },
   },
+  {
+    name: "CONC and CONT",
+    gedcom: [
+      "0 @X1@ SUBM",
+      "1 NAME Jo",
+      "2 CONC hn",
+      "2 CONT Doe",
+      "0 @X2@ SUBM",
+      "1 NAME",
+      "2 CONC johndoe@example.com",
+      "0 @X3@ SUBM",
+      "1 NAME",
+      "2 CONT John",
+      "2 CONT Doe",
+    ],
+    serializedGedcom: [
+      "0 @X1@ SUBM",
+      "1 NAME John",
+      "2 CONT Doe",
+      "0 @X2@ SUBM",
+      "1 NAME johndoe@example.com",
+      "0 @X3@ SUBM",
+      "1 NAME",
+      "2 CONT John",
+      "2 CONT Doe",
+    ],
+    database: {
+      submitters: [
+        { xref: "@X1@", name: "John\nDoe" },
+        { xref: "@X2@", name: "johndoe@example.com" },
+        { xref: "@X3@", name: "\nJohn\nDoe" },
+      ],
+    },
+  },
 ];
 
 interface Database {
@@ -261,65 +295,74 @@ interface Database {
   multimedia?: GedcomMultimedia[];
 }
 
-testCases.forEach((testCase) => {
-  it(testCase.name, () => {
-    const gedcomRecords = parseGedcomRecords(testCase.gedcom.join("\n"));
-    const database: Database = {};
-    gedcomRecords.forEach((gedcomRecord) => {
-      switch (gedcomRecord.tag) {
-        case "HEAD":
-          database.headers ??= [];
-          database.headers.push(parseGedcomHeader(gedcomRecord));
-          break;
-        case "SUBM":
-          database.submitters ??= [];
-          database.submitters.push(parseGedcomSubmitter(gedcomRecord));
-          break;
-        case "INDI":
-          database.individuals ??= [];
-          database.individuals.push(parseGedcomIndividual(gedcomRecord));
-          break;
-        case "FAM":
-          database.families ??= [];
-          database.families.push(parseGedcomFamily(gedcomRecord));
-          break;
-        case "REPO":
-          database.repositories ??= [];
-          database.repositories.push(parseGedcomRepository(gedcomRecord));
-          break;
-        case "SOUR":
-          database.sources ??= [];
-          database.sources.push(parseGedcomSource(gedcomRecord));
-          break;
-        case "OBJE":
-          database.multimedia ??= [];
-          database.multimedia.push(parseGedcomMultimedia(gedcomRecord));
-          break;
-        case "TRLR":
-          database.trailers ??= [];
-          database.trailers.push(parseGedcomTrailer(gedcomRecord));
-          break;
-      }
+describe("Gedcom Tests", () => {
+  testCases.forEach((testCase) => {
+    describe(testCase.name, () => {
+      const database: Database = {};
+
+      beforeAll(() => {
+        const gedcomRecords = parseGedcomRecords(testCase.gedcom.join("\n"));
+        gedcomRecords.forEach((gedcomRecord) => {
+          switch (gedcomRecord.tag) {
+            case "HEAD":
+              database.headers ??= [];
+              database.headers.push(parseGedcomHeader(gedcomRecord));
+              break;
+            case "SUBM":
+              database.submitters ??= [];
+              database.submitters.push(parseGedcomSubmitter(gedcomRecord));
+              break;
+            case "INDI":
+              database.individuals ??= [];
+              database.individuals.push(parseGedcomIndividual(gedcomRecord));
+              break;
+            case "FAM":
+              database.families ??= [];
+              database.families.push(parseGedcomFamily(gedcomRecord));
+              break;
+            case "REPO":
+              database.repositories ??= [];
+              database.repositories.push(parseGedcomRepository(gedcomRecord));
+              break;
+            case "SOUR":
+              database.sources ??= [];
+              database.sources.push(parseGedcomSource(gedcomRecord));
+              break;
+            case "OBJE":
+              database.multimedia ??= [];
+              database.multimedia.push(parseGedcomMultimedia(gedcomRecord));
+              break;
+            case "TRLR":
+              database.trailers ??= [];
+              database.trailers.push(parseGedcomTrailer(gedcomRecord));
+              break;
+          }
+        });
+      });
+
+      it("Verify Database", () => {
+        expect(database).toEqual(testCase.database);
+      });
+
+      it("Serialize Database", () => {
+        const serializedRecords: string[] = [
+          database.headers?.map((header) => serializeGedcomHeader(header)),
+          database.submitters?.map((subm) => serializeGedcomSubmitter(subm)),
+          database.individuals?.map((indi) => serializeGedcomIndividual(indi)),
+          database.families?.map((fam) => serializeGedcomFamily(fam)),
+          database.repositories?.map((repo) => serializeGedcomRepository(repo)),
+          database.sources?.map((sour) => serializeGedcomSource(sour)),
+          database.multimedia?.map((obje) => serializeGedcomMultimedia(obje)),
+          database.trailers?.map((trlr) => serializeGedcomTrailer(trlr)),
+        ]
+          .filter((record) => record != null)
+          .flat()
+          .flatMap((record) => serializeGedcomRecordToText(record));
+
+        expect(serializedRecords).toEqual(
+          testCase.serializedGedcom ?? testCase.gedcom
+        );
+      });
     });
-
-    expect(database).toEqual(testCase.database);
-
-    const serializedRecords: string[] = [
-      database.headers?.map((header) => serializeGedcomHeader(header)),
-      database.submitters?.map((subm) => serializeGedcomSubmitter(subm)),
-      database.individuals?.map((indi) => serializeGedcomIndividual(indi)),
-      database.families?.map((fam) => serializeGedcomFamily(fam)),
-      database.repositories?.map((repo) => serializeGedcomRepository(repo)),
-      database.sources?.map((sour) => serializeGedcomSource(sour)),
-      database.multimedia?.map((obje) => serializeGedcomMultimedia(obje)),
-      database.trailers?.map((trlr) => serializeGedcomTrailer(trlr)),
-    ]
-      .filter((record) => record != null)
-      .flat()
-      .flatMap((record) => serializeGedcomRecordToText(record));
-
-    expect(serializedRecords).toEqual(
-      testCase.serializedGedcom ?? testCase.gedcom
-    );
   });
 });
