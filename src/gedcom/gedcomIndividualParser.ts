@@ -1,9 +1,11 @@
+import type { GedcomDate } from "./gedcomDate";
 import type { GedcomIndividual } from "./gedcomIndividual";
 import type { GedcomRecord } from "./gedcomRecord";
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import { parseGedcomEvent } from "./gedcomEventParser";
 import { parseGedcomName } from "./gedcomNameParser";
 import { parseGedcomSex } from "./gedcomSexParser";
+import { parseGedcomDate } from "./gedcomDateParser";
 
 export function parseGedcomIndividual(record: GedcomRecord): GedcomIndividual {
   if (record.abstag !== "INDI") throw new Error();
@@ -55,6 +57,10 @@ export function parseGedcomIndividual(record: GedcomRecord): GedcomIndividual {
         gedcomIndividual.familySearchId =
           parseGedcomIndividualFamilySearchId(childRecord);
         break;
+      case "CHAN":
+        if (gedcomIndividual.changeDate) throw new Error();
+        gedcomIndividual.changeDate = parseGedcomChangeDate(childRecord);
+        break;
       default:
         reportUnparsedRecord(childRecord);
         break;
@@ -73,4 +79,28 @@ function parseGedcomIndividualFamilySearchId(
 
   gedcomRecord.children.forEach(reportUnparsedRecord);
   return gedcomRecord.value;
+}
+
+function parseGedcomChangeDate(gedcomRecord: GedcomRecord): GedcomDate {
+  if (gedcomRecord.abstag !== "INDI.CHAN") throw new Error();
+  if (gedcomRecord.xref != null) throw new Error();
+  if (gedcomRecord.value != null) throw new Error();
+
+  let date: GedcomDate | null = null;
+
+  for (const childRecord of gedcomRecord.children) {
+    switch (childRecord.tag) {
+      case "DATE":
+        date = parseGedcomDate(childRecord);
+        break;
+      default:
+        reportUnparsedRecord(childRecord);
+    }
+  }
+
+  if (date == null) {
+    throw new Error();
+  }
+
+  return date;
 }

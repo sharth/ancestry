@@ -1,3 +1,4 @@
+import type { GedcomDate } from "./gedcomDate";
 import type { GedcomEvent } from "./gedcomEvent";
 import type { GedcomName } from "./gedcomName";
 import type { GedcomSex } from "./gedcomSex";
@@ -8,6 +9,7 @@ export interface GedcomIndividual {
   events: GedcomEvent[];
   sex?: GedcomSex;
   familySearchId?: string;
+  changeDate?: GedcomDate; // Should only be a GedcomExactDate.
 }
 
 export function fullname(gedcomIndividual: GedcomIndividual): string {

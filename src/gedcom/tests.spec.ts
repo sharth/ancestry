@@ -73,6 +73,9 @@ const testCases: {
       "2 GIVN John",
       "2 SURN Doe",
       "2 NSFX Jr",
+      "0 @I7@ INDI",
+      "1 CHAN",
+      "2 DATE 1 Jan 2000",
     ],
     database: {
       individuals: [
@@ -161,6 +164,12 @@ const testCases: {
               citations: [],
             },
           ],
+          events: [],
+        },
+        {
+          xref: "@I7@",
+          changeDate: { value: "1 Jan 2000" },
+          names: [],
           events: [],
         },
       ],
