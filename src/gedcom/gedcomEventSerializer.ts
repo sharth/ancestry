@@ -12,6 +12,7 @@ export function serializeGedcomEvent(gedcomEvent: GedcomEvent): GedcomRecord {
     abstag: "",
     value: gedcomEvent.value,
     children: [
+      { tag: "TYPE", abstag: "", value: gedcomEvent.type, children: [] },
       gedcomEvent.date ? serializeGedcomDate(gedcomEvent.date) : null,
       gedcomEvent.sortDate
         ? serializeGedcomSortDate(gedcomEvent.sortDate)

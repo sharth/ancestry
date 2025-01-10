@@ -68,6 +68,7 @@ const testCases: {
       "2 CAUS normal",
       "2 SOUR @S1@",
       "1 OCCU Truck Driver",
+      "2 TYPE Permanent",
       "0 @I6@ INDI",
       "1 NAME John /Doe/ Jr",
       "2 GIVN John",
@@ -145,6 +146,7 @@ const testCases: {
             {
               tag: "OCCU",
               value: "Truck Driver",
+              type: "Permanent",
               citations: [],
               sharedWithXrefs: [],
             },
