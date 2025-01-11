@@ -1,8 +1,8 @@
 @if (vm(); as vm) {
   @for (difference of vm.differences; track difference.key) {
     <app-gedcom-diff
-      [oldGedcomText]="vm.originalText.join('\n')"
-      [newGedcomText]="vm.currentText.join('\n')"
+      [oldGedcomText]="difference.originalText.join('\n')"
+      [newGedcomText]="difference.currentText.join('\n')"
     ></app-gedcom-diff>
   }
 }

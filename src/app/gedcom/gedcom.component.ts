@@ -26,9 +26,7 @@ export class GedcomComponent {
 
   readonly vm = computed(() => {
     const ancestry = this.ancestryService.ancestryResource.value();
-    if (ancestry === undefined) {
-      return [];
-    }
+    if (ancestry == null) return;
 
     const deltas = new Map<
       string,
@@ -79,7 +77,8 @@ export class GedcomComponent {
           currentText: currentRecord
             ? serializeGedcomRecordToText(currentRecord)
             : [],
-        })),
+        }))
+        .toArray(),
     };
   });
 }
