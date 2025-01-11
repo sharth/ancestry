@@ -24,64 +24,30 @@ import { AncestryService } from "../../database/ancestry.service";
 export class GedcomComponent {
   private ancestryService = inject(AncestryService);
 
-  private readonly originalGedcomRecords = computed<GedcomRecord[]>(() => {
+  readonly vm = computed(() => {
     const ancestry = this.ancestryService.ancestryResource.value();
     if (ancestry === undefined) {
       return [];
     }
-    return parseGedcomRecords(ancestry.originalText);
-  });
 
-  readonly vmm = computed(() => {
-    const ancestry = this.ancestryService.ancestryResource.value();
-    if (ancestry === undefined) {
-      return [];
-    }
-    // Copy the existing objects in the database, so that we can mutate them.
-    const individuals = new Map(ancestry.individuals);
+    const deltas = new Map<
+      string,
+      { originalRecord?: GedcomRecord; currentRecord?: GedcomRecord }
+    >();
 
-    // For each record in the original database, find the matching record in the current database.
-    const deltas = [];
-    for (const originalRecord of parseGedcomRecords(ancestry.originalText)) {
-      if (originalRecord.tag == "INDI") {
-        const xref = originalRecord.xref;
-        if (xref == undefined) {
-          deltas.push({ originalRecord, newRecord: undefined });
-          continue;
-        }
-        const individual = individuals.get(xref);
-        if (individual == undefined) {
-          deltas.push({ originalRecord, newRecord: undefined });
-          continue;
-        }
-        individuals.delete(xref);
-        const newRecord = serializeGedcomIndividual(individual);
-        deltas.push({ originalRecord, newRecord });
+    for (const gedcomRecord of ancestry.originalRecords) {
+      const key = `${gedcomRecord.tag} ${gedcomRecord.xref} ${gedcomRecord.value}`;
+      const delta = deltas.get(key);
+      if (delta == null) {
+        deltas.set(key, { originalRecord: gedcomRecord });
+      } else if (delta.originalRecord) {
+        throw new Error("slot already used");
       } else {
-        deltas.push({ originalRecord, newRecord: undefined });
+        delta.originalRecord = gedcomRecord;
       }
     }
-    for (const individual of individuals.values()) {
-      deltas.push({
-        originalRecord: undefined,
-        newRecord: serializeGedcomIndividual(individual),
-      });
-    }
-    // For each record in originalGedcomRecords...
-    // - Lookup the new object.
-    // - Prepare a diff object for each one, passing the originalGedcomRecord, and newGedcomRecord
-    // For each remaining record in newGedcomRecords
-    // - Prepare a diff object for each one, passing undefined, and newGedcomRecord
 
-    return {};
-  });
-
-  private readonly currentGedcomRecords = computed<GedcomRecord[]>(() => {
-    const ancestry = this.ancestryService.ancestryResource.value();
-    if (ancestry === undefined) {
-      return [];
-    }
-    return [
+    for (const gedcomRecord of [
       { tag: "HEAD", abstag: "HEAD", children: [] },
       ...[...ancestry.submitters.values()].map(serializeGedcomSubmitter),
       ...[...ancestry.individuals.values()].map(serializeGedcomIndividual),
@@ -90,31 +56,30 @@ export class GedcomComponent {
       ...[...ancestry.repositories.values()].map(serializeGedcomRepository),
       ...[...ancestry.multimedia.values()].map(serializeGedcomMultimedia),
       { tag: "TRLR", abstag: "TRLR", children: [] },
-    ];
-  });
+    ]) {
+      const key = `${gedcomRecord.tag} ${gedcomRecord.xref} ${gedcomRecord.value}`;
+      const delta = deltas.get(key);
+      if (delta == null) {
+        deltas.set(key, { currentRecord: gedcomRecord });
+      } else if (delta.currentRecord) {
+        throw new Error("slot already used");
+      } else {
+        delta.currentRecord = gedcomRecord;
+      }
+    }
 
-  private readonly orderedGedcomRecords = computed<GedcomRecord[]>(() => {
-    const asKey = (record: GedcomRecord) =>
-      `${record.tag} ${record.xref ?? ""} ${record.value ?? ""}`;
-    const orderedRecords = new Map<string, GedcomRecord[]>();
-    this.originalGedcomRecords()
-      .filter((record) => record.abstag != "TRLR")
-      .forEach((record) => {
-        orderedRecords.set(asKey(record), []);
-      });
-    this.currentGedcomRecords().forEach((record) => {
-      if (!orderedRecords.get(asKey(record))?.push(record))
-        orderedRecords.set(asKey(record), [record]);
-    });
-    return Array.from(orderedRecords.values()).flat();
+    return {
+      differences: deltas
+        .entries()
+        .map(([key, { originalRecord, currentRecord }]) => ({
+          key,
+          originalText: originalRecord
+            ? serializeGedcomRecordToText(originalRecord)
+            : [],
+          currentText: currentRecord
+            ? serializeGedcomRecordToText(currentRecord)
+            : [],
+        })),
+    };
   });
-
-  readonly vm = computed(() => ({
-    oldGedcomText: this.originalGedcomRecords()
-      .flatMap((record) => serializeGedcomRecordToText(record))
-      .join("\n"),
-    newGedcomText: this.orderedGedcomRecords()
-      .flatMap((record) => serializeGedcomRecordToText(record))
-      .join("\n"),
-  }));
 }
