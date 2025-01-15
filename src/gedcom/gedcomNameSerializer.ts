@@ -15,6 +15,7 @@ export function serializeGedcomName(name: GedcomName): GedcomRecord {
       name.suffix,
     ]
       .filter((part) => part != undefined)
+      .filter((part) => part != "")
       .join(" "),
     children: [
       {
