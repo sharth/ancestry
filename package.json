@@ -41,7 +41,7 @@
     "ag-grid-community": "^33.0.2",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
-    "dexie": "^4.0.10",
+    "dexie": "^4.0.11",
     "diff": "^7.0.0",
     "eslint": "^9.18.0",
     "eslint-plugin-markdown": "^5.1.0",
