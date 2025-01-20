@@ -148,15 +148,13 @@ export class SourceEditorComponent {
     const repositoryCitations: {
       repositoryXref: string;
       callNumbers: string[];
-    }[] = Array.from(
-      Map.groupBy(
-        model.repositoryCitations,
-        ({ repositoryXref }) => repositoryXref
-      ).entries()
-    ).map(([repositoryXref, citations]) => ({
-      repositoryXref,
-      callNumbers: citations.map(({ callNumber }) => callNumber),
-    }));
+    }[] = Map.groupBy(model.repositoryCitations, (cite) => cite.repositoryXref)
+      .entries()
+      .map(([repositoryXref, repositoryCitations]) => ({
+        repositoryXref,
+        callNumbers: repositoryCitations.map((cite) => cite.callNumber),
+      }))
+      .toArray();
 
     await this.ancestryDatabase.transaction("rw", ["sources"], async () => {
       const xref = this.xref() ?? (await this.nextXref());

@@ -37,7 +37,7 @@ describe("AncestryService", () => {
 
   it("AncestryResource notices database changes", async () => {
     expect(ancestryResource.hasValue()).toBeTrue();
-    expect(Array.from(ancestryResource.value()!.sources.keys())).toEqual([]);
+    expect(ancestryResource.value()!.sources.keys().toArray()).toEqual([]);
     await ancestryDatabase.sources.add({
       xref: "@S10@",
       repositoryCitations: [],
@@ -45,7 +45,7 @@ describe("AncestryService", () => {
       multimediaLinks: [],
     });
     await waitForAncestryResource();
-    expect(Array.from(ancestryResource.value()!.sources.keys())).toEqual([
+    expect(ancestryResource.value()!.sources.keys().toArray()).toEqual([
       "@S10@",
     ]);
   });

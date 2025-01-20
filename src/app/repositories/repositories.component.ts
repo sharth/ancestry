@@ -21,7 +21,7 @@ export class RepositoriesComponent {
     }
 
     return {
-      repositories: Array.from(ancestry.repositories.values()),
+      repositories: ancestry.repositories.values().toArray(),
     };
   });
 }

@@ -1,7 +1,7 @@
 import type { GedcomRecord } from "./gedcomRecord";
 
 export function parseGedcomRecords(text: string): GedcomRecord[] {
-  return Array.from(generateGedcomRecords(text));
+  return generateGedcomRecords(text).toArray();
 }
 
 export function* generateGedcomRecords(text: string): Generator<GedcomRecord> {

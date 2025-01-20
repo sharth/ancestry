@@ -19,7 +19,7 @@ export class SourcesComponent {
     const ancestry = this.ancestryResource.value();
     if (ancestry == undefined) return undefined;
 
-    const sources = Array.from(ancestry.sources.values());
+    const sources = ancestry.sources.values().toArray();
     sources.sort((lhs, rhs) => (lhs.abbr ?? "").localeCompare(rhs.abbr ?? ""));
 
     return { sources };

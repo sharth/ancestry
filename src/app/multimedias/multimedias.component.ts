@@ -22,7 +22,7 @@ export class MultimediasComponent {
     }
 
     return {
-      multimedias: Array.from(ancestry.multimedia.values()),
+      multimedias: ancestry.multimedia.values().toArray(),
     };
   });
 }

@@ -17,11 +17,11 @@ export class IndexComponent {
     if (ancestry == undefined) return undefined;
 
     return {
-      individuals: Array.from(ancestry.individuals.values()),
-      families: Array.from(ancestry.families.values()),
-      sources: Array.from(ancestry.sources.values()),
-      repositories: Array.from(ancestry.repositories.values()),
-      submitters: Array.from(ancestry.submitters.values()),
+      individuals: ancestry.individuals.values().toArray(),
+      families: ancestry.families.values().toArray(),
+      sources: ancestry.sources.values().toArray(),
+      repositories: ancestry.repositories.values().toArray(),
+      submitters: ancestry.submitters.values().toArray(),
     };
   });
 }
