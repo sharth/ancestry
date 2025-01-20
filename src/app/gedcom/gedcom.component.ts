@@ -10,7 +10,6 @@ import {
   serializeGedcomSubmitter,
   serializeGedcomMultimedia,
   serializeGedcomRecordToText,
-  parseGedcomRecords,
 } from "../../gedcom";
 import { AncestryService } from "../../database/ancestry.service";
 

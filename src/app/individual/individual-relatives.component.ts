@@ -1,7 +1,7 @@
 import { Component, computed, inject, input } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterLink } from "@angular/router";
-import { fullname, GedcomSex, type GedcomIndividual } from "../../gedcom";
+import { fullname, type GedcomIndividual } from "../../gedcom";
 import { AncestryService } from "../../database/ancestry.service";
 
 @Component({
