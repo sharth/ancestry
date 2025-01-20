@@ -14,9 +14,9 @@
             "outputPath": "dist/angular",
             "index": "src/index.html",
             "browser": "src/main.ts",
-            "polyfills": [],
             "tsConfig": "tsconfig.app.json",
             "assets": ["src/favicon.ico", "src/assets"],
+            "polyfills": ["src/polyfills.ts"],
             "styles": [
               "src/styles.css",
               "node_modules/@fontsource/roboto/300.css",
@@ -74,7 +74,8 @@
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
             "browsers": "ChromeHeadless",
-            "tsConfig": "tsconfig.spec.json"
+            "tsConfig": "tsconfig.spec.json",
+            "polyfills": ["src/polyfills.ts"]
           }
         }
       }
