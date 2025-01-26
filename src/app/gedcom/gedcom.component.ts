@@ -9,7 +9,6 @@ import {
   serializeGedcomRepository,
   serializeGedcomSubmitter,
   serializeGedcomMultimedia,
-  serializeGedcomRecordToText,
 } from "../../gedcom";
 import { AncestryService } from "../../database/ancestry.service";
 
@@ -70,12 +69,8 @@ export class GedcomComponent {
         .entries()
         .map(([key, { originalRecord, currentRecord }]) => ({
           key,
-          originalText: originalRecord
-            ? serializeGedcomRecordToText(originalRecord)
-            : [],
-          currentText: currentRecord
-            ? serializeGedcomRecordToText(currentRecord)
-            : [],
+          originalRecord,
+          currentRecord,
         }))
         .toArray(),
     };

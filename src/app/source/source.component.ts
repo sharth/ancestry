@@ -2,11 +2,7 @@ import type { ElementRef } from "@angular/core";
 import { Component, computed, inject, input, viewChild } from "@angular/core";
 import { RouterModule } from "@angular/router";
 import { CommonModule } from "@angular/common";
-import {
-  serializeGedcomRecordToText,
-  serializeGedcomSource,
-  parseGedcomRecords,
-} from "../../gedcom";
+import { serializeGedcomSource, parseGedcomRecords } from "../../gedcom";
 import { GedcomDiffComponent } from "../../util/gedcom-diff.component";
 import { AncestryService } from "../../database/ancestry.service";
 import { SourceCitationsComponent } from "./source-citations.component";
@@ -28,8 +24,8 @@ import { SourceUnknownsComponent } from "./source-unknowns.component";
     SourceRepositoriesComponent,
     SourceMultimediaComponent,
     SourceEditorComponent,
-    SourceUnknownsComponent
-],
+    SourceUnknownsComponent,
+  ],
 })
 export class SourceComponent {
   readonly xref = input.required<string>();
@@ -47,14 +43,10 @@ export class SourceComponent {
 
     return {
       source,
-      oldGedcomText: [ancestry.originalText]
+      oldGedcomRecord: [ancestry.originalText]
         .flatMap((text) => parseGedcomRecords(text))
-        .filter((r) => r.tag == "SOUR" && r.xref == source.xref)
-        .flatMap((record) => serializeGedcomRecordToText(record))
-        .join("\n"),
-      newGedcomText: serializeGedcomRecordToText(
-        serializeGedcomSource(source)
-      ).join("\n"),
+        .find((r) => r.tag == "SOUR" && r.xref == source.xref),
+      newGedcomRecord: serializeGedcomSource(source),
     };
   });
 

@@ -1,5 +1,6 @@
 import { Component, computed, input } from "@angular/core";
 import { CommonModule } from "@angular/common";
+import { serializeGedcomRecordToText, type GedcomRecord } from "../gedcom";
 
 @Component({
   selector: "app-gedcom-diff",
@@ -9,11 +10,24 @@ import { CommonModule } from "@angular/common";
   imports: [CommonModule],
 })
 export class GedcomDiffComponent {
-  readonly newGedcomText = input.required<string>();
-  readonly oldGedcomText = input.required<string>();
+  readonly newGedcomRecord = input.required<GedcomRecord | undefined>();
+  readonly oldGedcomRecord = input.required<GedcomRecord | undefined>();
+
+  readonly newGedcomText = computed(() => {
+    const gedcomRecord = this.newGedcomRecord();
+    if (gedcomRecord == null) return "";
+    return serializeGedcomRecordToText(gedcomRecord);
+  });
+
+  readonly oldGedcomText = computed(() => {
+    const gedcomRecord = this.oldGedcomRecord();
+    if (gedcomRecord == null) return "";
+    return serializeGedcomRecordToText(gedcomRecord);
+  });
+
   readonly differences = computed(() => {
-    const oldGedcomArr = this.oldGedcomText().split(/\r?\n/);
-    const newGedcomArr = this.newGedcomText().split(/\r?\n/);
+    const oldGedcomArr = this.oldGedcomText();
+    const newGedcomArr = this.newGedcomText();
     const diffs = [];
     let i = 0;
     let j = 0;
