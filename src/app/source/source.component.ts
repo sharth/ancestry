@@ -43,9 +43,9 @@ export class SourceComponent {
 
     return {
       source,
-      oldGedcomRecord: [ancestry.originalText]
-        .flatMap((text) => parseGedcomRecords(text))
-        .find((r) => r.tag == "SOUR" && r.xref == source.xref),
+      oldGedcomRecord: ancestry.originalRecords.find(
+        (r) => r.tag == "SOUR" && r.xref == source.xref
+      ),
       newGedcomRecord: serializeGedcomSource(source),
     };
   });

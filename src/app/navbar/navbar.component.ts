@@ -115,7 +115,6 @@ function parseText(
   return ancestryDatabase.transaction(
     "readwrite",
     [
-      "originalText",
       "originalRecords",
       "headers",
       "submitters",
@@ -127,8 +126,6 @@ function parseText(
       "multimedia",
     ],
     async () => {
-      await ancestryDatabase.originalText.clear();
-      await ancestryDatabase.originalText.add({ text: text });
       await ancestryDatabase.originalRecords.clear();
       await ancestryDatabase.originalRecords.bulkAdd(gedcomRecords);
       await ancestryDatabase.headers.clear();
