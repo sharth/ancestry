@@ -3,9 +3,7 @@
     @for (ancestor of vm.ancestors; let ahnentafel = $index; track $index) {
       @if (ancestor != null) {
         <li value="{{ ahnentafel }}">
-          <a routerLink="/individual/{{ ancestor.xref }}">
-            {{ fullname(ancestor) || ancestor.xref }}
-          </a>
+          <app-individual-link [xref]="ancestor.xref" />
         </li>
       }
     }

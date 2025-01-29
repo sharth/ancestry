@@ -11,9 +11,7 @@
         <tr>
           <td>{{ relative.relationship }}</td>
           <td>
-            <a routerLink="/individual/{{ relative.individual.xref }}">{{
-              fullname(relative.individual) || relative.individual.xref
-            }}</a>
+            <app-individual-link [xref]="relative.individual.xref" />
           </td>
         </tr>
       }

@@ -3,13 +3,19 @@ import { RouterModule } from "@angular/router";
 import { CommonModule } from "@angular/common";
 import { AncestryService } from "../../database/ancestry.service";
 import { MatTableModule } from "@angular/material/table";
+import { IndividualLinkComponent } from "../individual-link/individual-link.component";
 
 @Component({
   selector: "app-source-citations",
   standalone: true,
   templateUrl: "./source-citations.component.html",
   styleUrl: "./source.component.css",
-  imports: [CommonModule, RouterModule, MatTableModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    MatTableModule,
+    IndividualLinkComponent,
+  ],
 })
 export class SourceCitationsComponent {
   readonly xref = input.required<string>();

@@ -7,9 +7,7 @@
     <ng-container matColumnDef="individual">
       <mat-header-cell *matHeaderCellDef>Individual</mat-header-cell>
       <mat-cell *matCellDef="let citation">
-        <a routerLink="/individual/{{ citation.individual.xref }}">
-          {{ citation.individual.name ?? citation.individual.xref }}
-        </a>
+        <app-individual-link [xref]="citation.individual.xref" />
       </mat-cell>
     </ng-container>
 

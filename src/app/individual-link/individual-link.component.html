@@ -1,0 +1,9 @@
+@if (vm(); as vm) {
+  <a routerLink="/individual/{{ vm.xref }}">
+    @if (vm.name) {
+      {{ vm.name }} ({{ vm.xref }})
+    } @else {
+      {{ vm.xref }}
+    }
+  </a>
+}

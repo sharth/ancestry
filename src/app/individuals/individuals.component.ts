@@ -1,15 +1,15 @@
 import { Component, computed, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { RouterLink } from "@angular/router";
-import type { GedcomIndividual} from "../../gedcom";
+import type { GedcomIndividual } from "../../gedcom";
 import { fullname, surname } from "../../gedcom";
 import { AncestryService } from "../../database/ancestry.service";
 import { IndividualEditorComponent } from "../individual-editor/individual-editor.component";
+import { IndividualLinkComponent } from "../individual-link/individual-link.component";
 
 @Component({
   selector: "app-individuals",
   standalone: true,
-  imports: [CommonModule, RouterLink, IndividualEditorComponent],
+  imports: [CommonModule, IndividualEditorComponent, IndividualLinkComponent],
   templateUrl: "./individuals.component.html",
   styleUrl: "./individuals.component.css",
 })
