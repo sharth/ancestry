@@ -1,17 +1,12 @@
 import { Component, computed, inject, input } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { RouterLink } from "@angular/router";
-import {
-  serializeGedcomRecordToText,
-  serializeGedcomEvent,
-} from "../../gedcom";
-import type { GedcomEvent } from "../../gedcom";
 import { AncestryService } from "../../database/ancestry.service";
+import { EventsTableComponent } from "../events-table/events-table.component";
 
 @Component({
   selector: "app-individual-events",
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, EventsTableComponent],
   templateUrl: "./individual-events.component.html",
   styleUrl: "./individual.component.css",
 })
@@ -29,22 +24,7 @@ export class IndividualEventsComponent {
       return undefined;
     }
     return {
-      events: individual.events.map((event) => ({
-        ...event,
-        gedcom: serializeGedcomRecordToText(serializeGedcomEvent(event)).join(
-          "\n"
-        ),
-      })),
+      events: individual.events,
     };
   });
-
-  private readonly showEventGedcomMap = new Map<GedcomEvent, boolean>();
-  toggleGedcom(event: GedcomEvent): void {
-    const status: boolean = this.showEventGedcomMap.get(event) ?? false;
-    this.showEventGedcomMap.set(event, !status);
-  }
-
-  showGedcom(event: GedcomEvent): boolean {
-    return this.showEventGedcomMap.get(event) ?? false;
-  }
 }

@@ -1,0 +1,45 @@
+@if (events(); as events) {
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Event</th>
+        <th scope="col">Type</th>
+        <th scope="col">Date</th>
+        <th scope="col">Location</th>
+        <th scope="col">Detail</th>
+        <th scope="col">Citations</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let event of events">
+        <td>{{ event.tag }}</td>
+        <td>{{ event.type }}</td>
+        <td>{{ event.date?.value }}</td>
+        <td>
+          <ng-container *ngIf="event.address">
+            {{ event.address }} <br />
+          </ng-container>
+          <ng-container *ngIf="event.place">
+            {{ event.place }} <br />
+          </ng-container>
+        </td>
+        <td>
+          <ng-container *ngIf="event.cause">
+            {{ event.cause }}<br />
+          </ng-container>
+          <ng-container *ngIf="event.value">
+            {{ event.value }}<br />
+          </ng-container>
+        </td>
+        <td>
+          <ng-container *ngFor="let citation of event.citations">
+            <a routerLink="/source/{{ citation.sourceXref }}">
+              {{ citation.sourceXref }}
+            </a>
+            {{ " " }}
+          </ng-container>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+}
