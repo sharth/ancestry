@@ -1,33 +1,35 @@
-import type {
-  GedcomFamily,
-  GedcomHeader,
-  GedcomIndividual,
-  GedcomMultimedia,
-  GedcomRepository,
-  GedcomSource,
-  GedcomSubmitter,
-  GedcomTrailer,
-} from ".";
+import type { GedcomFamily } from "./gedcomFamily";
+import { parseGedcomFamily, serializeGedcomFamily } from "./gedcomFamily";
+import type { GedcomHeader } from "./gedcomHeader";
+import { parseGedcomHeader, serializeGedcomHeader } from "./gedcomHeader";
+import type { GedcomIndividual } from "./gedcomIndividual";
 import {
-  parseGedcomFamily,
-  parseGedcomHeader,
   parseGedcomIndividual,
-  parseGedcomMultimedia,
-  parseGedcomRecords,
-  parseGedcomRepository,
-  parseGedcomSource,
-  parseGedcomSubmitter,
-  parseGedcomTrailer,
-  serializeGedcomFamily,
-  serializeGedcomHeader,
   serializeGedcomIndividual,
+} from "./gedcomIndividual";
+import type { GedcomMultimedia } from "./gedcomMultimedia";
+import {
+  parseGedcomMultimedia,
   serializeGedcomMultimedia,
+} from "./gedcomMultimedia";
+import {
+  parseGedcomRecords,
   serializeGedcomRecordToText,
+} from "./gedcomRecord";
+import type { GedcomRepository } from "./gedcomRepository";
+import {
+  parseGedcomRepository,
   serializeGedcomRepository,
-  serializeGedcomSource,
+} from "./gedcomRepository";
+import type { GedcomSource } from "./gedcomSource";
+import { parseGedcomSource, serializeGedcomSource } from "./gedcomSource";
+import type { GedcomSubmitter } from "./gedcomSubmitter";
+import {
+  parseGedcomSubmitter,
   serializeGedcomSubmitter,
-  serializeGedcomTrailer,
-} from ".";
+} from "./gedcomSubmitter";
+import type { GedcomTrailer } from "./gedcomTrailer";
+import { parseGedcomTrailer, serializeGedcomTrailer } from "./gedcomTrailer";
 
 const testCases: {
   name: string;

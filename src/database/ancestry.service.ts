@@ -1,28 +1,24 @@
 import { Injectable, resource, signal } from "@angular/core";
 import { AncestryDatabase } from "./ancestry.database";
 import Dexie from "dexie";
-import type {
-  GedcomFamily,
-  GedcomHeader,
-  GedcomIndividual,
-  GedcomMultimedia,
-  GedcomRepository,
-  GedcomSource,
-  GedcomSubmitter,
-  GedcomTrailer,
-} from "../gedcom";
-import {
-  parseGedcomFamily,
-  parseGedcomHeader,
-  parseGedcomIndividual,
-  parseGedcomMultimedia,
-  parseGedcomRecords,
-  parseGedcomRepository,
-  parseGedcomSource,
-  parseGedcomSubmitter,
-  parseGedcomTrailer,
-} from "../gedcom";
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
+import type { GedcomFamily } from "../gedcom/gedcomFamily";
+import { parseGedcomFamily } from "../gedcom/gedcomFamily";
+import type { GedcomHeader } from "../gedcom/gedcomHeader";
+import { parseGedcomHeader } from "../gedcom/gedcomHeader";
+import type { GedcomIndividual } from "../gedcom/gedcomIndividual";
+import { parseGedcomIndividual } from "../gedcom/gedcomIndividual";
+import type { GedcomMultimedia } from "../gedcom/gedcomMultimedia";
+import { parseGedcomMultimedia } from "../gedcom/gedcomMultimedia";
+import { parseGedcomRecords } from "../gedcom/gedcomRecord";
+import type { GedcomRepository } from "../gedcom/gedcomRepository";
+import { parseGedcomRepository } from "../gedcom/gedcomRepository";
+import type { GedcomSource } from "../gedcom/gedcomSource";
+import { parseGedcomSource } from "../gedcom/gedcomSource";
+import type { GedcomSubmitter } from "../gedcom/gedcomSubmitter";
+import { parseGedcomSubmitter } from "../gedcom/gedcomSubmitter";
+import type { GedcomTrailer } from "../gedcom/gedcomTrailer";
+import { parseGedcomTrailer } from "../gedcom/gedcomTrailer";
 
 @Injectable({ providedIn: "root" })
 export class AncestryService {

@@ -1,15 +1,13 @@
 import { Dexie } from "dexie";
-import type {
-  GedcomHeader,
-  GedcomSubmitter,
-  GedcomTrailer,
-  GedcomRepository,
-  GedcomSource,
-  GedcomIndividual,
-  GedcomFamily,
-  GedcomMultimedia,
-  GedcomRecord,
-} from "../gedcom";
+import type { GedcomFamily } from "../gedcom/gedcomFamily";
+import type { GedcomHeader } from "../gedcom/gedcomHeader";
+import type { GedcomIndividual } from "../gedcom/gedcomIndividual";
+import type { GedcomMultimedia } from "../gedcom/gedcomMultimedia";
+import type { GedcomRecord } from "../gedcom/gedcomRecord";
+import type { GedcomRepository } from "../gedcom/gedcomRepository";
+import type { GedcomSource } from "../gedcom/gedcomSource";
+import type { GedcomSubmitter } from "../gedcom/gedcomSubmitter";
+import type { GedcomTrailer } from "../gedcom/gedcomTrailer";
 
 export class AncestryDatabase extends Dexie {
   originalRecords!: Dexie.Table<GedcomRecord>;

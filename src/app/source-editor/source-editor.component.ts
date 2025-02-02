@@ -2,7 +2,7 @@ import { Component, inject, input, linkedSignal, output } from "@angular/core";
 import { RouterModule } from "@angular/router";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
-import type { GedcomRecord } from "../../gedcom";
+import type { GedcomRecord } from "../../gedcom/gedcomRecord";
 import { AncestryService } from "../../database/ancestry.service";
 import { SourceEditorRepositoryCitationsComponent } from "./source-editor-repositories.component";
 import { SourceEditorUnknownsComponent } from "./source-editor-unknowns.component";

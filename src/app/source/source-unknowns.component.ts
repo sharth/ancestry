@@ -2,7 +2,7 @@ import { Component, computed, inject, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
 import { CommonModule } from "@angular/common";
 import { AncestryService } from "../../database/ancestry.service";
-import { serializeGedcomRecordToText } from "../../gedcom";
+import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
 
 @Component({
   selector: "app-source-unknowns",

@@ -1,6 +1,6 @@
 import { Component, computed, inject, input } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { fullname, type GedcomIndividual } from "../../gedcom";
+import { fullname, type GedcomIndividual } from "../../gedcom/gedcomIndividual";
 import { AncestryService } from "../../database/ancestry.service";
 import { IndividualLinkComponent } from "../individual-link/individual-link.component";
 

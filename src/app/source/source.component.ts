@@ -2,7 +2,7 @@ import type { ElementRef } from "@angular/core";
 import { Component, computed, inject, input, viewChild } from "@angular/core";
 import { RouterModule } from "@angular/router";
 import { CommonModule } from "@angular/common";
-import { serializeGedcomSource, parseGedcomRecords } from "../../gedcom";
+import { serializeGedcomSource } from "../../gedcom/gedcomSource";
 import { GedcomDiffComponent } from "../../util/gedcom-diff.component";
 import { AncestryService } from "../../database/ancestry.service";
 import { SourceCitationsComponent } from "./source-citations.component";

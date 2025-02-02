@@ -2,8 +2,8 @@ import { Component, inject, input, linkedSignal, output } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { AncestryService } from "../../database/ancestry.service";
-import type { GedcomEvent } from "../../gedcom";
-import type { GedcomName } from "../../gedcom";
+import type { GedcomEvent } from "../../gedcom/gedcomEvent";
+import type { GedcomName } from "../../gedcom/gedcomName";
 import { IndividualEditorNamesComponent } from "./individual-editor-names.component";
 import { IndividualEditorEventsComponent } from "./individual-editor-events.component";
 

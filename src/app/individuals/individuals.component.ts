@@ -1,7 +1,7 @@
 import { Component, computed, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import type { GedcomIndividual } from "../../gedcom";
-import { fullname, surname } from "../../gedcom";
+import type { GedcomIndividual } from "../../gedcom/gedcomIndividual";
+import { fullname, surname } from "../../gedcom/gedcomIndividual";
 import { AncestryService } from "../../database/ancestry.service";
 import { IndividualEditorComponent } from "../individual-editor/individual-editor.component";
 import { IndividualLinkComponent } from "../individual-link/individual-link.component";

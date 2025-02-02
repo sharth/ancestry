@@ -1,16 +1,14 @@
 import { CommonModule } from "@angular/common";
 import { Component, computed, inject } from "@angular/core";
 import { GedcomDiffComponent } from "../../util/gedcom-diff.component";
-import type { GedcomRecord } from "../../gedcom";
-import {
-  serializeGedcomIndividual,
-  serializeGedcomFamily,
-  serializeGedcomSource,
-  serializeGedcomRepository,
-  serializeGedcomSubmitter,
-  serializeGedcomMultimedia,
-} from "../../gedcom";
+import type { GedcomRecord } from "../../gedcom/gedcomRecord";
 import { AncestryService } from "../../database/ancestry.service";
+import { serializeGedcomFamily } from "../../gedcom/gedcomFamily";
+import { serializeGedcomIndividual } from "../../gedcom/gedcomIndividual";
+import { serializeGedcomMultimedia } from "../../gedcom/gedcomMultimedia";
+import { serializeGedcomRepository } from "../../gedcom/gedcomRepository";
+import { serializeGedcomSource } from "../../gedcom/gedcomSource";
+import { serializeGedcomSubmitter } from "../../gedcom/gedcomSubmitter";
 
 @Component({
   selector: "app-gedcom",

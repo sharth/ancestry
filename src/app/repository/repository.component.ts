@@ -3,10 +3,8 @@ import { CommonModule } from "@angular/common";
 import { RouterModule } from "@angular/router";
 import { AncestryService } from "../../database/ancestry.service";
 import { RepositorySourcesComponent } from "./repository-sources.component";
-import {
-  serializeGedcomRecordToText,
-  serializeGedcomRepository,
-} from "../../gedcom";
+import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
+import { serializeGedcomRepository } from "../../gedcom/gedcomRepository";
 
 @Component({
   selector: "app-repository",
