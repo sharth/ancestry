@@ -1,6 +1,28 @@
 import { Injectable, resource, signal } from "@angular/core";
 import { AncestryDatabase } from "./ancestry.database";
 import Dexie from "dexie";
+import type {
+  GedcomFamily,
+  GedcomHeader,
+  GedcomIndividual,
+  GedcomMultimedia,
+  GedcomRepository,
+  GedcomSource,
+  GedcomSubmitter,
+  GedcomTrailer,
+} from "../gedcom";
+import {
+  parseGedcomFamily,
+  parseGedcomHeader,
+  parseGedcomIndividual,
+  parseGedcomMultimedia,
+  parseGedcomRecords,
+  parseGedcomRepository,
+  parseGedcomSource,
+  parseGedcomSubmitter,
+  parseGedcomTrailer,
+} from "../gedcom";
+import { reportUnparsedRecord } from "../util/record-unparsed-records";
 
 @Injectable({ providedIn: "root" })
 export class AncestryService {
@@ -66,4 +88,83 @@ export class AncestryService {
       };
     },
   });
+
+  initializeDatabase(text: string): Promise<void> {
+    const headers: GedcomHeader[] = [];
+    const submitters: GedcomSubmitter[] = [];
+    const trailers: GedcomTrailer[] = [];
+    const individuals: GedcomIndividual[] = [];
+    const families: GedcomFamily[] = [];
+    const repositories: GedcomRepository[] = [];
+    const sources: GedcomSource[] = [];
+    const multimedia: GedcomMultimedia[] = [];
+
+    const gedcomRecords = parseGedcomRecords(text);
+    for (const gedcomRecord of gedcomRecords) {
+      switch (gedcomRecord.tag) {
+        case "HEAD":
+          headers.push(parseGedcomHeader(gedcomRecord));
+          break;
+        case "SUBM":
+          submitters.push(parseGedcomSubmitter(gedcomRecord));
+          break;
+        case "TRLR":
+          trailers.push(parseGedcomTrailer(gedcomRecord));
+          break;
+        case "INDI":
+          individuals.push(parseGedcomIndividual(gedcomRecord));
+          break;
+        case "FAM":
+          families.push(parseGedcomFamily(gedcomRecord));
+          break;
+        case "REPO":
+          repositories.push(parseGedcomRepository(gedcomRecord));
+          break;
+        case "SOUR":
+          sources.push(parseGedcomSource(gedcomRecord));
+          break;
+        case "OBJE":
+          multimedia.push(parseGedcomMultimedia(gedcomRecord));
+          break;
+        default:
+          reportUnparsedRecord(gedcomRecord);
+          break;
+      }
+    }
+
+    return this.ancestryDatabase.transaction(
+      "readwrite",
+      [
+        "originalRecords",
+        "headers",
+        "submitters",
+        "trailers",
+        "individuals",
+        "families",
+        "repositories",
+        "sources",
+        "multimedia",
+      ],
+      async () => {
+        await this.ancestryDatabase.originalRecords.clear();
+        await this.ancestryDatabase.originalRecords.bulkAdd(gedcomRecords);
+        await this.ancestryDatabase.headers.clear();
+        await this.ancestryDatabase.headers.bulkAdd(headers);
+        await this.ancestryDatabase.submitters.clear();
+        await this.ancestryDatabase.submitters.bulkAdd(submitters);
+        await this.ancestryDatabase.trailers.clear();
+        await this.ancestryDatabase.trailers.bulkAdd(trailers);
+        await this.ancestryDatabase.individuals.clear();
+        await this.ancestryDatabase.individuals.bulkAdd(individuals);
+        await this.ancestryDatabase.families.clear();
+        await this.ancestryDatabase.families.bulkAdd(families);
+        await this.ancestryDatabase.repositories.clear();
+        await this.ancestryDatabase.repositories.bulkAdd(repositories);
+        await this.ancestryDatabase.sources.clear();
+        await this.ancestryDatabase.sources.bulkAdd(sources);
+        await this.ancestryDatabase.multimedia.clear();
+        await this.ancestryDatabase.multimedia.bulkAdd(multimedia);
+      }
+    );
+  }
 }
