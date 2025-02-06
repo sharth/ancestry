@@ -127,6 +127,12 @@ export function serializeGedcomEvent(gedcomEvent: GedcomEvent): GedcomRecord {
       { tag: "PLAC", abstag: "", value: gedcomEvent.place, children: [] },
       { tag: "ADDR", abstag: "", value: gedcomEvent.address, children: [] },
       { tag: "CAUS", abstag: "", value: gedcomEvent.cause, children: [] },
+      ...gedcomEvent.sharedWithXrefs.map((xref) => ({
+        tag: "_SHAR",
+        abstag: "",
+        value: xref,
+        children: [],
+      })),
       ...gedcomEvent.citations.map((c) => serializeGedcomCitation(c)),
     ]
       .filter((r) => r != null)
