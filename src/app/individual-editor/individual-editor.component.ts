@@ -6,6 +6,7 @@ import type { GedcomEvent } from "../../gedcom/gedcomEvent";
 import type { GedcomName } from "../../gedcom/gedcomName";
 import { IndividualEditorNamesComponent } from "./individual-editor-names.component";
 import { IndividualEditorEventsComponent } from "./individual-editor-events.component";
+import type { GedcomIndividual } from "../../gedcom/gedcomIndividual";
 
 @Component({
   selector: "app-individual-editor",
@@ -28,26 +29,26 @@ export class IndividualEditorComponent {
   readonly xref = input<string>();
   readonly finished = output();
 
-  readonly vm = linkedSignal(() => {
+  readonly vm = linkedSignal<GedcomIndividual | undefined>(() => {
     const ancestry = this.ancestryResource.value();
     if (ancestry == null) return;
 
     const xref = this.xref();
     if (xref == null) {
-      return {
+      const newIndividual: GedcomIndividual = {
+        xref: "",
         names: [],
         events: [],
+        childOfFamilyXref: [],
+        parentOfFamilyXref: [],
       };
+      return newIndividual;
     }
 
     const individual = ancestry.individuals.get(xref);
     if (individual == null) return;
 
-    return {
-      // Do i need to deep copy this?
-      names: individual.names,
-      events: individual.events,
-    };
+    return individual;
   });
 
   private async nextXref(): Promise<string> {
@@ -118,12 +119,7 @@ export class IndividualEditorComponent {
       [this.ancestryDatabase.individuals],
       async () => {
         const xref = this.xref() ?? (await this.nextXref());
-
-        await this.ancestryDatabase.individuals.put({
-          xref,
-          names: vm.names,
-          events: vm.events,
-        });
+        await this.ancestryDatabase.individuals.put({ ...vm, xref });
       }
     );
 

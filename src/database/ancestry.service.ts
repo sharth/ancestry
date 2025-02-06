@@ -128,6 +128,44 @@ export class AncestryService {
       }
     }
 
+    // For whatever reason, GEDCOM has the family references in both the FAM and INDI.
+    // Ensure that these are consistent.
+    const individualMap = new Map(individuals.map((indi) => [indi.xref, indi]));
+    for (const family of families) {
+      if (family.husbandXref) {
+        const husband = individualMap.get(family.husbandXref);
+        if (!husband) throw new Error();
+        if (!husband.parentOfFamilyXref.includes(family.xref))
+          throw new Error();
+      }
+      if (family.wifeXref) {
+        const wife = individualMap.get(family.wifeXref);
+        if (!wife) throw new Error();
+        if (!wife.parentOfFamilyXref.includes(family.xref)) throw new Error();
+      }
+      for (const childXref of family.childXrefs) {
+        const child = individualMap.get(childXref);
+        if (!child) throw new Error();
+        if (!child.childOfFamilyXref.includes(family.xref)) throw new Error();
+      }
+    }
+    const familyMap = new Map(families.map((family) => [family.xref, family]));
+    for (const individual of individuals) {
+      for (const familyXref of individual.parentOfFamilyXref) {
+        const family = familyMap.get(familyXref);
+        const parents = [family?.husbandXref, family?.wifeXref].filter(
+          (e) => e != null
+        );
+        if (!family) throw new Error();
+        if (!parents.includes(individual.xref)) throw new Error();
+      }
+      for (const familyXref of individual.childOfFamilyXref) {
+        const family = familyMap.get(familyXref);
+        if (!family) throw new Error();
+        if (!family.childXrefs.includes(individual.xref)) throw new Error();
+      }
+    }
+
     return this.ancestryDatabase.transaction(
       "readwrite",
       [

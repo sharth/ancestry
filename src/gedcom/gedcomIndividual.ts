@@ -20,6 +20,8 @@ export interface GedcomIndividual {
   sex?: GedcomSex;
   familySearchId?: string;
   changeDate?: GedcomDate; // Should only be a GedcomExactDate.
+  childOfFamilyXref: string[];
+  parentOfFamilyXref: string[];
 }
 
 export function fullname(gedcomIndividual: GedcomIndividual): string {
@@ -51,6 +53,8 @@ export function parseGedcomIndividual(record: GedcomRecord): GedcomIndividual {
     xref: record.xref,
     names: [],
     events: [],
+    parentOfFamilyXref: [],
+    childOfFamilyXref: [],
   };
 
   for (const childRecord of record.children) {
@@ -85,9 +89,17 @@ export function parseGedcomIndividual(record: GedcomRecord): GedcomIndividual {
         gedcomIndividual.sex = parseGedcomSex(childRecord);
         break;
       case "FAMS":
-        break; // Let's just use the links inside the Family record.
+        if (childRecord.xref != null) throw new Error();
+        if (childRecord.value == null) throw new Error();
+        childRecord.children.forEach(reportUnparsedRecord);
+        gedcomIndividual.parentOfFamilyXref.push(childRecord.value);
+        break;
       case "FAMC":
-        break; // Let's just use the links inside the Family record.
+        if (childRecord.xref != null) throw new Error();
+        if (childRecord.value == null) throw new Error();
+        childRecord.children.forEach(reportUnparsedRecord);
+        gedcomIndividual.childOfFamilyXref.push(childRecord.value);
+        break;
       case "_FSFTID":
         gedcomIndividual.familySearchId =
           parseGedcomIndividualFamilySearchId(childRecord);
@@ -157,6 +169,18 @@ export function serializeGedcomIndividual(
         ? serializeChangeDate(gedcomIndividual.changeDate)
         : null,
       ...gedcomIndividual.events.map((event) => serializeGedcomEvent(event)),
+      ...gedcomIndividual.parentOfFamilyXref.map((xref) => ({
+        tag: "FAMS",
+        abstag: "",
+        value: xref,
+        children: [],
+      })),
+      ...gedcomIndividual.childOfFamilyXref.map((xref) => ({
+        tag: "FAMC",
+        abstag: "",
+        value: xref,
+        children: [],
+      })),
     ]
       .filter((record) => record != null)
       .filter((record) => record.children.length || record.value),
