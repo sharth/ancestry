@@ -123,6 +123,8 @@ export function serializeGedcomSource(source: GedcomSource): GedcomRecord {
     children: [
       { tag: "ABBR", abstag: "SOUR.ABBR", value: source.abbr, children: [] },
       { tag: "TITL", abstag: "SOUR.TITL", value: source.title, children: [] },
+      ...source.unknownRecords.filter((record) => record.tag == "_SUBQ"),
+      ...source.unknownRecords.filter((record) => record.tag == "_BIBL"),
       { tag: "TEXT", abstag: "SOUR.TEXT", value: source.text, children: [] },
       ...source.repositoryCitations.map((repositoryCitation) => ({
         tag: "REPO",
@@ -135,7 +137,9 @@ export function serializeGedcomSource(source: GedcomSource): GedcomRecord {
           children: [],
         })),
       })),
-      ...source.unknownRecords,
+      ...source.unknownRecords.filter(
+        (record) => record.tag != "_SUBQ" && record.tag != "_BIBL"
+      ),
     ].filter((record) => record.children.length || record.value),
   };
 }
