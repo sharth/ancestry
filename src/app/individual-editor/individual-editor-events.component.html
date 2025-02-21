@@ -92,8 +92,8 @@
   <ng-container matColumnDef="sharedWith">
     <mat-header-cell *matHeaderCellDef>Shared With</mat-header-cell>
     <mat-cell *matCellDef="let event">
-      @for (xref of event.sharedWithXrefs; track $index) {
-        {{ xref }}
+      @for (sharedWith of event.sharedWith; track $index) {
+        {{ sharedWith.xref }}
       }
     </mat-cell>
   </ng-container>
