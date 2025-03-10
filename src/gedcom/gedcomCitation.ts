@@ -81,9 +81,9 @@ export function serializeGedcomCitation(
     value: gedcomCitation.sourceXref,
     children: [
       { tag: "OBJE", abstag: "", value: gedcomCitation.obje, children: [] },
+      { tag: "PAGE", abstag: "", value: gedcomCitation.page, children: [] },
       { tag: "NAME", abstag: "", value: gedcomCitation.name, children: [] },
       { tag: "NOTE", abstag: "", value: gedcomCitation.note, children: [] },
-      { tag: "PAGE", abstag: "", value: gedcomCitation.page, children: [] },
       { tag: "QUAY", abstag: "", value: gedcomCitation.quality, children: [] },
       {
         tag: "DATA",

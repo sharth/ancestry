@@ -9,4 +9,6 @@ th {
 
 td {
   font-family: monospace;
+  overflow: scroll;
+  text-wrap: nowrap;
 }
