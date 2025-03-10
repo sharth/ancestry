@@ -148,13 +148,13 @@ export function serializeGedcomEvent(gedcomEvent: GedcomEvent): GedcomRecord {
     value: gedcomEvent.value,
     children: [
       { tag: "TYPE", abstag: "", value: gedcomEvent.type, children: [] },
+      { tag: "CAUS", abstag: "", value: gedcomEvent.cause, children: [] },
       gedcomEvent.date ? serializeGedcomDate(gedcomEvent.date) : null,
       gedcomEvent.sortDate
         ? serializeGedcomSortDate(gedcomEvent.sortDate)
         : null,
       { tag: "PLAC", abstag: "", value: gedcomEvent.place, children: [] },
       { tag: "ADDR", abstag: "", value: gedcomEvent.address, children: [] },
-      { tag: "CAUS", abstag: "", value: gedcomEvent.cause, children: [] },
       ...gedcomEvent.sharedWith.map((s) => serializeGedcomSharedEvent(s)),
       ...gedcomEvent.citations.map((c) => serializeGedcomCitation(c)),
     ]

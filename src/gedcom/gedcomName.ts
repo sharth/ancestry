@@ -116,7 +116,7 @@ export function serializeGedcomName(name: GedcomName): GedcomRecord {
       name.givenName,
       name.nickName,
       name.surnamePrefix,
-      name.surname ? `/${name.surname}/` : undefined,
+      name.surname ? `/${name.surname}/` : "//",
       name.suffix,
     ]
       .filter((part) => part != undefined)
