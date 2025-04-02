@@ -29,12 +29,12 @@
     "@fontsource/material-icons": "^5.2.5",
     "@fontsource/roboto": "^5.2.5",
     "@popperjs/core": "^2.11.8",
-    "@testing-library/angular": "^17.3.6",
+    "@testing-library/angular": "^17.3.7",
     "@testing-library/dom": "^10.4.0",
     "@types/diff": "^7.0.2",
     "@types/jasmine": "^5.1.7",
     "@types/karma": "^6.3.9",
-    "@types/wicg-file-system-access": "^2023.10.5",
+    "@types/wicg-file-system-access": "^2023.10.6",
     "@web/test-runner": "^0.20.0",
     "@web/test-runner-playwright": "^0.11.0",
     "ag-grid-angular": "^33.2.1",
@@ -53,7 +53,7 @@
     "karma-jasmine-html-reporter": "^2.1.0",
     "prettier": "^3.5.3",
     "typescript": "^5.8.2",
-    "typescript-eslint": "^8.28.0",
+    "typescript-eslint": "^8.29.0",
     "uuid": "^11.1.0",
     "vest": "^5.4.6"
   }
