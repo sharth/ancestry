@@ -13,31 +13,24 @@ import { AncestryService } from "../../database/ancestry.service";
 export class NavbarComponent {
   private readonly ancestryService = inject(AncestryService);
 
-  openFile() {
-    pickFileFromUser()
-      .then((file) => readFile(file))
-      .then((text) => this.ancestryService.initializeDatabase(text))
-      .then(() => {
-        console.log("Parsing complete");
-      })
-      .catch((err: unknown) => {
-        console.error(err);
+  async openFile() {
+    try {
+      const [fileHandle] = await window.showOpenFilePicker({
+        types: [
+          {
+            description: "Gedcom",
+            accept: {
+              "text/plain": [".ged"],
+            },
+          },
+        ],
       });
+      const file = await fileHandle.getFile();
+      const text = await file.text();
+      await this.ancestryService.initializeDatabase(text);
+      console.log("Parsing complete");
+    } catch (err) {
+      console.error(err);
+    }
   }
-}
-
-async function pickFileFromUser(): Promise<File> {
-  const [fileHandle] = await window.showOpenFilePicker({
-    types: [
-      {
-        description: "Gedcom Files",
-        accept: { "text/plain": [".ged"] },
-      },
-    ],
-  });
-  return fileHandle.getFile();
-}
-
-function readFile(file: File): Promise<string> {
-  return file.text();
 }
