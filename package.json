@@ -32,7 +32,7 @@
     "@testing-library/angular": "^17.3.7",
     "@testing-library/dom": "^10.4.0",
     "@types/diff": "^7.0.2",
-    "@types/jasmine": "^5.1.7",
+    "@types/jasmine": "^5.1.8",
     "@types/karma": "^6.3.9",
     "@types/wicg-file-system-access": "^2023.10.6",
     "@web/test-runner": "^0.20.1",
