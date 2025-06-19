@@ -1,15 +1,15 @@
+import { routes } from "./app.routes";
 import {
   type ApplicationConfig,
-  provideExperimentalZonelessChangeDetection,
+  provideZonelessChangeDetection,
 } from "@angular/core";
+import { provideAnimations } from "@angular/platform-browser/animations";
 import {
   provideRouter,
   withComponentInputBinding,
   withHashLocation,
   withInMemoryScrolling,
 } from "@angular/router";
-import { routes } from "./app.routes";
-import { provideAnimations } from "@angular/platform-browser/animations";
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -21,7 +21,7 @@ export const appConfig: ApplicationConfig = {
         scrollPositionRestoration: "enabled",
       }),
     ),
-    provideExperimentalZonelessChangeDetection(),
+    provideZonelessChangeDetection(),
     provideAnimations(),
   ],
 };

@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-
-import { TestBed } from "@angular/core/testing";
-import { provideExperimentalZonelessChangeDetection } from "@angular/core";
-import { toObservable } from "@angular/core/rxjs-interop";
 import { AncestryService } from "../database/ancestry.service";
+import { provideZonelessChangeDetection } from "@angular/core";
+import { toObservable } from "@angular/core/rxjs-interop";
+import { TestBed } from "@angular/core/testing";
 import * as rxjs from "rxjs";
 
 describe("AncestryService", () => {
@@ -15,15 +14,15 @@ describe("AncestryService", () => {
     return TestBed.runInInjectionContext(async () => {
       await rxjs.firstValueFrom(
         toObservable(ancestryResource.isLoading).pipe(
-          rxjs.filter((value: boolean) => !value)
-        )
+          rxjs.filter((value: boolean) => !value),
+        ),
       );
     });
   }
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      providers: [provideExperimentalZonelessChangeDetection()],
+      providers: [provideZonelessChangeDetection()],
     });
 
     indexedDB.deleteDatabase("AncestryDatabase");

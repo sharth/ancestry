@@ -18,7 +18,7 @@
     "@angular/common": "^20.0.0",
     "@angular/compiler": "^20.0.0",
     "@angular/compiler-cli": "^20.0.4",
-    "@angular/core": "^20.0.0",
+    "@angular/core": "^20.0.4",
     "@angular/forms": "^20.0.4",
     "@angular/material": "^20.0.3",
     "@angular/platform-browser": "^20.0.0",
@@ -67,5 +67,8 @@
       "typescript",
       "decorators"
     ]
+  },
+  "devDependencies": {
+    "@angular/build": "^20.0.3"
   }
 }

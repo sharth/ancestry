@@ -1,7 +1,3 @@
-import { Injectable, resource, signal } from "@angular/core";
-import { AncestryDatabase } from "./ancestry.database";
-import Dexie from "dexie";
-import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import type { GedcomFamily } from "../gedcom/gedcomFamily";
 import { parseGedcomFamily } from "../gedcom/gedcomFamily";
 import type { GedcomHeader } from "../gedcom/gedcomHeader";
@@ -19,6 +15,10 @@ import type { GedcomSubmitter } from "../gedcom/gedcomSubmitter";
 import { parseGedcomSubmitter } from "../gedcom/gedcomSubmitter";
 import type { GedcomTrailer } from "../gedcom/gedcomTrailer";
 import { parseGedcomTrailer } from "../gedcom/gedcomTrailer";
+import { reportUnparsedRecord } from "../util/record-unparsed-records";
+import { AncestryDatabase } from "./ancestry.database";
+import { Injectable, resource, signal } from "@angular/core";
+import Dexie from "dexie";
 
 @Injectable({ providedIn: "root" })
 export class AncestryService {
@@ -36,7 +36,7 @@ export class AncestryService {
   }
 
   ancestryResource = resource({
-    request: () => ({
+    params: () => ({
       changeCount: this.ancestryChanges(),
     }),
     loader: async () => {
@@ -70,7 +70,7 @@ export class AncestryService {
           await this.ancestryDatabase.submitters.orderBy("xref").toArray(),
           await this.ancestryDatabase.headers.toArray(),
           await this.ancestryDatabase.originalRecords.toArray(),
-        ]
+        ],
       );
       return {
         individuals: new Map(individuals.map((indi) => [indi.xref, indi])),
@@ -154,7 +154,7 @@ export class AncestryService {
       for (const familyXref of individual.parentOfFamilyXref) {
         const family = familyMap.get(familyXref);
         const parents = [family?.husbandXref, family?.wifeXref].filter(
-          (e) => e != null
+          (e) => e != null,
         );
         if (!family) throw new Error();
         if (!parents.includes(individual.xref)) throw new Error();
@@ -198,7 +198,7 @@ export class AncestryService {
         await this.ancestryDatabase.sources.bulkAdd(sources);
         await this.ancestryDatabase.multimedia.clear();
         await this.ancestryDatabase.multimedia.bulkAdd(multimedia);
-      }
+      },
     );
   }
 }

@@ -1,10 +1,10 @@
+import { AncestryService } from "../../database/ancestry.service";
+import { SourceEditorComponent } from "./source-editor.component";
+import { provideZonelessChangeDetection } from "@angular/core";
+import { toObservable } from "@angular/core/rxjs-interop";
 import type { ComponentFixture } from "@angular/core/testing";
 import { TestBed } from "@angular/core/testing";
-import { SourceEditorComponent } from "./source-editor.component";
-import { provideExperimentalZonelessChangeDetection } from "@angular/core";
-import { AncestryService } from "../../database/ancestry.service";
 import * as rxjs from "rxjs";
-import { toObservable } from "@angular/core/rxjs-interop";
 
 describe("SourceEditorComponent", () => {
   let ancestryService: AncestryService;
@@ -17,15 +17,15 @@ describe("SourceEditorComponent", () => {
     return TestBed.runInInjectionContext(async () => {
       await rxjs.firstValueFrom(
         toObservable(ancestryResource.isLoading).pipe(
-          rxjs.filter((value: boolean) => !value)
-        )
+          rxjs.filter((value: boolean) => !value),
+        ),
       );
     });
   }
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [provideExperimentalZonelessChangeDetection()],
+      providers: [provideZonelessChangeDetection()],
       imports: [SourceEditorComponent],
     });
   });
@@ -82,13 +82,13 @@ describe("SourceEditorComponent", () => {
     expect(nativeElement).toBeDefined();
 
     const abbrElement = nativeElement?.querySelector<HTMLTextAreaElement>(
-      "textarea[name='abbr']"
+      "textarea[name='abbr']",
     );
     expect(abbrElement).toBeDefined();
     expect(abbrElement?.value).toEqual("Source 1");
 
     const titleElement = nativeElement?.querySelector<HTMLTextAreaElement>(
-      "textarea[name='title']"
+      "textarea[name='title']",
     );
     expect(titleElement).toBeDefined();
     expect(titleElement?.value).toEqual("Title 1");
