@@ -1,7 +1,7 @@
+import type { GedcomEvent } from "../../gedcom/gedcomEvent";
 import { CommonModule } from "@angular/common";
 import { Component, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
-import type { GedcomEvent } from "../../gedcom/gedcomEvent";
 
 @Component({
   selector: "app-events-table",

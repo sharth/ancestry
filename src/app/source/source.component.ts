@@ -1,15 +1,15 @@
+import { AncestryService } from "../../database/ancestry.service";
+import { serializeGedcomSource } from "../../gedcom/gedcomSource";
+import { GedcomDiffComponent } from "../../util/gedcom-diff.component";
+import { SourceEditorComponent } from "../source-editor/source-editor.component";
+import { SourceCitationsComponent } from "./source-citations.component";
+import { SourceMultimediaComponent } from "./source-multimedia.component";
+import { SourceRepositoriesComponent } from "./source-repositories.component";
+import { SourceUnknownsComponent } from "./source-unknowns.component";
+import { CommonModule } from "@angular/common";
 import type { ElementRef } from "@angular/core";
 import { Component, computed, inject, input, viewChild } from "@angular/core";
 import { RouterModule } from "@angular/router";
-import { CommonModule } from "@angular/common";
-import { serializeGedcomSource } from "../../gedcom/gedcomSource";
-import { GedcomDiffComponent } from "../../util/gedcom-diff.component";
-import { AncestryService } from "../../database/ancestry.service";
-import { SourceCitationsComponent } from "./source-citations.component";
-import { SourceRepositoriesComponent } from "./source-repositories.component";
-import { SourceMultimediaComponent } from "./source-multimedia.component";
-import { SourceEditorComponent } from "../source-editor/source-editor.component";
-import { SourceUnknownsComponent } from "./source-unknowns.component";
 
 @Component({
   selector: "app-source",
@@ -43,7 +43,7 @@ export class SourceComponent {
     return {
       source,
       oldGedcomRecord: ancestry.originalRecords.find(
-        (r) => r.tag == "SOUR" && r.xref == source.xref
+        (r) => r.tag == "SOUR" && r.xref == source.xref,
       ),
       newGedcomRecord: serializeGedcomSource(source),
     };

@@ -1,9 +1,9 @@
-import { Component, computed, inject, input } from "@angular/core";
-import { RouterModule } from "@angular/router";
-import { CommonModule } from "@angular/common";
 import { AncestryService } from "../../database/ancestry.service";
-import { MatTableModule } from "@angular/material/table";
 import { IndividualLinkComponent } from "../individual-link/individual-link.component";
+import { CommonModule } from "@angular/common";
+import { Component, computed, inject, input } from "@angular/core";
+import { MatTableModule } from "@angular/material/table";
+import { RouterModule } from "@angular/router";
 
 @Component({
   selector: "app-source-citations",
@@ -35,12 +35,12 @@ export class SourceCitationsComponent {
           .flatMap((individual) =>
             individual.events
               .filter((event) => event.citations.length > 0)
-              .map((event) => ({ individual, event }))
+              .map((event) => ({ individual, event })),
           )
           .flatMap(({ individual, event }) =>
             event.citations
               .filter((citation) => citation.sourceXref == xref)
-              .map((citation) => ({ individual, event, citation }))
+              .map((citation) => ({ individual, event, citation })),
           )
           .map(({ individual, event, citation }) => ({
             individual,
@@ -59,7 +59,7 @@ export class SourceCitationsComponent {
               individual,
               event: "SEX",
               citation,
-            }))
+            })),
           ),
       ],
     };

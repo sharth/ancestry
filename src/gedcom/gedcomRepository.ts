@@ -7,7 +7,7 @@ export interface GedcomRepository {
 }
 
 export function parseGedcomRepository(
-  gedcomRecord: GedcomRecord
+  gedcomRecord: GedcomRecord,
 ): GedcomRepository {
   if (gedcomRecord.tag !== "REPO") throw new Error();
   if (gedcomRecord.xref == null) throw new Error();
@@ -35,7 +35,7 @@ export function parseGedcomRepository(
 }
 
 export function serializeGedcomRepository(
-  gedcomRepository: GedcomRepository
+  gedcomRepository: GedcomRepository,
 ): GedcomRecord {
   return {
     xref: gedcomRepository.xref,

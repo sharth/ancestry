@@ -17,7 +17,7 @@ export function parseGedcomTrailer(gedcomRecord: GedcomRecord): GedcomTrailer {
 
 export function serializeGedcomTrailer(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  gedcomTrailer: GedcomTrailer
+  gedcomTrailer: GedcomTrailer,
 ): GedcomRecord {
   return {
     tag: "TRLR",

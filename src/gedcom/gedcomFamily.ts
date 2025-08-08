@@ -1,5 +1,5 @@
-import type { GedcomEvent } from "./gedcomEvent";
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
+import type { GedcomEvent } from "./gedcomEvent";
 import { parseGedcomEvent } from "./gedcomEvent";
 import { serializeGedcomEvent } from "./gedcomEvent";
 import type { GedcomRecord } from "./gedcomRecord";
@@ -59,7 +59,7 @@ export function parseGedcomFamily(record: GedcomRecord): GedcomFamily {
 }
 
 export function serializeGedcomFamily(
-  gedcomFamily: GedcomFamily
+  gedcomFamily: GedcomFamily,
 ): GedcomRecord {
   return {
     xref: gedcomFamily.xref,

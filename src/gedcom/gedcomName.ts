@@ -1,8 +1,8 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import type { GedcomCitation } from "./gedcomCitation";
 import { parseGedcomCitation } from "./gedcomCitation";
-import type { GedcomRecord } from "./gedcomRecord";
 import { serializeGedcomCitation } from "./gedcomCitation";
+import type { GedcomRecord } from "./gedcomRecord";
 
 export interface GedcomName {
   prefix?: string;

@@ -1,12 +1,12 @@
-import { Component, inject, input, linkedSignal, output } from "@angular/core";
-import { CommonModule } from "@angular/common";
-import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomEvent } from "../../gedcom/gedcomEvent";
-import type { GedcomName } from "../../gedcom/gedcomName";
-import { IndividualEditorNamesComponent } from "./individual-editor-names.component";
-import { IndividualEditorEventsComponent } from "./individual-editor-events.component";
 import type { GedcomIndividual } from "../../gedcom/gedcomIndividual";
+import type { GedcomName } from "../../gedcom/gedcomName";
+import { IndividualEditorEventsComponent } from "./individual-editor-events.component";
+import { IndividualEditorNamesComponent } from "./individual-editor-names.component";
+import { CommonModule } from "@angular/common";
+import { Component, inject, input, linkedSignal, output } from "@angular/core";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 
 @Component({
   selector: "app-individual-editor",
@@ -119,7 +119,7 @@ export class IndividualEditorComponent {
       async () => {
         const xref = this.xref() ?? (await this.nextXref());
         await this.ancestryDatabase.individuals.put({ ...vm, xref });
-      }
+      },
     );
 
     this.finished.emit();

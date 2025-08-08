@@ -1,9 +1,9 @@
-import { Component, computed, input } from "@angular/core";
-import { CommonModule } from "@angular/common";
 import {
-  serializeGedcomRecordToText,
   type GedcomRecord,
+  serializeGedcomRecordToText,
 } from "../gedcom/gedcomRecord";
+import { CommonModule } from "@angular/common";
+import { Component, computed, input } from "@angular/core";
 
 @Component({
   selector: "app-gedcom-diff",

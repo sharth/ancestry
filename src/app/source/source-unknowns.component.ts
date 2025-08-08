@@ -1,8 +1,8 @@
-import { Component, computed, inject, input } from "@angular/core";
-import { RouterModule } from "@angular/router";
-import { CommonModule } from "@angular/common";
 import { AncestryService } from "../../database/ancestry.service";
 import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
+import { CommonModule } from "@angular/common";
+import { Component, computed, inject, input } from "@angular/core";
+import { RouterModule } from "@angular/router";
 
 @Component({
   selector: "app-source-unknowns",
@@ -28,7 +28,7 @@ export class SourceUnknownsComponent {
 
     return {
       unknownGedcom: source.unknownRecords.map((unknownRecord) =>
-        serializeGedcomRecordToText(unknownRecord)
+        serializeGedcomRecordToText(unknownRecord),
       ),
     };
   });

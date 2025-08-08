@@ -1,5 +1,5 @@
-import type { GedcomRecord } from "./gedcomRecord";
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
+import type { GedcomRecord } from "./gedcomRecord";
 
 export interface GedcomSource {
   xref: string;
@@ -54,12 +54,12 @@ export function parseGedcomSource(record: GedcomRecord): GedcomSource {
         break;
       case "REPO":
         gedcomSource.repositoryCitations.push(
-          parseGedcomSourceRepositoryCitation(childRecord)
+          parseGedcomSourceRepositoryCitation(childRecord),
         );
         break;
       case "OBJE":
         gedcomSource.multimediaLinks.push(
-          parseGedcomSourceMultimediaLink(childRecord)
+          parseGedcomSourceMultimediaLink(childRecord),
         );
         break;
       default:
@@ -138,7 +138,7 @@ export function serializeGedcomSource(source: GedcomSource): GedcomRecord {
         })),
       })),
       ...source.unknownRecords.filter(
-        (record) => record.tag != "_SUBQ" && record.tag != "_BIBL"
+        (record) => record.tag != "_SUBQ" && record.tag != "_BIBL",
       ),
     ].filter((record) => record.children.length || record.value),
   };

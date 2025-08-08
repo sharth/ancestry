@@ -1,8 +1,8 @@
-import type { GedcomCitation } from "./gedcomCitation";
-import type { GedcomRecord } from "./gedcomRecord";
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
+import type { GedcomCitation } from "./gedcomCitation";
 import { serializeGedcomCitation } from "./gedcomCitation";
 import { parseGedcomCitation } from "./gedcomCitation";
+import type { GedcomRecord } from "./gedcomRecord";
 
 export interface GedcomSex {
   sex: string;

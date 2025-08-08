@@ -1,5 +1,5 @@
-import { Component, computed, inject } from "@angular/core";
 import { AncestryService } from "../../database/ancestry.service";
+import { Component, computed, inject } from "@angular/core";
 
 @Component({
   selector: "app-index",

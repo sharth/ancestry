@@ -1,11 +1,11 @@
-import { Component, input, output } from "@angular/core";
-import { RouterModule } from "@angular/router";
-import { CommonModule } from "@angular/common";
-import { FormsModule } from "@angular/forms";
 import {
-  serializeGedcomRecordToText,
   type GedcomRecord,
+  serializeGedcomRecordToText,
 } from "../../gedcom/gedcomRecord";
+import { CommonModule } from "@angular/common";
+import { Component, input, output } from "@angular/core";
+import { FormsModule } from "@angular/forms";
+import { RouterModule } from "@angular/router";
 
 @Component({
   selector: "app-source-editor-unknowns",

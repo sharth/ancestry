@@ -1,16 +1,16 @@
-import type { Routes } from "@angular/router";
+import { GedcomComponent } from "./gedcom/gedcom.component";
 import { IndexComponent } from "./index/index.component";
 import { IndividualComponent } from "./individual/individual.component";
 import { IndividualsComponent } from "./individuals/individuals.component";
-import { SourcesComponent } from "./sources/sources.component";
-import { SourceComponent } from "./source/source.component";
+import { MultimediaComponent } from "./multimedia/multimedia.component";
+import { MultimediasComponent } from "./multimedias/multimedias.component";
+import { PageNotFoundComponent } from "./page-not-found/page-not-found.component";
 import { RepositoriesComponent } from "./repositories/repositories.component";
 import { RepositoryComponent } from "./repository/repository.component";
-import { GedcomComponent } from "./gedcom/gedcom.component";
+import { SourceComponent } from "./source/source.component";
+import { SourcesComponent } from "./sources/sources.component";
 import { ValidationComponent } from "./validation/validation.component";
-import { PageNotFoundComponent } from "./page-not-found/page-not-found.component";
-import { MultimediasComponent } from "./multimedias/multimedias.component";
-import { MultimediaComponent } from "./multimedia/multimedia.component";
+import type { Routes } from "@angular/router";
 
 export const routes: Routes = [
   { path: "", component: IndexComponent },

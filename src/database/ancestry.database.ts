@@ -1,4 +1,3 @@
-import { Dexie } from "dexie";
 import type { GedcomFamily } from "../gedcom/gedcomFamily";
 import type { GedcomHeader } from "../gedcom/gedcomHeader";
 import type { GedcomIndividual } from "../gedcom/gedcomIndividual";
@@ -8,6 +7,7 @@ import type { GedcomRepository } from "../gedcom/gedcomRepository";
 import type { GedcomSource } from "../gedcom/gedcomSource";
 import type { GedcomSubmitter } from "../gedcom/gedcomSubmitter";
 import type { GedcomTrailer } from "../gedcom/gedcomTrailer";
+import { Dexie } from "dexie";
 
 export class AncestryDatabase extends Dexie {
   originalRecords!: Dexie.Table<GedcomRecord>;

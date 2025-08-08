@@ -1,7 +1,7 @@
+import { AncestryService } from "../../database/ancestry.service";
+import { CommonModule } from "@angular/common";
 import { Component, computed, inject, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
-import { CommonModule } from "@angular/common";
-import { AncestryService } from "../../database/ancestry.service";
 
 @Component({
   selector: "app-source-multimedia",

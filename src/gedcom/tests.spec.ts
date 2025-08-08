@@ -419,7 +419,7 @@ describe("Gedcom Tests", () => {
           .flatMap((record) => serializeGedcomRecordToText(record));
 
         expect(serializedRecords).toEqual(
-          testCase.serializedGedcom ?? testCase.gedcom
+          testCase.serializedGedcom ?? testCase.gedcom,
         );
       });
     });

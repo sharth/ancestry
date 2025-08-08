@@ -49,7 +49,7 @@ export function parseGedcomMultimedia(record: GedcomRecord): GedcomMultimedia {
 }
 
 export function serializeGedcomMultimedia(
-  gedcomMultimedia: GedcomMultimedia
+  gedcomMultimedia: GedcomMultimedia,
 ): GedcomRecord {
   return {
     xref: gedcomMultimedia.xref,

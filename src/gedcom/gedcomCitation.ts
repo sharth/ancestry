@@ -1,5 +1,5 @@
-import type { GedcomRecord } from "./gedcomRecord";
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
+import type { GedcomRecord } from "./gedcomRecord";
 
 export interface GedcomCitation {
   sourceXref: string;
@@ -12,7 +12,7 @@ export interface GedcomCitation {
 }
 
 export function parseGedcomCitation(
-  gedcomRecord: GedcomRecord
+  gedcomRecord: GedcomRecord,
 ): GedcomCitation {
   if (gedcomRecord.tag !== "SOUR") throw new Error();
   if (gedcomRecord.xref != null) throw new Error();
@@ -73,7 +73,7 @@ export function parseGedcomCitation(
 }
 
 export function serializeGedcomCitation(
-  gedcomCitation: GedcomCitation
+  gedcomCitation: GedcomCitation,
 ): GedcomRecord {
   return {
     tag: "SOUR",

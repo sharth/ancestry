@@ -1,10 +1,10 @@
-import { Component, computed, inject, input } from "@angular/core";
-import { CommonModule } from "@angular/common";
-import { RouterModule } from "@angular/router";
 import { AncestryService } from "../../database/ancestry.service";
-import { RepositorySourcesComponent } from "./repository-sources.component";
 import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
 import { serializeGedcomRepository } from "../../gedcom/gedcomRepository";
+import { RepositorySourcesComponent } from "./repository-sources.component";
+import { CommonModule } from "@angular/common";
+import { Component, computed, inject, input } from "@angular/core";
+import { RouterModule } from "@angular/router";
 
 @Component({
   selector: "app-repository",
@@ -29,7 +29,7 @@ export class RepositoryComponent {
     return {
       name: repository.name,
       gedcom: serializeGedcomRecordToText(
-        serializeGedcomRepository(repository)
+        serializeGedcomRepository(repository),
       ).join("\n"),
     };
   });

@@ -1,6 +1,6 @@
 import eslint from "@eslint/js";
-import tseslint from "typescript-eslint";
 import markdown from "eslint-plugin-markdown";
+import tseslint from "typescript-eslint";
 
 export default tseslint.config(
   eslint.configs.recommended,
@@ -24,6 +24,10 @@ export default tseslint.config(
         { allowNumber: true },
       ],
       "@typescript-eslint/no-extraneous-class": "off",
+      "@typescript-eslint/no-unnecessary-condition": [
+        "error",
+        { allowConstantLoopConditions: "only-allowed-literals" },
+      ],
     },
-  }
+  },
 );

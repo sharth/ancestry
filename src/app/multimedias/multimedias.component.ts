@@ -1,8 +1,8 @@
-import { Component, computed, inject } from "@angular/core";
-import { CommonModule } from "@angular/common";
-import { RouterLink } from "@angular/router";
 import { AncestryService } from "../../database/ancestry.service";
 import { MultimediaEditorComponent } from "../multimedia-editor/multimedia-editor.component";
+import { CommonModule } from "@angular/common";
+import { Component, computed, inject } from "@angular/core";
+import { RouterLink } from "@angular/router";
 
 @Component({
   selector: "app-multimedias",

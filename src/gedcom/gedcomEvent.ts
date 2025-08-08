@@ -1,10 +1,10 @@
-import type { GedcomCitation } from "./gedcomCitation";
-import type { GedcomDate } from "./gedcomDate";
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
+import type { GedcomCitation } from "./gedcomCitation";
 import { parseGedcomCitation, serializeGedcomCitation } from "./gedcomCitation";
+import type { GedcomDate } from "./gedcomDate";
 import { parseGedcomDate } from "./gedcomDate";
-import type { GedcomRecord } from "./gedcomRecord";
 import { serializeGedcomDate, serializeGedcomSortDate } from "./gedcomDate";
+import type { GedcomRecord } from "./gedcomRecord";
 
 export interface GedcomEvent {
   tag: string;

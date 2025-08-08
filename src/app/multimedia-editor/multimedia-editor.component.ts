@@ -1,7 +1,7 @@
-import { Component, inject, input, linkedSignal, output } from "@angular/core";
-import { CommonModule } from "@angular/common";
-import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { AncestryService } from "../../database/ancestry.service";
+import { CommonModule } from "@angular/common";
+import { Component, inject, input, linkedSignal, output } from "@angular/core";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 
 @Component({
   selector: "app-multimedia-editor",
@@ -65,7 +65,7 @@ export class MultimediaEditorComponent {
           filePath: vm.filePath,
           mediaType: vm.mimeType,
         });
-      }
+      },
     );
 
     this.finished.emit();

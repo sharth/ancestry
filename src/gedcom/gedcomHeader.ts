@@ -15,7 +15,7 @@ export function parseGedcomHeader(record: GedcomRecord): GedcomHeader {
 }
 
 export function serializeGedcomHeader(
-  gedcomHeader: GedcomHeader
+  gedcomHeader: GedcomHeader,
 ): GedcomRecord {
   return gedcomHeader.record;
 }

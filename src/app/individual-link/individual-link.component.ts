@@ -1,8 +1,8 @@
-import { Component, computed, inject, input } from "@angular/core";
-import { CommonModule } from "@angular/common";
 import { AncestryService } from "../../database/ancestry.service";
-import { RouterModule } from "@angular/router";
 import { fullname } from "../../gedcom/gedcomIndividual";
+import { CommonModule } from "@angular/common";
+import { Component, computed, inject, input } from "@angular/core";
+import { RouterModule } from "@angular/router";
 
 @Component({
   selector: "app-individual-link",

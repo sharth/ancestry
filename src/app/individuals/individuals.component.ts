@@ -1,10 +1,7 @@
-import { Component, computed, inject } from "@angular/core";
-import { CommonModule } from "@angular/common";
+import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomIndividual } from "../../gedcom/gedcomIndividual";
 import { fullname, surname } from "../../gedcom/gedcomIndividual";
-import { AncestryService } from "../../database/ancestry.service";
-import { IndividualEditorComponent } from "../individual-editor/individual-editor.component";
-import { IndividualLinkComponent } from "../individual-link/individual-link.component";
+import { Component, computed, inject } from "@angular/core";
 
 @Component({
   selector: "app-individuals",
@@ -27,7 +24,7 @@ export class IndividualsComponent {
   });
 
   private individualsBySurname(
-    individuals: Map<string, GedcomIndividual>
+    individuals: Map<string, GedcomIndividual>,
   ): { surname?: string; individuals: GedcomIndividual[] }[] {
     const individualsList = individuals
       .values()
@@ -35,7 +32,7 @@ export class IndividualsComponent {
       .sort(
         (lhs, rhs) =>
           surname(lhs).localeCompare(surname(rhs)) ||
-          fullname(lhs).localeCompare(fullname(rhs))
+          fullname(lhs).localeCompare(fullname(rhs)),
       );
     return Map.groupBy(individualsList, (individual) => surname(individual))
       .entries()

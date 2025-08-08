@@ -1,17 +1,17 @@
-import type { GedcomDate } from "./gedcomDate";
-import type { GedcomEvent } from "./gedcomEvent";
-import type { GedcomName } from "./gedcomName";
-import type { GedcomSex } from "./gedcomSex";
-import type { GedcomRecord } from "./gedcomRecord";
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
-import { parseGedcomEvent } from "./gedcomEvent";
-import { parseGedcomName } from "./gedcomName";
-import { parseGedcomSex } from "./gedcomSex";
+import type { GedcomDate } from "./gedcomDate";
 import { parseGedcomDate } from "./gedcomDate";
-import { serializeGedcomEvent } from "./gedcomEvent";
-import { serializeGedcomName } from "./gedcomName";
-import { serializeSex } from "./gedcomSex";
 import { serializeGedcomDate } from "./gedcomDate";
+import type { GedcomEvent } from "./gedcomEvent";
+import { parseGedcomEvent } from "./gedcomEvent";
+import { serializeGedcomEvent } from "./gedcomEvent";
+import type { GedcomName } from "./gedcomName";
+import { parseGedcomName } from "./gedcomName";
+import { serializeGedcomName } from "./gedcomName";
+import type { GedcomRecord } from "./gedcomRecord";
+import type { GedcomSex } from "./gedcomSex";
+import { parseGedcomSex } from "./gedcomSex";
+import { serializeSex } from "./gedcomSex";
 
 export interface GedcomIndividual {
   xref: string;
@@ -118,7 +118,7 @@ export function parseGedcomIndividual(record: GedcomRecord): GedcomIndividual {
 }
 
 function parseGedcomIndividualFamilySearchId(
-  gedcomRecord: GedcomRecord
+  gedcomRecord: GedcomRecord,
 ): string {
   if (gedcomRecord.abstag !== "INDI._FSFTID") throw new Error();
   if (gedcomRecord.xref != null) throw new Error();
@@ -153,7 +153,7 @@ function parseGedcomChangeDate(gedcomRecord: GedcomRecord): GedcomDate {
 }
 
 export function serializeGedcomIndividual(
-  gedcomIndividual: GedcomIndividual
+  gedcomIndividual: GedcomIndividual,
 ): GedcomRecord {
   return {
     xref: gedcomIndividual.xref,

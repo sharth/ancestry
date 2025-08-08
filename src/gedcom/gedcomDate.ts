@@ -1,5 +1,5 @@
-import type { GedcomRecord } from "./gedcomRecord";
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
+import type { GedcomRecord } from "./gedcomRecord";
 
 export interface GedcomDate {
   value: string;

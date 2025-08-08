@@ -57,7 +57,7 @@ export function* generateGedcomRecords(text: string): Generator<GedcomRecord> {
       }
     } else {
       throw new Error(
-        `Skipped parent level on line number ${lineNumber + 1}: ${line}`
+        `Skipped parent level on line number ${lineNumber + 1}: ${line}`,
       );
     }
   }
@@ -68,7 +68,7 @@ export function* generateGedcomRecords(text: string): Generator<GedcomRecord> {
 
 export function serializeGedcomRecordToText(
   gedcomRecord: GedcomRecord,
-  level = 0
+  level = 0,
 ): string[] {
   const [firstValue, ...remainingValues] =
     gedcomRecord.value?.split("\n") ?? [];
@@ -78,10 +78,10 @@ export function serializeGedcomRecordToText(
       ` ${gedcomRecord.tag}` +
       (firstValue ? ` ${firstValue}` : ""),
     ...remainingValues.map(
-      (nextValue) => `${level + 1} CONT` + (nextValue ? ` ${nextValue}` : "")
+      (nextValue) => `${level + 1} CONT` + (nextValue ? ` ${nextValue}` : ""),
     ),
     ...gedcomRecord.children.flatMap((record) =>
-      serializeGedcomRecordToText(record, level + 1)
+      serializeGedcomRecordToText(record, level + 1),
     ),
   ];
 }

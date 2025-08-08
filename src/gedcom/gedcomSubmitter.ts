@@ -8,7 +8,7 @@ export interface GedcomSubmitter {
 }
 
 export function parseGedcomSubmitter(
-  gedcomRecord: GedcomRecord
+  gedcomRecord: GedcomRecord,
 ): GedcomSubmitter {
   if (gedcomRecord.tag !== "SUBM") throw new Error();
   if (gedcomRecord.xref == null) throw new Error();
@@ -40,7 +40,7 @@ export function parseGedcomSubmitter(
 }
 
 export function serializeGedcomSubmitter(
-  gedcomSubmitter: GedcomSubmitter
+  gedcomSubmitter: GedcomSubmitter,
 ): GedcomRecord {
   return {
     xref: gedcomSubmitter.xref,

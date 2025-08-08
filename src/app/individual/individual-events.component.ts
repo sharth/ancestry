@@ -1,7 +1,7 @@
-import { Component, computed, inject, input } from "@angular/core";
-import { CommonModule } from "@angular/common";
 import { AncestryService } from "../../database/ancestry.service";
 import { EventsTableComponent } from "../events-table/events-table.component";
+import { CommonModule } from "@angular/common";
+import { Component, computed, inject, input } from "@angular/core";
 
 @Component({
   selector: "app-individual-events",

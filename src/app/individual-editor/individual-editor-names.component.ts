@@ -1,8 +1,8 @@
-import { Component, input, output } from "@angular/core";
+import type { GedcomName } from "../../gedcom/gedcomName";
 import { CommonModule } from "@angular/common";
+import { Component, input, output } from "@angular/core";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatTableModule } from "@angular/material/table";
-import type { GedcomName } from "../../gedcom/gedcomName";
 
 @Component({
   selector: "app-individual-editor-names",
