@@ -6,7 +6,6 @@ import { SourceEditorComponent } from "../source-editor/source-editor.component"
 
 @Component({
   selector: "app-sources",
-  standalone: true,
   imports: [CommonModule, RouterLink, SourceEditorComponent],
   templateUrl: "./sources.component.html",
   styleUrl: "./sources.component.css",

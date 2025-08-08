@@ -9,7 +9,6 @@ import {
 
 @Component({
   selector: "app-source-editor-unknowns",
-  standalone: true,
   templateUrl: "./source-editor-unknowns.component.html",
   styleUrl: "./source-editor.component.css",
   imports: [CommonModule, RouterModule, FormsModule],

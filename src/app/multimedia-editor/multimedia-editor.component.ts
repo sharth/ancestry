@@ -5,7 +5,6 @@ import { AncestryService } from "../../database/ancestry.service";
 
 @Component({
   selector: "app-multimedia-editor",
-  standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: "./multimedia-editor.component.html",
   styleUrl: "./multimedia-editor.component.css",

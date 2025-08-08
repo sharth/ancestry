@@ -6,7 +6,6 @@ import { fullname } from "../../gedcom/gedcomIndividual";
 
 @Component({
   selector: "app-individual-link",
-  standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: "./individual-link.component.html",
   styleUrl: "./individual-link.component.css",

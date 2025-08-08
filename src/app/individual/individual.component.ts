@@ -13,7 +13,6 @@ import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
 
 @Component({
   selector: "app-individual",
-  standalone: true,
   imports: [
     CommonModule,
     IndividualRelativesComponent,

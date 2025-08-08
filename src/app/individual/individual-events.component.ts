@@ -5,7 +5,6 @@ import { EventsTableComponent } from "../events-table/events-table.component";
 
 @Component({
   selector: "app-individual-events",
-  standalone: true,
   imports: [CommonModule, EventsTableComponent],
   templateUrl: "./individual-events.component.html",
   styleUrl: "./individual.component.css",

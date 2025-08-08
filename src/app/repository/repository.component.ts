@@ -8,7 +8,6 @@ import { serializeGedcomRepository } from "../../gedcom/gedcomRepository";
 
 @Component({
   selector: "app-repository",
-  standalone: true,
   imports: [CommonModule, RouterModule, RepositorySourcesComponent],
   templateUrl: "./repository.component.html",
   styleUrl: "./repository.component.css",

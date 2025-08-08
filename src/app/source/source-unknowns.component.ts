@@ -6,7 +6,6 @@ import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
 
 @Component({
   selector: "app-source-unknowns",
-  standalone: true,
   templateUrl: "./source-unknowns.component.html",
   styleUrl: "./source.component.css",
   imports: [CommonModule, RouterModule],

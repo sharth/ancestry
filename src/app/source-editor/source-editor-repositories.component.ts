@@ -6,7 +6,6 @@ import { AncestryService } from "../../database/ancestry.service";
 
 @Component({
   selector: "app-source-editor-repositories",
-  standalone: true,
   templateUrl: "./source-editor-repositories.component.html",
   styleUrl: "./source-editor.component.css",
   imports: [CommonModule, RouterModule, FormsModule],

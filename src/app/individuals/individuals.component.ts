@@ -8,7 +8,6 @@ import { IndividualLinkComponent } from "../individual-link/individual-link.comp
 
 @Component({
   selector: "app-individuals",
-  standalone: true,
   imports: [CommonModule, IndividualEditorComponent, IndividualLinkComponent],
   templateUrl: "./individuals.component.html",
   styleUrl: "./individuals.component.css",

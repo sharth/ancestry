@@ -13,7 +13,6 @@ import { SourceUnknownsComponent } from "./source-unknowns.component";
 
 @Component({
   selector: "app-source",
-  standalone: true,
   templateUrl: "./source.component.html",
   styleUrl: "./source.component.css",
   imports: [

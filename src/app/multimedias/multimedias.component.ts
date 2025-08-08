@@ -6,7 +6,6 @@ import { MultimediaEditorComponent } from "../multimedia-editor/multimedia-edito
 
 @Component({
   selector: "app-multimedias",
-  standalone: true,
   imports: [CommonModule, RouterLink, MultimediaEditorComponent],
   templateUrl: "./multimedias.component.html",
   styleUrl: "./multimedias.component.css",

@@ -5,7 +5,6 @@ import { AncestryService } from "../../database/ancestry.service";
 
 @Component({
   selector: "app-source-multimedia",
-  standalone: true,
   templateUrl: "./source-multimedia.component.html",
   styleUrl: "./source.component.css",
   imports: [CommonModule, RouterModule],

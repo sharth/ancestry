@@ -5,7 +5,6 @@ import { AncestryService } from "../../database/ancestry.service";
 
 @Component({
   selector: "app-repositories",
-  standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: "./repositories.component.html",
   styleUrl: "./repositories.component.css",

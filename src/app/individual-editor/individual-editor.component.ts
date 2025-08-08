@@ -10,7 +10,6 @@ import type { GedcomIndividual } from "../../gedcom/gedcomIndividual";
 
 @Component({
   selector: "app-individual-editor",
-  standalone: true,
   imports: [
     CommonModule,
     FormsModule,

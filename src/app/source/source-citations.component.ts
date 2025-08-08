@@ -7,7 +7,6 @@ import { IndividualLinkComponent } from "../individual-link/individual-link.comp
 
 @Component({
   selector: "app-source-citations",
-  standalone: true,
   templateUrl: "./source-citations.component.html",
   styleUrl: "./source.component.css",
   imports: [

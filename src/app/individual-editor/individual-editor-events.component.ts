@@ -6,7 +6,6 @@ import type { GedcomEvent } from "../../gedcom/gedcomEvent";
 
 @Component({
   selector: "app-individual-editor-events",
-  standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, MatTableModule],
   templateUrl: "./individual-editor-events.component.html",
   styleUrl: "./individual-editor.component.css",

@@ -6,7 +6,6 @@ import type { GedcomName } from "../../gedcom/gedcomName";
 
 @Component({
   selector: "app-individual-editor-names",
-  standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, MatTableModule],
   templateUrl: "./individual-editor-names.component.html",
   styleUrl: "./individual-editor.component.css",

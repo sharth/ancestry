@@ -4,7 +4,6 @@ import { RouterModule } from "@angular/router";
 
 @Component({
   selector: "app-validation",
-  standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: "./validation.component.html",
   styleUrl: "./validation.component.css",

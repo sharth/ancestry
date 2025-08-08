@@ -3,7 +3,6 @@ import { AncestryService } from "../../database/ancestry.service";
 
 @Component({
   selector: "app-index",
-  standalone: true,
   imports: [],
   templateUrl: "./index.component.html",
   styleUrl: "./index.component.css",

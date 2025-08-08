@@ -7,7 +7,6 @@ import {
 
 @Component({
   selector: "app-gedcom-diff",
-  standalone: true,
   templateUrl: "./gedcom-diff.component.html",
   styleUrl: "./gedcom-diff.component.css",
   imports: [CommonModule],

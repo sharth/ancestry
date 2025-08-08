@@ -10,7 +10,6 @@ import { SourceEditorMultimediaLinksComponent } from "./source-editor-multimedia
 
 @Component({
   selector: "app-source-editor",
-  standalone: true,
   templateUrl: "./source-editor.component.html",
   styleUrl: "./source-editor.component.css",
   imports: [
