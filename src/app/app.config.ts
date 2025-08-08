@@ -1,10 +1,10 @@
 import { routes } from "./app.routes";
-import {
-  type ApplicationConfig,
-  provideZonelessChangeDetection,
-} from "@angular/core";
+import { NoRouteReuseStrategy } from "./no-reuse-route-strategy";
+import type { ApplicationConfig } from "@angular/core";
+import { provideZonelessChangeDetection } from "@angular/core";
 import { provideAnimations } from "@angular/platform-browser/animations";
 import {
+  RouteReuseStrategy,
   provideRouter,
   withComponentInputBinding,
   withHashLocation,
@@ -21,6 +21,7 @@ export const appConfig: ApplicationConfig = {
         scrollPositionRestoration: "enabled",
       }),
     ),
+    { provide: RouteReuseStrategy, useClass: NoRouteReuseStrategy },
     provideZonelessChangeDetection(),
     provideAnimations(),
   ],
