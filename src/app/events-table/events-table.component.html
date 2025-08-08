@@ -11,35 +11,37 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let event of events">
-        <td>{{ event.tag }}</td>
-        <td>{{ event.type }}</td>
-        <td>{{ event.date?.value }}</td>
-        <td>
-          <ng-container *ngIf="event.address">
-            {{ event.address }} <br />
-          </ng-container>
-          <ng-container *ngIf="event.place">
-            {{ event.place }} <br />
-          </ng-container>
-        </td>
-        <td>
-          <ng-container *ngIf="event.cause">
-            {{ event.cause }}<br />
-          </ng-container>
-          <ng-container *ngIf="event.value">
-            {{ event.value }}<br />
-          </ng-container>
-        </td>
-        <td>
-          <ng-container *ngFor="let citation of event.citations">
-            <a routerLink="/source/{{ citation.sourceXref }}">
-              {{ citation.sourceXref }}
-            </a>
-            {{ " " }}
-          </ng-container>
-        </td>
-      </tr>
+      @for (event of events; track event) {
+        <tr>
+          <td>{{ event.tag }}</td>
+          <td>{{ event.type }}</td>
+          <td>{{ event.date?.value }}</td>
+          <td>
+            @if (event.address) {
+              {{ event.address }} <br />
+            }
+            @if (event.place) {
+              {{ event.place }} <br />
+            }
+          </td>
+          <td>
+            @if (event.cause) {
+              {{ event.cause }}<br />
+            }
+            @if (event.value) {
+              {{ event.value }}<br />
+            }
+          </td>
+          <td>
+            @for (citation of event.citations; track citation) {
+              <a routerLink="/source/{{ citation.sourceXref }}">
+                {{ citation.sourceXref }}
+              </a>
+              {{ " " }}
+            }
+          </td>
+        </tr>
+      }
     </tbody>
   </table>
 }

@@ -1,11 +1,13 @@
 @if (vm(); as vm) {
   <h1>{{ vm.sources.length }} Sources</h1>
   <ul>
-    <li *ngFor="let source of vm.sources">
-      <a routerLink="/source/{{ source.xref }}">
-        {{ source.abbr || source.xref }}
-      </a>
-    </li>
+    @for (source of vm.sources; track source) {
+      <li>
+        <a routerLink="/source/{{ source.xref }}">
+          {{ source.abbr || source.xref }}
+        </a>
+      </li>
+    }
   </ul>
 
   <div class="position-fixed bottom-0 end-0 rounded-circle m-5">
