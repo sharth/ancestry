@@ -4,6 +4,8 @@ import { parseGedcomCitation, serializeGedcomCitation } from "./gedcomCitation";
 import type { GedcomDate } from "./gedcomDate";
 import { parseGedcomDate } from "./gedcomDate";
 import { serializeGedcomDate, serializeGedcomSortDate } from "./gedcomDate";
+import type { GedcomNote } from "./gedcomNote";
+import { parseGedcomNote, serializeGedcomNote } from "./gedcomNote";
 import type { GedcomRecord } from "./gedcomRecord";
 
 export interface GedcomEventSharedWith {
@@ -22,6 +24,7 @@ export interface GedcomEvent {
   value?: string;
   citations: GedcomCitation[];
   sharedWith: GedcomEventSharedWith[];
+  notes: GedcomNote[];
 }
 
 export const gedcomEventTags = new Map([
@@ -59,6 +62,7 @@ export function parseGedcomEvent(record: GedcomRecord): GedcomEvent {
     value: record.value,
     citations: [],
     sharedWith: [],
+    notes: [],
   };
 
   for (const childRecord of record.children) {
@@ -102,10 +106,12 @@ export function parseGedcomEvent(record: GedcomRecord): GedcomEvent {
         childRecord.children.forEach(reportUnparsedRecord);
         gedcomEvent.cause = childRecord.value;
         break;
+      case "NOTE":
+        gedcomEvent.notes.push(parseGedcomNote(childRecord));
+        break;
       case "_SENT":
       case "_PRIM":
       case "_PROOF":
-      case "NOTE":
         break;
       default:
         reportUnparsedRecord(childRecord);
@@ -158,6 +164,7 @@ export function serializeGedcomEvent(gedcomEvent: GedcomEvent): GedcomRecord {
       { tag: "PLAC", abstag: "", value: gedcomEvent.place, children: [] },
       { tag: "ADDR", abstag: "", value: gedcomEvent.address, children: [] },
       ...gedcomEvent.sharedWith.map((s) => serializeGedcomSharedEvent(s)),
+      ...gedcomEvent.notes.map((n) => serializeGedcomNote(n)),
       ...gedcomEvent.citations.map((c) => serializeGedcomCitation(c)),
     ]
       .filter((r) => r != null)

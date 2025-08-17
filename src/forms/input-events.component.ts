@@ -88,6 +88,7 @@ export class InputEventsComponent implements ControlValueAccessor, OnDestroy {
         value: event.value || undefined,
         citations: event.citations,
         sharedWith: event.sharedWith,
+        notes: [],
       })),
     );
   });

@@ -164,6 +164,7 @@ const testCases: {
               type: "familysearch.org",
               citations: [],
               sharedWith: [],
+              notes: [],
             },
             {
               tag: "BIRT",
@@ -175,6 +176,7 @@ const testCases: {
               sortDate: { value: "1 Jan 2000" },
               citations: [{ sourceXref: "@S1@" }],
               sharedWith: [],
+              notes: [],
             },
             {
               tag: "OCCU",
@@ -182,6 +184,7 @@ const testCases: {
               type: "Permanent",
               citations: [],
               sharedWith: [],
+              notes: [],
             },
           ],
           parentOfFamilyXrefs: [],
@@ -233,6 +236,7 @@ const testCases: {
               value: undefined,
               citations: [],
               sharedWith: [{ xref: "@I7@" }, { xref: "@I8@", role: "Friend" }],
+              notes: [],
             },
           ],
           parentOfFamilyXrefs: [],
