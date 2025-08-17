@@ -61,6 +61,11 @@
         "test": {
           "builder": "@angular/build:karma",
           "options": {
+            "assets": [
+              "src/assets",
+              "src/favicon.ico",
+              { "input": "src/tests", "output": "tests", "glob": "*.ged" }
+            ],
             "browsers": "ChromeHeadless",
             "tsConfig": "tsconfig.spec.json",
             "polyfills": ["src/polyfills.ts"]

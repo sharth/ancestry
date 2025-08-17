@@ -1,5 +1,6 @@
 import { AncestryService } from "../../database/ancestry.service";
-import { CommonModule } from "@angular/common";
+import { InputRepositoryCallNumberComponent } from "../../forms/input-repository-call-number.component";
+import { InputRepositoryXrefComponent } from "../../forms/input-repository-xref.component";
 import { Component, computed, inject, input, output } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { RouterModule } from "@angular/router";
@@ -8,7 +9,12 @@ import { RouterModule } from "@angular/router";
   selector: "app-source-editor-repositories",
   templateUrl: "./source-editor-repositories.component.html",
   styleUrl: "./source-editor.component.css",
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [
+    RouterModule,
+    FormsModule,
+    InputRepositoryCallNumberComponent,
+    InputRepositoryXrefComponent,
+  ],
 })
 export class SourceEditorRepositoryCitationsComponent {
   private readonly ancestryService = inject(AncestryService);
@@ -23,7 +29,7 @@ export class SourceEditorRepositoryCitationsComponent {
   }>();
 
   readonly vm = computed(() => {
-    const ancestry = this.ancestryService.ancestryResource.value();
+    const ancestry = this.ancestryService.contents();
     if (ancestry == undefined) return undefined;
 
     return {

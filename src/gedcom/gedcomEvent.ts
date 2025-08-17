@@ -6,6 +6,11 @@ import { parseGedcomDate } from "./gedcomDate";
 import { serializeGedcomDate, serializeGedcomSortDate } from "./gedcomDate";
 import type { GedcomRecord } from "./gedcomRecord";
 
+export interface GedcomEventSharedWith {
+  xref: string;
+  role?: string;
+}
+
 export interface GedcomEvent {
   tag: string;
   type?: string;
@@ -16,10 +21,7 @@ export interface GedcomEvent {
   sortDate?: GedcomDate;
   value?: string;
   citations: GedcomCitation[];
-  sharedWith: {
-    xref: string;
-    role?: string;
-  }[];
+  sharedWith: GedcomEventSharedWith[];
 }
 
 export const gedcomEventTags = new Map([
@@ -32,6 +34,7 @@ export const gedcomEventTags = new Map([
   ["EDUC", "Education"],
   ["EMIG", "Emigration"],
   ["EVEN", "Event"],
+  ["IDNO", "ID Number"],
   ["IMMI", "Immigration"],
   ["MARB", "Marriage Banns"],
   ["MARR", "Marriage"],
@@ -113,10 +116,9 @@ export function parseGedcomEvent(record: GedcomRecord): GedcomEvent {
   return gedcomEvent;
 }
 
-function parseGedcomShareEvent(gedcomRecord: GedcomRecord): {
-  xref: string;
-  role?: string;
-} {
+function parseGedcomShareEvent(
+  gedcomRecord: GedcomRecord,
+): GedcomEventSharedWith {
   if (gedcomRecord.xref != null) throw new Error();
   if (gedcomRecord.tag != "_SHAR") throw new Error();
   if (gedcomRecord.value == null) throw new Error();
@@ -163,10 +165,7 @@ export function serializeGedcomEvent(gedcomEvent: GedcomEvent): GedcomRecord {
   };
 }
 
-function serializeGedcomSharedEvent(sharedWith: {
-  xref: string;
-  role?: string;
-}) {
+function serializeGedcomSharedEvent(sharedWith: GedcomEventSharedWith) {
   return {
     tag: "_SHAR",
     abstag: "",

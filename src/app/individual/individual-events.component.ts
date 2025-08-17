@@ -1,11 +1,10 @@
 import { AncestryService } from "../../database/ancestry.service";
 import { EventsTableComponent } from "../events-table/events-table.component";
-import { CommonModule } from "@angular/common";
 import { Component, computed, inject, input } from "@angular/core";
 
 @Component({
   selector: "app-individual-events",
-  imports: [CommonModule, EventsTableComponent],
+  imports: [EventsTableComponent],
   templateUrl: "./individual-events.component.html",
   styleUrl: "./individual.component.css",
 })
@@ -14,7 +13,7 @@ export class IndividualEventsComponent {
   private ancestryService = inject(AncestryService);
 
   readonly vm = computed(() => {
-    const ancestry = this.ancestryService.ancestryResource.value();
+    const ancestry = this.ancestryService.contents();
     if (ancestry === undefined) {
       return undefined;
     }

@@ -5,6 +5,21 @@ export interface GedcomDate {
   value: string;
 }
 
+export const monthNames = [
+  "JAN",
+  "FEB",
+  "MAR",
+  "APR",
+  "MAY",
+  "JUN",
+  "JUL",
+  "AUG",
+  "SEP",
+  "OCT",
+  "NOV",
+  "DEC",
+];
+
 export function parseGedcomDate(gedcomRecord: GedcomRecord): GedcomDate {
   if (gedcomRecord.xref != null) throw new Error();
   if (gedcomRecord.value == null) throw new Error();

@@ -2,13 +2,12 @@ import { AncestryService } from "../../database/ancestry.service";
 import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
 import { serializeGedcomRepository } from "../../gedcom/gedcomRepository";
 import { RepositorySourcesComponent } from "./repository-sources.component";
-import { CommonModule } from "@angular/common";
 import { Component, computed, inject, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
 
 @Component({
   selector: "app-repository",
-  imports: [CommonModule, RouterModule, RepositorySourcesComponent],
+  imports: [RouterModule, RepositorySourcesComponent],
   templateUrl: "./repository.component.html",
   styleUrl: "./repository.component.css",
 })
@@ -17,7 +16,7 @@ export class RepositoryComponent {
   private readonly ancestryService = inject(AncestryService);
 
   readonly vm = computed(() => {
-    const ancestry = this.ancestryService.ancestryResource.value();
+    const ancestry = this.ancestryService.contents();
     if (ancestry == undefined) {
       return undefined;
     }

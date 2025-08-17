@@ -1,0 +1,22 @@
+table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+th {
+  width: 50%;
+}
+
+td {
+  font-family: monospace;
+  overflow: scroll;
+  text-wrap: nowrap;
+}
+
+.identical {
+  background-color: lightgray;
+}
+
+.different {
+  background-color: lightcoral;
+}

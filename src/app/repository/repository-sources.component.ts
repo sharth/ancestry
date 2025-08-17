@@ -1,11 +1,10 @@
 import { AncestryService } from "../../database/ancestry.service";
-import { CommonModule } from "@angular/common";
 import { Component, computed, inject, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
 
 @Component({
   selector: "app-repository-sources",
-  imports: [CommonModule, RouterModule],
+  imports: [RouterModule],
   templateUrl: "./repository-sources.component.html",
   styleUrl: "./repository.component.css",
 })
@@ -14,7 +13,7 @@ export class RepositorySourcesComponent {
   private readonly ancestryService = inject(AncestryService);
 
   readonly vm = computed(() => {
-    const ancestry = this.ancestryService.ancestryResource.value();
+    const ancestry = this.ancestryService.contents();
     if (ancestry == undefined) {
       return undefined;
     }

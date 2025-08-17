@@ -1,4 +1,6 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
+import type { GedcomCitation } from "./gedcomCitation";
+import { parseGedcomCitation, serializeGedcomCitation } from "./gedcomCitation";
 import type { GedcomEvent } from "./gedcomEvent";
 import { parseGedcomEvent } from "./gedcomEvent";
 import { serializeGedcomEvent } from "./gedcomEvent";
@@ -10,6 +12,7 @@ export interface GedcomFamily {
   wifeXref?: string;
   childXrefs: string[];
   events: GedcomEvent[];
+  citations: GedcomCitation[];
 }
 
 export function parseGedcomFamily(record: GedcomRecord): GedcomFamily {
@@ -21,6 +24,7 @@ export function parseGedcomFamily(record: GedcomRecord): GedcomFamily {
     xref: record.xref,
     childXrefs: [],
     events: [],
+    citations: [],
   };
 
   for (const childRecord of record.children) {
@@ -48,6 +52,9 @@ export function parseGedcomFamily(record: GedcomRecord): GedcomFamily {
       case "MARR":
       case "MARB":
         gedcomFamily.events.push(parseGedcomEvent(childRecord));
+        break;
+      case "SOUR":
+        gedcomFamily.citations.push(parseGedcomCitation(childRecord));
         break;
       default:
         reportUnparsedRecord(childRecord);
@@ -84,6 +91,9 @@ export function serializeGedcomFamily(
         value: childXref,
         children: [],
       })),
+      ...gedcomFamily.citations.map((citation) =>
+        serializeGedcomCitation(citation),
+      ),
       ...gedcomFamily.events.map((event) => serializeGedcomEvent(event)),
     ].filter((record) => record.children.length || record.value),
   };

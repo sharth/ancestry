@@ -1,12 +1,10 @@
 import { AncestryService } from "../../database/ancestry.service";
-import { CommonModule } from "@angular/common";
 import { Component, inject } from "@angular/core";
 import { RouterLink } from "@angular/router";
 
 @Component({
   selector: "app-navbar",
-  standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [RouterLink],
   templateUrl: "./navbar.component.html",
   styleUrl: "./navbar.component.css",
 })
@@ -25,10 +23,16 @@ export class NavbarComponent {
           },
         ],
       });
-      const file = await fileHandle.getFile();
-      const text = await file.text();
-      await this.ancestryService.initializeDatabase(text);
+      await this.ancestryService.openGedcom(fileHandle);
       console.log("Parsing complete");
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async requestPermissions() {
+    try {
+      await this.ancestryService.requestPermissions();
     } catch (err) {
       console.error(err);
     }

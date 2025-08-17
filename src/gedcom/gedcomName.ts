@@ -112,12 +112,12 @@ export function serializeGedcomName(name: GedcomName): GedcomRecord {
     tag: "NAME",
     abstag: "INDI.NAME",
     value: [
-      name.prefix,
+      // name.prefix,
       name.givenName,
-      name.nickName,
-      name.surnamePrefix,
+      // name.nickName,
+      // name.surnamePrefix,
       name.surname ? `/${name.surname}/` : "//",
-      name.suffix,
+      // name.suffix,
     ]
       .filter((part) => part != undefined)
       .filter((part) => part != "")
@@ -136,12 +136,6 @@ export function serializeGedcomName(name: GedcomName): GedcomRecord {
         children: [],
       },
       {
-        tag: "NICK",
-        abstag: "INDI.NAME.NICK",
-        value: name.nickName,
-        children: [],
-      },
-      {
         tag: "SPFX",
         abstag: "INDI.NAME.SPFX",
         value: name.surnamePrefix,
@@ -157,6 +151,12 @@ export function serializeGedcomName(name: GedcomName): GedcomRecord {
         tag: "NSFX",
         abstag: "INDI.NAME.NSFX",
         value: name.suffix,
+        children: [],
+      },
+      {
+        tag: "NICK",
+        abstag: "INDI.NAME.NICK",
+        value: name.nickName,
         children: [],
       },
       {

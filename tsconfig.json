@@ -7,7 +7,9 @@
     "strict": true,
     "noImplicitOverride": true,
     "paths": {
-      "gedcom": ["./dist/gedcom"]
+      "gedcom": [
+        "./dist/gedcom"
+      ]
     },
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
@@ -22,7 +24,12 @@
     "target": "es2023",
     "module": "esnext",
     "useDefineForClassFields": false,
-    "lib": ["es2023", "ESNext.Collection", "ESNext.Iterator", "dom"]
+    "lib": [
+      "es2023",
+      "ESNext.Collection",
+      "ESNext.Iterator",
+      "dom"
+    ]
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

@@ -18,35 +18,16 @@
             ></button>
           </td>
           <td>
-            <div class="form-floating">
-              <select
-                class="form-select"
-                [(ngModel)]="rCitation.repositoryXref"
-                name="repositoryXref"
-              >
-                <option selected value="">Repositories...</option>
-                @for (
-                  repository of vm.repositories.values();
-                  track repository.xref
-                ) {
-                  <option value="{{ repository.xref }}">
-                    {{ repository.name }}
-                  </option>
-                }
-              </select>
-              <label>Repository</label>
-            </div>
+            <app-input-repository-xref
+              name="repositoryXref"
+              [(ngModel)]="rCitation.repositoryXref"
+            ></app-input-repository-xref>
           </td>
           <td>
-            <div class="form-floating">
-              <input
-                class="form-control"
-                type="text"
-                [(ngModel)]="rCitation.callNumber"
-                name="callNumber"
-              />
-              <label>Call Number</label>
-            </div>
+            <app-input-repository-call-number
+              name="repositoryCallNumber"
+              [(ngModel)]="rCitation.callNumber"
+            ></app-input-repository-call-number>
           </td>
         </tr>
       }

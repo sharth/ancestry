@@ -1,0 +1,24 @@
+<table>
+  <thead>
+    <tr>
+      <th>Old Gedcom</th>
+      <th>New Gedcom</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        @for (difference of differences(); track difference) {
+          @let class = difference.identical ? "identical" : "different";
+          <div class="{{ class }}">{{ difference.lhs || "&nbsp;" }}</div>
+        }
+      </td>
+      <td>
+        @for (difference of differences(); track difference) {
+          @let class = difference.identical ? "identical" : "different";
+          <div class="{{ class }}">{{ difference.rhs || "&nbsp;" }}</div>
+        }
+      </td>
+    </tr>
+  </tbody>
+</table>

@@ -1,6 +1,4 @@
 @if (vm(); as vm) {
-  <ag-grid-angular [rowData]="vm.multimediaLinks" [gridOptions]="gridOptions" />
-
   <table>
     <thead>
       <tr>
@@ -28,7 +26,7 @@
               >
                 <option selected value="">Multimedia...</option>
                 @for (
-                  multimedia of vm.multimedia.values();
+                  multimedia of vm.multimedias.values();
                   track multimedia.xref
                 ) {
                   <option value="{{ multimedia.xref }}">

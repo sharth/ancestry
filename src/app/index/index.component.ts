@@ -9,10 +9,9 @@ import { Component, computed, inject } from "@angular/core";
 })
 export class IndexComponent {
   private readonly ancestryService = inject(AncestryService);
-  private readonly ancestryResource = this.ancestryService.ancestryResource;
 
   readonly vm = computed(() => {
-    const ancestry = this.ancestryResource.value();
+    const ancestry = this.ancestryService.contents();
     if (ancestry == undefined) return undefined;
 
     return {

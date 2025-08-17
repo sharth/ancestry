@@ -1,27 +1,23 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import type { GedcomDate } from "./gedcomDate";
-import { parseGedcomDate } from "./gedcomDate";
-import { serializeGedcomDate } from "./gedcomDate";
+import { parseGedcomDate, serializeGedcomDate } from "./gedcomDate";
 import type { GedcomEvent } from "./gedcomEvent";
-import { parseGedcomEvent } from "./gedcomEvent";
-import { serializeGedcomEvent } from "./gedcomEvent";
+import { parseGedcomEvent, serializeGedcomEvent } from "./gedcomEvent";
 import type { GedcomName } from "./gedcomName";
-import { parseGedcomName } from "./gedcomName";
-import { serializeGedcomName } from "./gedcomName";
+import { parseGedcomName, serializeGedcomName } from "./gedcomName";
 import type { GedcomRecord } from "./gedcomRecord";
 import type { GedcomSex } from "./gedcomSex";
-import { parseGedcomSex } from "./gedcomSex";
-import { serializeSex } from "./gedcomSex";
+import { parseGedcomSex, serializeSex } from "./gedcomSex";
 
 export interface GedcomIndividual {
   xref: string;
   names: GedcomName[];
   events: GedcomEvent[];
   sex?: GedcomSex;
-  familySearchId?: string;
   changeDate?: GedcomDate; // Should only be a GedcomExactDate.
-  childOfFamilyXref: string[];
-  parentOfFamilyXref: string[];
+  childOfFamilyXrefs: string[];
+  parentOfFamilyXrefs: string[];
+  unknownRecords: GedcomRecord[];
 }
 
 export function fullname(gedcomIndividual: GedcomIndividual): string {
@@ -53,8 +49,9 @@ export function parseGedcomIndividual(record: GedcomRecord): GedcomIndividual {
     xref: record.xref,
     names: [],
     events: [],
-    parentOfFamilyXref: [],
-    childOfFamilyXref: [],
+    parentOfFamilyXrefs: [],
+    childOfFamilyXrefs: [],
+    unknownRecords: [],
   };
 
   for (const childRecord of record.children) {
@@ -67,6 +64,7 @@ export function parseGedcomIndividual(record: GedcomRecord): GedcomIndividual {
       case "EDUC":
       case "EMIG":
       case "EVEN":
+      case "IDNO":
       case "IMMI":
       case "MARB":
       case "MARR":
@@ -92,40 +90,25 @@ export function parseGedcomIndividual(record: GedcomRecord): GedcomIndividual {
         if (childRecord.xref != null) throw new Error();
         if (childRecord.value == null) throw new Error();
         childRecord.children.forEach(reportUnparsedRecord);
-        gedcomIndividual.parentOfFamilyXref.push(childRecord.value);
+        gedcomIndividual.parentOfFamilyXrefs.push(childRecord.value);
         break;
       case "FAMC":
         if (childRecord.xref != null) throw new Error();
         if (childRecord.value == null) throw new Error();
         childRecord.children.forEach(reportUnparsedRecord);
-        gedcomIndividual.childOfFamilyXref.push(childRecord.value);
-        break;
-      case "_FSFTID":
-        gedcomIndividual.familySearchId =
-          parseGedcomIndividualFamilySearchId(childRecord);
+        gedcomIndividual.childOfFamilyXrefs.push(childRecord.value);
         break;
       case "CHAN":
         if (gedcomIndividual.changeDate) throw new Error();
         gedcomIndividual.changeDate = parseGedcomChangeDate(childRecord);
         break;
       default:
-        reportUnparsedRecord(childRecord);
+        gedcomIndividual.unknownRecords.push(childRecord);
         break;
     }
   }
 
   return gedcomIndividual;
-}
-
-function parseGedcomIndividualFamilySearchId(
-  gedcomRecord: GedcomRecord,
-): string {
-  if (gedcomRecord.abstag !== "INDI._FSFTID") throw new Error();
-  if (gedcomRecord.xref != null) throw new Error();
-  if (gedcomRecord.value == null) throw new Error();
-
-  gedcomRecord.children.forEach(reportUnparsedRecord);
-  return gedcomRecord.value;
 }
 
 function parseGedcomChangeDate(gedcomRecord: GedcomRecord): GedcomDate {
@@ -162,37 +145,42 @@ export function serializeGedcomIndividual(
     children: [
       ...gedcomIndividual.names.map((name) => serializeGedcomName(name)),
       gedcomIndividual.sex ? serializeSex(gedcomIndividual.sex) : null,
-      gedcomIndividual.familySearchId
-        ? serializeFamilySearchId(gedcomIndividual.familySearchId)
-        : null,
+      ...gedcomIndividual.unknownRecords.filter(
+        (record) => record.tag == "_UID",
+      ),
+      ...gedcomIndividual.unknownRecords.filter(
+        (record) => record.tag == "_FSFTID",
+      ),
+      ...gedcomIndividual.unknownRecords.filter(
+        (record) => record.tag == "_AMTID",
+      ),
       gedcomIndividual.changeDate
         ? serializeChangeDate(gedcomIndividual.changeDate)
         : null,
+      ...gedcomIndividual.unknownRecords.filter(
+        (record) => record.tag == "SOUR",
+      ),
       ...gedcomIndividual.events.map((event) => serializeGedcomEvent(event)),
-      ...gedcomIndividual.parentOfFamilyXref.map((xref) => ({
+      ...gedcomIndividual.parentOfFamilyXrefs.map((xref) => ({
         tag: "FAMS",
         abstag: "",
         value: xref,
         children: [],
       })),
-      ...gedcomIndividual.childOfFamilyXref.map((xref) => ({
+      ...gedcomIndividual.childOfFamilyXrefs.map((xref) => ({
         tag: "FAMC",
         abstag: "",
         value: xref,
         children: [],
       })),
-    ]
-      .filter((record) => record != null)
-      .filter((record) => record.children.length || record.value),
-  };
-}
-
-function serializeFamilySearchId(familySearchId: string): GedcomRecord {
-  return {
-    tag: "_FSFTID",
-    abstag: "INDI._FSFTID",
-    value: familySearchId,
-    children: [],
+      ...gedcomIndividual.unknownRecords.filter(
+        (record) =>
+          record.tag != "_UID" &&
+          record.tag != "_FSFTID" &&
+          record.tag != "_AMTID" &&
+          record.tag != "SOUR",
+      ),
+    ].filter((record) => record != null),
   };
 }
 

@@ -1,13 +1,12 @@
 import { AncestryService } from "../../database/ancestry.service";
-import { type GedcomIndividual, fullname } from "../../gedcom/gedcomIndividual";
+import type { GedcomIndividual } from "../../gedcom/gedcomIndividual";
+import { fullname } from "../../gedcom/gedcomIndividual";
 import { IndividualLinkComponent } from "../individual-link/individual-link.component";
-import { CommonModule } from "@angular/common";
 import { Component, computed, inject, input } from "@angular/core";
 
 @Component({
   selector: "app-individual-ancestors",
-  standalone: true,
-  imports: [CommonModule, IndividualLinkComponent],
+  imports: [IndividualLinkComponent],
   templateUrl: "./individual-ancestors.component.html",
   styleUrl: "./individual.component.css",
 })
@@ -16,7 +15,7 @@ export class IndividualAncestorsComponent {
   private ancestryService = inject(AncestryService);
 
   readonly vm = computed(() => {
-    const ancestry = this.ancestryService.ancestryResource.value();
+    const ancestry = this.ancestryService.contents();
     if (ancestry === undefined) {
       return undefined;
     }

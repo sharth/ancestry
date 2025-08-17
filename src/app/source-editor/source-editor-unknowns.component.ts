@@ -1,8 +1,5 @@
-import {
-  type GedcomRecord,
-  serializeGedcomRecordToText,
-} from "../../gedcom/gedcomRecord";
-import { CommonModule } from "@angular/common";
+import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
+import type { GedcomRecord } from "../../gedcom/gedcomRecord";
 import { Component, input, output } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { RouterModule } from "@angular/router";
@@ -11,7 +8,7 @@ import { RouterModule } from "@angular/router";
   selector: "app-source-editor-unknowns",
   templateUrl: "./source-editor-unknowns.component.html",
   styleUrl: "./source-editor.component.css",
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [RouterModule, FormsModule],
 })
 export class SourceEditorUnknownsComponent {
   readonly unknownRecords = input.required<GedcomRecord[]>();

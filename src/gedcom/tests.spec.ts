@@ -13,6 +13,7 @@ import {
   serializeGedcomMultimedia,
 } from "./gedcomMultimedia";
 import {
+  mergeConcContRecords,
   parseGedcomRecords,
   serializeGedcomRecordToText,
 } from "./gedcomRecord";
@@ -61,7 +62,8 @@ const testCases: {
       "2 SOUR @S50@",
       "0 @I4@ INDI",
       "0 @I5@ INDI",
-      "1 _FSFTID abcd",
+      "1 IDNO abcd",
+      "2 TYPE familysearch.org",
       "1 BIRT",
       "2 CAUS normal",
       "2 DATE ABT 1 Jan 2000",
@@ -72,7 +74,7 @@ const testCases: {
       "1 OCCU Truck Driver",
       "2 TYPE Permanent",
       "0 @I6@ INDI",
-      "1 NAME John /Doe/ Jr",
+      "1 NAME John /Doe/",
       "2 GIVN John",
       "2 SURN Doe",
       "2 NSFX Jr",
@@ -122,36 +124,47 @@ const testCases: {
             },
           ],
           events: [],
-          parentOfFamilyXref: [],
-          childOfFamilyXref: [],
+          parentOfFamilyXrefs: [],
+          childOfFamilyXrefs: [],
+          unknownRecords: [],
         },
         {
           xref: "@I2@",
           sex: { sex: "M", citations: [] },
           names: [],
           events: [],
-          parentOfFamilyXref: [],
-          childOfFamilyXref: [],
+          parentOfFamilyXrefs: [],
+          childOfFamilyXrefs: [],
+          unknownRecords: [],
         },
         {
           xref: "@I3@",
           sex: { sex: "F", citations: [{ sourceXref: "@S50@" }] },
           names: [],
           events: [],
-          parentOfFamilyXref: [],
-          childOfFamilyXref: [],
+          parentOfFamilyXrefs: [],
+          childOfFamilyXrefs: [],
+          unknownRecords: [],
         },
         {
           xref: "@I4@",
           names: [],
           events: [],
-          parentOfFamilyXref: [],
-          childOfFamilyXref: [],
+          parentOfFamilyXrefs: [],
+          childOfFamilyXrefs: [],
+          unknownRecords: [],
         },
         {
           xref: "@I5@",
           names: [],
           events: [
+            {
+              tag: "IDNO",
+              value: "abcd",
+              type: "familysearch.org",
+              citations: [],
+              sharedWith: [],
+            },
             {
               tag: "BIRT",
               value: undefined,
@@ -171,9 +184,9 @@ const testCases: {
               sharedWith: [],
             },
           ],
-          familySearchId: "abcd",
-          parentOfFamilyXref: [],
-          childOfFamilyXref: [],
+          parentOfFamilyXrefs: [],
+          childOfFamilyXrefs: [],
+          unknownRecords: [],
         },
         {
           xref: "@I6@",
@@ -190,23 +203,26 @@ const testCases: {
             },
           ],
           events: [],
-          parentOfFamilyXref: [],
-          childOfFamilyXref: [],
+          parentOfFamilyXrefs: [],
+          childOfFamilyXrefs: [],
+          unknownRecords: [],
         },
         {
           xref: "@I7@",
           changeDate: { value: "1 Jan 2000" },
           names: [],
           events: [],
-          parentOfFamilyXref: [],
-          childOfFamilyXref: [],
+          parentOfFamilyXrefs: [],
+          childOfFamilyXrefs: [],
+          unknownRecords: [],
         },
         {
           xref: "@I8@",
           names: [],
           events: [],
-          parentOfFamilyXref: ["@F1@"],
-          childOfFamilyXref: ["@F2@"],
+          parentOfFamilyXrefs: ["@F1@"],
+          childOfFamilyXrefs: ["@F2@"],
+          unknownRecords: [],
         },
         {
           xref: "@I9@",
@@ -219,8 +235,9 @@ const testCases: {
               sharedWith: [{ xref: "@I7@" }, { xref: "@I8@", role: "Friend" }],
             },
           ],
-          parentOfFamilyXref: [],
-          childOfFamilyXref: [],
+          parentOfFamilyXrefs: [],
+          childOfFamilyXrefs: [],
+          unknownRecords: [],
         },
       ],
     },
@@ -277,13 +294,14 @@ const testCases: {
     gedcom: ["0 @F1@ FAM", "0 @F3@ FAM", "1 HUSB @I3@", "1 WIFE @I2@"],
     database: {
       families: [
-        { xref: "@F1@", childXrefs: [], events: [] },
+        { xref: "@F1@", childXrefs: [], events: [], citations: [] },
         {
           xref: "@F3@",
           wifeXref: "@I2@",
           husbandXref: "@I3@",
           childXrefs: [],
           events: [],
+          citations: [],
         },
       ],
     },
@@ -360,7 +378,10 @@ describe("Gedcom Tests", () => {
       const database: Database = {};
 
       beforeAll(() => {
-        const gedcomRecords = parseGedcomRecords(testCase.gedcom.join("\n"));
+        const gedcomRecords = parseGedcomRecords(
+          testCase.gedcom.join("\n"),
+        ).map((record) => mergeConcContRecords(record));
+
         gedcomRecords.forEach((gedcomRecord) => {
           switch (gedcomRecord.tag) {
             case "HEAD":

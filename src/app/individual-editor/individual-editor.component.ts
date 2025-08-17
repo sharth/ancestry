@@ -1,126 +1,137 @@
 import { AncestryService } from "../../database/ancestry.service";
-import type { GedcomEvent } from "../../gedcom/gedcomEvent";
+import { InputIndividualComponent } from "../../forms/input-individual.component";
+import { serializeGedcomFamily } from "../../gedcom/gedcomFamily";
 import type { GedcomIndividual } from "../../gedcom/gedcomIndividual";
-import type { GedcomName } from "../../gedcom/gedcomName";
-import { IndividualEditorEventsComponent } from "./individual-editor-events.component";
-import { IndividualEditorNamesComponent } from "./individual-editor-names.component";
-import { CommonModule } from "@angular/common";
-import { Component, inject, input, linkedSignal, output } from "@angular/core";
+import { serializeGedcomIndividual } from "../../gedcom/gedcomIndividual";
+import { serializeGedcomMultimedia } from "../../gedcom/gedcomMultimedia";
+import {
+  type GedcomRecord,
+  serializeGedcomRecordToText,
+} from "../../gedcom/gedcomRecord";
+import { serializeGedcomRepository } from "../../gedcom/gedcomRepository";
+import { serializeGedcomSource } from "../../gedcom/gedcomSource";
+import { serializeGedcomSubmitter } from "../../gedcom/gedcomSubmitter";
+import type { OnInit } from "@angular/core";
+import {
+  Component,
+  computed,
+  inject,
+  input,
+  output,
+  signal,
+} from "@angular/core";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 
 @Component({
   selector: "app-individual-editor",
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    IndividualEditorNamesComponent,
-    IndividualEditorEventsComponent,
-  ],
+  imports: [FormsModule, ReactiveFormsModule, InputIndividualComponent],
   templateUrl: "./individual-editor.component.html",
   styleUrl: "./individual-editor.component.css",
 })
-export class IndividualEditorComponent {
+export class IndividualEditorComponent implements OnInit {
   private readonly ancestryService = inject(AncestryService);
-  private readonly ancestryDatabase = this.ancestryService.ancestryDatabase;
-  private readonly ancestryResource = this.ancestryService.ancestryResource;
 
   readonly xref = input<string>();
   readonly finished = output();
 
-  readonly vm = linkedSignal<GedcomIndividual | undefined>(() => {
-    const ancestry = this.ancestryResource.value();
-    if (ancestry == null) return;
+  readonly individual = signal<GedcomIndividual | undefined>(undefined);
+  readonly originalRecord = signal<GedcomRecord | undefined>(undefined);
 
-    const xref = this.xref();
-    if (xref == null) {
-      const newIndividual: GedcomIndividual = {
-        xref: "",
-        names: [],
-        events: [],
-        childOfFamilyXref: [],
-        parentOfFamilyXref: [],
-      };
-      return newIndividual;
-    }
+  constructor() {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
+    (window as any).individualEditor = this;
+  }
 
-    const individual = ancestry.individuals.get(xref);
-    if (individual == null) return;
+  ngOnInit() {
+    const ancestry = this.ancestryService.contents();
+    const originalRecord = ancestry?.gedcomRecords.find(
+      (record) => record.tag == "INDI" && record.xref == this.xref(),
+    );
+    this.originalRecord.set(originalRecord);
 
-    return individual;
+    const xref = this.xref() ?? "";
+    const individual = ancestry?.individuals.get(xref);
+    this.individual.set(individual);
+  }
+
+  // readonly computedRecord = computed<GedcomRecord | undefined>(() => {
+  //   const individual = this.individual();
+  //   return individual ? serializeGedcomIndividual(individual) : undefined;
+  // });
+
+  readonly originalText = computed<string[]>(() => {
+    return this.ancestryService.contents()?.gedcomText?.split(`\r?\n`) ?? [];
   });
 
-  private async nextXref(): Promise<string> {
-    const individualXrefs = await this.ancestryDatabase.individuals
-      .toCollection()
-      .primaryKeys();
-    const nextXrefNumber = individualXrefs.reduce((nextXrefNumber, xref) => {
-      const group = new RegExp(/^@[a-z]*(\d+)@$/, "i").exec(xref);
-      return group
-        ? Math.max(Number(group[1]) + 1, nextXrefNumber)
-        : nextXrefNumber;
-    }, 0);
-    return `@I${nextXrefNumber}@`;
-  }
+  readonly computedRecords = computed<GedcomRecord[]>(() => {
+    const ancestry = this.ancestryService.contents();
+    if (ancestry == null) return [];
 
-  addName() {
-    this.vm.update((model) => {
-      if (model == null) return undefined;
-      return {
-        ...model,
-        names: model.names.concat({
-          citations: [],
-        }),
-      };
-    });
-  }
+    const recordMap = new Map<string, GedcomRecord | null>();
+    const hash = (gedcomRecord: GedcomRecord) =>
+      `${gedcomRecord.tag} ${gedcomRecord.xref} ${gedcomRecord.value}`;
+    const includeInRecordMap = (gedcomRecord: GedcomRecord) =>
+      recordMap.set(hash(gedcomRecord), gedcomRecord);
 
-  removeName(gedcomName: GedcomName) {
-    this.vm.update((model) => {
-      if (model == null) return undefined;
-      return {
-        ...model,
-        names: model.names.filter((c) => c !== gedcomName),
-      };
-    });
-  }
+    for (const gedcomRecord of ancestry.gedcomRecords) {
+      recordMap.set(hash(gedcomRecord), null);
+    }
 
-  addEvent() {
-    this.vm.update((model) => {
-      if (model == null) return undefined;
-      return {
-        ...model,
-        events: model.events.concat({
-          tag: "",
-          sharedWith: [],
-          citations: [],
-        }),
-      };
-    });
-  }
+    includeInRecordMap({ tag: "HEAD", abstag: "HEAD", children: [] });
+    ancestry.submitters
+      .values()
+      .map(serializeGedcomSubmitter)
+      .forEach(includeInRecordMap);
+    ancestry.individuals
+      .values()
+      .filter((individual: GedcomIndividual) => individual.xref != this.xref())
+      .map(serializeGedcomIndividual)
+      .forEach(includeInRecordMap);
+    ancestry.families
+      .values()
+      .map(serializeGedcomFamily)
+      .forEach(includeInRecordMap);
+    ancestry.sources
+      .values()
+      .map(serializeGedcomSource)
+      .forEach(includeInRecordMap);
+    ancestry.repositories
+      .values()
+      .map(serializeGedcomRepository)
+      .forEach(includeInRecordMap);
+    ancestry.multimedias
+      .values()
+      .map(serializeGedcomMultimedia)
+      .forEach(includeInRecordMap);
+    const individual = this.individual();
+    if (individual != null) {
+      includeInRecordMap(serializeGedcomIndividual(individual));
+    }
+    includeInRecordMap({ tag: "TRLR", abstag: "TRLR", children: [] });
 
-  removeEvent(event: GedcomEvent) {
-    this.vm.update((model) => {
-      if (model == null) return undefined;
-      return {
-        ...model,
-        events: model.events.filter((c) => c !== event),
-      };
-    });
-  }
+    return recordMap
+      .values()
+      .filter((gedcomRecord: GedcomRecord | null) => gedcomRecord != null)
+      .toArray();
+  });
 
-  async submitForm() {
-    const vm = this.vm();
-    if (vm == null) return;
-
-    await this.ancestryDatabase.transaction(
-      "rw",
-      [this.ancestryDatabase.individuals],
-      async () => {
-        const xref = this.xref() ?? (await this.nextXref());
-        await this.ancestryDatabase.individuals.put({ ...vm, xref });
-      },
+  readonly computedText = computed<string[]>(() => {
+    return this.computedRecords().flatMap((gedcomRecord) =>
+      serializeGedcomRecordToText(gedcomRecord),
     );
+  });
+
+  submitForm() {
+    // const vm = this.vm();
+    // if (vm == null) return;
+    // await this.ancestryDatabase.transaction(
+    //   "rw",
+    //   [this.ancestryDatabase.individuals],
+    //   async () => {
+    //     const xref = this.xref() ?? (await this.nextXref());
+    //     await this.ancestryDatabase.individuals.put({ ...vm, xref });
+    //   }
+    // );
 
     this.finished.emit();
   }

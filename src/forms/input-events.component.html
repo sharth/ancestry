@@ -1,0 +1,109 @@
+<table>
+  <tbody>
+    @for (event of formArray.controls; track $index) {
+      <tr>
+        <td>
+          <button
+            type="button"
+            class="btn btn-danger bi-trash"
+            (click)="removeEvent($index)"
+          ></button>
+        </td>
+        <td class="form-floating">
+          <select
+            class="form-control"
+            id="tag_{{ $index }}"
+            [formControl]="event.controls.tag"
+          >
+            @for (event of gedcomEventTags; track event.tag) {
+              <option [ngValue]="event.tag">{{ event.description }}</option>
+            }
+          </select>
+          <label for="tag_{{ $index }}">Tag</label>
+        </td>
+        <td class="form-floating">
+          <input
+            class="form-control"
+            id="type_{{ $index }}"
+            [formControl]="event.controls.type"
+          />
+          <label for="type_{{ $index }}">Type</label>
+        </td>
+        <td class="form-floating">
+          <input
+            class="form-control"
+            id="address_{{ $index }}"
+            [formControl]="event.controls.address"
+          />
+          <label for="address_{{ $index }}">Address</label>
+        </td>
+        <td class="form-floating">
+          <input
+            class="form-control"
+            id="place_{{ $index }}"
+            [formControl]="event.controls.place"
+          />
+          <label for="place_{{ $index }}">Place</label>
+        </td>
+        <td class="form-floating">
+          <input
+            class="form-control"
+            id="cause_{{ $index }}"
+            [formControl]="event.controls.cause"
+          />
+          <label for="cause_{{ $index }}">Cause</label>
+        </td>
+        <td class="form-floating">
+          <input
+            class="form-control"
+            id="date_{{ $index }}"
+            [formControl]="event.controls.date"
+          />
+          <label for="date_{{ $index }}">Date</label>
+        </td>
+        <td class="form-floating">
+          <input
+            class="form-control"
+            id="sdate_{{ $index }}"
+            [formControl]="event.controls.sortDate"
+          />
+          <label for="sdate_{{ $index }}">Sort Date</label>
+        </td>
+      </tr>
+      <tr>
+        <td>Citations</td>
+        <td colspan="7">
+          <app-input-citations
+            [formControl]="event.controls.citations"
+          ></app-input-citations>
+        </td>
+      </tr>
+      <tr>
+        <td>Shared With</td>
+        <td colspan="7">
+          <app-input-shared-with
+            [formControl]="event.controls.sharedWith"
+          ></app-input-shared-with>
+        </td>
+      </tr>
+    }
+  </tbody>
+  <tfoot>
+    <tr>
+      <th>
+        <button
+          type="button"
+          class="btn btn-outline-primary bi-plus"
+          (click)="appendEvent()"
+        ></button>
+      </th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </tfoot>
+</table>

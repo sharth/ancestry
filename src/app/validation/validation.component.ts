@@ -1,10 +1,9 @@
-import { CommonModule } from "@angular/common";
 import { Component } from "@angular/core";
 import { RouterModule } from "@angular/router";
 
 @Component({
   selector: "app-validation",
-  imports: [CommonModule, RouterModule],
+  imports: [RouterModule],
   templateUrl: "./validation.component.html",
   styleUrl: "./validation.component.css",
 })

@@ -1,20 +1,19 @@
-import { Component, computed, inject, input } from "@angular/core";
-import { CommonModule } from "@angular/common";
+import { AncestryService } from "../../database/ancestry.service";
 import {
   fullname,
   serializeGedcomIndividual,
 } from "../../gedcom/gedcomIndividual";
-import { IndividualRelativesComponent } from "./individual-relatives.component";
-import { IndividualAncestorsComponent } from "./individual-ancestors.component";
-import { AncestryService } from "../../database/ancestry.service";
-import { IndividualEventsComponent } from "./individual-events.component";
-import { IndividualEditorComponent } from "../individual-editor/individual-editor.component";
 import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
+import { IndividualEditorComponent } from "../individual-editor/individual-editor.component";
+import { IndividualAncestorsComponent } from "./individual-ancestors.component";
+import { IndividualEventsComponent } from "./individual-events.component";
+import { IndividualRelativesComponent } from "./individual-relatives.component";
+import type { ElementRef } from "@angular/core";
+import { Component, computed, inject, input, viewChild } from "@angular/core";
 
 @Component({
   selector: "app-individual",
   imports: [
-    CommonModule,
     IndividualRelativesComponent,
     IndividualAncestorsComponent,
     IndividualEventsComponent,
@@ -26,9 +25,10 @@ import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
 export class IndividualComponent {
   readonly xref = input.required<string>();
   private ancestryService = inject(AncestryService);
+  private dialog = viewChild<ElementRef<HTMLDialogElement>>("editDialog");
 
   readonly vm = computed(() => {
-    const ancestry = this.ancestryService.ancestryResource.value();
+    const ancestry = this.ancestryService.contents();
     if (ancestry === undefined) {
       return undefined;
     }
@@ -40,7 +40,7 @@ export class IndividualComponent {
       name: fullname(individual),
       sex: individual.sex?.sex ?? "Unknown",
       gedcom: serializeGedcomRecordToText(
-        serializeGedcomIndividual(individual)
+        serializeGedcomIndividual(individual),
       ).join("\n"),
     };
   });

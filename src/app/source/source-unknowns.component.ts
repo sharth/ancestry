@@ -1,6 +1,5 @@
 import { AncestryService } from "../../database/ancestry.service";
 import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
-import { CommonModule } from "@angular/common";
 import { Component, computed, inject, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
 
@@ -8,17 +7,16 @@ import { RouterModule } from "@angular/router";
   selector: "app-source-unknowns",
   templateUrl: "./source-unknowns.component.html",
   styleUrl: "./source.component.css",
-  imports: [CommonModule, RouterModule],
+  imports: [RouterModule],
 })
 export class SourceUnknownsComponent {
   readonly xref = input.required<string>();
 
   private readonly ancestryService = inject(AncestryService);
-  private readonly ancestryResource = this.ancestryService.ancestryResource;
 
   readonly vm = computed(() => {
-    const ancestry = this.ancestryResource.value();
-    if (ancestry == undefined) {
+    const ancestry = this.ancestryService.contents();
+    if (ancestry === undefined) {
       return undefined;
     }
     const source = ancestry.sources.get(this.xref());

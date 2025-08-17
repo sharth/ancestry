@@ -20,10 +20,7 @@
   <app-source-unknowns [xref]="xref()" />
 
   <h2>Gedcom</h2>
-  <app-gedcom-diff
-    [oldGedcomRecord]="vm.oldGedcomRecord"
-    [newGedcomRecord]="vm.newGedcomRecord"
-  ></app-gedcom-diff>
+  <pre>{{ vm.newGedcomText.join("\n") }}</pre>
 
   <div class="position-fixed bottom-0 end-0 rounded-circle m-5">
     <button

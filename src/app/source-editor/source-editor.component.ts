@@ -1,19 +1,18 @@
-import { Component, inject, input, linkedSignal, output } from "@angular/core";
-import { RouterModule } from "@angular/router";
-import { CommonModule } from "@angular/common";
-import { FormsModule } from "@angular/forms";
-import type { GedcomRecord } from "../../gedcom/gedcomRecord";
 import { AncestryService } from "../../database/ancestry.service";
+import type { GedcomRecord } from "../../gedcom/gedcomRecord";
+import type { GedcomSource } from "../../gedcom/gedcomSource";
+import { SourceEditorMultimediaLinksComponent } from "./source-editor-multimedia-links.component";
 import { SourceEditorRepositoryCitationsComponent } from "./source-editor-repositories.component";
 import { SourceEditorUnknownsComponent } from "./source-editor-unknowns.component";
-import { SourceEditorMultimediaLinksComponent } from "./source-editor-multimedia-links.component";
+import { Component, inject, input, linkedSignal, output } from "@angular/core";
+import { FormsModule } from "@angular/forms";
+import { RouterModule } from "@angular/router";
 
 @Component({
   selector: "app-source-editor",
   templateUrl: "./source-editor.component.html",
   styleUrl: "./source-editor.component.css",
   imports: [
-    CommonModule,
     RouterModule,
     FormsModule,
     SourceEditorRepositoryCitationsComponent,
@@ -23,13 +22,12 @@ import { SourceEditorMultimediaLinksComponent } from "./source-editor-multimedia
 })
 export class SourceEditorComponent {
   private readonly ancestryService = inject(AncestryService);
-  private readonly ancestryDatabase = this.ancestryService.ancestryDatabase;
 
   readonly xref = input<string>();
   readonly finished = output();
 
   readonly vm = linkedSignal(() => {
-    const ancestry = this.ancestryService.ancestryResource.value();
+    const ancestry = this.ancestryService.contents();
     if (ancestry == undefined) return undefined;
 
     const xref = this.xref();
@@ -55,7 +53,7 @@ export class SourceEditorComponent {
           repositoryCitation.callNumbers.map((callNumber) => ({
             repositoryXref: repositoryCitation.repositoryXref,
             callNumber,
-          }))
+          })),
       ),
       multimediaLinks: source.multimediaLinks,
       unknownRecords: source.unknownRecords,
@@ -84,7 +82,7 @@ export class SourceEditorComponent {
       return {
         ...model,
         repositoryCitations: model.repositoryCitations.filter(
-          (c) => c !== repositoryCitation
+          (c) => c !== repositoryCitation,
         ),
       };
     });
@@ -112,7 +110,7 @@ export class SourceEditorComponent {
       return {
         ...model,
         multimediaLinks: model.multimediaLinks.filter(
-          (m) => m !== multimediaLink
+          (m) => m !== multimediaLink,
         ),
       };
     });
@@ -128,8 +126,7 @@ export class SourceEditorComponent {
     });
   }
 
-  private async nextXref(): Promise<string> {
-    const sources = await this.ancestryDatabase.sources.toArray();
+  private nextXref(sources: GedcomSource[]): string {
     const sourceXrefs = sources.map((source) => source.xref);
     const nextXrefNumber = sourceXrefs.reduce((nextXrefNumber, xref) => {
       const group = new RegExp(/^@[a-z]*(\d+)@$/, "i").exec(xref);
@@ -155,19 +152,19 @@ export class SourceEditorComponent {
       }))
       .toArray();
 
-    await this.ancestryDatabase.transaction("rw", ["sources"], async () => {
-      const xref = this.xref() ?? (await this.nextXref());
+    // await this.ancestryDatabase.transaction("rw", ["sources"], async () => {
+    //   const xref = this.xref() ?? (await this.nextXref());
 
-      await this.ancestryDatabase.sources.put({
-        xref: xref,
-        abbr: model.abbr,
-        title: model.title,
-        text: model.text,
-        repositoryCitations,
-        unknownRecords: model.unknownRecords,
-        multimediaLinks: model.multimediaLinks,
-      });
-    });
+    //   await this.ancestryDatabase.sources.put({
+    //     xref: xref,
+    //     abbr: model.abbr,
+    //     title: model.title,
+    //     text: model.text,
+    //     repositoryCitations,
+    //     unknownRecords: model.unknownRecords,
+    //     multimediaLinks: model.multimediaLinks,
+    //   });
+    // });
 
     this.finished.emit();
   }

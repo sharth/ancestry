@@ -9,3 +9,19 @@ mat-form-field {
 textarea {
   field-sizing: content;
 }
+
+table {
+  width: 100%;
+}
+
+table thead {
+  background-color: lightblue;
+}
+
+table tbody tr:nth-child(2n + 0) {
+  background-color: gainsboro;
+}
+
+table tbody tr:nth-child(2n + 1) {
+  background-color: whitesmoke;
+}

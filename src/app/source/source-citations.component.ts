@@ -1,6 +1,5 @@
 import { AncestryService } from "../../database/ancestry.service";
 import { IndividualLinkComponent } from "../individual-link/individual-link.component";
-import { CommonModule } from "@angular/common";
 import { Component, computed, inject, input } from "@angular/core";
 import { MatTableModule } from "@angular/material/table";
 import { RouterModule } from "@angular/router";
@@ -9,12 +8,7 @@ import { RouterModule } from "@angular/router";
   selector: "app-source-citations",
   templateUrl: "./source-citations.component.html",
   styleUrl: "./source.component.css",
-  imports: [
-    CommonModule,
-    RouterModule,
-    MatTableModule,
-    IndividualLinkComponent,
-  ],
+  imports: [RouterModule, MatTableModule, IndividualLinkComponent],
 })
 export class SourceCitationsComponent {
   readonly xref = input.required<string>();
@@ -22,14 +16,14 @@ export class SourceCitationsComponent {
 
   readonly vm = computed(() => {
     const xref = this.xref();
-    const ancestry = this.ancestryService.ancestryResource.value();
+    const ancestry = this.ancestryService.contents();
     if (ancestry == undefined) {
       return undefined;
     }
 
     return {
       citations: [
-        // Event Citations
+        // Individual Event Citations
         ...ancestry.individuals
           .values()
           .flatMap((individual) =>
@@ -47,7 +41,7 @@ export class SourceCitationsComponent {
             event: event.tag,
             citation,
           })),
-        // Sex Citations
+        // Individual Sex Citations
         ...ancestry.individuals
           .values()
           .map((individual) => ({

@@ -1,19 +1,15 @@
-@if (vm(); as vm) {
-  <form (ngSubmit)="submitForm()" class="vstack gap-3">
-    <h2>Names</h2>
-    <app-individual-editor-names
-      [names]="vm.names"
-      (addName)="addName()"
-      (removeName)="removeName($event)"
-    />
+<form (ngSubmit)="submitForm()" class="vstack gap-3">
+  <app-input-individual
+    [(ngModel)]="individual"
+    [ngModelOptions]="{ standalone: true }"
+  ></app-input-individual>
 
-    <h2>Events</h2>
-    <app-individual-editor-events
-      [events]="vm.events"
-      (addEvent)="addEvent()"
-      (removeEvent)="removeEvent($event)"
-    ></app-individual-editor-events>
-    <input type="submit" />
-    <input type="button" value="Cancel" (click)="cancelForm()" />
-  </form>
-}
+  <h2>Gedcom Delta</h2>
+  <!-- <app-gedcom-diff
+    [oldGedcomRecord]="originalRecord()"
+    [newGedcomRecord]="computedRecord()"
+  ></app-gedcom-diff> -->
+
+  <input type="submit" />
+  <input type="button" value="Cancel" (click)="cancelForm()" />
+</form>

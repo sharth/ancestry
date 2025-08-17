@@ -1,20 +1,18 @@
 import { AncestryService } from "../../database/ancestry.service";
-import { CommonModule } from "@angular/common";
 import { Component, computed, inject } from "@angular/core";
 import { RouterLink } from "@angular/router";
 
 @Component({
   selector: "app-repositories",
-  imports: [CommonModule, RouterLink],
+  imports: [RouterLink],
   templateUrl: "./repositories.component.html",
   styleUrl: "./repositories.component.css",
 })
 export class RepositoriesComponent {
   private readonly ancestryService = inject(AncestryService);
-  private readonly ancestryResource = this.ancestryService.ancestryResource;
 
   readonly vm = computed(() => {
-    const ancestry = this.ancestryResource.value();
+    const ancestry = this.ancestryService.contents();
     if (ancestry == undefined) {
       return undefined;
     }

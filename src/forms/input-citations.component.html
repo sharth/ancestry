@@ -1,0 +1,83 @@
+<table>
+  <tbody>
+    @for (formGroup of form.controls; track $index) {
+      <tr>
+        <td>
+          <button
+            type="button"
+            class="btn btn-danger bi-trash"
+            (click)="removeCitation($index)"
+          ></button>
+        </td>
+        <td class="form-floating">
+          <input
+            class="form-control"
+            id="sourceXref_{{ $index }}"
+            [formControl]="formGroup.controls.sourceXref"
+          />
+          <label for="`sourceXref_{{ $index }}`">Source Xref</label>
+        </td>
+        <td class="form-floating">
+          <input
+            class="form-control"
+            id="name_{{ $index }}"
+            [formControl]="formGroup.controls.name"
+          />
+          <label for="`name_{{ $index }}`">Name</label>
+        </td>
+        <td class="form-floating">
+          <input
+            class="form-control"
+            id="obje_{{ $index }}"
+            [formControl]="formGroup.controls.obje"
+            data-op-ignore
+          />
+          <label for="`obje_{{ $index }}`">Obje</label>
+        </td>
+        <td class="form-floating">
+          <input
+            class="form-control"
+            id="note_{{ $index }}"
+            [formControl]="formGroup.controls.note"
+          />
+          <label for="`note_{{ $index }}`">Note</label>
+        </td>
+        <td class="form-floating">
+          <input
+            class="form-control"
+            id="text_{{ $index }}"
+            [formControl]="formGroup.controls.text"
+          />
+          <label for="`text_{{ $index }}`">Text</label>
+        </td>
+        <td class="form-floating">
+          <input
+            class="form-control"
+            id="page_{{ $index }}"
+            [formControl]="formGroup.controls.page"
+          />
+          <label for="`page_{{ $index }}`">Page</label>
+        </td>
+        <td class="form-floating">
+          <input
+            class="form-control"
+            id="quality_{{ $index }}"
+            [formControl]="formGroup.controls.quality"
+          />
+          <label for="`quality_{{ $index }}`">Quality</label>
+        </td>
+      </tr>
+    }
+  </tbody>
+  <tfoot>
+    <tr>
+      <th>
+        <button
+          type="button"
+          class="btn btn-outline-primary bi-plus"
+          (click)="appendCitation()"
+        ></button>
+      </th>
+    </tr>
+  </tfoot>
+</table>
