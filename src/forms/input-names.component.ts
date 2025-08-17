@@ -70,6 +70,7 @@ export class InputNamesComponent implements ControlValueAccessor {
         surname: formValue.surname || undefined,
         suffix: formValue.suffix || undefined,
         citations: formValue.citations,
+        notes: [],
       })),
     );
   });

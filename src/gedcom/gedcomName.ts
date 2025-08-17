@@ -2,6 +2,11 @@ import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import type { GedcomCitation } from "./gedcomCitation";
 import { parseGedcomCitation } from "./gedcomCitation";
 import { serializeGedcomCitation } from "./gedcomCitation";
+import {
+  type GedcomNote,
+  parseGedcomNote,
+  serializeGedcomNote,
+} from "./gedcomNote";
 import type { GedcomRecord } from "./gedcomRecord";
 
 export interface GedcomName {
@@ -13,6 +18,7 @@ export interface GedcomName {
   suffix?: string;
   nameType?: string;
   citations: GedcomCitation[];
+  notes: GedcomNote[];
 }
 
 export function parseGedcomName(gedcomRecord: GedcomRecord): GedcomName {
@@ -26,6 +32,7 @@ export function parseGedcomName(gedcomRecord: GedcomRecord): GedcomName {
   const surnames: string[] = [];
   const suffixes: string[] = [];
   const citations: GedcomCitation[] = [];
+  const notes: GedcomNote[] = [];
   let nameType: string | undefined = undefined;
 
   for (const childRecord of gedcomRecord.children) {
@@ -70,6 +77,9 @@ export function parseGedcomName(gedcomRecord: GedcomRecord): GedcomName {
         childRecord.children.forEach(reportUnparsedRecord);
         nameType = childRecord.value;
         break;
+      case "NOTE":
+        notes.push(parseGedcomNote(childRecord));
+        break;
       default:
         reportUnparsedRecord(childRecord);
         break;
@@ -104,6 +114,7 @@ export function parseGedcomName(gedcomRecord: GedcomRecord): GedcomName {
     suffix: suffixes.join(" ") || undefined,
     nameType,
     citations,
+    notes,
   };
 }
 
@@ -165,6 +176,7 @@ export function serializeGedcomName(name: GedcomName): GedcomRecord {
         value: name.nameType,
         children: [],
       },
+      ...name.notes.map((n) => serializeGedcomNote(n)),
       ...name.citations.map((citation) => serializeGedcomCitation(citation)),
     ].filter((record) => record.children.length || record.value),
   };
