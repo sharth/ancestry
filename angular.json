@@ -68,7 +68,8 @@
             ],
             "browsers": "ChromeHeadless",
             "tsConfig": "tsconfig.spec.json",
-            "polyfills": ["src/polyfills.ts"]
+            "polyfills": ["src/polyfills.ts"],
+            "main": "src/test.ts"
           }
         }
       }
