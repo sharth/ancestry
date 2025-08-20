@@ -1,5 +1,3 @@
-import { AncestryService } from "../database/ancestry.service";
-import { monthNames } from "../gedcom/gedcomDate";
 import type { GedcomEvent } from "../gedcom/gedcomEvent";
 import type { GedcomIndividual } from "../gedcom/gedcomIndividual";
 import type { GedcomName } from "../gedcom/gedcomName";
@@ -8,6 +6,7 @@ import { InputEventsComponent } from "./input-events.component";
 import { InputNamesComponent } from "./input-names.component";
 import { InputSexComponent } from "./input-sex.component";
 import { Component, inject } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type { ControlValueAccessor } from "@angular/forms";
 import {
   FormsModule,
@@ -46,6 +45,34 @@ export class InputIndividualComponent implements ControlValueAccessor {
     parentOfFamilies: this.formBuilder.control<string[]>([]),
   });
 
+  constructor() {
+    this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
+      const now = new Date();
+      const formValue = this.form.getRawValue();
+      this.onChange({
+        xref: formValue.xref,
+        changeDate: {
+          value: now
+            .toLocaleString("en-gb", { dateStyle: "medium" })
+            .toLocaleUpperCase(),
+        },
+        sex: formValue.sex ?? undefined,
+        names: formValue.names,
+        events: formValue.events,
+        childOfFamilyXrefs: formValue.childOfFamilies,
+        parentOfFamilyXrefs: formValue.parentOfFamilies,
+        // FIXME: Very likely wrong.
+        unknownRecords: [],
+      });
+    });
+
+    this.form.statusChanges.pipe(takeUntilDestroyed()).subscribe(() => {
+      if (this.form.touched) {
+        this.onTouch();
+      }
+    });
+  }
+
   writeValue(individual: GedcomIndividual | undefined): void {
     this.form.setValue(
       {
@@ -71,48 +98,6 @@ export class InputIndividualComponent implements ControlValueAccessor {
     this.onTouch = fn;
   }
 
-  readonly formValueChanges = this.form.valueChanges.subscribe(() => {
-    const now = new Date();
-    const formValue = this.form.getRawValue();
-    this.onChange({
-      xref: formValue.xref,
-      changeDate: {
-        value: now
-          .toLocaleString("en-gb", { dateStyle: "medium" })
-          .toLocaleUpperCase(),
-      },
-      sex: formValue.sex ?? undefined,
-      names: formValue.names,
-      events: formValue.events,
-      childOfFamilyXrefs: formValue.childOfFamilies,
-      parentOfFamilyXrefs: formValue.parentOfFamilies,
-      // FIXME: Very likely wrong.
-      unknownRecords: [],
-    });
-  });
-
-  readonly formStatusChanges = this.form.statusChanges.subscribe(() => {
-    if (this.form.touched) {
-      this.onTouch();
-    }
-  });
-
-  ngOnDestroy(): void {
-    this.formValueChanges.unsubscribe();
-    this.formStatusChanges.unsubscribe();
-  }
-
-  private nextXref(individuals: GedcomIndividual[]): string {
-    const individualXrefs = individuals.map((individual) => individual.xref);
-    const nextXrefNumber = individualXrefs.reduce((nextXrefNumber, xref) => {
-      const group = new RegExp(/^@[a-z]*(\d+)@$/, "i").exec(xref);
-      return group
-        ? Math.max(Number(group[1]) + 1, nextXrefNumber)
-        : nextXrefNumber;
-    }, 0);
-    return `@I${nextXrefNumber}@`;
-  }
-
-  onChange!: (individual: GedcomIndividual | undefined) => void;
-  onTouch!: () => void;
+  private onChange!: (individual: GedcomIndividual | undefined) => void;
+  private onTouch!: () => void;
 }

@@ -3,7 +3,6 @@ import type { GedcomRecord } from "../../gedcom/gedcomRecord";
 import type { GedcomSource } from "../../gedcom/gedcomSource";
 import { SourceEditorMultimediaLinksComponent } from "./source-editor-multimedia-links.component";
 import { SourceEditorRepositoryCitationsComponent } from "./source-editor-repositories.component";
-import { SourceEditorUnknownsComponent } from "./source-editor-unknowns.component";
 import { Component, inject, input, linkedSignal, output } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { RouterModule } from "@angular/router";
@@ -16,7 +15,6 @@ import { RouterModule } from "@angular/router";
     RouterModule,
     FormsModule,
     SourceEditorRepositoryCitationsComponent,
-    SourceEditorUnknownsComponent,
     SourceEditorMultimediaLinksComponent,
   ],
 })

@@ -12,15 +12,12 @@ import { serializeGedcomRepository } from "../../gedcom/gedcomRepository";
 import { serializeGedcomSource } from "../../gedcom/gedcomSource";
 import { serializeGedcomSubmitter } from "../../gedcom/gedcomSubmitter";
 import type { OnInit } from "@angular/core";
+import { Component, computed, inject, input, output } from "@angular/core";
 import {
-  Component,
-  computed,
-  inject,
-  input,
-  output,
-  signal,
-} from "@angular/core";
-import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+  FormsModule,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+} from "@angular/forms";
 
 @Component({
   selector: "app-individual-editor",
@@ -34,33 +31,20 @@ export class IndividualEditorComponent implements OnInit {
   readonly xref = input<string>();
   readonly finished = output();
 
-  readonly individual = signal<GedcomIndividual | undefined>(undefined);
-  readonly originalRecord = signal<GedcomRecord | undefined>(undefined);
-
-  constructor() {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
-    (window as any).individualEditor = this;
-  }
+  readonly formBuilder = inject(NonNullableFormBuilder);
+  readonly form = this.formBuilder.control<GedcomIndividual | undefined>(
+    undefined,
+  );
 
   ngOnInit() {
     const ancestry = this.ancestryService.contents();
-    const originalRecord = ancestry?.gedcomRecords.find(
-      (record) => record.tag == "INDI" && record.xref == this.xref(),
-    );
-    this.originalRecord.set(originalRecord);
-
     const xref = this.xref() ?? "";
     const individual = ancestry?.individuals.get(xref);
-    this.individual.set(individual);
+    this.form.setValue(individual, { emitEvent: false });
   }
 
-  // readonly computedRecord = computed<GedcomRecord | undefined>(() => {
-  //   const individual = this.individual();
-  //   return individual ? serializeGedcomIndividual(individual) : undefined;
-  // });
-
-  readonly originalText = computed<string[]>(() => {
-    return this.ancestryService.contents()?.gedcomText?.split(`\r?\n`) ?? [];
+  readonly origianlText = computed<string[]>(() => {
+    return this.ancestryService.contents()?.gedcomText?.split(/\r?\n/) ?? [];
   });
 
   readonly computedRecords = computed<GedcomRecord[]>(() => {
@@ -103,7 +87,8 @@ export class IndividualEditorComponent implements OnInit {
       .values()
       .map(serializeGedcomMultimedia)
       .forEach(includeInRecordMap);
-    const individual = this.individual();
+    // Is this reactive?
+    const individual = this.form.value;
     if (individual != null) {
       includeInRecordMap(serializeGedcomIndividual(individual));
     }

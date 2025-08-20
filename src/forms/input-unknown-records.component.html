@@ -6,17 +6,19 @@
     </tr>
   </thead>
   <tbody>
-    @for (unknownRecord of unknownRecords(); track unknownRecord) {
+    @for (unknownRecord of formArray.controls; track $index) {
       <tr>
         <td>
           <button
             class="btn btn-outline-secondary bi bi-trash"
             type="button"
-            (click)="removeUnknownRecord.emit(unknownRecord)"
+            (click)="removeUnknownRecord($index)"
           ></button>
         </td>
         <td>
-          <pre>{{ serializeGedcomRecordToText(unknownRecord).join("\n") }}</pre>
+          <pre>{{
+            serializeGedcomRecordToText(unknownRecord.value).join("\n")
+          }}</pre>
         </td>
       </tr>
     }

@@ -62,6 +62,6 @@ export class InputSexComponent implements ControlValueAccessor {
     this.onTouch = fn;
   }
 
-  onChange!: (sex: GedcomSex | null) => void;
-  onTouch!: () => void;
+  private onChange!: (sex: GedcomSex | null) => void;
+  private onTouch!: () => void;
 }

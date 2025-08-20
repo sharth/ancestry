@@ -41,11 +41,11 @@
       (removeMultimediaLink)="removeMultimediaLink($event)"
     />
 
-    <h2>Unknown Records</h2>
-    <app-source-editor-unknowns
-      [unknownRecords]="vm.unknownRecords"
-      (removeUnknownRecord)="removeUnknownRecord($event)"
-    />
+    <!-- <h2>Unknown Records</h2>
+    <app-input-unknown-records
+      [ngModel]="vm.unknownRecords"
+      name="unknownRecords"
+    ></app-input-unknown-records> -->
 
     <input type="submit" />
     <input type="button" value="Cancel" (click)="cancelForm()" />

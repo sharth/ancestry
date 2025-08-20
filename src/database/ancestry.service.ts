@@ -191,4 +191,32 @@ export class AncestryService {
     await fileHandle?.requestPermission();
     this.gedcomResource.reload();
   }
+
+  readonly nextIndividualXref = computed<string | undefined>(() => {
+    const individuals = this.gedcomResource.value()?.individuals;
+    if (individuals == undefined) {
+      return undefined;
+    }
+    const nextIndex = individuals
+      .values()
+      .map((individual) => /^@I(\d+)@/.exec(individual.xref))
+      .filter((match) => match != undefined)
+      .map((match) => parseInt(match[1]))
+      .reduce((acc, index) => Math.max(acc, index + 1), 0);
+    return `@I${nextIndex}@`;
+  });
+
+  readonly nextSourceXref = computed<string | undefined>(() => {
+    const sources = this.gedcomResource.value()?.sources;
+    if (sources == undefined) {
+      return undefined;
+    }
+    const nextIndex = sources
+      .values()
+      .map((source) => /^S@(\d+)@/.exec(source.xref))
+      .filter((match) => match != undefined)
+      .map((match) => parseInt(match[1], 10))
+      .reduce((acc, index) => Math.max(acc, index + 1), 0);
+    return `@S${nextIndex}@`;
+  });
 }

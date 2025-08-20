@@ -1,6 +1,6 @@
 import type { GedcomCitation } from "../gedcom/gedcomCitation";
-import type { OnDestroy } from "@angular/core";
 import { Component, inject } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type {
   ControlValueAccessor,
   FormControl,
@@ -25,9 +25,7 @@ import {
     },
   ],
 })
-export class InputCitationsComponent
-  implements ControlValueAccessor, OnDestroy
-{
+export class InputCitationsComponent implements ControlValueAccessor {
   readonly formBuilder = inject(NonNullableFormBuilder);
   readonly form = this.formBuilder.array<
     FormGroup<{
@@ -40,6 +38,28 @@ export class InputCitationsComponent
       quality: FormControl<string>;
     }>
   >([]);
+
+  constructor() {
+    this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
+      this.onChange(
+        this.form.getRawValue().map((citation) => ({
+          sourceXref: citation.sourceXref,
+          name: citation.name || undefined,
+          obje: citation.obje || undefined,
+          note: citation.note || undefined,
+          text: citation.text || undefined,
+          page: citation.page || undefined,
+          quality: citation.quality || undefined,
+        })),
+      );
+    });
+
+    this.form.statusChanges.pipe(takeUntilDestroyed()).subscribe(() => {
+      if (this.form.touched) {
+        this.onTouch();
+      }
+    });
+  }
 
   writeValue(citations: GedcomCitation[]): void {
     this.form.clear({ emitEvent: false });
@@ -85,31 +105,6 @@ export class InputCitationsComponent
     this.form.removeAt(index);
   }
 
-  readonly formValueChanges = this.form.valueChanges.subscribe(() => {
-    this.onChange(
-      this.form.getRawValue().map((citation) => ({
-        sourceXref: citation.sourceXref,
-        name: citation.name || undefined,
-        obje: citation.obje || undefined,
-        note: citation.note || undefined,
-        text: citation.text || undefined,
-        page: citation.page || undefined,
-        quality: citation.quality || undefined,
-      })),
-    );
-  });
-
-  readonly formStatusChanges = this.form.statusChanges.subscribe(() => {
-    if (this.form.touched) {
-      this.onTouch();
-    }
-  });
-
-  ngOnDestroy(): void {
-    this.formValueChanges.unsubscribe();
-    this.formStatusChanges.unsubscribe();
-  }
-
-  onChange!: (citations: GedcomCitation[]) => void;
-  onTouch!: () => void;
+  private onChange!: (citations: GedcomCitation[]) => void;
+  private onTouch!: () => void;
 }

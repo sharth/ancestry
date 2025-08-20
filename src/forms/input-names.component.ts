@@ -2,6 +2,7 @@ import type { GedcomCitation } from "../gedcom/gedcomCitation";
 import type { GedcomName } from "../gedcom/gedcomName";
 import { InputCitationsComponent } from "./input-citations.component";
 import { Component, inject } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type { ControlValueAccessor } from "@angular/forms";
 import {
   NG_VALUE_ACCESSOR,
@@ -36,6 +37,29 @@ export class InputNamesComponent implements ControlValueAccessor {
     }),
   ]);
 
+  constructor() {
+    this.formArray.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
+      this.onChange(
+        this.formArray.getRawValue().map((formValue) => ({
+          prefix: formValue.prefix || undefined,
+          givenName: formValue.givenName || undefined,
+          nickName: formValue.nickName || undefined,
+          surnamePrefix: formValue.surnamePrefix || undefined,
+          surname: formValue.surname || undefined,
+          suffix: formValue.suffix || undefined,
+          citations: formValue.citations,
+          notes: [],
+        })),
+      );
+    });
+
+    this.formArray.statusChanges.pipe(takeUntilDestroyed()).subscribe(() => {
+      if (this.formArray.touched) {
+        this.onTouch();
+      }
+    });
+  }
+
   writeValue(names: GedcomName[]): void {
     this.formArray.clear({ emitEvent: false });
     for (const name of names) {
@@ -60,32 +84,6 @@ export class InputNamesComponent implements ControlValueAccessor {
     this.onTouch = fn;
   }
 
-  readonly formValueChanges = this.formArray.valueChanges.subscribe(() => {
-    this.onChange(
-      this.formArray.getRawValue().map((formValue) => ({
-        prefix: formValue.prefix || undefined,
-        givenName: formValue.givenName || undefined,
-        nickName: formValue.nickName || undefined,
-        surnamePrefix: formValue.surnamePrefix || undefined,
-        surname: formValue.surname || undefined,
-        suffix: formValue.suffix || undefined,
-        citations: formValue.citations,
-        notes: [],
-      })),
-    );
-  });
-
-  readonly formStatusChanges = this.formArray.statusChanges.subscribe(() => {
-    if (this.formArray.touched) {
-      this.onTouch();
-    }
-  });
-
-  ngOnDestroy(): void {
-    this.formValueChanges.unsubscribe();
-    this.formStatusChanges.unsubscribe();
-  }
-
   appendName() {
     this.formArray.push(
       this.formBuilder.group({
@@ -104,6 +102,6 @@ export class InputNamesComponent implements ControlValueAccessor {
     this.formArray.removeAt(index);
   }
 
-  onChange!: (names: GedcomName[]) => void;
-  onTouch!: () => void;
+  private onChange!: (names: GedcomName[]) => void;
+  private onTouch!: () => void;
 }

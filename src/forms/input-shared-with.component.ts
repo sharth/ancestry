@@ -1,6 +1,6 @@
 import type { GedcomEventSharedWith } from "../gedcom/gedcomEvent";
-import type { OnDestroy } from "@angular/core";
 import { Component, inject } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type {
   ControlValueAccessor,
   FormControl,
@@ -25,9 +25,7 @@ import {
     },
   ],
 })
-export class InputSharedWithComponent
-  implements ControlValueAccessor, OnDestroy
-{
+export class InputSharedWithComponent implements ControlValueAccessor {
   readonly formBuilder = inject(NonNullableFormBuilder);
   readonly form = this.formBuilder.array<
     FormGroup<{
@@ -35,6 +33,23 @@ export class InputSharedWithComponent
       role: FormControl<string>;
     }>
   >([]);
+
+  constructor() {
+    this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
+      this.onChange(
+        this.form.getRawValue().map((friend) => ({
+          xref: friend.xref,
+          role: friend.role || undefined,
+        })),
+      );
+    });
+
+    this.form.statusChanges.pipe(takeUntilDestroyed()).subscribe(() => {
+      if (this.form.touched) {
+        this.onTouch();
+      }
+    });
+  }
 
   writeValue(sharedWith: GedcomEventSharedWith[]): void {
     this.form.clear({ emitEvent: false });
@@ -70,26 +85,6 @@ export class InputSharedWithComponent
     this.form.removeAt(index);
   }
 
-  readonly formValueChanges = this.form.valueChanges.subscribe(() => {
-    this.onChange(
-      this.form.getRawValue().map((friend) => ({
-        xref: friend.xref,
-        role: friend.role || undefined,
-      })),
-    );
-  });
-
-  readonly formStatusChanges = this.form.statusChanges.subscribe(() => {
-    if (this.form.touched) {
-      this.onTouch();
-    }
-  });
-
-  ngOnDestroy(): void {
-    this.formValueChanges.unsubscribe();
-    this.formStatusChanges.unsubscribe();
-  }
-
-  onChange!: (sharedWith: GedcomEventSharedWith[]) => void;
-  onTouch!: () => void;
+  private onChange!: (sharedWith: GedcomEventSharedWith[]) => void;
+  private onTouch!: () => void;
 }

@@ -1,13 +1,14 @@
 <form (ngSubmit)="submitForm()" class="vstack gap-3">
   <app-input-individual
-    [(ngModel)]="individual"
-    [ngModelOptions]="{ standalone: true }"
+    [formControl]="this.form"
+    name="individual"
   ></app-input-individual>
 
   <h2>Gedcom Delta</h2>
+  <pre>{{ computedText().join("\n") }}</pre>
   <!-- <app-gedcom-diff
-    [oldGedcomRecord]="originalRecord()"
-    [newGedcomRecord]="computedRecord()"
+    [oldGedcomText]="originalRecord()"
+    [newGedcomText]="computedRecord()"
   ></app-gedcom-diff> -->
 
   <input type="submit" />

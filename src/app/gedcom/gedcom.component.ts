@@ -112,13 +112,16 @@ export class GedcomComponent {
           key,
           originalRecord,
           currentRecord,
+          originalText: originalRecord
+            ? serializeGedcomRecordToText(originalRecord)
+            : [],
+          currentText: currentRecord
+            ? serializeGedcomRecordToText(currentRecord)
+            : [],
         }))
         .filter(
-          ({ originalRecord, currentRecord }) =>
-            originalRecord === undefined ||
-            currentRecord === undefined ||
-            serializeGedcomRecordToText(originalRecord).join("\n") !=
-              serializeGedcomRecordToText(currentRecord).join("\n"),
+          ({ originalText, currentText }) =>
+            originalText.join("\n") != currentText.join("\n"),
         )
         .toArray(),
     };

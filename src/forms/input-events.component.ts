@@ -3,8 +3,8 @@ import type { GedcomEvent, GedcomEventSharedWith } from "../gedcom/gedcomEvent";
 import { gedcomEventTags } from "../gedcom/gedcomEvent";
 import { InputCitationsComponent } from "./input-citations.component";
 import { InputSharedWithComponent } from "./input-shared-with.component";
-import type { OnDestroy } from "@angular/core";
 import { Component, inject } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type { ControlValueAccessor } from "@angular/forms";
 import {
   NG_VALUE_ACCESSOR,
@@ -29,7 +29,7 @@ import {
     },
   ],
 })
-export class InputEventsComponent implements ControlValueAccessor, OnDestroy {
+export class InputEventsComponent implements ControlValueAccessor {
   readonly formBuilder = inject(NonNullableFormBuilder);
   readonly formArray = this.formBuilder.array([
     this.formBuilder.group({
@@ -45,6 +45,32 @@ export class InputEventsComponent implements ControlValueAccessor, OnDestroy {
       sharedWith: this.formBuilder.control<GedcomEventSharedWith[]>([]),
     }),
   ]);
+
+  constructor() {
+    this.formArray.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
+      this.onChange(
+        this.formArray.getRawValue().map((event) => ({
+          tag: event.tag,
+          type: event.type || undefined,
+          address: event.address || undefined,
+          place: event.place || undefined,
+          cause: event.cause || undefined,
+          date: event.date ? { value: event.date } : undefined,
+          sdate: event.sortDate ? { value: event.sortDate } : undefined,
+          value: event.value || undefined,
+          citations: event.citations,
+          sharedWith: event.sharedWith,
+          notes: [],
+        })),
+      );
+    });
+
+    this.formArray.statusChanges.pipe(takeUntilDestroyed()).subscribe(() => {
+      if (this.formArray.touched) {
+        this.onTouch();
+      }
+    });
+  }
 
   writeValue(events: GedcomEvent[]): void {
     this.formArray.clear({ emitEvent: false });
@@ -75,35 +101,6 @@ export class InputEventsComponent implements ControlValueAccessor, OnDestroy {
     this.onTouch = fn;
   }
 
-  readonly formValueChanges = this.formArray.valueChanges.subscribe(() => {
-    this.onChange(
-      this.formArray.getRawValue().map((event) => ({
-        tag: event.tag,
-        type: event.type || undefined,
-        address: event.address || undefined,
-        place: event.place || undefined,
-        cause: event.cause || undefined,
-        date: event.date ? { value: event.date } : undefined,
-        sdate: event.sortDate ? { value: event.sortDate } : undefined,
-        value: event.value || undefined,
-        citations: event.citations,
-        sharedWith: event.sharedWith,
-        notes: [],
-      })),
-    );
-  });
-
-  readonly formStatusChanges = this.formArray.statusChanges.subscribe(() => {
-    if (this.formArray.touched) {
-      this.onTouch();
-    }
-  });
-
-  ngOnDestroy(): void {
-    this.formValueChanges.unsubscribe();
-    this.formStatusChanges.unsubscribe();
-  }
-
   appendEvent() {
     this.formArray.push(
       this.formBuilder.group({
@@ -130,6 +127,6 @@ export class InputEventsComponent implements ControlValueAccessor, OnDestroy {
     .toArray()
     .map(([tag, description]) => ({ tag, description }));
 
-  onChange!: (events: GedcomEvent[]) => void;
-  onTouch!: () => void;
+  private onChange!: (events: GedcomEvent[]) => void;
+  private onTouch!: () => void;
 }
