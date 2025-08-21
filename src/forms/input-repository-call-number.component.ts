@@ -1,4 +1,4 @@
-import { Component, inject } from "@angular/core";
+import { Component, DestroyRef, inject } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type { ControlValueAccessor } from "@angular/forms";
 import {
@@ -23,18 +23,9 @@ import {
 export class InputRepositoryCallNumberComponent
   implements ControlValueAccessor
 {
-  constructor() {
-    this.formGroup.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
-      this.onChange(this.formGroup.getRawValue().callNumber);
-    });
-    this.formGroup.statusChanges.pipe(takeUntilDestroyed()).subscribe(() => {
-      if (this.formGroup.touched) {
-        this.onTouch();
-      }
-    });
-  }
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly formBuilder = inject(NonNullableFormBuilder);
 
-  readonly formBuilder = inject(NonNullableFormBuilder);
   readonly formGroup = this.formBuilder.group({
     callNumber: "",
   });
@@ -43,14 +34,21 @@ export class InputRepositoryCallNumberComponent
     this.formGroup.setValue({ callNumber }, { emitEvent: false });
   }
 
-  registerOnChange(fn: (callNumber: string) => void): void {
-    this.onChange = fn;
+  registerOnChange(onChange: (callNumber: string) => void): void {
+    this.formGroup.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        onChange(this.formGroup.getRawValue().callNumber);
+      });
   }
 
-  registerOnTouched(fn: () => void): void {
-    this.onTouch = fn;
+  registerOnTouched(onTouch: () => void): void {
+    this.formGroup.statusChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.formGroup.touched) {
+          onTouch();
+        }
+      });
   }
-
-  private onChange!: (callNumber: string) => void;
-  private onTouch!: () => void;
 }

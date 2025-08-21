@@ -3,7 +3,7 @@ import type { GedcomEvent, GedcomEventSharedWith } from "../gedcom/gedcomEvent";
 import { gedcomEventTags } from "../gedcom/gedcomEvent";
 import { InputCitationsComponent } from "./input-citations.component";
 import { InputSharedWithComponent } from "./input-shared-with.component";
-import { Component, inject } from "@angular/core";
+import { Component, DestroyRef, inject } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type { ControlValueAccessor } from "@angular/forms";
 import {
@@ -30,7 +30,9 @@ import {
   ],
 })
 export class InputEventsComponent implements ControlValueAccessor {
-  readonly formBuilder = inject(NonNullableFormBuilder);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly formBuilder = inject(NonNullableFormBuilder);
+
   readonly formArray = this.formBuilder.array([
     this.formBuilder.group({
       tag: "",
@@ -45,32 +47,6 @@ export class InputEventsComponent implements ControlValueAccessor {
       sharedWith: this.formBuilder.control<GedcomEventSharedWith[]>([]),
     }),
   ]);
-
-  constructor() {
-    this.formArray.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
-      this.onChange(
-        this.formArray.getRawValue().map((event) => ({
-          tag: event.tag,
-          type: event.type || undefined,
-          address: event.address || undefined,
-          place: event.place || undefined,
-          cause: event.cause || undefined,
-          date: event.date ? { value: event.date } : undefined,
-          sdate: event.sortDate ? { value: event.sortDate } : undefined,
-          value: event.value || undefined,
-          citations: event.citations,
-          sharedWith: event.sharedWith,
-          notes: [],
-        })),
-      );
-    });
-
-    this.formArray.statusChanges.pipe(takeUntilDestroyed()).subscribe(() => {
-      if (this.formArray.touched) {
-        this.onTouch();
-      }
-    });
-  }
 
   writeValue(events: GedcomEvent[]): void {
     this.formArray.clear({ emitEvent: false });
@@ -93,12 +69,36 @@ export class InputEventsComponent implements ControlValueAccessor {
     }
   }
 
-  registerOnChange(fn: (events: GedcomEvent[]) => void): void {
-    this.onChange = fn;
+  registerOnChange(onChange: (events: GedcomEvent[]) => void): void {
+    this.formArray.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        onChange(
+          this.formArray.getRawValue().map((event) => ({
+            tag: event.tag,
+            type: event.type || undefined,
+            address: event.address || undefined,
+            place: event.place || undefined,
+            cause: event.cause || undefined,
+            date: event.date ? { value: event.date } : undefined,
+            sdate: event.sortDate ? { value: event.sortDate } : undefined,
+            value: event.value || undefined,
+            citations: event.citations,
+            sharedWith: event.sharedWith,
+            notes: [],
+          })),
+        );
+      });
   }
 
-  registerOnTouched(fn: () => void): void {
-    this.onTouch = fn;
+  registerOnTouched(onTouch: () => void): void {
+    this.formArray.statusChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.formArray.touched) {
+          onTouch();
+        }
+      });
   }
 
   appendEvent() {
@@ -126,7 +126,4 @@ export class InputEventsComponent implements ControlValueAccessor {
     .entries()
     .toArray()
     .map(([tag, description]) => ({ tag, description }));
-
-  private onChange!: (events: GedcomEvent[]) => void;
-  private onTouch!: () => void;
 }

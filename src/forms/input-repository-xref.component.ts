@@ -1,5 +1,5 @@
 import { AncestryService } from "../database/ancestry.service";
-import { Component, computed, inject } from "@angular/core";
+import { Component, DestroyRef, computed, inject } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type { ControlValueAccessor } from "@angular/forms";
 import {
@@ -22,18 +22,9 @@ import {
   ],
 })
 export class InputRepositoryXrefComponent implements ControlValueAccessor {
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly formBuilder = inject(NonNullableFormBuilder);
   private readonly ancestryService = inject(AncestryService);
-
-  constructor() {
-    this.formGroup.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
-      this.onChange(this.formGroup.getRawValue().repositoryXref);
-    });
-    this.formGroup.statusChanges.pipe(takeUntilDestroyed()).subscribe(() => {
-      if (this.formGroup.touched) {
-        this.onTouch();
-      }
-    });
-  }
 
   public vm = computed(() => {
     const ancestry = this.ancestryService.contents();
@@ -46,7 +37,6 @@ export class InputRepositoryXrefComponent implements ControlValueAccessor {
     };
   });
 
-  readonly formBuilder = inject(NonNullableFormBuilder);
   readonly formGroup = this.formBuilder.group({
     repositoryXref: "",
   });
@@ -55,14 +45,21 @@ export class InputRepositoryXrefComponent implements ControlValueAccessor {
     this.formGroup.setValue({ repositoryXref }, { emitEvent: false });
   }
 
-  registerOnChange(fn: (repositoryXref: string) => void): void {
-    this.onChange = fn;
+  registerOnChange(onChange: (repositoryXref: string) => void): void {
+    this.formGroup.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        onChange(this.formGroup.getRawValue().repositoryXref);
+      });
   }
 
-  registerOnTouched(fn: () => void): void {
-    this.onTouch = fn;
+  registerOnTouched(onTouch: () => void): void {
+    this.formGroup.statusChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.formGroup.touched) {
+          onTouch();
+        }
+      });
   }
-
-  private onChange!: (repositoryXref: string) => void;
-  private onTouch!: () => void;
 }

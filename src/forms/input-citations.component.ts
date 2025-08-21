@@ -1,5 +1,5 @@
 import type { GedcomCitation } from "../gedcom/gedcomCitation";
-import { Component, inject } from "@angular/core";
+import { Component, DestroyRef, inject } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type {
   ControlValueAccessor,
@@ -26,7 +26,9 @@ import {
   ],
 })
 export class InputCitationsComponent implements ControlValueAccessor {
-  readonly formBuilder = inject(NonNullableFormBuilder);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly formBuilder = inject(NonNullableFormBuilder);
+
   readonly form = this.formBuilder.array<
     FormGroup<{
       sourceXref: FormControl<string>;
@@ -38,28 +40,6 @@ export class InputCitationsComponent implements ControlValueAccessor {
       quality: FormControl<string>;
     }>
   >([]);
-
-  constructor() {
-    this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
-      this.onChange(
-        this.form.getRawValue().map((citation) => ({
-          sourceXref: citation.sourceXref,
-          name: citation.name || undefined,
-          obje: citation.obje || undefined,
-          note: citation.note || undefined,
-          text: citation.text || undefined,
-          page: citation.page || undefined,
-          quality: citation.quality || undefined,
-        })),
-      );
-    });
-
-    this.form.statusChanges.pipe(takeUntilDestroyed()).subscribe(() => {
-      if (this.form.touched) {
-        this.onTouch();
-      }
-    });
-  }
 
   writeValue(citations: GedcomCitation[]): void {
     this.form.clear({ emitEvent: false });
@@ -79,12 +59,32 @@ export class InputCitationsComponent implements ControlValueAccessor {
     });
   }
 
-  registerOnChange(fn: (citations: GedcomCitation[]) => void): void {
-    this.onChange = fn;
+  registerOnChange(onChange: (citations: GedcomCitation[]) => void): void {
+    this.form.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        onChange(
+          this.form.getRawValue().map((citation) => ({
+            sourceXref: citation.sourceXref,
+            name: citation.name || undefined,
+            obje: citation.obje || undefined,
+            note: citation.note || undefined,
+            text: citation.text || undefined,
+            page: citation.page || undefined,
+            quality: citation.quality || undefined,
+          })),
+        );
+      });
   }
 
-  registerOnTouched(fn: () => void): void {
-    this.onTouch = fn;
+  registerOnTouched(onTouch: () => void): void {
+    this.form.statusChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.form.touched) {
+          onTouch();
+        }
+      });
   }
 
   appendCitation() {
@@ -104,7 +104,4 @@ export class InputCitationsComponent implements ControlValueAccessor {
   removeCitation(index: number) {
     this.form.removeAt(index);
   }
-
-  private onChange!: (citations: GedcomCitation[]) => void;
-  private onTouch!: () => void;
 }

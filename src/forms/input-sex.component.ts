@@ -1,7 +1,7 @@
 import type { GedcomCitation } from "../gedcom/gedcomCitation";
 import type { GedcomSex } from "../gedcom/gedcomSex";
 import { InputCitationsComponent } from "./input-citations.component";
-import { Component, inject } from "@angular/core";
+import { Component, DestroyRef, inject } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type { ControlValueAccessor } from "@angular/forms";
 import {
@@ -24,21 +24,9 @@ import {
   styleUrl: "./input.component.css",
 })
 export class InputSexComponent implements ControlValueAccessor {
-  constructor() {
-    this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe((formValue) => {
-      this.onChange({
-        sex: formValue.sex ?? "",
-        citations: formValue.citations ?? [],
-      });
-    });
-    this.form.statusChanges.pipe(takeUntilDestroyed()).subscribe(() => {
-      if (this.form.touched) {
-        this.onTouch();
-      }
-    });
-  }
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly formBuilder = inject(NonNullableFormBuilder);
 
-  readonly formBuilder = inject(NonNullableFormBuilder);
   readonly form = this.formBuilder.group({
     sex: "",
     citations: this.formBuilder.control<GedcomCitation[]>([]),
@@ -54,14 +42,24 @@ export class InputSexComponent implements ControlValueAccessor {
     );
   }
 
-  registerOnChange(fn: (sex: GedcomSex | null) => void): void {
-    this.onChange = fn;
+  registerOnChange(onChange: (sex: GedcomSex | null) => void): void {
+    this.form.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((formValue) => {
+        onChange({
+          sex: formValue.sex ?? "",
+          citations: formValue.citations ?? [],
+        });
+      });
   }
 
-  registerOnTouched(fn: () => void): void {
-    this.onTouch = fn;
+  registerOnTouched(onTouch: () => void): void {
+    this.form.statusChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.form.touched) {
+          onTouch();
+        }
+      });
   }
-
-  private onChange!: (sex: GedcomSex | null) => void;
-  private onTouch!: () => void;
 }

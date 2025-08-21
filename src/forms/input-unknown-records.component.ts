@@ -1,6 +1,6 @@
 import { serializeGedcomRecordToText } from "../gedcom/gedcomRecord";
 import type { GedcomRecord } from "../gedcom/gedcomRecord";
-import { Component, inject } from "@angular/core";
+import { Component, DestroyRef, inject } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type { ControlValueAccessor } from "@angular/forms";
 import {
@@ -24,21 +24,10 @@ import { RouterModule } from "@angular/router";
   ],
 })
 export class InputUnknownRecordsComponent implements ControlValueAccessor {
+  private readonly destroyRef = inject(DestroyRef);
   private readonly formBuilder = inject(NonNullableFormBuilder);
-  readonly formArray = this.formBuilder.array<GedcomRecord[]>([]);
 
-  constructor() {
-    this.formArray.valueChanges
-      .pipe(takeUntilDestroyed())
-      .subscribe((formValue) => {
-        this.onChange(formValue);
-      });
-    this.formArray.statusChanges.pipe(takeUntilDestroyed()).subscribe(() => {
-      if (this.formArray.touched) {
-        this.onTouch();
-      }
-    });
-  }
+  readonly formArray = this.formBuilder.array<GedcomRecord[]>([]);
 
   writeValue(unknownRecords: GedcomRecord[]): void {
     this.formArray.clear({ emitEvent: false });
@@ -50,20 +39,27 @@ export class InputUnknownRecordsComponent implements ControlValueAccessor {
     });
   }
 
-  registerOnChange(fn: (unknownRecords: GedcomRecord[]) => void): void {
-    this.onChange = fn;
+  registerOnChange(onChange: (unknownRecords: GedcomRecord[]) => void): void {
+    this.formArray.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((formValue) => {
+        onChange(formValue);
+      });
   }
 
-  registerOnTouched(fn: () => void): void {
-    this.onTouch = fn;
+  registerOnTouched(onTouch: () => void): void {
+    this.formArray.statusChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.formArray.touched) {
+          onTouch();
+        }
+      });
   }
 
   removeUnknownRecord(index: number) {
     this.formArray.removeAt(index);
   }
-
-  private onChange!: (unknownRecords: GedcomRecord[]) => void;
-  private onTouch!: () => void;
 
   readonly serializeGedcomRecordToText = serializeGedcomRecordToText;
 }

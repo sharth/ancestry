@@ -1,5 +1,5 @@
 import type { GedcomEventSharedWith } from "../gedcom/gedcomEvent";
-import { Component, inject } from "@angular/core";
+import { Component, DestroyRef, inject } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type {
   ControlValueAccessor,
@@ -26,30 +26,15 @@ import {
   ],
 })
 export class InputSharedWithComponent implements ControlValueAccessor {
-  readonly formBuilder = inject(NonNullableFormBuilder);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly formBuilder = inject(NonNullableFormBuilder);
+
   readonly form = this.formBuilder.array<
     FormGroup<{
       xref: FormControl<string>;
       role: FormControl<string>;
     }>
   >([]);
-
-  constructor() {
-    this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
-      this.onChange(
-        this.form.getRawValue().map((friend) => ({
-          xref: friend.xref,
-          role: friend.role || undefined,
-        })),
-      );
-    });
-
-    this.form.statusChanges.pipe(takeUntilDestroyed()).subscribe(() => {
-      if (this.form.touched) {
-        this.onTouch();
-      }
-    });
-  }
 
   writeValue(sharedWith: GedcomEventSharedWith[]): void {
     this.form.clear({ emitEvent: false });
@@ -64,12 +49,29 @@ export class InputSharedWithComponent implements ControlValueAccessor {
     });
   }
 
-  registerOnChange(fn: (sharedWith: GedcomEventSharedWith[]) => void): void {
-    this.onChange = fn;
+  registerOnChange(
+    onChange: (sharedWith: GedcomEventSharedWith[]) => void,
+  ): void {
+    this.form.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        onChange(
+          this.form.getRawValue().map((friend) => ({
+            xref: friend.xref,
+            role: friend.role || undefined,
+          })),
+        );
+      });
   }
 
-  registerOnTouched(fn: () => void): void {
-    this.onTouch = fn;
+  registerOnTouched(onTouch: () => void): void {
+    this.form.statusChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.form.touched) {
+          onTouch();
+        }
+      });
   }
 
   appendSharedEvent() {
@@ -84,7 +86,4 @@ export class InputSharedWithComponent implements ControlValueAccessor {
   removeSharedEvent(index: number) {
     this.form.removeAt(index);
   }
-
-  private onChange!: (sharedWith: GedcomEventSharedWith[]) => void;
-  private onTouch!: () => void;
 }

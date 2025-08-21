@@ -5,7 +5,7 @@ import type { GedcomSex } from "../gedcom/gedcomSex";
 import { InputEventsComponent } from "./input-events.component";
 import { InputNamesComponent } from "./input-names.component";
 import { InputSexComponent } from "./input-sex.component";
-import { Component, inject } from "@angular/core";
+import { Component, DestroyRef, inject } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type { ControlValueAccessor } from "@angular/forms";
 import {
@@ -35,7 +35,9 @@ import {
   ],
 })
 export class InputIndividualComponent implements ControlValueAccessor {
-  readonly formBuilder = inject(NonNullableFormBuilder);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly formBuilder = inject(NonNullableFormBuilder);
+
   readonly form = this.formBuilder.group({
     xref: this.formBuilder.control<string>(""),
     sex: this.formBuilder.control<GedcomSex | null>(null),
@@ -44,34 +46,6 @@ export class InputIndividualComponent implements ControlValueAccessor {
     childOfFamilies: this.formBuilder.control<string[]>([]),
     parentOfFamilies: this.formBuilder.control<string[]>([]),
   });
-
-  constructor() {
-    this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
-      const now = new Date();
-      const formValue = this.form.getRawValue();
-      this.onChange({
-        xref: formValue.xref,
-        changeDate: {
-          value: now
-            .toLocaleString("en-gb", { dateStyle: "medium" })
-            .toLocaleUpperCase(),
-        },
-        sex: formValue.sex ?? undefined,
-        names: formValue.names,
-        events: formValue.events,
-        childOfFamilyXrefs: formValue.childOfFamilies,
-        parentOfFamilyXrefs: formValue.parentOfFamilies,
-        // FIXME: Very likely wrong.
-        unknownRecords: [],
-      });
-    });
-
-    this.form.statusChanges.pipe(takeUntilDestroyed()).subscribe(() => {
-      if (this.form.touched) {
-        this.onTouch();
-      }
-    });
-  }
 
   writeValue(individual: GedcomIndividual | undefined): void {
     this.form.setValue(
@@ -89,15 +63,38 @@ export class InputIndividualComponent implements ControlValueAccessor {
   }
 
   registerOnChange(
-    fn: (individual: GedcomIndividual | undefined) => void,
+    onChange: (individual: GedcomIndividual | undefined) => void,
   ): void {
-    this.onChange = fn;
+    this.form.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        const now = new Date();
+        const formValue = this.form.getRawValue();
+        onChange({
+          xref: formValue.xref,
+          changeDate: {
+            value: now
+              .toLocaleString("en-gb", { dateStyle: "medium" })
+              .toLocaleUpperCase(),
+          },
+          sex: formValue.sex ?? undefined,
+          names: formValue.names,
+          events: formValue.events,
+          childOfFamilyXrefs: formValue.childOfFamilies,
+          parentOfFamilyXrefs: formValue.parentOfFamilies,
+          // FIXME: Very likely wrong.
+          unknownRecords: [],
+        });
+      });
   }
 
-  registerOnTouched(fn: () => void): void {
-    this.onTouch = fn;
+  registerOnTouched(onTouch: () => void): void {
+    this.form.statusChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.form.touched) {
+          onTouch();
+        }
+      });
   }
-
-  private onChange!: (individual: GedcomIndividual | undefined) => void;
-  private onTouch!: () => void;
 }
