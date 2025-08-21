@@ -11,6 +11,7 @@ import {
   NonNullableFormBuilder,
   ReactiveFormsModule,
 } from "@angular/forms";
+import { startWith } from "rxjs/operators";
 
 @Component({
   selector: "app-input-shared-with",
@@ -53,6 +54,7 @@ export class InputSharedWithComponent implements ControlValueAccessor {
     onChange: (sharedWith: GedcomEventSharedWith[]) => void,
   ): void {
     this.form.valueChanges
+      .pipe(startWith(this.form.value))
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         onChange(
@@ -66,6 +68,7 @@ export class InputSharedWithComponent implements ControlValueAccessor {
 
   registerOnTouched(onTouch: () => void): void {
     this.form.statusChanges
+      .pipe(startWith())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         if (this.form.touched) {

@@ -14,6 +14,7 @@ import {
   NonNullableFormBuilder,
   ReactiveFormsModule,
 } from "@angular/forms";
+import { startWith } from "rxjs/operators";
 
 @Component({
   selector: "app-input-individual",
@@ -66,6 +67,7 @@ export class InputIndividualComponent implements ControlValueAccessor {
     onChange: (individual: GedcomIndividual | undefined) => void,
   ): void {
     this.form.valueChanges
+      .pipe(startWith(this.form.value))
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         const now = new Date();
@@ -90,6 +92,7 @@ export class InputIndividualComponent implements ControlValueAccessor {
 
   registerOnTouched(onTouch: () => void): void {
     this.form.statusChanges
+      .pipe(startWith())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         if (this.form.touched) {

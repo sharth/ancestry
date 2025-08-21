@@ -6,6 +6,7 @@ import {
   NonNullableFormBuilder,
   ReactiveFormsModule,
 } from "@angular/forms";
+import { startWith } from "rxjs/operators";
 
 @Component({
   selector: "app-input-repository-call-number",
@@ -36,6 +37,7 @@ export class InputRepositoryCallNumberComponent
 
   registerOnChange(onChange: (callNumber: string) => void): void {
     this.formGroup.valueChanges
+      .pipe(startWith(this.formGroup.value))
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         onChange(this.formGroup.getRawValue().callNumber);
@@ -44,6 +46,7 @@ export class InputRepositoryCallNumberComponent
 
   registerOnTouched(onTouch: () => void): void {
     this.formGroup.statusChanges
+      .pipe(startWith())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         if (this.formGroup.touched) {

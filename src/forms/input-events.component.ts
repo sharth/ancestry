@@ -11,6 +11,7 @@ import {
   NonNullableFormBuilder,
   ReactiveFormsModule,
 } from "@angular/forms";
+import { startWith } from "rxjs/operators";
 
 @Component({
   selector: "app-input-events",
@@ -71,6 +72,7 @@ export class InputEventsComponent implements ControlValueAccessor {
 
   registerOnChange(onChange: (events: GedcomEvent[]) => void): void {
     this.formArray.valueChanges
+      .pipe(startWith(this.formArray.value))
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         onChange(
@@ -93,6 +95,7 @@ export class InputEventsComponent implements ControlValueAccessor {
 
   registerOnTouched(onTouch: () => void): void {
     this.formArray.statusChanges
+      .pipe(startWith())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         if (this.formArray.touched) {

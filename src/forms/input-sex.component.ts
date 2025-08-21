@@ -9,6 +9,7 @@ import {
   NonNullableFormBuilder,
   ReactiveFormsModule,
 } from "@angular/forms";
+import { startWith } from "rxjs/operators";
 
 @Component({
   selector: "app-input-sex",
@@ -44,6 +45,7 @@ export class InputSexComponent implements ControlValueAccessor {
 
   registerOnChange(onChange: (sex: GedcomSex | null) => void): void {
     this.form.valueChanges
+      .pipe(startWith(this.form.value))
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((formValue) => {
         onChange({
@@ -55,6 +57,7 @@ export class InputSexComponent implements ControlValueAccessor {
 
   registerOnTouched(onTouch: () => void): void {
     this.form.statusChanges
+      .pipe(startWith())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         if (this.form.touched) {

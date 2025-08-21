@@ -9,6 +9,7 @@ import {
   ReactiveFormsModule,
 } from "@angular/forms";
 import { RouterModule } from "@angular/router";
+import { startWith } from "rxjs/operators";
 
 @Component({
   selector: "app-input-unknown-records",
@@ -41,6 +42,7 @@ export class InputUnknownRecordsComponent implements ControlValueAccessor {
 
   registerOnChange(onChange: (unknownRecords: GedcomRecord[]) => void): void {
     this.formArray.valueChanges
+      .pipe(startWith(this.formArray.value))
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((formValue) => {
         onChange(formValue);
@@ -49,6 +51,7 @@ export class InputUnknownRecordsComponent implements ControlValueAccessor {
 
   registerOnTouched(onTouch: () => void): void {
     this.formArray.statusChanges
+      .pipe(startWith())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         if (this.formArray.touched) {

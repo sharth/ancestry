@@ -7,6 +7,7 @@ import {
   NonNullableFormBuilder,
   ReactiveFormsModule,
 } from "@angular/forms";
+import { startWith } from "rxjs/operators";
 
 @Component({
   selector: "app-input-repository-xref",
@@ -47,6 +48,7 @@ export class InputRepositoryXrefComponent implements ControlValueAccessor {
 
   registerOnChange(onChange: (repositoryXref: string) => void): void {
     this.formGroup.valueChanges
+      .pipe(startWith(this.formGroup.value))
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         onChange(this.formGroup.getRawValue().repositoryXref);
@@ -55,6 +57,7 @@ export class InputRepositoryXrefComponent implements ControlValueAccessor {
 
   registerOnTouched(onTouch: () => void): void {
     this.formGroup.statusChanges
+      .pipe(startWith())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         if (this.formGroup.touched) {
