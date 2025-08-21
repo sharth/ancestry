@@ -8,13 +8,13 @@
   <tbody>
     <tr>
       <td>
-        @for (difference of differences(); track difference) {
+        @for (difference of differences(); track $index) {
           @let class = difference.identical ? "identical" : "different";
           <div class="{{ class }}">{{ difference.lhs || "&nbsp;" }}</div>
         }
       </td>
       <td>
-        @for (difference of differences(); track difference) {
+        @for (difference of differences(); track $index) {
           @let class = difference.identical ? "identical" : "different";
           <div class="{{ class }}">{{ difference.rhs || "&nbsp;" }}</div>
         }
