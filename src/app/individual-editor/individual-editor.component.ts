@@ -11,8 +11,10 @@ import {
 import { serializeGedcomRepository } from "../../gedcom/gedcomRepository";
 import { serializeGedcomSource } from "../../gedcom/gedcomSource";
 import { serializeGedcomSubmitter } from "../../gedcom/gedcomSubmitter";
+import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
 import type { OnInit } from "@angular/core";
 import { Component, computed, inject, input, output } from "@angular/core";
+import { toSignal } from "@angular/core/rxjs-interop";
 import {
   FormsModule,
   NonNullableFormBuilder,
@@ -21,7 +23,12 @@ import {
 
 @Component({
   selector: "app-individual-editor",
-  imports: [FormsModule, ReactiveFormsModule, InputIndividualComponent],
+  imports: [
+    FormsModule,
+    ReactiveFormsModule,
+    InputIndividualComponent,
+    GedcomDiffComponent,
+  ],
   templateUrl: "./individual-editor.component.html",
   styleUrl: "./individual-editor.component.css",
 })
@@ -35,31 +42,41 @@ export class IndividualEditorComponent implements OnInit {
   readonly form = this.formBuilder.control<GedcomIndividual | undefined>(
     undefined,
   );
+  readonly formSignal = toSignal(this.form.valueChanges);
 
   ngOnInit() {
     const ancestry = this.ancestryService.contents();
     const xref = this.xref() ?? "";
     const individual = ancestry?.individuals.get(xref);
-    this.form.setValue(individual, { emitEvent: false });
+    this.form.setValue(individual);
   }
 
-  readonly origianlText = computed<string[]>(() => {
-    return this.ancestryService.contents()?.gedcomText?.split(/\r?\n/) ?? [];
-  });
-
-  readonly computedRecords = computed<GedcomRecord[]>(() => {
+  readonly records = computed(() => {
     const ancestry = this.ancestryService.contents();
-    if (ancestry == null) return [];
+    if (ancestry == null) {
+      return [];
+    }
 
-    const recordMap = new Map<string, GedcomRecord | null>();
+    const recordMap = new Map<
+      string,
+      { oldRecord?: GedcomRecord; currentRecord?: GedcomRecord }
+    >();
     const hash = (gedcomRecord: GedcomRecord) =>
       `${gedcomRecord.tag} ${gedcomRecord.xref} ${gedcomRecord.value}`;
-    const includeInRecordMap = (gedcomRecord: GedcomRecord) =>
-      recordMap.set(hash(gedcomRecord), gedcomRecord);
 
     for (const gedcomRecord of ancestry.gedcomRecords) {
-      recordMap.set(hash(gedcomRecord), null);
+      recordMap.set(hash(gedcomRecord), { oldRecord: gedcomRecord });
     }
+
+    const includeInRecordMap = (gedcomRecord: GedcomRecord) => {
+      const h = hash(gedcomRecord);
+      const r = recordMap.get(h);
+      if (r === undefined) {
+        recordMap.set(h, { currentRecord: gedcomRecord });
+      } else {
+        r.currentRecord = gedcomRecord;
+      }
+    };
 
     includeInRecordMap({ tag: "HEAD", abstag: "HEAD", children: [] });
     ancestry.submitters
@@ -68,7 +85,6 @@ export class IndividualEditorComponent implements OnInit {
       .forEach(includeInRecordMap);
     ancestry.individuals
       .values()
-      .filter((individual: GedcomIndividual) => individual.xref != this.xref())
       .map(serializeGedcomIndividual)
       .forEach(includeInRecordMap);
     ancestry.families
@@ -87,23 +103,25 @@ export class IndividualEditorComponent implements OnInit {
       .values()
       .map(serializeGedcomMultimedia)
       .forEach(includeInRecordMap);
-    // Is this reactive?
-    const individual = this.form.value;
+    const individual = this.formSignal();
     if (individual != null) {
       includeInRecordMap(serializeGedcomIndividual(individual));
     }
     includeInRecordMap({ tag: "TRLR", abstag: "TRLR", children: [] });
 
     return recordMap
-      .values()
-      .filter((gedcomRecord: GedcomRecord | null) => gedcomRecord != null)
+      .entries()
+      .map(([hash, { oldRecord, currentRecord }]) => ({
+        hash,
+        oldRecord,
+        currentRecord,
+        equivalent:
+          oldRecord != undefined &&
+          currentRecord != undefined &&
+          serializeGedcomRecordToText(oldRecord).join("\n") ==
+            serializeGedcomRecordToText(currentRecord).join("\n"),
+      }))
       .toArray();
-  });
-
-  readonly computedText = computed<string[]>(() => {
-    return this.computedRecords().flatMap((gedcomRecord) =>
-      serializeGedcomRecordToText(gedcomRecord),
-    );
   });
 
   submitForm() {

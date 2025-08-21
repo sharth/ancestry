@@ -5,11 +5,14 @@
   ></app-input-individual>
 
   <h2>Gedcom Delta</h2>
-  <pre>{{ computedText().join("\n") }}</pre>
-  <!-- <app-gedcom-diff
-    [oldGedcomText]="originalRecord()"
-    [newGedcomText]="computedRecord()"
-  ></app-gedcom-diff> -->
+  @for (r of records(); track $index) {
+    @if (r.equivalent == false || r.currentRecord?.xref == xref()) {
+      <app-gedcom-diff
+        [oldGedcomRecord]="r.oldRecord"
+        [newGedcomRecord]="r.currentRecord"
+      ></app-gedcom-diff>
+    }
+  }
 
   <input type="submit" />
   <input type="button" value="Cancel" (click)="cancelForm()" />
