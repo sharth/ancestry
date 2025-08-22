@@ -1,53 +1,6 @@
-@if (vm(); as vm) {
-  <form (ngSubmit)="submitForm()" class="vstack gap-3">
-    <div class="form-floating">
-      <textarea
-        class="form-control h-auto"
-        [(ngModel)]="vm.abbr"
-        name="abbr"
-      ></textarea>
-      <label>Short Title</label>
-    </div>
+<form (ngSubmit)="submitForm()" class="vstack gap-3">
+  <app-input-source [formControl]="this.form" name="source"></app-input-source>
 
-    <div class="form-floating">
-      <textarea
-        class="form-control h-auto"
-        [(ngModel)]="vm.title"
-        name="title"
-      ></textarea>
-      <label>Title</label>
-    </div>
-
-    <div class="form-floating">
-      <textarea
-        class="form-control h-auto"
-        [(ngModel)]="vm.text"
-        name="text"
-      ></textarea>
-      <label>Text</label>
-    </div>
-
-    <h2>Repositories</h2>
-    <app-source-editor-repositories
-      [repositoryCitations]="vm.repositoryCitations"
-      (addRepository)="addRepository()"
-      (removeRepository)="removeRepository($event)"
-    />
-
-    <h2>Multimedia</h2>
-    <app-source-editor-multimedia-links
-      [multimediaLinks]="vm.multimediaLinks"
-      (addMultimediaLink)="addMultimediaLink()"
-      (removeMultimediaLink)="removeMultimediaLink($event)"
-    />
-
-    <!-- <h2>Unknown Records</h2>
-    <app-input-unknown-records
-      [ngModel]="vm.unknownRecords"
-      name="unknownRecords"
-    ></app-input-unknown-records> -->
-
-    <input type="submit" />
-    <input type="button" value="Cancel" (click)="cancelForm()" />
-  </form>
-}
+  <input type="submit" />
+  <input type="button" value="Cancel" (click)="cancelForm()" />
+</form>

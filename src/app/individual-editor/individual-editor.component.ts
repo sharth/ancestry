@@ -15,30 +15,21 @@ import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
 import type { OnInit } from "@angular/core";
 import { Component, computed, inject, input, output } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
-import {
-  FormsModule,
-  NonNullableFormBuilder,
-  ReactiveFormsModule,
-} from "@angular/forms";
+import { NonNullableFormBuilder, ReactiveFormsModule } from "@angular/forms";
 
 @Component({
   selector: "app-individual-editor",
-  imports: [
-    FormsModule,
-    ReactiveFormsModule,
-    InputIndividualComponent,
-    GedcomDiffComponent,
-  ],
+  imports: [ReactiveFormsModule, InputIndividualComponent, GedcomDiffComponent],
   templateUrl: "./individual-editor.component.html",
   styleUrl: "./individual-editor.component.css",
 })
 export class IndividualEditorComponent implements OnInit {
   private readonly ancestryService = inject(AncestryService);
+  readonly formBuilder = inject(NonNullableFormBuilder);
 
   readonly xref = input<string>();
   readonly finished = output();
 
-  readonly formBuilder = inject(NonNullableFormBuilder);
   readonly form = this.formBuilder.control<GedcomIndividual | undefined>(
     undefined,
   );

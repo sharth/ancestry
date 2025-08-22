@@ -1,0 +1,38 @@
+<div class="form-floating">
+  <textarea
+    class="form-control h-auto"
+    [formControl]="form.controls.abbr"
+  ></textarea>
+  <label>Short Title</label>
+</div>
+
+<div class="form-floating">
+  <textarea
+    class="form-control h-auto"
+    [formControl]="form.controls.title"
+  ></textarea>
+  <label>Title</label>
+</div>
+
+<div class="form-floating">
+  <textarea
+    class="form-control h-auto"
+    [formControl]="form.controls.text"
+  ></textarea>
+  <label>Text</label>
+</div>
+
+<h2>Repositories</h2>
+<app-input-source-repository-citations
+  [formControl]="form.controls.repositoryCitations"
+></app-input-source-repository-citations>
+
+<h2>Multimedia</h2>
+<app-input-source-multimedia-links
+  [formControl]="form.controls.multimediaLinks"
+></app-input-source-multimedia-links>
+
+<h2>Unknown Records</h2>
+<app-input-unknown-records
+  [formControl]="form.controls.unknownRecords"
+></app-input-unknown-records>

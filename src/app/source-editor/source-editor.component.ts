@@ -1,155 +1,34 @@
 import { AncestryService } from "../../database/ancestry.service";
-import type { GedcomRecord } from "../../gedcom/gedcomRecord";
+import { InputSourceComponent } from "../../forms/input-source.component";
 import type { GedcomSource } from "../../gedcom/gedcomSource";
-import { SourceEditorMultimediaLinksComponent } from "./source-editor-multimedia-links.component";
-import { SourceEditorRepositoryCitationsComponent } from "./source-editor-repositories.component";
-import { Component, inject, input, linkedSignal, output } from "@angular/core";
-import { FormsModule } from "@angular/forms";
+import { Component, inject, input, output } from "@angular/core";
+import { toSignal } from "@angular/core/rxjs-interop";
+import { NonNullableFormBuilder, ReactiveFormsModule } from "@angular/forms";
 import { RouterModule } from "@angular/router";
 
 @Component({
   selector: "app-source-editor",
   templateUrl: "./source-editor.component.html",
   styleUrl: "./source-editor.component.css",
-  imports: [
-    RouterModule,
-    FormsModule,
-    SourceEditorRepositoryCitationsComponent,
-    SourceEditorMultimediaLinksComponent,
-  ],
+  imports: [RouterModule, ReactiveFormsModule, InputSourceComponent],
 })
 export class SourceEditorComponent {
   private readonly ancestryService = inject(AncestryService);
+  private readonly formBuilder = inject(NonNullableFormBuilder);
 
   readonly xref = input<string>();
   readonly finished = output();
 
-  readonly vm = linkedSignal(() => {
+  readonly form = this.formBuilder.control<GedcomSource | undefined>(undefined);
+  readonly formSignal = toSignal(this.form.valueChanges);
+
+  ngOnInit() {
     const ancestry = this.ancestryService.contents();
-    if (ancestry == undefined) return undefined;
-
-    const xref = this.xref();
-    if (xref == null) {
-      return {
-        abbr: "",
-        title: "",
-        text: "",
-        repositoryCitations: [],
-        multimediaLinks: [],
-        unknownRecords: [],
-      };
-    }
-    const source = ancestry.sources.get(xref);
-    if (source == undefined) return undefined;
-
-    return {
-      abbr: source.abbr,
-      title: source.title,
-      text: source.text,
-      repositoryCitations: source.repositoryCitations.flatMap(
-        (repositoryCitation) =>
-          repositoryCitation.callNumbers.map((callNumber) => ({
-            repositoryXref: repositoryCitation.repositoryXref,
-            callNumber,
-          })),
-      ),
-      multimediaLinks: source.multimediaLinks,
-      unknownRecords: source.unknownRecords,
-    };
-  });
-
-  addRepository() {
-    this.vm.update((model) => {
-      if (model == null) return undefined;
-      return {
-        ...model,
-        repositoryCitations: model.repositoryCitations.concat({
-          repositoryXref: "",
-          callNumber: "",
-        }),
-      };
-    });
-  }
-
-  removeRepository(repositoryCitation: {
-    repositoryXref: string;
-    callNumber: string;
-  }) {
-    this.vm.update((model) => {
-      if (model == null) return undefined;
-      return {
-        ...model,
-        repositoryCitations: model.repositoryCitations.filter(
-          (c) => c !== repositoryCitation,
-        ),
-      };
-    });
-  }
-
-  addMultimediaLink() {
-    this.vm.update((model) => {
-      if (model == null) return undefined;
-      return {
-        ...model,
-        multimediaLinks: model.multimediaLinks.concat({
-          multimediaXref: "",
-          title: "",
-        }),
-      };
-    });
-  }
-
-  removeMultimediaLink(multimediaLink: {
-    multimediaXref: string;
-    title?: string;
-  }) {
-    this.vm.update((model) => {
-      if (model == null) return undefined;
-      return {
-        ...model,
-        multimediaLinks: model.multimediaLinks.filter(
-          (m) => m !== multimediaLink,
-        ),
-      };
-    });
-  }
-
-  removeUnknownRecord(unknownRecord: GedcomRecord) {
-    this.vm.update((model) => {
-      if (model == null) return undefined;
-      return {
-        ...model,
-        unknownRecords: model.unknownRecords.filter((r) => r !== unknownRecord),
-      };
-    });
-  }
-
-  private nextXref(sources: GedcomSource[]): string {
-    const sourceXrefs = sources.map((source) => source.xref);
-    const nextXrefNumber = sourceXrefs.reduce((nextXrefNumber, xref) => {
-      const group = new RegExp(/^@[a-z]*(\d+)@$/, "i").exec(xref);
-      return group
-        ? Math.max(Number(group[1]) + 1, nextXrefNumber)
-        : nextXrefNumber;
-    }, 0);
-    return `@S${nextXrefNumber}@`;
+    const source = ancestry?.sources.get(this.xref() ?? "");
+    this.form.setValue(source);
   }
 
   async submitForm() {
-    const model = this.vm();
-    if (model == undefined) return;
-
-    const repositoryCitations: {
-      repositoryXref: string;
-      callNumbers: string[];
-    }[] = Map.groupBy(model.repositoryCitations, (cite) => cite.repositoryXref)
-      .entries()
-      .map(([repositoryXref, repositoryCitations]) => ({
-        repositoryXref,
-        callNumbers: repositoryCitations.map((cite) => cite.callNumber),
-      }))
-      .toArray();
-
     // await this.ancestryDatabase.transaction("rw", ["sources"], async () => {
     //   const xref = this.xref() ?? (await this.nextXref());
 

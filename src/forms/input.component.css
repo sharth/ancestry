@@ -1,13 +1,26 @@
 table {
-  background-color: lightblue;
+  background-color: lightgoldenrodyellow;
   border: 3px solid black;
   width: 100%;
+}
+
+table thead {
+  background-color: orange;
+  font-weight: bold;
 }
 
 table tbody tr {
   border: 3px solid black;
 }
 
-table thead {
-  font-weight: bold;
+div {
+  white-space: pre-wrap;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+textarea {
+  field-sizing: content;
 }
