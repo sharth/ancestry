@@ -1,10 +1,12 @@
 import type { GedcomEvent } from "../gedcom/gedcomEvent";
 import type { GedcomIndividual } from "../gedcom/gedcomIndividual";
 import type { GedcomName } from "../gedcom/gedcomName";
+import type { GedcomRecord } from "../gedcom/gedcomRecord";
 import type { GedcomSex } from "../gedcom/gedcomSex";
 import { InputEventsComponent } from "./input-events.component";
 import { InputNamesComponent } from "./input-names.component";
 import { InputSexComponent } from "./input-sex.component";
+import { InputUnknownRecordsComponent } from "./input-unknown-records.component";
 import { Component, DestroyRef, inject } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type { ControlValueAccessor } from "@angular/forms";
@@ -24,6 +26,7 @@ import { startWith } from "rxjs/operators";
     InputNamesComponent,
     InputEventsComponent,
     InputSexComponent,
+    InputUnknownRecordsComponent,
   ],
   templateUrl: "./input-individual.component.html",
   styleUrl: "./input.component.css",
@@ -46,6 +49,7 @@ export class InputIndividualComponent implements ControlValueAccessor {
     events: this.formBuilder.control<GedcomEvent[]>([]),
     childOfFamilies: this.formBuilder.control<string[]>([]),
     parentOfFamilies: this.formBuilder.control<string[]>([]),
+    unknownRecords: this.formBuilder.control<GedcomRecord[]>([]),
   });
 
   writeValue(individual: GedcomIndividual | undefined): void {
@@ -58,6 +62,7 @@ export class InputIndividualComponent implements ControlValueAccessor {
         events: individual?.events ?? [],
         childOfFamilies: individual?.childOfFamilyXrefs ?? [],
         parentOfFamilies: individual?.parentOfFamilyXrefs ?? [],
+        unknownRecords: individual?.unknownRecords ?? [],
       },
       { emitEvent: false },
     );
@@ -70,12 +75,11 @@ export class InputIndividualComponent implements ControlValueAccessor {
       .pipe(startWith(this.form.value))
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
-        const now = new Date();
         const formValue = this.form.getRawValue();
         onChange({
           xref: formValue.xref,
           changeDate: {
-            value: now
+            value: new Date()
               .toLocaleString("en-gb", { dateStyle: "medium" })
               .toLocaleUpperCase(),
           },
@@ -84,8 +88,7 @@ export class InputIndividualComponent implements ControlValueAccessor {
           events: formValue.events,
           childOfFamilyXrefs: formValue.childOfFamilies,
           parentOfFamilyXrefs: formValue.parentOfFamilies,
-          // FIXME: Very likely wrong.
-          unknownRecords: [],
+          unknownRecords: formValue.unknownRecords,
         });
       });
   }
