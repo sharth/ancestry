@@ -12,9 +12,6 @@ updates:
         patterns:
           - "@angular/*"
           - "@angular-devkit/build-angular"
-      aggrid-dependencies:
-        patterns:
-          - "ag-grid-*"
       eslint:
         patterns:
           - "@eslint/js"
