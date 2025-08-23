@@ -15,11 +15,20 @@ import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
 import type { OnInit } from "@angular/core";
 import { Component, computed, inject, input, output } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
-import { NonNullableFormBuilder, ReactiveFormsModule } from "@angular/forms";
+import {
+  FormsModule,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+} from "@angular/forms";
 
 @Component({
   selector: "app-individual-editor",
-  imports: [ReactiveFormsModule, InputIndividualComponent, GedcomDiffComponent],
+  imports: [
+    FormsModule,
+    ReactiveFormsModule,
+    InputIndividualComponent,
+    GedcomDiffComponent,
+  ],
   templateUrl: "./individual-editor.component.html",
   styleUrl: "./individual-editor.component.css",
 })
@@ -115,17 +124,25 @@ export class IndividualEditorComponent implements OnInit {
       .toArray();
   });
 
-  submitForm() {
-    // const vm = this.vm();
-    // if (vm == null) return;
-    // await this.ancestryDatabase.transaction(
-    //   "rw",
-    //   [this.ancestryDatabase.individuals],
-    //   async () => {
-    //     const xref = this.xref() ?? (await this.nextXref());
-    //     await this.ancestryDatabase.individuals.put({ ...vm, xref });
-    //   }
-    // );
+  async submitForm() {
+    const ancestry = this.ancestryService.contents();
+    if (ancestry == undefined) {
+      throw new Error("ancestry is undefined");
+    }
+    const fileHandle = ancestry.gedcomFileHandle;
+    if (fileHandle == undefined) {
+      throw new Error("fileHandle is undefined");
+    }
+    const gedcomText = this.records()
+      .map(({ currentRecord }) => currentRecord)
+      .filter((record) => record != undefined)
+      .flatMap((record) => serializeGedcomRecordToText(record))
+      .join("\n");
+
+    const writableStream = await fileHandle.createWritable();
+    await writableStream.write(gedcomText);
+    await writableStream.close();
+    this.ancestryService.gedcomResource.reload();
 
     this.finished.emit();
   }

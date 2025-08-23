@@ -48,7 +48,7 @@ export class AncestryService {
     });
   }
 
-  private readonly gedcomResource = resource({
+  readonly gedcomResource = resource({
     params: () => ({
       changeCount: this.ancestryChanges(),
     }),
@@ -156,6 +156,7 @@ export class AncestryService {
       }
 
       return {
+        gedcomFileHandle: fileHandle,
         gedcomFile,
         gedcomText,
         gedcomRecords: rawGedcomRecords,
