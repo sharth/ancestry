@@ -51,8 +51,8 @@ export class InputEventsComponent implements ControlValueAccessor {
 
   writeValue(events: GedcomEvent[]): void {
     this.formArray.clear({ emitEvent: false });
-    for (const event of events) {
-      this.formArray.push(
+    this.formArray.push(
+      events.map((event) =>
         this.formBuilder.group({
           tag: event.tag,
           type: event.type ?? "",
@@ -65,9 +65,9 @@ export class InputEventsComponent implements ControlValueAccessor {
           citations: this.formBuilder.control(event.citations),
           sharedWith: this.formBuilder.control(event.sharedWith),
         }),
-        { emitEvent: false },
-      );
-    }
+      ),
+      { emitEvent: false },
+    );
   }
 
   registerOnChange(onChange: (events: GedcomEvent[]) => void): void {

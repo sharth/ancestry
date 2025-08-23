@@ -50,14 +50,15 @@ export class InputSourceMultimediaLinksComponent
     multimediaLinks: { multimediaXref: string; title?: string }[],
   ): void {
     this.formArray.clear();
-    multimediaLinks.forEach((multimediaLink) => {
-      this.formArray.push(
+    this.formArray.push(
+      multimediaLinks.map((multimediaLink) =>
         this.formBuilder.group({
           multimediaXref: multimediaLink.multimediaXref,
           title: multimediaLink.title ?? "",
         }),
-      );
-    });
+      ),
+      { emitEvent: false },
+    );
   }
 
   registerOnChange(

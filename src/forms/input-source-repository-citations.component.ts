@@ -46,15 +46,15 @@ export class InputSourceRepositoryCitationsComponent
     repositoryCitations: { repositoryXref: string; callNumber: string }[],
   ): void {
     this.formArray.clear({ emitEvent: false });
-    repositoryCitations.forEach((repositoryCitation) => {
-      this.formArray.push(
+    this.formArray.push(
+      repositoryCitations.map((repositoryCitation) =>
         this.formBuilder.group({
           repositoryXref: repositoryCitation.repositoryXref,
           callNumber: repositoryCitation.callNumber,
         }),
-        { emitEvent: false },
-      );
-    });
+      ),
+      { emitEvent: false },
+    );
   }
 
   registerOnChange(

@@ -1,7 +1,7 @@
 import type { GedcomRecord } from "../gedcom/gedcomRecord";
 import type { GedcomSource } from "../gedcom/gedcomSource";
 import { InputSourceMultimediaLinksComponent } from "./input-source-multimedia-links.component";
-import { InputSourceRepositoryCitationsComponent } from "./input-source-repository-citations";
+import { InputSourceRepositoryCitationsComponent } from "./input-source-repository-citations.component";
 import { InputUnknownRecordsComponent } from "./input-unknown-records.component";
 import { Component, DestroyRef, inject } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";

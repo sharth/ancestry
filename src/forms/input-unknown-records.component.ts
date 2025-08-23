@@ -32,12 +32,12 @@ export class InputUnknownRecordsComponent implements ControlValueAccessor {
 
   writeValue(unknownRecords: GedcomRecord[]): void {
     this.formArray.clear({ emitEvent: false });
-    unknownRecords.forEach((unknownRecord) => {
-      this.formArray.push(
+    this.formArray.push(
+      unknownRecords.map((unknownRecord) =>
         this.formBuilder.control<GedcomRecord>(unknownRecord),
-        { emitEvent: false },
-      );
-    });
+      ),
+      { emitEvent: false },
+    );
   }
 
   registerOnChange(onChange: (unknownRecords: GedcomRecord[]) => void): void {

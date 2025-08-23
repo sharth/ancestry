@@ -39,15 +39,15 @@ export class InputSharedWithComponent implements ControlValueAccessor {
 
   writeValue(sharedWith: GedcomEventSharedWith[]): void {
     this.form.clear({ emitEvent: false });
-    sharedWith.forEach((friend) => {
-      this.form.push(
+    this.form.push(
+      sharedWith.map((friend) =>
         this.formBuilder.group({
           xref: friend.xref,
           role: friend.role ?? "",
         }),
-        { emitEvent: false },
-      );
-    });
+      ),
+      { emitEvent: false },
+    );
   }
 
   registerOnChange(

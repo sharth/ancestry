@@ -44,8 +44,8 @@ export class InputCitationsComponent implements ControlValueAccessor {
 
   writeValue(citations: GedcomCitation[]): void {
     this.form.clear({ emitEvent: false });
-    citations.forEach((citation: GedcomCitation) => {
-      this.form.push(
+    this.form.push(
+      citations.map((citation) =>
         this.formBuilder.group({
           sourceXref: citation.sourceXref,
           name: citation.name ?? "",
@@ -55,9 +55,9 @@ export class InputCitationsComponent implements ControlValueAccessor {
           page: citation.page ?? "",
           quality: citation.quality ?? "",
         }),
-        { emitEvent: false },
-      );
-    });
+      ),
+      { emitEvent: false },
+    );
   }
 
   registerOnChange(onChange: (citations: GedcomCitation[]) => void): void {

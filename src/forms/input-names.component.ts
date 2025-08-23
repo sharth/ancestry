@@ -42,8 +42,8 @@ export class InputNamesComponent implements ControlValueAccessor {
 
   writeValue(names: GedcomName[]): void {
     this.formArray.clear({ emitEvent: false });
-    for (const name of names) {
-      this.formArray.push(
+    this.formArray.push(
+      names.map((name) =>
         this.formBuilder.group({
           prefix: name.prefix ?? "",
           givenName: name.givenName ?? "",
@@ -53,9 +53,9 @@ export class InputNamesComponent implements ControlValueAccessor {
           suffix: name.suffix ?? "",
           citations: this.formBuilder.control<GedcomCitation[]>(name.citations),
         }),
-        { emitEvent: false },
-      );
-    }
+      ),
+      { emitEvent: false },
+    );
   }
   registerOnChange(onChange: (names: GedcomName[]) => void): void {
     this.formArray.valueChanges
