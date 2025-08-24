@@ -122,17 +122,7 @@ export function serializeGedcomName(name: GedcomName): GedcomRecord {
   return {
     tag: "NAME",
     abstag: "INDI.NAME",
-    value: [
-      // name.prefix,
-      name.givenName,
-      // name.nickName,
-      // name.surnamePrefix,
-      name.surname ? `/${name.surname}/` : "//",
-      // name.suffix,
-    ]
-      .filter((part) => part != undefined)
-      .filter((part) => part != "")
-      .join(" "),
+    value: displayGedcomName(name),
     children: [
       {
         tag: "NPFX",
@@ -180,4 +170,18 @@ export function serializeGedcomName(name: GedcomName): GedcomRecord {
       ...name.citations.map((citation) => serializeGedcomCitation(citation)),
     ].filter((record) => record.children.length || record.value),
   };
+}
+
+export function displayGedcomName(gedcomName: GedcomName) {
+  return [
+    // gedcomName.prefix,
+    gedcomName.givenName,
+    // gedcomName.nickName,
+    // gedcomName.surnamePrefix,
+    gedcomName.surname ? `/${gedcomName.surname}/` : "//",
+    // gedcomName.suffix,
+  ]
+    .filter((part) => part != undefined)
+    .filter((part) => part != "")
+    .join(" ");
 }

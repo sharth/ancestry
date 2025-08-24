@@ -1,4 +1,5 @@
 import type { GedcomEventSharedWith } from "../gedcom/gedcomEvent";
+import { InputIndividualXrefComponent } from "./input-individual-xref.component";
 import { Component, DestroyRef, inject } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type {
@@ -15,7 +16,7 @@ import { startWith } from "rxjs/operators";
 
 @Component({
   selector: "app-input-shared-with",
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, InputIndividualXrefComponent],
   templateUrl: "./input-shared-with.component.html",
   styleUrl: "./input.component.css",
   providers: [

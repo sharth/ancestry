@@ -1,0 +1,21 @@
+@if (vm(); as vm) {
+  <div class="form-floating">
+    <select
+      class="form-select"
+      [formControl]="formGroup.controls.individualXref"
+    >
+      <option selected value="">Individuals...</option>
+      @for (individual of vm.individuals.values(); track individual.xref) {
+        <option value="{{ individual.xref }}">
+          @let name = individual.names.at(0);
+          @if (name == undefined) {
+            Unnamed Person ({{ individual.xref }})
+          } @else {
+            {{ displayGedcomName(name) }} ({{ individual.xref }})
+          }
+        </option>
+      }
+    </select>
+    <label>Individual</label>
+  </div>
+}

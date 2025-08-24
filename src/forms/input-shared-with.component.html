@@ -10,12 +10,9 @@
           ></button>
         </td>
         <td class="form-floating">
-          <input
-            class="form-control"
-            id="xref_{{ $index }}"
+          <app-input-individual-xref
             [formControl]="sharedWith.controls.xref"
-          />
-          <label for="xref_{{ $index }}">Shared With</label>
+          ></app-input-individual-xref>
         </td>
         <td class="form-floating">
           <input
