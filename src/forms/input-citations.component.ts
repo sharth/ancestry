@@ -1,4 +1,5 @@
 import type { GedcomCitation } from "../gedcom/gedcomCitation";
+import { InputSourceXrefComponent } from "./input-source-xref.component";
 import { Component, DestroyRef, inject } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type {
@@ -15,7 +16,7 @@ import { startWith } from "rxjs/operators";
 
 @Component({
   selector: "app-input-citations",
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, InputSourceXrefComponent],
   templateUrl: "./input-citations.component.html",
   styleUrl: "./input.component.css",
   providers: [

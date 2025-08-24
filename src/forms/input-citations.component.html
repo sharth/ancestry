@@ -9,13 +9,10 @@
             (click)="removeCitation($index)"
           ></button>
         </td>
-        <td class="form-floating">
-          <input
-            class="form-control"
-            id="sourceXref_{{ $index }}"
+        <td>
+          <app-input-source-xref
             [formControl]="formGroup.controls.sourceXref"
-          />
-          <label for="`sourceXref_{{ $index }}`">Source Xref</label>
+          ></app-input-source-xref>
         </td>
         <td class="form-floating">
           <input
