@@ -1,11 +1,13 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
+import type { GedcomNote } from "./gedcomNote";
+import { parseGedcomNote, serializeGedcomNote } from "./gedcomNote";
 import type { GedcomRecord } from "./gedcomRecord";
 
 export interface GedcomCitation {
   sourceXref: string;
   name?: string;
   obje?: string;
-  note?: string;
+  notes: GedcomNote[];
   text?: string;
   page?: string;
   quality?: string;
@@ -20,6 +22,7 @@ export function parseGedcomCitation(
 
   const gedcomCitation: GedcomCitation = {
     sourceXref: gedcomRecord.value,
+    notes: [],
   };
 
   for (const childRecord of gedcomRecord.children) {
@@ -40,8 +43,7 @@ export function parseGedcomCitation(
         gedcomCitation.name = childRecord.value;
         break;
       case "NOTE":
-        childRecord.children.forEach(reportUnparsedRecord);
-        gedcomCitation.note = childRecord.value;
+        gedcomCitation.notes.push(parseGedcomNote(childRecord));
         break;
       case "PAGE":
         childRecord.children.forEach(reportUnparsedRecord);
@@ -83,11 +85,14 @@ export function serializeGedcomCitation(
       { tag: "OBJE", abstag: "", value: gedcomCitation.obje, children: [] },
       { tag: "PAGE", abstag: "", value: gedcomCitation.page, children: [] },
       { tag: "NAME", abstag: "", value: gedcomCitation.name, children: [] },
-      { tag: "NOTE", abstag: "", value: gedcomCitation.note, children: [] },
+      ...gedcomCitation.notes.map((gedcomNote) =>
+        serializeGedcomNote(gedcomNote),
+      ),
       { tag: "QUAY", abstag: "", value: gedcomCitation.quality, children: [] },
       {
         tag: "DATA",
         abstag: "",
+        value: undefined,
         children: [
           { tag: "TEXT", abstag: "", value: gedcomCitation.text, children: [] },
         ].filter((record) => record.children.length || record.value),

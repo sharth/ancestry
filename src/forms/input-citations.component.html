@@ -31,14 +31,14 @@
           />
           <label for="`obje_{{ $index }}`">Obje</label>
         </td>
-        <td class="form-floating">
+        <!-- <td class="form-floating">
           <input
             class="form-control"
             id="note_{{ $index }}"
             [formControl]="formGroup.controls.note"
           />
           <label for="`note_{{ $index }}`">Note</label>
-        </td>
+        </td> -->
         <td class="form-floating">
           <input
             class="form-control"
@@ -62,6 +62,14 @@
             [formControl]="formGroup.controls.quality"
           />
           <label for="`quality_{{ $index }}`">Quality</label>
+        </td>
+      </tr>
+      <tr>
+        <td>Notes</td>
+        <td colspan="7">
+          <app-input-notes
+            [formControl]="formGroup.controls.notes"
+          ></app-input-notes>
         </td>
       </tr>
     }

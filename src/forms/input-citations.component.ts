@@ -1,4 +1,6 @@
 import type { GedcomCitation } from "../gedcom/gedcomCitation";
+import type { GedcomNote } from "../gedcom/gedcomNote";
+import { InputNotesComponent } from "./input-notes.component";
 import { InputSourceXrefComponent } from "./input-source-xref.component";
 import { Component, DestroyRef, inject } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -16,7 +18,7 @@ import { startWith } from "rxjs/operators";
 
 @Component({
   selector: "app-input-citations",
-  imports: [ReactiveFormsModule, InputSourceXrefComponent],
+  imports: [ReactiveFormsModule, InputSourceXrefComponent, InputNotesComponent],
   templateUrl: "./input-citations.component.html",
   styleUrl: "./input.component.css",
   providers: [
@@ -36,7 +38,7 @@ export class InputCitationsComponent implements ControlValueAccessor {
       sourceXref: FormControl<string>;
       name: FormControl<string>;
       obje: FormControl<string>;
-      note: FormControl<string>;
+      notes: FormControl<GedcomNote[]>;
       text: FormControl<string>;
       page: FormControl<string>;
       quality: FormControl<string>;
@@ -44,20 +46,19 @@ export class InputCitationsComponent implements ControlValueAccessor {
   >([]);
 
   writeValue(citations: GedcomCitation[]): void {
-    this.form.clear({ emitEvent: false });
+    this.form.clear();
     this.form.push(
       citations.map((citation) =>
         this.formBuilder.group({
           sourceXref: citation.sourceXref,
           name: citation.name ?? "",
           obje: citation.obje ?? "",
-          note: citation.note ?? "",
+          notes: this.formBuilder.control<GedcomNote[]>(citation.notes),
           text: citation.text ?? "",
           page: citation.page ?? "",
           quality: citation.quality ?? "",
         }),
       ),
-      { emitEvent: false },
     );
   }
 
@@ -71,7 +72,7 @@ export class InputCitationsComponent implements ControlValueAccessor {
             sourceXref: citation.sourceXref,
             name: citation.name || undefined,
             obje: citation.obje || undefined,
-            note: citation.note || undefined,
+            notes: citation.notes,
             text: citation.text || undefined,
             page: citation.page || undefined,
             quality: citation.quality || undefined,
@@ -97,7 +98,7 @@ export class InputCitationsComponent implements ControlValueAccessor {
         sourceXref: this.formBuilder.control(""),
         name: this.formBuilder.control(""),
         obje: this.formBuilder.control(""),
-        note: this.formBuilder.control(""),
+        notes: this.formBuilder.control<GedcomNote[]>([]),
         text: this.formBuilder.control(""),
         page: this.formBuilder.control(""),
         quality: this.formBuilder.control(""),

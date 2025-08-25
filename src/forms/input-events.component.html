@@ -73,17 +73,22 @@
       <tr>
         <td>Citations</td>
         <td colspan="7">
-          <app-input-citations
-            [formControl]="event.controls.citations"
-          ></app-input-citations>
+          <app-input-citations [formControl]="event.controls.citations">
+          </app-input-citations>
         </td>
       </tr>
       <tr>
         <td>Shared With</td>
         <td colspan="7">
-          <app-input-shared-with
-            [formControl]="event.controls.sharedWith"
-          ></app-input-shared-with>
+          <app-input-shared-with [formControl]="event.controls.sharedWith">
+          </app-input-shared-with>
+        </td>
+      </tr>
+      <tr>
+        <td>Notes</td>
+        <td colspan="7">
+          <app-input-notes [formControl]="event.controls.notes">
+          </app-input-notes>
         </td>
       </tr>
     }

@@ -1,7 +1,9 @@
 import type { GedcomCitation } from "../gedcom/gedcomCitation";
 import type { GedcomEvent, GedcomEventSharedWith } from "../gedcom/gedcomEvent";
 import { gedcomEventTags } from "../gedcom/gedcomEvent";
+import type { GedcomNote } from "../gedcom/gedcomNote";
 import { InputCitationsComponent } from "./input-citations.component";
+import { InputNotesComponent } from "./input-notes.component";
 import { InputSharedWithComponent } from "./input-shared-with.component";
 import { Component, DestroyRef, inject } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -18,6 +20,7 @@ import { startWith } from "rxjs/operators";
   imports: [
     ReactiveFormsModule,
     InputCitationsComponent,
+    InputNotesComponent,
     InputSharedWithComponent,
   ],
   templateUrl: "./input-events.component.html",
@@ -46,6 +49,7 @@ export class InputEventsComponent implements ControlValueAccessor {
       value: "",
       citations: this.formBuilder.control<GedcomCitation[]>([]),
       sharedWith: this.formBuilder.control<GedcomEventSharedWith[]>([]),
+      notes: this.formBuilder.control<GedcomNote[]>([]),
     }),
   ]);
 
@@ -64,6 +68,7 @@ export class InputEventsComponent implements ControlValueAccessor {
           value: event.value ?? "",
           citations: this.formBuilder.control(event.citations),
           sharedWith: this.formBuilder.control(event.sharedWith),
+          notes: this.formBuilder.control(event.notes),
         }),
       ),
       { emitEvent: false },
@@ -87,7 +92,7 @@ export class InputEventsComponent implements ControlValueAccessor {
             value: event.value || undefined,
             citations: event.citations,
             sharedWith: event.sharedWith,
-            notes: [],
+            notes: event.notes,
           })),
         );
       });
@@ -117,6 +122,7 @@ export class InputEventsComponent implements ControlValueAccessor {
         value: "",
         citations: this.formBuilder.control<GedcomCitation[]>([]),
         sharedWith: this.formBuilder.control<GedcomEventSharedWith[]>([]),
+        notes: this.formBuilder.control<GedcomNote[]>([]),
       }),
     );
   }

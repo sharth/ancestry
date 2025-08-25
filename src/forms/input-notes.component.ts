@@ -1,0 +1,77 @@
+import type { GedcomNote } from "../gedcom/gedcomNote";
+import { Component, DestroyRef, inject } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import type { ControlValueAccessor } from "@angular/forms";
+import {
+  NG_VALUE_ACCESSOR,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+} from "@angular/forms";
+import { startWith } from "rxjs/operators";
+
+@Component({
+  selector: "app-input-notes",
+  imports: [ReactiveFormsModule],
+  templateUrl: "./input-notes.component.html",
+  styleUrl: "./input.component.css",
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: InputNotesComponent,
+      multi: true,
+    },
+  ],
+})
+export class InputNotesComponent implements ControlValueAccessor {
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly formBuilder = inject(NonNullableFormBuilder);
+
+  readonly formArray = this.formBuilder.array([
+    this.formBuilder.group({
+      text: "",
+    }),
+  ]);
+
+  writeValue(gedcomNotes: GedcomNote[]): void {
+    this.formArray.clear();
+    this.formArray.push(
+      gedcomNotes.map((gedcomNote) =>
+        this.formBuilder.group({
+          text: gedcomNote.text,
+        }),
+      ),
+    );
+  }
+
+  registerOnChange(onChange: (gedcomNotes: GedcomNote[]) => void): void {
+    this.formArray.valueChanges
+      .pipe(startWith(this.formArray.value))
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        onChange(this.formArray.getRawValue());
+      });
+  }
+
+  registerOnTouched(onTouch: () => void): void {
+    this.formArray.statusChanges
+      .pipe(startWith())
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.formArray.touched) {
+          onTouch();
+        }
+      });
+  }
+
+  appendNote() {
+    this.formArray.push(
+      this.formBuilder.group({
+        text: "",
+      }),
+    );
+  }
+
+  removeNote(index: number) {
+    this.formArray.removeAt(index);
+  }
+}
