@@ -49,7 +49,6 @@ const testCases: {
       "2 SOUR @S2@",
       "3 QUAY 3",
       "2 SOUR @S3@",
-      "3 OBJE google.com",
       "3 PAGE page",
       "3 NAME name",
       "3 QUAY 3",
@@ -107,18 +106,23 @@ const testCases: {
               citations: [
                 {
                   sourceXref: "@S1@",
+                  multimediaLinks: [],
+                  notes: [],
                 },
                 {
                   sourceXref: "@S2@",
                   quality: "3",
+                  multimediaLinks: [],
+                  notes: [],
                 },
                 {
                   sourceXref: "@S3@",
                   name: "name",
-                  obje: "google.com",
                   text: "text",
                   page: "page",
                   quality: "3",
+                  multimediaLinks: [],
+                  notes: [],
                 },
               ],
               notes: [],
@@ -128,6 +132,7 @@ const testCases: {
           parentOfFamilyXrefs: [],
           childOfFamilyXrefs: [],
           unknownRecords: [],
+          notes: [],
         },
         {
           xref: "@I2@",
@@ -137,15 +142,26 @@ const testCases: {
           parentOfFamilyXrefs: [],
           childOfFamilyXrefs: [],
           unknownRecords: [],
+          notes: [],
         },
         {
           xref: "@I3@",
-          sex: { sex: "F", citations: [{ sourceXref: "@S50@" }] },
+          sex: {
+            sex: "F",
+            citations: [
+              {
+                sourceXref: "@S50@",
+                multimediaLinks: [],
+                notes: [],
+              },
+            ],
+          },
           names: [],
           events: [],
           parentOfFamilyXrefs: [],
           childOfFamilyXrefs: [],
           unknownRecords: [],
+          notes: [],
         },
         {
           xref: "@I4@",
@@ -154,6 +170,7 @@ const testCases: {
           parentOfFamilyXrefs: [],
           childOfFamilyXrefs: [],
           unknownRecords: [],
+          notes: [],
         },
         {
           xref: "@I5@",
@@ -175,7 +192,13 @@ const testCases: {
               cause: "normal",
               date: { value: "ABT 1 Jan 2000" },
               sortDate: { value: "1 Jan 2000" },
-              citations: [{ sourceXref: "@S1@" }],
+              citations: [
+                {
+                  sourceXref: "@S1@",
+                  multimediaLinks: [],
+                  notes: [],
+                },
+              ],
               sharedWith: [],
               notes: [],
             },
@@ -191,6 +214,7 @@ const testCases: {
           parentOfFamilyXrefs: [],
           childOfFamilyXrefs: [],
           unknownRecords: [],
+          notes: [],
         },
         {
           xref: "@I6@",
@@ -211,6 +235,7 @@ const testCases: {
           parentOfFamilyXrefs: [],
           childOfFamilyXrefs: [],
           unknownRecords: [],
+          notes: [],
         },
         {
           xref: "@I7@",
@@ -220,6 +245,7 @@ const testCases: {
           parentOfFamilyXrefs: [],
           childOfFamilyXrefs: [],
           unknownRecords: [],
+          notes: [],
         },
         {
           xref: "@I8@",
@@ -228,6 +254,7 @@ const testCases: {
           parentOfFamilyXrefs: ["@F1@"],
           childOfFamilyXrefs: ["@F2@"],
           unknownRecords: [],
+          notes: [],
         },
         {
           xref: "@I9@",
@@ -244,6 +271,7 @@ const testCases: {
           parentOfFamilyXrefs: [],
           childOfFamilyXrefs: [],
           unknownRecords: [],
+          notes: [],
         },
       ],
     },
