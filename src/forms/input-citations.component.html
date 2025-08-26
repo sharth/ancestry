@@ -22,7 +22,7 @@
           />
           <label for="`name_{{ $index }}`">Name</label>
         </td>
-        <td class="form-floating">
+        <!-- <td class="form-floating">
           <input
             class="form-control"
             id="obje_{{ $index }}"
@@ -30,7 +30,7 @@
             data-op-ignore
           />
           <label for="`obje_{{ $index }}`">Obje</label>
-        </td>
+        </td> -->
         <!-- <td class="form-floating">
           <input
             class="form-control"
@@ -62,6 +62,14 @@
             [formControl]="formGroup.controls.quality"
           />
           <label for="`quality_{{ $index }}`">Quality</label>
+        </td>
+      </tr>
+      <tr>
+        <td>Multimedia</td>
+        <td colspan="7">
+          <app-input-multimedia-links
+            [formControl]="formGroup.controls.multimediaLinks"
+          ></app-input-multimedia-links>
         </td>
       </tr>
       <tr>

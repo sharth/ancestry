@@ -1,4 +1,5 @@
 import { AncestryService } from "../database/ancestry.service";
+import type { GedcomMultimediaLink } from "../gedcom/gedcomMultimediaLink";
 import { Component, DestroyRef, computed, inject } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type { ControlValueAccessor } from "@angular/forms";
@@ -11,21 +12,19 @@ import { RouterModule } from "@angular/router";
 import { startWith } from "rxjs/operators";
 
 @Component({
-  selector: "app-input-source-multimedia-links",
-  templateUrl: "./input-source-multimedia-links.component.html",
+  selector: "app-input-multimedia-links",
+  templateUrl: "./input-multimedia-links.component.html",
   styleUrl: "./input.component.css",
   imports: [RouterModule, ReactiveFormsModule],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: InputSourceMultimediaLinksComponent,
+      useExisting: InputMultimediaLinksComponent,
       multi: true,
     },
   ],
 })
-export class InputSourceMultimediaLinksComponent
-  implements ControlValueAccessor
-{
+export class InputMultimediaLinksComponent implements ControlValueAccessor {
   private readonly destroyRef = inject(DestroyRef);
   private readonly formBuilder = inject(NonNullableFormBuilder);
   private readonly ancestryService = inject(AncestryService);
@@ -41,19 +40,17 @@ export class InputSourceMultimediaLinksComponent
 
   readonly formArray = this.formBuilder.array([
     this.formBuilder.group({
-      multimediaXref: "",
+      xref: "",
       title: "",
     }),
   ]);
 
-  writeValue(
-    multimediaLinks: { multimediaXref: string; title?: string }[],
-  ): void {
+  writeValue(multimediaLinks: GedcomMultimediaLink[]): void {
     this.formArray.clear();
     this.formArray.push(
       multimediaLinks.map((multimediaLink) =>
         this.formBuilder.group({
-          multimediaXref: multimediaLink.multimediaXref,
+          xref: multimediaLink.xref,
           title: multimediaLink.title ?? "",
         }),
       ),
@@ -62,9 +59,7 @@ export class InputSourceMultimediaLinksComponent
   }
 
   registerOnChange(
-    onChange: (
-      multimediaLinks: { multimediaXref: string; title?: string }[],
-    ) => void,
+    onChange: (multimediaLinks: GedcomMultimediaLink[]) => void,
   ): void {
     this.formArray.valueChanges
       .pipe(startWith(this.formArray.value))
@@ -88,7 +83,7 @@ export class InputSourceMultimediaLinksComponent
   appendMultimediaLink() {
     this.formArray.push(
       this.formBuilder.group({
-        multimediaXref: "",
+        xref: "",
         title: "",
       }),
     );

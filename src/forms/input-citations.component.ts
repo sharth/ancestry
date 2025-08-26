@@ -1,5 +1,7 @@
 import type { GedcomCitation } from "../gedcom/gedcomCitation";
+import type { GedcomMultimediaLink } from "../gedcom/gedcomMultimediaLink";
 import type { GedcomNote } from "../gedcom/gedcomNote";
+import { InputMultimediaLinksComponent } from "./input-multimedia-links.component";
 import { InputNotesComponent } from "./input-notes.component";
 import { InputSourceXrefComponent } from "./input-source-xref.component";
 import { Component, DestroyRef, inject } from "@angular/core";
@@ -18,7 +20,12 @@ import { startWith } from "rxjs/operators";
 
 @Component({
   selector: "app-input-citations",
-  imports: [ReactiveFormsModule, InputSourceXrefComponent, InputNotesComponent],
+  imports: [
+    ReactiveFormsModule,
+    InputSourceXrefComponent,
+    InputNotesComponent,
+    InputMultimediaLinksComponent,
+  ],
   templateUrl: "./input-citations.component.html",
   styleUrl: "./input.component.css",
   providers: [
@@ -37,11 +44,11 @@ export class InputCitationsComponent implements ControlValueAccessor {
     FormGroup<{
       sourceXref: FormControl<string>;
       name: FormControl<string>;
-      obje: FormControl<string>;
       notes: FormControl<GedcomNote[]>;
       text: FormControl<string>;
       page: FormControl<string>;
       quality: FormControl<string>;
+      multimediaLinks: FormControl<GedcomMultimediaLink[]>;
     }>
   >([]);
 
@@ -52,11 +59,13 @@ export class InputCitationsComponent implements ControlValueAccessor {
         this.formBuilder.group({
           sourceXref: citation.sourceXref,
           name: citation.name ?? "",
-          obje: citation.obje ?? "",
           notes: this.formBuilder.control<GedcomNote[]>(citation.notes),
           text: citation.text ?? "",
           page: citation.page ?? "",
           quality: citation.quality ?? "",
+          multimediaLinks: this.formBuilder.control<GedcomMultimediaLink[]>(
+            citation.multimediaLinks,
+          ),
         }),
       ),
     );
@@ -71,11 +80,11 @@ export class InputCitationsComponent implements ControlValueAccessor {
           this.form.getRawValue().map((citation) => ({
             sourceXref: citation.sourceXref,
             name: citation.name || undefined,
-            obje: citation.obje || undefined,
             notes: citation.notes,
             text: citation.text || undefined,
             page: citation.page || undefined,
             quality: citation.quality || undefined,
+            multimediaLinks: citation.multimediaLinks,
           })),
         );
       });
@@ -97,11 +106,11 @@ export class InputCitationsComponent implements ControlValueAccessor {
       this.formBuilder.group({
         sourceXref: this.formBuilder.control(""),
         name: this.formBuilder.control(""),
-        obje: this.formBuilder.control(""),
         notes: this.formBuilder.control<GedcomNote[]>([]),
         text: this.formBuilder.control(""),
         page: this.formBuilder.control(""),
         quality: this.formBuilder.control(""),
+        multimediaLinks: this.formBuilder.control<GedcomMultimediaLink[]>([]),
       }),
     );
   }

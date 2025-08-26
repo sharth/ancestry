@@ -1,6 +1,7 @@
+import type { GedcomMultimediaLink } from "../gedcom/gedcomMultimediaLink";
 import type { GedcomRecord } from "../gedcom/gedcomRecord";
 import type { GedcomSource } from "../gedcom/gedcomSource";
-import { InputSourceMultimediaLinksComponent } from "./input-source-multimedia-links.component";
+import { InputMultimediaLinksComponent } from "./input-multimedia-links.component";
 import { InputSourceRepositoryCitationsComponent } from "./input-source-repository-citations.component";
 import { InputUnknownRecordsComponent } from "./input-unknown-records.component";
 import { Component, DestroyRef, inject } from "@angular/core";
@@ -17,7 +18,7 @@ import { startWith } from "rxjs/operators";
   selector: "app-input-source",
   imports: [
     ReactiveFormsModule,
-    InputSourceMultimediaLinksComponent,
+    InputMultimediaLinksComponent,
     InputSourceRepositoryCitationsComponent,
     InputUnknownRecordsComponent,
   ],
@@ -46,12 +47,7 @@ export class InputSourceComponent implements ControlValueAccessor {
         callNumber: string;
       }[]
     >([]),
-    multimediaLinks: this.formBuilder.control<
-      {
-        multimediaXref: string;
-        title?: string;
-      }[]
-    >([]),
+    multimediaLinks: this.formBuilder.control<GedcomMultimediaLink[]>([]),
     unknownRecords: this.formBuilder.control<GedcomRecord[]>([]),
   });
 

@@ -1,4 +1,9 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
+import {
+  type GedcomMultimediaLink,
+  parseGedcomMultimediaLink,
+  serializeGedcomMultimediaLink,
+} from "./gedcomMultimediaLink";
 import type { GedcomNote } from "./gedcomNote";
 import { parseGedcomNote, serializeGedcomNote } from "./gedcomNote";
 import type { GedcomRecord } from "./gedcomRecord";
@@ -6,11 +11,11 @@ import type { GedcomRecord } from "./gedcomRecord";
 export interface GedcomCitation {
   sourceXref: string;
   name?: string;
-  obje?: string;
   notes: GedcomNote[];
   text?: string;
   page?: string;
   quality?: string;
+  multimediaLinks: GedcomMultimediaLink[];
 }
 
 export function parseGedcomCitation(
@@ -23,6 +28,7 @@ export function parseGedcomCitation(
   const gedcomCitation: GedcomCitation = {
     sourceXref: gedcomRecord.value,
     notes: [],
+    multimediaLinks: [],
   };
 
   for (const childRecord of gedcomRecord.children) {
@@ -35,8 +41,9 @@ export function parseGedcomCitation(
         gedcomCitation.quality = childRecord.value;
         break;
       case "OBJE":
-        childRecord.children.forEach(reportUnparsedRecord);
-        gedcomCitation.obje = childRecord.value;
+        gedcomCitation.multimediaLinks.push(
+          parseGedcomMultimediaLink(childRecord),
+        );
         break;
       case "NAME":
         childRecord.children.forEach(reportUnparsedRecord);
@@ -82,7 +89,9 @@ export function serializeGedcomCitation(
     abstag: "",
     value: gedcomCitation.sourceXref,
     children: [
-      { tag: "OBJE", abstag: "", value: gedcomCitation.obje, children: [] },
+      ...gedcomCitation.multimediaLinks.map((gedcomMultimediaLink) =>
+        serializeGedcomMultimediaLink(gedcomMultimediaLink),
+      ),
       { tag: "PAGE", abstag: "", value: gedcomCitation.page, children: [] },
       { tag: "NAME", abstag: "", value: gedcomCitation.name, children: [] },
       ...gedcomCitation.notes.map((gedcomNote) =>

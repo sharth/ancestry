@@ -1,4 +1,9 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
+import type { GedcomMultimediaLink } from "./gedcomMultimediaLink";
+import {
+  parseGedcomMultimediaLink,
+  serializeGedcomMultimediaLink,
+} from "./gedcomMultimediaLink";
 import type { GedcomRecord } from "./gedcomRecord";
 
 export interface GedcomSource {
@@ -11,10 +16,7 @@ export interface GedcomSource {
     callNumbers: string[];
   }[];
   unknownRecords: GedcomRecord[];
-  multimediaLinks: {
-    multimediaXref: string;
-    title?: string;
-  }[];
+  multimediaLinks: GedcomMultimediaLink[];
 }
 
 export function parseGedcomSource(record: GedcomRecord): GedcomSource {
@@ -59,7 +61,7 @@ export function parseGedcomSource(record: GedcomRecord): GedcomSource {
         break;
       case "OBJE":
         gedcomSource.multimediaLinks.push(
-          parseGedcomSourceMultimediaLink(childRecord),
+          parseGedcomMultimediaLink(childRecord),
         );
         break;
       default:
@@ -97,24 +99,6 @@ function parseGedcomSourceRepositoryCitation(gedcomRecord: GedcomRecord) {
   return { repositoryXref, callNumbers };
 }
 
-function parseGedcomSourceMultimediaLink(gedcomRecord: GedcomRecord): {
-  multimediaXref: string;
-  title?: string;
-} {
-  if (gedcomRecord.abstag !== "SOUR.OBJE") throw new Error();
-  if (gedcomRecord.xref != null) throw new Error();
-  if (gedcomRecord.value == null) throw new Error();
-
-  for (const childRecord of gedcomRecord.children) {
-    switch (childRecord.tag) {
-      default:
-        reportUnparsedRecord(childRecord);
-    }
-  }
-
-  return { multimediaXref: gedcomRecord.value };
-}
-
 export function serializeGedcomSource(source: GedcomSource): GedcomRecord {
   return {
     xref: source.xref,
@@ -137,6 +121,9 @@ export function serializeGedcomSource(source: GedcomSource): GedcomRecord {
           children: [],
         })),
       })),
+      ...source.multimediaLinks.map((multimediaLink) =>
+        serializeGedcomMultimediaLink(multimediaLink),
+      ),
       ...source.unknownRecords.filter(
         (record) => record.tag != "_SUBQ" && record.tag != "_BIBL",
       ),
