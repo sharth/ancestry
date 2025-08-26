@@ -1,8 +1,8 @@
 <table>
   <tbody>
     @for (formGroup of form.controls; track $index) {
-      <tr>
-        <td>
+      <tr style="border: 0">
+        <td rowspan="2">
           <button
             type="button"
             class="btn btn-danger bi-trash"
@@ -22,31 +22,6 @@
           />
           <label for="`name_{{ $index }}`">Name</label>
         </td>
-        <!-- <td class="form-floating">
-          <input
-            class="form-control"
-            id="obje_{{ $index }}"
-            [formControl]="formGroup.controls.obje"
-            data-op-ignore
-          />
-          <label for="`obje_{{ $index }}`">Obje</label>
-        </td> -->
-        <!-- <td class="form-floating">
-          <input
-            class="form-control"
-            id="note_{{ $index }}"
-            [formControl]="formGroup.controls.note"
-          />
-          <label for="`note_{{ $index }}`">Note</label>
-        </td> -->
-        <td class="form-floating">
-          <input
-            class="form-control"
-            id="text_{{ $index }}"
-            [formControl]="formGroup.controls.text"
-          />
-          <label for="`text_{{ $index }}`">Text</label>
-        </td>
         <td class="form-floating">
           <input
             class="form-control"
@@ -62,6 +37,16 @@
             [formControl]="formGroup.controls.quality"
           />
           <label for="`quality_{{ $index }}`">Quality</label>
+        </td>
+      </tr>
+      <tr style="border: 0">
+        <td class="form-floating" colspan="7">
+          <textarea
+            class="form-control"
+            id="text_{{ $index }}"
+            [formControl]="formGroup.controls.text"
+          ></textarea>
+          <label for="`text_{{ $index }}`">Text</label>
         </td>
       </tr>
       <tr>

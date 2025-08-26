@@ -23,4 +23,5 @@ mat-form-field {
 
 textarea {
   field-sizing: content;
+  height: auto !important;
 }
