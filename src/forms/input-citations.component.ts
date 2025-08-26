@@ -43,7 +43,6 @@ export class InputCitationsComponent implements ControlValueAccessor {
   readonly form = this.formBuilder.array<
     FormGroup<{
       sourceXref: FormControl<string>;
-      name: FormControl<string>;
       notes: FormControl<GedcomNote[]>;
       text: FormControl<string>;
       page: FormControl<string>;
@@ -58,7 +57,6 @@ export class InputCitationsComponent implements ControlValueAccessor {
       citations.map((citation) =>
         this.formBuilder.group({
           sourceXref: citation.sourceXref,
-          name: citation.name ?? "",
           notes: this.formBuilder.control<GedcomNote[]>(citation.notes),
           text: citation.text ?? "",
           page: citation.page ?? "",
@@ -79,7 +77,6 @@ export class InputCitationsComponent implements ControlValueAccessor {
         onChange(
           this.form.getRawValue().map((citation) => ({
             sourceXref: citation.sourceXref,
-            name: citation.name || undefined,
             notes: citation.notes,
             text: citation.text || undefined,
             page: citation.page || undefined,
@@ -105,7 +102,6 @@ export class InputCitationsComponent implements ControlValueAccessor {
     this.form.push(
       this.formBuilder.group({
         sourceXref: this.formBuilder.control(""),
-        name: this.formBuilder.control(""),
         notes: this.formBuilder.control<GedcomNote[]>([]),
         text: this.formBuilder.control(""),
         page: this.formBuilder.control(""),

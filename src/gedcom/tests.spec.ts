@@ -50,7 +50,6 @@ const testCases: {
       "3 QUAY 3",
       "2 SOUR @S3@",
       "3 PAGE page",
-      "3 NAME name",
       "3 QUAY 3",
       "3 DATA",
       "4 TEXT text",
@@ -117,7 +116,6 @@ const testCases: {
                 },
                 {
                   sourceXref: "@S3@",
-                  name: "name",
                   text: "text",
                   page: "page",
                   quality: "3",

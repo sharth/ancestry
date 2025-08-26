@@ -10,7 +10,6 @@ import type { GedcomRecord } from "./gedcomRecord";
 
 export interface GedcomCitation {
   sourceXref: string;
-  name?: string;
   notes: GedcomNote[];
   text?: string;
   page?: string;
@@ -44,10 +43,6 @@ export function parseGedcomCitation(
         gedcomCitation.multimediaLinks.push(
           parseGedcomMultimediaLink(childRecord),
         );
-        break;
-      case "NAME":
-        childRecord.children.forEach(reportUnparsedRecord);
-        gedcomCitation.name = childRecord.value;
         break;
       case "NOTE":
         gedcomCitation.notes.push(parseGedcomNote(childRecord));
@@ -93,7 +88,6 @@ export function serializeGedcomCitation(
         serializeGedcomMultimediaLink(gedcomMultimediaLink),
       ),
       { tag: "PAGE", abstag: "", value: gedcomCitation.page, children: [] },
-      { tag: "NAME", abstag: "", value: gedcomCitation.name, children: [] },
       ...gedcomCitation.notes.map((gedcomNote) =>
         serializeGedcomNote(gedcomNote),
       ),
