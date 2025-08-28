@@ -72,7 +72,7 @@ export class InputSharedWithComponent implements ControlValueAccessor {
 
   registerOnTouched(onTouch: () => void): void {
     this.form.statusChanges
-      .pipe(startWith())
+      .pipe(startWith(this.form.status))
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         if (this.form.touched) {

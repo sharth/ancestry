@@ -54,7 +54,7 @@ export class InputUnknownRecordsComponent implements ControlValueAccessor {
 
   registerOnTouched(onTouch: () => void): void {
     this.formArray.statusChanges
-      .pipe(startWith())
+      .pipe(startWith(this.formArray.status))
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         if (this.formArray.touched) {

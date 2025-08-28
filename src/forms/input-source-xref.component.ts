@@ -48,7 +48,7 @@ export class InputSourceXrefComponent implements ControlValueAccessor {
 
   registerOnTouched(onTouch: () => void): void {
     this.formGroup.statusChanges
-      .pipe(startWith())
+      .pipe(startWith(this.formGroup.status))
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         if (this.formGroup.touched) {
