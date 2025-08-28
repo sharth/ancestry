@@ -1,6 +1,7 @@
+import type { AncestryDatabase } from "../database/ancestry.service";
 import type { GedcomEventSharedWith } from "../gedcom/gedcomEvent";
 import { InputIndividualXrefComponent } from "./input-individual-xref.component";
-import { Component, DestroyRef, inject } from "@angular/core";
+import { Component, DestroyRef, inject, input } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type {
   ControlValueAccessor,
@@ -30,6 +31,8 @@ import { startWith } from "rxjs/operators";
 export class InputSharedWithComponent implements ControlValueAccessor {
   private readonly destroyRef = inject(DestroyRef);
   private readonly formBuilder = inject(NonNullableFormBuilder);
+
+  readonly ancestryDatabase = input.required<AncestryDatabase>();
 
   readonly form = this.formBuilder.array<
     FormGroup<{

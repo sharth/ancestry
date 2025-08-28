@@ -1,13 +1,12 @@
+import type { AncestryDatabase } from "../../database/ancestry.service";
 import { AncestryService } from "../../database/ancestry.service";
 import { InputIndividualComponent } from "../../forms/input-individual.component";
 import { serializeGedcomFamily } from "../../gedcom/gedcomFamily";
 import type { GedcomIndividual } from "../../gedcom/gedcomIndividual";
 import { serializeGedcomIndividual } from "../../gedcom/gedcomIndividual";
 import { serializeGedcomMultimedia } from "../../gedcom/gedcomMultimedia";
-import {
-  type GedcomRecord,
-  serializeGedcomRecordToText,
-} from "../../gedcom/gedcomRecord";
+import type { GedcomRecord } from "../../gedcom/gedcomRecord";
+import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
 import { serializeGedcomRepository } from "../../gedcom/gedcomRepository";
 import { serializeGedcomSource } from "../../gedcom/gedcomSource";
 import { serializeGedcomSubmitter } from "../../gedcom/gedcomSubmitter";
@@ -34,7 +33,7 @@ import {
 })
 export class IndividualEditorComponent implements OnInit {
   private readonly ancestryService = inject(AncestryService);
-  readonly formBuilder = inject(NonNullableFormBuilder);
+  private readonly formBuilder = inject(NonNullableFormBuilder);
 
   readonly xref = input<string>();
   readonly finished = output();
@@ -51,7 +50,33 @@ export class IndividualEditorComponent implements OnInit {
     this.form.setValue(individual);
   }
 
-  readonly records = computed(() => {
+  private readonly computedDatabase = computed<AncestryDatabase | undefined>(
+    () => {
+      const ancestryDatabase = this.ancestryService.contents();
+      if (ancestryDatabase == null) {
+        return undefined;
+      }
+
+      const computedIndividual = this.formSignal();
+      if (computedIndividual == undefined) {
+        return undefined;
+      }
+
+      const individuals = new Map(ancestryDatabase.individuals);
+      individuals.set(computedIndividual.xref, computedIndividual);
+
+      return {
+        individuals,
+        families: ancestryDatabase.families,
+        sources: ancestryDatabase.sources,
+        repositories: ancestryDatabase.repositories,
+        multimedias: ancestryDatabase.multimedias,
+        submitters: ancestryDatabase.submitters,
+      };
+    },
+  );
+
+  private readonly records = computed(() => {
     const ancestry = this.ancestryService.contents();
     if (ancestry == null) {
       return [];
@@ -124,22 +149,36 @@ export class IndividualEditorComponent implements OnInit {
       .toArray();
   });
 
+  readonly vm = computed(() => {
+    const ancestryDatabase = this.ancestryService.contents();
+    if (ancestryDatabase == undefined) {
+      return undefined;
+    }
+    const computedDatabase = this.computedDatabase();
+    if (computedDatabase == undefined) {
+      return undefined;
+    }
+
+    return {
+      ancestryDatabase,
+      computedDatabase,
+      records: this.records(),
+    };
+  });
+
   async submitForm() {
     const ancestry = this.ancestryService.contents();
     if (ancestry == undefined) {
       throw new Error("ancestry is undefined");
     }
-    const fileHandle = ancestry.gedcomFileHandle;
-    if (fileHandle == undefined) {
-      throw new Error("fileHandle is undefined");
-    }
+    const gedcomFileHandle = ancestry.gedcomFileHandle;
     const gedcomText = this.records()
       .map(({ currentRecord }) => currentRecord)
       .filter((record) => record != undefined)
       .flatMap((record) => serializeGedcomRecordToText(record))
       .join("\n");
 
-    const writableStream = await fileHandle.createWritable();
+    const writableStream = await gedcomFileHandle.createWritable();
     await writableStream.write(gedcomText);
     await writableStream.close();
     this.ancestryService.gedcomResource.reload();

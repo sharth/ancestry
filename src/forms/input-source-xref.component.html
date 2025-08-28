@@ -1,17 +1,15 @@
-@if (vm(); as vm) {
-  <div class="form-floating">
-    <select class="form-select" [formControl]="formGroup.controls.sourceXref">
-      <option selected value="">Sources...</option>
-      @for (source of vm.sources.values(); track source.xref) {
-        <option value="{{ source.xref }}">
-          @if (source.abbr == undefined) {
-            Untitled Source ({{ source.xref }})
-          } @else {
-            {{ source.abbr }} ({{ source.xref }})
-          }
-        </option>
-      }
-    </select>
-    <label>Source</label>
-  </div>
-}
+<div class="form-floating">
+  <select class="form-select" [formControl]="formGroup.controls.sourceXref">
+    <option selected value="">Sources...</option>
+    @for (source of ancestryDatabase().sources.values(); track source.xref) {
+      <option value="{{ source.xref }}">
+        @if (source.abbr == undefined) {
+          Untitled Source ({{ source.xref }})
+        } @else {
+          {{ source.abbr }} ({{ source.xref }})
+        }
+      </option>
+    }
+  </select>
+  <label>Source</label>
+</div>

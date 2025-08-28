@@ -1,3 +1,4 @@
+import type { AncestryDatabase } from "../database/ancestry.service";
 import type { GedcomEvent } from "../gedcom/gedcomEvent";
 import type { GedcomIndividual } from "../gedcom/gedcomIndividual";
 import type { GedcomName } from "../gedcom/gedcomName";
@@ -9,7 +10,7 @@ import { InputNamesComponent } from "./input-names.component";
 import { InputNotesComponent } from "./input-notes.component";
 import { InputSexComponent } from "./input-sex.component";
 import { InputUnknownRecordsComponent } from "./input-unknown-records.component";
-import { Component, DestroyRef, inject } from "@angular/core";
+import { Component, DestroyRef, inject, input } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type { ControlValueAccessor } from "@angular/forms";
 import {
@@ -44,6 +45,8 @@ import { startWith } from "rxjs/operators";
 export class InputIndividualComponent implements ControlValueAccessor {
   private readonly destroyRef = inject(DestroyRef);
   private readonly formBuilder = inject(NonNullableFormBuilder);
+
+  readonly ancestryDatabase = input.required<AncestryDatabase>();
 
   readonly form = this.formBuilder.group({
     xref: this.formBuilder.control<string>(""),

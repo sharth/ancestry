@@ -1,5 +1,6 @@
+import type { AncestryDatabase } from "../database/ancestry.service";
 import type { GedcomNote } from "../gedcom/gedcomNote";
-import { Component, DestroyRef, inject } from "@angular/core";
+import { Component, DestroyRef, inject, input } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type { ControlValueAccessor } from "@angular/forms";
 import {
@@ -25,6 +26,8 @@ import { startWith } from "rxjs/operators";
 export class InputNotesComponent implements ControlValueAccessor {
   private readonly destroyRef = inject(DestroyRef);
   private readonly formBuilder = inject(NonNullableFormBuilder);
+
+  readonly ancestryDatabase = input.required<AncestryDatabase>();
 
   readonly formArray = this.formBuilder.array([
     this.formBuilder.group({

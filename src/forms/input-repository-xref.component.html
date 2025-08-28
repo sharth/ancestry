@@ -1,16 +1,14 @@
-@if (vm(); as vm) {
-  <div class="form-floating">
-    <select
-      class="form-select"
-      [formControl]="formGroup.controls.repositoryXref"
-    >
-      <option selected value="">Repositories...</option>
-      @for (repository of vm.repositories.values(); track repository.xref) {
-        <option value="{{ repository.xref }}">
-          {{ repository.name }}
-        </option>
-      }
-    </select>
-    <label>Repository</label>
-  </div>
-}
+<div class="form-floating">
+  <select class="form-select" [formControl]="formGroup.controls.repositoryXref">
+    <option selected value="">Repositories...</option>
+    @for (
+      repository of ancestryDatabase().repositories.values();
+      track repository.xref
+    ) {
+      <option value="{{ repository.xref }}">
+        {{ repository.name }}
+      </option>
+    }
+  </select>
+  <label>Repository</label>
+</div>

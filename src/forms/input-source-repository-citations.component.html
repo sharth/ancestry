@@ -19,11 +19,13 @@
         <td>
           <app-input-repository-xref
             [formControl]="citation.controls.repositoryXref"
+            [ancestryDatabase]="ancestryDatabase()"
           ></app-input-repository-xref>
         </td>
         <td>
           <app-input-repository-call-number
             [formControl]="citation.controls.callNumber"
+            [ancestryDatabase]="ancestryDatabase()"
           ></app-input-repository-call-number>
         </td>
       </tr>

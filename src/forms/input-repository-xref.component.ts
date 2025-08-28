@@ -1,5 +1,5 @@
-import { AncestryService } from "../database/ancestry.service";
-import { Component, DestroyRef, computed, inject } from "@angular/core";
+import type { AncestryDatabase } from "../database/ancestry.service";
+import { Component, DestroyRef, inject, input } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type { ControlValueAccessor } from "@angular/forms";
 import {
@@ -25,18 +25,8 @@ import { startWith } from "rxjs/operators";
 export class InputRepositoryXrefComponent implements ControlValueAccessor {
   private readonly destroyRef = inject(DestroyRef);
   private readonly formBuilder = inject(NonNullableFormBuilder);
-  private readonly ancestryService = inject(AncestryService);
 
-  public vm = computed(() => {
-    const ancestry = this.ancestryService.contents();
-    if (ancestry == undefined) {
-      return undefined;
-    }
-
-    return {
-      repositories: ancestry.repositories,
-    };
-  });
+  readonly ancestryDatabase = input.required<AncestryDatabase>();
 
   readonly formGroup = this.formBuilder.group({
     repositoryXref: "",

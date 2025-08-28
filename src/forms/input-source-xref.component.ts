@@ -1,6 +1,6 @@
-import { AncestryService } from "../database/ancestry.service";
+import type { AncestryDatabase } from "../database/ancestry.service";
 import { displayGedcomName } from "../gedcom/gedcomName";
-import { Component, DestroyRef, computed, inject } from "@angular/core";
+import { Component, DestroyRef, inject, input } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type { ControlValueAccessor } from "@angular/forms";
 import {
@@ -26,18 +26,8 @@ import { startWith } from "rxjs/operators";
 export class InputSourceXrefComponent implements ControlValueAccessor {
   private readonly destroyRef = inject(DestroyRef);
   private readonly formBuilder = inject(NonNullableFormBuilder);
-  private readonly ancestryService = inject(AncestryService);
 
-  public vm = computed(() => {
-    const ancestry = this.ancestryService.contents();
-    if (ancestry == undefined) {
-      return undefined;
-    }
-
-    return {
-      sources: ancestry.sources,
-    };
-  });
+  readonly ancestryDatabase = input.required<AncestryDatabase>();
 
   readonly formGroup = this.formBuilder.group({
     sourceXref: "",

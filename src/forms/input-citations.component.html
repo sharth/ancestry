@@ -12,6 +12,7 @@
         <td>
           <app-input-source-xref
             [formControl]="formGroup.controls.sourceXref"
+            [ancestryDatabase]="ancestryDatabase()"
           ></app-input-source-xref>
         </td>
         <td class="form-floating">
@@ -46,6 +47,7 @@
         <td colspan="7">
           <app-input-multimedia-links
             [formControl]="formGroup.controls.multimediaLinks"
+            [ancestryDatabase]="ancestryDatabase()"
           ></app-input-multimedia-links>
         </td>
       </tr>
@@ -54,6 +56,7 @@
         <td colspan="7">
           <app-input-notes
             [formControl]="formGroup.controls.notes"
+            [ancestryDatabase]="ancestryDatabase()"
           ></app-input-notes>
         </td>
       </tr>

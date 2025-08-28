@@ -1,10 +1,11 @@
+import type { AncestryDatabase } from "../database/ancestry.service";
 import type { GedcomMultimediaLink } from "../gedcom/gedcomMultimediaLink";
 import type { GedcomRecord } from "../gedcom/gedcomRecord";
 import type { GedcomSource } from "../gedcom/gedcomSource";
 import { InputMultimediaLinksComponent } from "./input-multimedia-links.component";
 import { InputSourceRepositoryCitationsComponent } from "./input-source-repository-citations.component";
 import { InputUnknownRecordsComponent } from "./input-unknown-records.component";
-import { Component, DestroyRef, inject } from "@angular/core";
+import { Component, DestroyRef, inject, input } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type { ControlValueAccessor } from "@angular/forms";
 import {
@@ -35,6 +36,8 @@ import { startWith } from "rxjs/operators";
 export class InputSourceComponent implements ControlValueAccessor {
   private readonly destroyRef = inject(DestroyRef);
   private readonly formBuilder = inject(NonNullableFormBuilder);
+
+  readonly ancestryDatabase = input.required<AncestryDatabase>();
 
   readonly form = this.formBuilder.group({
     xref: "",

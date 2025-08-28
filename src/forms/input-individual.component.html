@@ -1,16 +1,29 @@
 <h2>Names</h2>
-<app-input-names [formControl]="form.controls.names"></app-input-names>
+<app-input-names
+  [formControl]="form.controls.names"
+  [ancestryDatabase]="ancestryDatabase()"
+></app-input-names>
 
 <h2>Sex</h2>
-<app-input-sex [formControl]="form.controls.sex"></app-input-sex>
+<app-input-sex
+  [formControl]="form.controls.sex"
+  [ancestryDatabase]="ancestryDatabase()"
+></app-input-sex>
 
 <h2>Events</h2>
-<app-input-events [formControl]="form.controls.events"></app-input-events>
+<app-input-events
+  [formControl]="form.controls.events"
+  [ancestryDatabase]="ancestryDatabase()"
+></app-input-events>
 
 <h2>Notes</h2>
-<app-input-notes [formControl]="form.controls.notes"></app-input-notes>
+<app-input-notes
+  [formControl]="form.controls.notes"
+  [ancestryDatabase]="ancestryDatabase()"
+></app-input-notes>
 
 <h2>Unknown Records</h2>
 <app-input-unknown-records
   [formControl]="form.controls.unknownRecords"
+  [ancestryDatabase]="ancestryDatabase()"
 ></app-input-unknown-records>
