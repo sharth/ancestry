@@ -1,4 +1,3 @@
-import { GedcomComponent } from "./gedcom/gedcom.component";
 import { IndexComponent } from "./index/index.component";
 import { IndividualComponent } from "./individual/individual.component";
 import { IndividualsComponent } from "./individuals/individuals.component";
@@ -14,7 +13,6 @@ import type { Routes } from "@angular/router";
 
 export const routes: Routes = [
   { path: "", component: IndexComponent },
-  { path: "gedcom", component: GedcomComponent },
   { path: "individuals", component: IndividualsComponent },
   { path: "individual/:xref", component: IndividualComponent },
   { path: "repositories", component: RepositoriesComponent },

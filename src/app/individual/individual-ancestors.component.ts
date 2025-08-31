@@ -15,7 +15,7 @@ export class IndividualAncestorsComponent {
   private ancestryService = inject(AncestryService);
 
   readonly vm = computed(() => {
-    const ancestry = this.ancestryService.contents();
+    const ancestry = this.ancestryService.ancestryDatabase();
     if (ancestry === undefined) {
       return undefined;
     }

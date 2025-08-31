@@ -16,7 +16,7 @@ export class SourceCitationsComponent {
 
   readonly vm = computed(() => {
     const xref = this.xref();
-    const ancestry = this.ancestryService.contents();
+    const ancestry = this.ancestryService.ancestryDatabase();
     if (ancestry == undefined) {
       return undefined;
     }

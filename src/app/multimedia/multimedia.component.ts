@@ -15,7 +15,7 @@ export class MultimediaComponent {
   readonly xref = input.required<string>();
 
   readonly vm = computed(() => {
-    const ancestry = this.ancestryService.contents();
+    const ancestry = this.ancestryService.ancestryDatabase();
     if (ancestry === undefined) {
       return undefined;
     }

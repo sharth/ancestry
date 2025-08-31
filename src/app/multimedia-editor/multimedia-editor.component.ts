@@ -16,7 +16,7 @@ export class MultimediaEditorComponent {
   readonly finished = output();
 
   readonly vm = linkedSignal(() => {
-    const ancestry = this.ancestryService.contents();
+    const ancestry = this.ancestryService.ancestryDatabase();
     if (ancestry == null) return;
 
     const xref = this.xref();

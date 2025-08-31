@@ -16,7 +16,7 @@ export class IndividualLinkComponent {
 
   readonly vm = computed(() => {
     const xref = this.xref();
-    const ancestry = this.ancestryService.contents();
+    const ancestry = this.ancestryService.ancestryDatabase();
     const individual = ancestry?.individuals.get(xref);
 
     const name = individual ? fullname(individual) : undefined;

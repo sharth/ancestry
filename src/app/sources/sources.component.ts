@@ -13,7 +13,7 @@ export class SourcesComponent {
   private readonly ancestryService = inject(AncestryService);
 
   vm = computed(() => {
-    const ancestry = this.ancestryService.contents();
+    const ancestry = this.ancestryService.ancestryDatabase();
     if (ancestry == undefined) return undefined;
 
     const sources = ancestry.sources.values().toArray();

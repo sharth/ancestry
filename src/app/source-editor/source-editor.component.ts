@@ -23,7 +23,7 @@ export class SourceEditorComponent {
   readonly formSignal = toSignal(this.form.valueChanges);
 
   ngOnInit() {
-    const ancestry = this.ancestryService.contents();
+    const ancestry = this.ancestryService.ancestryDatabase();
     const source = ancestry?.sources.get(this.xref() ?? "");
     this.form.setValue(source);
   }

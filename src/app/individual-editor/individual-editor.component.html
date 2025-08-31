@@ -7,13 +7,11 @@
     ></app-input-individual>
 
     <h2>Gedcom Delta</h2>
-    @for (r of vm.records; track $index) {
-      @if (r.equivalent == false || r.currentRecord?.xref == xref()) {
-        <app-gedcom-diff
-          [oldGedcomRecord]="r.oldRecord"
-          [newGedcomRecord]="r.currentRecord"
-        ></app-gedcom-diff>
-      }
+    @for (r of vm.differences; track $index) {
+      <app-gedcom-diff
+        [oldGedcomRecord]="r.canonicalRecord"
+        [newGedcomRecord]="r.currentRecord"
+      ></app-gedcom-diff>
     }
 
     <input type="submit" />

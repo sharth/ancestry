@@ -1,8 +1,0 @@
-@if (vm(); as vm) {
-  @for (difference of vm.differences; track difference.key) {
-    <app-gedcom-diff
-      [oldGedcomRecord]="difference.originalRecord"
-      [newGedcomRecord]="difference.currentRecord"
-    ></app-gedcom-diff>
-  }
-}
