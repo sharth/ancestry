@@ -1,22 +1,35 @@
 import { AncestryService } from "../../database/ancestry.service";
 import { InputSourceComponent } from "../../forms/input-source.component";
+import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
 import type { GedcomSource } from "../../gedcom/gedcomSource";
-import { Component, inject, input, output } from "@angular/core";
+import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
+import type { OnInit } from "@angular/core";
+import { Component, computed, inject, input, output } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
-import { NonNullableFormBuilder, ReactiveFormsModule } from "@angular/forms";
+import {
+  FormsModule,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+} from "@angular/forms";
 import { RouterModule } from "@angular/router";
 
 @Component({
   selector: "app-source-editor",
   templateUrl: "./source-editor.component.html",
   styleUrl: "./source-editor.component.css",
-  imports: [RouterModule, ReactiveFormsModule, InputSourceComponent],
+  imports: [
+    FormsModule,
+    RouterModule,
+    ReactiveFormsModule,
+    InputSourceComponent,
+    GedcomDiffComponent,
+  ],
 })
-export class SourceEditorComponent {
+export class SourceEditorComponent implements OnInit {
   private readonly ancestryService = inject(AncestryService);
   private readonly formBuilder = inject(NonNullableFormBuilder);
 
-  readonly xref = input<string>();
+  readonly xref = input.required<string>();
   readonly finished = output();
 
   readonly form = this.formBuilder.control<GedcomSource | undefined>(undefined);
@@ -24,25 +37,60 @@ export class SourceEditorComponent {
 
   ngOnInit() {
     const ancestry = this.ancestryService.ancestryDatabase();
-    const source = ancestry?.sources.get(this.xref() ?? "");
+    const source = ancestry?.sources.get(this.xref());
     this.form.setValue(source);
   }
 
+  private readonly computedDatabase = computed(() => {
+    const ancestryDatabase = this.ancestryService.ancestryDatabase();
+    if (ancestryDatabase == null) {
+      return undefined;
+    }
+
+    const computedSource = this.formSignal();
+    if (computedSource == undefined) {
+      return undefined;
+    }
+
+    const sources = new Map(ancestryDatabase.sources);
+    sources.set(this.xref(), computedSource);
+
+    return {
+      individuals: ancestryDatabase.individuals,
+      families: ancestryDatabase.families,
+      sources,
+      repositories: ancestryDatabase.repositories,
+      multimedias: ancestryDatabase.multimedias,
+      submitters: ancestryDatabase.submitters,
+    };
+  });
+
+  readonly vm = computed(() => {
+    const computedDatabase = this.computedDatabase();
+    if (computedDatabase == undefined) {
+      return undefined;
+    }
+
+    return {
+      computedDatabase,
+      differences: this.ancestryService
+        .compareGedcomDatabase(computedDatabase)
+        .filter(
+          ({ canonicalRecord, currentRecord }) =>
+            canonicalRecord !== undefined &&
+            currentRecord !== undefined &&
+            serializeGedcomRecordToText(canonicalRecord).join("\n") !==
+              serializeGedcomRecordToText(currentRecord).join("\n"),
+        ),
+    };
+  });
+
   async submitForm() {
-    // await this.ancestryDatabase.transaction("rw", ["sources"], async () => {
-    //   const xref = this.xref() ?? (await this.nextXref());
-
-    //   await this.ancestryDatabase.sources.put({
-    //     xref: xref,
-    //     abbr: model.abbr,
-    //     title: model.title,
-    //     text: model.text,
-    //     repositoryCitations,
-    //     unknownRecords: model.unknownRecords,
-    //     multimediaLinks: model.multimediaLinks,
-    //   });
-    // });
-
+    const computedDatabase = this.computedDatabase();
+    if (computedDatabase == undefined) {
+      throw new Error("computedDatabase is undefined");
+    }
+    await this.ancestryService.updateGedcomDatabase(computedDatabase);
     this.finished.emit();
   }
 
