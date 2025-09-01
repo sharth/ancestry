@@ -17,6 +17,10 @@ td {
   background-color: lightgray;
 }
 
-.different {
+.old-gedcom .different {
   background-color: lightcoral;
+}
+
+.new-gedcom .different {
+  background-color: lightgreen;
 }
