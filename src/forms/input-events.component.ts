@@ -91,7 +91,7 @@ export class InputEventsComponent implements ControlValueAccessor {
             place: event.place || undefined,
             cause: event.cause || undefined,
             date: event.date ? { value: event.date } : undefined,
-            sdate: event.sortDate ? { value: event.sortDate } : undefined,
+            sortDate: event.sortDate ? { value: event.sortDate } : undefined,
             value: event.value || undefined,
             citations: event.citations,
             sharedWith: event.sharedWith,
