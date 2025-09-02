@@ -72,39 +72,26 @@
       </tr>
       <tr>
         <td colspan="7">
-          <details>
-            <summary>
-              Citations ({{ event.controls.citations.value.length }})
-            </summary>
-            <app-input-citations
-              [formControl]="event.controls.citations"
-              [ancestryDatabase]="ancestryDatabase()"
-            ></app-input-citations>
-          </details>
+          <app-input-citations
+            [formControl]="event.controls.citations"
+            [ancestryDatabase]="ancestryDatabase()"
+          ></app-input-citations>
         </td>
       </tr>
       <tr>
         <td colspan="7">
-          <details>
-            <summary>
-              Shared With ({{ event.controls.sharedWith.value.length }})
-            </summary>
-            <app-input-shared-with
-              [formControl]="event.controls.sharedWith"
-              [ancestryDatabase]="ancestryDatabase()"
-            ></app-input-shared-with>
-          </details>
+          <app-input-shared-with
+            [formControl]="event.controls.sharedWith"
+            [ancestryDatabase]="ancestryDatabase()"
+          ></app-input-shared-with>
         </td>
       </tr>
       <tr>
         <td colspan="7">
-          <details>
-            <summary>Notes ({{ event.controls.notes.value.length }})</summary>
-            <app-input-notes
-              [formControl]="event.controls.notes"
-              [ancestryDatabase]="ancestryDatabase()"
-            ></app-input-notes>
-          </details>
+          <app-input-notes
+            [formControl]="event.controls.notes"
+            [ancestryDatabase]="ancestryDatabase()"
+          ></app-input-notes>
         </td>
       </tr>
     }

@@ -60,13 +60,10 @@
       </tr>
       <tr>
         <td colspan="6">
-          <details>
-            <summary>Citations</summary>
-            <app-input-citations
-              [formControl]="name.controls.citations"
-              [ancestryDatabase]="ancestryDatabase()"
-            ></app-input-citations>
-          </details>
+          <app-input-citations
+            [formControl]="name.controls.citations"
+            [ancestryDatabase]="ancestryDatabase()"
+          ></app-input-citations>
         </td>
       </tr>
     }

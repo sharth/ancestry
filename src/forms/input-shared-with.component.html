@@ -1,42 +1,45 @@
-<table>
-  <tbody>
-    @for (sharedWith of form.controls; track $index) {
+<details>
+  <summary>Shared With ({{ form.controls.length }})</summary>
+  <table>
+    <tbody>
+      @for (sharedWith of form.controls; track $index) {
+        <tr>
+          <td>
+            <button
+              type="button"
+              class="btn btn-danger bi-trash"
+              (click)="removeSharedEvent($index)"
+            ></button>
+          </td>
+          <td class="form-floating">
+            <app-input-individual-xref
+              [formControl]="sharedWith.controls.xref"
+              [ancestryDatabase]="ancestryDatabase()"
+            ></app-input-individual-xref>
+          </td>
+          <td class="form-floating">
+            <input
+              class="form-control"
+              id="role_{{ $index }}"
+              [formControl]="sharedWith.controls.role"
+            />
+            <label for="role_{{ $index }}">Role</label>
+          </td>
+        </tr>
+      }
+    </tbody>
+    <tfoot>
       <tr>
-        <td>
+        <th>
           <button
             type="button"
-            class="btn btn-danger bi-trash"
-            (click)="removeSharedEvent($index)"
+            class="btn btn-outline-primary bi-plus"
+            (click)="appendSharedEvent()"
           ></button>
-        </td>
-        <td class="form-floating">
-          <app-input-individual-xref
-            [formControl]="sharedWith.controls.xref"
-            [ancestryDatabase]="ancestryDatabase()"
-          ></app-input-individual-xref>
-        </td>
-        <td class="form-floating">
-          <input
-            class="form-control"
-            id="role_{{ $index }}"
-            [formControl]="sharedWith.controls.role"
-          />
-          <label for="role_{{ $index }}">Role</label>
-        </td>
+        </th>
+        <th></th>
+        <th></th>
       </tr>
-    }
-  </tbody>
-  <tfoot>
-    <tr>
-      <th>
-        <button
-          type="button"
-          class="btn btn-outline-primary bi-plus"
-          (click)="appendSharedEvent()"
-        ></button>
-      </th>
-      <th></th>
-      <th></th>
-    </tr>
-  </tfoot>
-</table>
+    </tfoot>
+  </table>
+</details>
