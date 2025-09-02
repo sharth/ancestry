@@ -9,9 +9,9 @@ table thead {
   font-weight: bold;
 }
 
-table tbody tr {
+/* table tbody tr {
   border: 3px solid black;
-}
+} */
 
 div {
   white-space: pre-wrap;

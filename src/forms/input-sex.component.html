@@ -1,6 +1,6 @@
 <table>
   <tr>
-    <td></td>
+    <td rowspan="2" class="align-top"></td>
     <td class="form-floating">
       <select class="form-select" id="sex" [formControl]="form.controls.sex">
         <option value=""></option>
@@ -11,12 +11,14 @@
     </td>
   </tr>
   <tr>
-    <td>Citations</td>
     <td>
-      <app-input-citations
-        [formControl]="form.controls.citations"
-        [ancestryDatabase]="ancestryDatabase()"
-      ></app-input-citations>
+      <details>
+        <summary>Citations</summary>
+        <app-input-citations
+          [formControl]="form.controls.citations"
+          [ancestryDatabase]="ancestryDatabase()"
+        ></app-input-citations>
+      </details>
     </td>
   </tr>
 </table>

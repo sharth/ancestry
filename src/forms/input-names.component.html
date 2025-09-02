@@ -2,7 +2,7 @@
   <tbody>
     @for (name of formArray.controls; track $index; let i = $index) {
       <tr>
-        <td>
+        <td rowspan="2" class="align-top">
           <button
             type="button"
             class="btn btn-danger bi-trash"
@@ -59,12 +59,14 @@
         </td>
       </tr>
       <tr>
-        <td>Citations</td>
         <td colspan="6">
-          <app-input-citations
-            [formControl]="name.controls.citations"
-            [ancestryDatabase]="ancestryDatabase()"
-          ></app-input-citations>
+          <details>
+            <summary>Citations</summary>
+            <app-input-citations
+              [formControl]="name.controls.citations"
+              [ancestryDatabase]="ancestryDatabase()"
+            ></app-input-citations>
+          </details>
         </td>
       </tr>
     }

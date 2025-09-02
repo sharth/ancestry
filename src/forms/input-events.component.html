@@ -2,7 +2,7 @@
   <tbody>
     @for (event of formArray.controls; track $index) {
       <tr>
-        <td>
+        <td rowspan="4" class="align-top">
           <button
             type="button"
             class="btn btn-danger bi-trash"
@@ -71,31 +71,40 @@
         </td>
       </tr>
       <tr>
-        <td>Citations</td>
         <td colspan="7">
-          <app-input-citations
-            [formControl]="event.controls.citations"
-            [ancestryDatabase]="ancestryDatabase()"
-          ></app-input-citations>
+          <details>
+            <summary>
+              Citations ({{ event.controls.citations.value.length }})
+            </summary>
+            <app-input-citations
+              [formControl]="event.controls.citations"
+              [ancestryDatabase]="ancestryDatabase()"
+            ></app-input-citations>
+          </details>
         </td>
       </tr>
       <tr>
-        <td>Shared With</td>
         <td colspan="7">
-          <app-input-shared-with
-            [formControl]="event.controls.sharedWith"
-            [ancestryDatabase]="ancestryDatabase()"
-          ></app-input-shared-with>
+          <details>
+            <summary>
+              Shared With ({{ event.controls.sharedWith.value.length }})
+            </summary>
+            <app-input-shared-with
+              [formControl]="event.controls.sharedWith"
+              [ancestryDatabase]="ancestryDatabase()"
+            ></app-input-shared-with>
+          </details>
         </td>
       </tr>
       <tr>
-        <td>Notes</td>
         <td colspan="7">
-          <app-input-notes
-            [formControl]="event.controls.notes"
-            [ancestryDatabase]="ancestryDatabase()"
-          >
-          </app-input-notes>
+          <details>
+            <summary>Notes ({{ event.controls.notes.value.length }})</summary>
+            <app-input-notes
+              [formControl]="event.controls.notes"
+              [ancestryDatabase]="ancestryDatabase()"
+            ></app-input-notes>
+          </details>
         </td>
       </tr>
     }

@@ -2,7 +2,7 @@
   <tbody>
     @for (formGroup of form.controls; track $index) {
       <tr style="border: 0">
-        <td rowspan="2">
+        <td rowspan="4" class="align-top">
           <button
             type="button"
             class="btn btn-danger bi-trash"
@@ -43,21 +43,25 @@
         </td>
       </tr>
       <tr>
-        <td>Multimedia</td>
         <td colspan="7">
-          <app-input-multimedia-links
-            [formControl]="formGroup.controls.multimediaLinks"
-            [ancestryDatabase]="ancestryDatabase()"
-          ></app-input-multimedia-links>
+          <details>
+            <summary>Multimedia</summary>
+            <app-input-multimedia-links
+              [formControl]="formGroup.controls.multimediaLinks"
+              [ancestryDatabase]="ancestryDatabase()"
+            ></app-input-multimedia-links>
+          </details>
         </td>
       </tr>
       <tr>
-        <td>Notes</td>
         <td colspan="7">
-          <app-input-notes
-            [formControl]="formGroup.controls.notes"
-            [ancestryDatabase]="ancestryDatabase()"
-          ></app-input-notes>
+          <details>
+            <summary>Notes</summary>
+            <app-input-notes
+              [formControl]="formGroup.controls.notes"
+              [ancestryDatabase]="ancestryDatabase()"
+            ></app-input-notes>
+          </details>
         </td>
       </tr>
     }
