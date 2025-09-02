@@ -18,40 +18,42 @@ export class IndividualRelativesComponent {
     if (ancestry === undefined) {
       return undefined;
     }
-    const xref = this.xref();
 
-    const parents: GedcomIndividual[] = ancestry.families
-      .values()
-      .filter((family) => family.childXrefs.includes(xref))
+    const xref = this.xref();
+    const individual = ancestry.individuals.get(xref);
+    if (individual === undefined) {
+      return undefined;
+    }
+
+    const parents: GedcomIndividual[] = individual.childOfFamilyXrefs
+      .map((familyXref) => ancestry.families.get(familyXref))
+      .filter((family) => family != null)
       .flatMap((family) => [family.husbandXref, family.wifeXref])
       .filter((parentXref) => parentXref != null)
       .map((parentXref) => ancestry.individuals.get(parentXref))
-      .filter((parent) => parent != null)
-      .toArray();
-    const siblings: GedcomIndividual[] = ancestry.families
-      .values()
-      .filter((family) => family.childXrefs.includes(xref))
+      .filter((parent) => parent != null);
+    const siblings: GedcomIndividual[] = individual.childOfFamilyXrefs
+      .map((familyXref) => ancestry.families.get(familyXref))
+      .filter((family) => family != null)
       .flatMap((family) => family.childXrefs)
-      .filter((siblingXref) => siblingXref != xref)
       .map((siblingXref) => ancestry.individuals.get(siblingXref))
       .filter((sibling) => sibling != null)
-      .toArray();
-    const spouses: GedcomIndividual[] = ancestry.families
-      .values()
-      .filter((family) => family.husbandXref == xref || family.wifeXref == xref)
+      .filter((sibling) => sibling.xref != xref);
+    const spouses: GedcomIndividual[] = individual.parentOfFamilyXrefs
+      .map((familyXref) => ancestry.families.get(familyXref))
+      .filter((family) => family != null)
       .flatMap((family) => [family.husbandXref, family.wifeXref])
       .filter((spouseXref) => spouseXref != null)
-      .filter((spouseXref) => spouseXref != xref)
       .map((spouseXref) => ancestry.individuals.get(spouseXref))
       .filter((spouse) => spouse != null)
-      .toArray();
-    const children: GedcomIndividual[] = ancestry.families
-      .values()
-      .filter((family) => family.husbandXref == xref || family.wifeXref == xref)
+      .filter((spouse) => spouse.xref != xref);
+    const children: GedcomIndividual[] = individual.parentOfFamilyXrefs
+      .map((familyXref) => ancestry.families.get(familyXref))
+      .filter((family) => family != null)
       .flatMap((family) => family.childXrefs)
       .map((childXref) => ancestry.individuals.get(childXref))
-      .filter((child) => child != null)
-      .toArray();
+      .filter((child) => child != null);
+
     return {
       relatives: [
         ...parents.map((parent) => ({
