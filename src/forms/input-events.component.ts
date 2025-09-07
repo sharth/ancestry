@@ -6,7 +6,14 @@ import type { GedcomNote } from "../gedcom/gedcomNote";
 import { InputCitationsComponent } from "./input-citations.component";
 import { InputNotesComponent } from "./input-notes.component";
 import { InputSharedWithComponent } from "./input-shared-with.component";
-import { Component, DestroyRef, inject, input } from "@angular/core";
+import type { ElementRef, QueryList } from "@angular/core";
+import {
+  Component,
+  DestroyRef,
+  ViewChildren,
+  inject,
+  input,
+} from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type { ControlValueAccessor } from "@angular/forms";
 import {
@@ -112,6 +119,10 @@ export class InputEventsComponent implements ControlValueAccessor {
       });
   }
 
+  @ViewChildren("focusTarget") private focusTargets!: QueryList<
+    ElementRef<HTMLElement>
+  >;
+
   appendEvent() {
     this.formArray.push(
       this.formBuilder.group({
@@ -128,6 +139,9 @@ export class InputEventsComponent implements ControlValueAccessor {
         notes: this.formBuilder.control<GedcomNote[]>([]),
       }),
     );
+    setTimeout(() => {
+      this.focusTargets.last.nativeElement.focus();
+    });
   }
 
   removeEvent(index: number) {

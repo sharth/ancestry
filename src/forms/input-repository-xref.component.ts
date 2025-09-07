@@ -1,5 +1,6 @@
 import type { AncestryDatabase } from "../database/ancestry.service";
-import { Component, DestroyRef, inject, input } from "@angular/core";
+import type { ElementRef } from "@angular/core";
+import { Component, DestroyRef, ViewChild, inject, input } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type { ControlValueAccessor } from "@angular/forms";
 import {
@@ -54,5 +55,12 @@ export class InputRepositoryXrefComponent implements ControlValueAccessor {
           onTouch();
         }
       });
+  }
+
+  @ViewChild("selectElement")
+  private selectElement!: ElementRef<HTMLSelectElement>;
+
+  focus() {
+    this.selectElement.nativeElement.focus();
   }
 }

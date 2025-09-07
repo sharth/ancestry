@@ -1,6 +1,13 @@
 import type { AncestryDatabase } from "../database/ancestry.service";
 import type { GedcomMultimediaLink } from "../gedcom/gedcomMultimediaLink";
-import { Component, DestroyRef, inject, input } from "@angular/core";
+import type { ElementRef, QueryList } from "@angular/core";
+import {
+  Component,
+  DestroyRef,
+  ViewChildren,
+  inject,
+  input,
+} from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type { ControlValueAccessor } from "@angular/forms";
 import {
@@ -72,6 +79,10 @@ export class InputMultimediaLinksComponent implements ControlValueAccessor {
       });
   }
 
+  @ViewChildren("focusTarget") private focusTargets!: QueryList<
+    ElementRef<HTMLElement>
+  >;
+
   appendMultimediaLink() {
     this.formArray.push(
       this.formBuilder.group({
@@ -79,6 +90,9 @@ export class InputMultimediaLinksComponent implements ControlValueAccessor {
         title: "",
       }),
     );
+    setTimeout(() => {
+      this.focusTargets.last.nativeElement.focus();
+    });
   }
 
   removeMultimediaLink(index: number) {

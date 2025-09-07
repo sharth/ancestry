@@ -5,7 +5,14 @@ import type { GedcomNote } from "../gedcom/gedcomNote";
 import { InputMultimediaLinksComponent } from "./input-multimedia-links.component";
 import { InputNotesComponent } from "./input-notes.component";
 import { InputSourceXrefComponent } from "./input-source-xref.component";
-import { Component, DestroyRef, inject, input } from "@angular/core";
+import type { QueryList } from "@angular/core";
+import {
+  Component,
+  DestroyRef,
+  ViewChildren,
+  inject,
+  input,
+} from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type {
   ControlValueAccessor,
@@ -101,6 +108,9 @@ export class InputCitationsComponent implements ControlValueAccessor {
       });
   }
 
+  @ViewChildren("focusTarget")
+  private focusTargets!: QueryList<InputSourceXrefComponent>;
+
   appendCitation() {
     this.form.push(
       this.formBuilder.group({
@@ -112,6 +122,9 @@ export class InputCitationsComponent implements ControlValueAccessor {
         multimediaLinks: this.formBuilder.control<GedcomMultimediaLink[]>([]),
       }),
     );
+    setTimeout(() => {
+      this.focusTargets.last.focus();
+    });
   }
 
   removeCitation(index: number) {

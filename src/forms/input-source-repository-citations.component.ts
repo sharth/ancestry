@@ -1,7 +1,14 @@
 import type { AncestryDatabase } from "../database/ancestry.service";
 import { InputRepositoryCallNumberComponent } from "./input-repository-call-number.component";
 import { InputRepositoryXrefComponent } from "./input-repository-xref.component";
-import { Component, DestroyRef, inject, input } from "@angular/core";
+import type { QueryList } from "@angular/core";
+import {
+  Component,
+  DestroyRef,
+  ViewChildren,
+  inject,
+  input,
+} from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type { ControlValueAccessor } from "@angular/forms";
 import {
@@ -84,6 +91,9 @@ export class InputSourceRepositoryCitationsComponent
       });
   }
 
+  @ViewChildren("focusTarget")
+  focusTargets!: QueryList<InputRepositoryXrefComponent>;
+
   appendCitation() {
     this.formArray.push(
       this.formBuilder.group({
@@ -91,6 +101,9 @@ export class InputSourceRepositoryCitationsComponent
         callNumber: "",
       }),
     );
+    setTimeout(() => {
+      this.focusTargets.last.focus();
+    });
   }
 
   removeCitation(index: number) {

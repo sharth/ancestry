@@ -1,6 +1,7 @@
 import type { AncestryDatabase } from "../database/ancestry.service";
 import { displayGedcomName } from "../gedcom/gedcomName";
-import { Component, DestroyRef, inject, input } from "@angular/core";
+import type { ElementRef } from "@angular/core";
+import { Component, DestroyRef, ViewChild, inject, input } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type { ControlValueAccessor } from "@angular/forms";
 import {
@@ -58,4 +59,9 @@ export class InputIndividualXrefComponent implements ControlValueAccessor {
   }
 
   public readonly displayGedcomName = displayGedcomName;
+
+  @ViewChild("focusTarget") private focusTarget!: ElementRef<HTMLElement>;
+  public focus() {
+    this.focusTarget.nativeElement.focus();
+  }
 }

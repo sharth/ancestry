@@ -1,7 +1,14 @@
 import type { AncestryDatabase } from "../database/ancestry.service";
 import type { GedcomEventSharedWith } from "../gedcom/gedcomEvent";
 import { InputIndividualXrefComponent } from "./input-individual-xref.component";
-import { Component, DestroyRef, inject, input } from "@angular/core";
+import type { QueryList } from "@angular/core";
+import {
+  Component,
+  DestroyRef,
+  ViewChildren,
+  inject,
+  input,
+} from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type {
   ControlValueAccessor,
@@ -81,6 +88,9 @@ export class InputSharedWithComponent implements ControlValueAccessor {
       });
   }
 
+  @ViewChildren("focusTarget")
+  private focusTargets!: QueryList<InputIndividualXrefComponent>;
+
   appendSharedEvent() {
     this.form.push(
       this.formBuilder.group({
@@ -88,6 +98,9 @@ export class InputSharedWithComponent implements ControlValueAccessor {
         role: this.formBuilder.control(""),
       }),
     );
+    setTimeout(() => {
+      this.focusTargets.last.focus();
+    });
   }
 
   removeSharedEvent(index: number) {

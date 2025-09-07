@@ -2,7 +2,14 @@ import type { AncestryDatabase } from "../database/ancestry.service";
 import type { GedcomCitation } from "../gedcom/gedcomCitation";
 import type { GedcomName } from "../gedcom/gedcomName";
 import { InputCitationsComponent } from "./input-citations.component";
-import { Component, DestroyRef, inject, input } from "@angular/core";
+import type { ElementRef, QueryList } from "@angular/core";
+import {
+  Component,
+  DestroyRef,
+  ViewChildren,
+  inject,
+  input,
+} from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type { ControlValueAccessor } from "@angular/forms";
 import {
@@ -90,6 +97,10 @@ export class InputNamesComponent implements ControlValueAccessor {
       });
   }
 
+  @ViewChildren("focusTarget") private focusTargets!: QueryList<
+    ElementRef<HTMLElement>
+  >;
+
   appendName() {
     this.formArray.push(
       this.formBuilder.group({
@@ -102,6 +113,9 @@ export class InputNamesComponent implements ControlValueAccessor {
         citations: this.formBuilder.control<GedcomCitation[]>([]),
       }),
     );
+    setTimeout(() => {
+      this.focusTargets.last.nativeElement.focus();
+    });
   }
 
   removeName(index: number) {
