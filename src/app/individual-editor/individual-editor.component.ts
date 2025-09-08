@@ -37,9 +37,24 @@ export class IndividualEditorComponent implements OnInit {
 
   ngOnInit() {
     const ancestry = this.ancestryService.ancestryDatabase();
-    const xref = this.xref() ?? "";
-    const individual = ancestry?.individuals.get(xref);
-    this.form.setValue(individual);
+    if (ancestry == undefined) {
+      return;
+    }
+
+    const xref = this.xref();
+    if (xref == undefined) {
+      this.form.setValue({
+        xref: this.ancestryService.nextIndividualXref(),
+        names: [],
+        events: [],
+        childOfFamilyXrefs: [],
+        parentOfFamilyXrefs: [],
+        notes: [],
+        unknownRecords: [],
+      });
+    } else {
+      this.form.setValue(ancestry.individuals.get(xref));
+    }
   }
 
   private readonly computedDatabase = computed(() => {
@@ -78,8 +93,8 @@ export class IndividualEditorComponent implements OnInit {
         .compareGedcomDatabase(computedDatabase)
         .filter(
           ({ canonicalRecord, currentRecord }) =>
-            canonicalRecord !== undefined &&
-            currentRecord !== undefined &&
+            canonicalRecord == undefined ||
+            currentRecord == undefined ||
             serializeGedcomRecordToText(canonicalRecord).join("\n") !==
               serializeGedcomRecordToText(currentRecord).join("\n"),
         ),

@@ -10,7 +10,6 @@
     }
   </ul>
 
-  <!--
   <div class="position-fixed bottom-0 end-0 rounded-circle m-5">
     <button
       type="button"
@@ -20,7 +19,8 @@
   </div>
 
   <dialog #editDialog>
-    <app-source-editor (finished)="editDialog.close()" />
+    @if (editDialog.open) {
+      <app-source-editor (finished)="editDialog.close()" />
+    }
   </dialog>
-  -->
 }

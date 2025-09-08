@@ -29,7 +29,7 @@ export class SourceEditorComponent implements OnInit {
   private readonly ancestryService = inject(AncestryService);
   private readonly formBuilder = inject(NonNullableFormBuilder);
 
-  readonly xref = input.required<string>();
+  readonly xref = input<string>();
   readonly finished = output();
 
   readonly form = this.formBuilder.control<GedcomSource | undefined>(undefined);
@@ -37,8 +37,20 @@ export class SourceEditorComponent implements OnInit {
 
   ngOnInit() {
     const ancestry = this.ancestryService.ancestryDatabase();
-    const source = ancestry?.sources.get(this.xref());
-    this.form.setValue(source);
+    if (ancestry == undefined) {
+      return;
+    }
+    const xref = this.xref();
+    if (xref == undefined) {
+      this.form.setValue({
+        xref: this.ancestryService.nextSourceXref(),
+        repositoryCitations: [],
+        unknownRecords: [],
+        multimediaLinks: [],
+      });
+    } else {
+      this.form.setValue(ancestry.sources.get(xref));
+    }
   }
 
   private readonly computedDatabase = computed(() => {
@@ -53,7 +65,7 @@ export class SourceEditorComponent implements OnInit {
     }
 
     const sources = new Map(ancestryDatabase.sources);
-    sources.set(this.xref(), computedSource);
+    sources.set(computedSource.xref, computedSource);
 
     return {
       individuals: ancestryDatabase.individuals,
@@ -77,8 +89,8 @@ export class SourceEditorComponent implements OnInit {
         .compareGedcomDatabase(computedDatabase)
         .filter(
           ({ canonicalRecord, currentRecord }) =>
-            canonicalRecord !== undefined &&
-            currentRecord !== undefined &&
+            canonicalRecord == undefined ||
+            currentRecord == undefined ||
             serializeGedcomRecordToText(canonicalRecord).join("\n") !==
               serializeGedcomRecordToText(currentRecord).join("\n"),
         ),

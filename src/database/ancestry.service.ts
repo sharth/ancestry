@@ -324,11 +324,8 @@ export class AncestryService {
     this.gedcomResource.reload();
   }
 
-  readonly nextIndividualXref = computed<string | undefined>(() => {
-    const individuals = this.ancestryDatabase()?.individuals;
-    if (individuals == undefined) {
-      return undefined;
-    }
+  readonly nextIndividualXref = computed<string>(() => {
+    const individuals = this.ancestryDatabase()?.individuals ?? [];
     const nextIndex = individuals
       .values()
       .map((individual) => /^@I(\d+)@/.exec(individual.xref))
@@ -338,11 +335,8 @@ export class AncestryService {
     return `@I${nextIndex}@`;
   });
 
-  readonly nextSourceXref = computed<string | undefined>(() => {
-    const sources = this.ancestryDatabase()?.sources;
-    if (sources == undefined) {
-      return undefined;
-    }
+  readonly nextSourceXref = computed<string>(() => {
+    const sources = this.ancestryDatabase()?.sources ?? [];
     const nextIndex = sources
       .values()
       .map((source) => /^S@(\d+)@/.exec(source.xref))
