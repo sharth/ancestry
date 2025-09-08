@@ -50,11 +50,16 @@ export class InputSexComponent implements ControlValueAccessor {
     this.form.valueChanges
       .pipe(startWith(this.form.value))
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((formValue) => {
-        onChange({
-          sex: formValue.sex ?? "",
-          citations: formValue.citations ?? [],
-        });
+      .subscribe(() => {
+        const rawFormValue = this.form.getRawValue();
+        if (rawFormValue.sex == "" && rawFormValue.citations.length == 0) {
+          onChange(null);
+        } else {
+          onChange({
+            sex: rawFormValue.sex,
+            citations: rawFormValue.citations,
+          });
+        }
       });
   }
 
