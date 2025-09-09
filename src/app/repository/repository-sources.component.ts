@@ -19,22 +19,23 @@ export class RepositorySourcesComponent {
     }
 
     return {
-      sources: [...ancestry.sources.values()]
+      sources: ancestry.sources
+        .values()
         .flatMap((source) =>
-          source.repositoryCitations.map((repositoryCitation) => ({
+          source.repositoryLinks.map((repositoryLink) => ({
             source,
-            repositoryCitation,
+            repositoryLink,
           })),
         )
         .filter(
-          ({ repositoryCitation }) =>
-            repositoryCitation.repositoryXref == this.xref(),
+          ({ repositoryLink }) => repositoryLink.repositoryXref == this.xref(),
         )
-        .map(({ source, repositoryCitation }) => ({
+        .map(({ source, repositoryLink }) => ({
           xref: source.xref,
           abbr: source.abbr,
-          callNumbers: repositoryCitation.callNumbers,
-        })),
+          callNumbers: repositoryLink.callNumbers,
+        }))
+        .toArray(),
     };
   });
 }

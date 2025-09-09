@@ -44,7 +44,7 @@ export class SourceEditorComponent implements OnInit {
     if (xref == undefined) {
       this.form.setValue({
         xref: this.ancestryService.nextSourceXref(),
-        repositoryCitations: [],
+        repositoryLinks: [],
         unknownRecords: [],
         multimediaLinks: [],
       });

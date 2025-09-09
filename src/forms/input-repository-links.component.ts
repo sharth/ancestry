@@ -1,4 +1,5 @@
 import type { AncestryDatabase } from "../database/ancestry.service";
+import type { GedcomRepositoryLink } from "../gedcom/gedcomRepositoryLink";
 import { InputRepositoryCallNumberComponent } from "./input-repository-call-number.component";
 import { InputRepositoryXrefComponent } from "./input-repository-xref.component";
 import type { QueryList } from "@angular/core";
@@ -20,8 +21,8 @@ import { RouterModule } from "@angular/router";
 import { startWith } from "rxjs/operators";
 
 @Component({
-  selector: "app-input-source-repository-citations",
-  templateUrl: "./input-source-repository-citations.component.html",
+  selector: "app-input-repository-links",
+  templateUrl: "./input-repository-links.component.html",
   styleUrl: "./input.component.css",
   imports: [
     RouterModule,
@@ -32,14 +33,12 @@ import { startWith } from "rxjs/operators";
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: InputSourceRepositoryCitationsComponent,
+      useExisting: InputRepositoryLinksComponent,
       multi: true,
     },
   ],
 })
-export class InputSourceRepositoryCitationsComponent
-  implements ControlValueAccessor
-{
+export class InputRepositoryLinksComponent implements ControlValueAccessor {
   private readonly destroyRef = inject(DestroyRef);
   private readonly formBuilder = inject(NonNullableFormBuilder);
 
@@ -52,31 +51,34 @@ export class InputSourceRepositoryCitationsComponent
     }),
   ]);
 
-  writeValue(
-    repositoryCitations: { repositoryXref: string; callNumber: string }[],
-  ): void {
+  writeValue(repositoryLinks: GedcomRepositoryLink[]): void {
     this.formArray.clear({ emitEvent: false });
     this.formArray.push(
-      repositoryCitations.map((repositoryCitation) =>
-        this.formBuilder.group({
-          repositoryXref: repositoryCitation.repositoryXref,
-          callNumber: repositoryCitation.callNumber,
-        }),
+      repositoryLinks.flatMap((repositoryLink) =>
+        repositoryLink.callNumbers.map((callNumber) =>
+          this.formBuilder.group({
+            repositoryXref: repositoryLink.repositoryXref,
+            callNumber,
+          }),
+        ),
       ),
       { emitEvent: false },
     );
   }
 
   registerOnChange(
-    onChange: (
-      repositoryCitations: { repositoryXref: string; callNumber: string }[],
-    ) => void,
+    onChange: (repositoryLink: GedcomRepositoryLink[]) => void,
   ): void {
     this.formArray.valueChanges
       .pipe(startWith(this.formArray.value))
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
-        onChange(this.formArray.getRawValue());
+        onChange(
+          this.formArray.getRawValue().map((formGroup) => ({
+            repositoryXref: formGroup.repositoryXref,
+            callNumbers: formGroup.callNumber ? [formGroup.callNumber] : [],
+          })),
+        );
       });
   }
 

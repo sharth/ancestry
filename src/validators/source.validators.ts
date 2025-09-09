@@ -8,7 +8,7 @@ export const sourceValidators = create(
       enforce(source.unknownRecords).isEmpty();
     });
     test("repositories", "Source is not part of any repository", () => {
-      enforce(source.repositoryCitations).isNotEmpty();
+      enforce(source.repositoryLinks).isNotEmpty();
     });
     // test('citations', 'Source is not used as a citation anywhere', () => {
     //  enforce(source.citations()).isNotEmpty();

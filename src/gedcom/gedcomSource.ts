@@ -5,16 +5,18 @@ import {
   serializeGedcomMultimediaLink,
 } from "./gedcomMultimediaLink";
 import type { GedcomRecord } from "./gedcomRecord";
+import type { GedcomRepositoryLink } from "./gedcomRepositoryLink";
+import {
+  parseGedcomRepositoryLink,
+  serializeGedcomRepositoryLink,
+} from "./gedcomRepositoryLink";
 
 export interface GedcomSource {
   xref: string;
   abbr?: string;
   title?: string;
   text?: string;
-  repositoryCitations: {
-    repositoryXref: string;
-    callNumbers: string[];
-  }[];
+  repositoryLinks: GedcomRepositoryLink[];
   unknownRecords: GedcomRecord[];
   multimediaLinks: GedcomMultimediaLink[];
 }
@@ -26,7 +28,7 @@ export function parseGedcomSource(record: GedcomRecord): GedcomSource {
 
   const gedcomSource: GedcomSource = {
     xref: record.xref,
-    repositoryCitations: [],
+    repositoryLinks: [],
     unknownRecords: [],
     multimediaLinks: [],
   };
@@ -55,8 +57,8 @@ export function parseGedcomSource(record: GedcomRecord): GedcomSource {
         gedcomSource.title = childRecord.value;
         break;
       case "REPO":
-        gedcomSource.repositoryCitations.push(
-          parseGedcomSourceRepositoryCitation(childRecord),
+        gedcomSource.repositoryLinks.push(
+          parseGedcomRepositoryLink(childRecord),
         );
         break;
       case "OBJE":
@@ -73,32 +75,6 @@ export function parseGedcomSource(record: GedcomRecord): GedcomSource {
   return gedcomSource;
 }
 
-function parseGedcomSourceRepositoryCitation(gedcomRecord: GedcomRecord) {
-  if (gedcomRecord.abstag !== "SOUR.REPO") throw new Error();
-  if (gedcomRecord.xref != null) throw new Error();
-  if (gedcomRecord.value == null) throw new Error();
-
-  const repositoryXref = gedcomRecord.value;
-  const callNumbers: string[] = [];
-
-  for (const childRecord of gedcomRecord.children) {
-    switch (childRecord.tag) {
-      case "CALN":
-        if (childRecord.abstag != "SOUR.REPO.CALN") throw new Error();
-        if (childRecord.xref != null) throw new Error();
-        if (childRecord.value == null) throw new Error();
-        if (childRecord.children.length > 0) throw new Error();
-        callNumbers.push(childRecord.value);
-        break;
-      default:
-        reportUnparsedRecord(childRecord);
-        break;
-    }
-  }
-
-  return { repositoryXref, callNumbers };
-}
-
 export function serializeGedcomSource(source: GedcomSource): GedcomRecord {
   return {
     xref: source.xref,
@@ -110,17 +86,9 @@ export function serializeGedcomSource(source: GedcomSource): GedcomRecord {
       ...source.unknownRecords.filter((record) => record.tag == "_SUBQ"),
       ...source.unknownRecords.filter((record) => record.tag == "_BIBL"),
       { tag: "TEXT", abstag: "SOUR.TEXT", value: source.text, children: [] },
-      ...source.repositoryCitations.map((repositoryCitation) => ({
-        tag: "REPO",
-        abstag: "SOUR.REPO",
-        value: repositoryCitation.repositoryXref,
-        children: repositoryCitation.callNumbers.map((callNumber) => ({
-          tag: "CALN",
-          abstag: "SOUR.REPO.CALN",
-          value: callNumber,
-          children: [],
-        })),
-      })),
+      ...source.repositoryLinks.map((repositoryLink) =>
+        serializeGedcomRepositoryLink(repositoryLink),
+      ),
       ...source.multimediaLinks.map((multimediaLink) =>
         serializeGedcomMultimediaLink(multimediaLink),
       ),

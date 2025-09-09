@@ -1,9 +1,10 @@
 import type { AncestryDatabase } from "../database/ancestry.service";
 import type { GedcomMultimediaLink } from "../gedcom/gedcomMultimediaLink";
 import type { GedcomRecord } from "../gedcom/gedcomRecord";
+import type { GedcomRepositoryLink } from "../gedcom/gedcomRepositoryLink";
 import type { GedcomSource } from "../gedcom/gedcomSource";
 import { InputMultimediaLinksComponent } from "./input-multimedia-links.component";
-import { InputSourceRepositoryCitationsComponent } from "./input-source-repository-citations.component";
+import { InputRepositoryLinksComponent } from "./input-repository-links.component";
 import { InputUnknownRecordsComponent } from "./input-unknown-records.component";
 import { Component, DestroyRef, inject, input } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -20,7 +21,7 @@ import { startWith } from "rxjs/operators";
   imports: [
     ReactiveFormsModule,
     InputMultimediaLinksComponent,
-    InputSourceRepositoryCitationsComponent,
+    InputRepositoryLinksComponent,
     InputUnknownRecordsComponent,
   ],
   templateUrl: "./input-source.component.html",
@@ -44,12 +45,7 @@ export class InputSourceComponent implements ControlValueAccessor {
     abbr: "",
     title: "",
     text: "",
-    repositoryCitations: this.formBuilder.control<
-      {
-        repositoryXref: string;
-        callNumber: string;
-      }[]
-    >([]),
+    repositoryLinks: this.formBuilder.control<GedcomRepositoryLink[]>([]),
     multimediaLinks: this.formBuilder.control<GedcomMultimediaLink[]>([]),
     unknownRecords: this.formBuilder.control<GedcomRecord[]>([]),
   });
@@ -61,13 +57,7 @@ export class InputSourceComponent implements ControlValueAccessor {
         abbr: source?.abbr ?? "",
         title: source?.title ?? "",
         text: source?.text ?? "",
-        repositoryCitations:
-          source?.repositoryCitations.flatMap((repositoryCitation) =>
-            repositoryCitation.callNumbers.map((callNumber) => ({
-              repositoryXref: repositoryCitation.repositoryXref,
-              callNumber,
-            })),
-          ) ?? [],
+        repositoryLinks: source?.repositoryLinks ?? [],
         multimediaLinks: source?.multimediaLinks ?? [],
         unknownRecords: source?.unknownRecords ?? [],
       },
@@ -86,14 +76,7 @@ export class InputSourceComponent implements ControlValueAccessor {
           abbr: formValue.abbr || undefined,
           title: formValue.title || undefined,
           text: formValue.text || undefined,
-          repositoryCitations: formValue.repositoryCitations.map(
-            (repositoryCitation) => ({
-              repositoryXref: repositoryCitation.repositoryXref,
-              callNumbers: repositoryCitation.callNumber
-                ? [repositoryCitation.callNumber]
-                : [],
-            }),
-          ),
+          repositoryLinks: formValue.repositoryLinks,
           multimediaLinks: formValue.multimediaLinks,
           unknownRecords: formValue.unknownRecords,
         });

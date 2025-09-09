@@ -50,7 +50,7 @@
 //       xref: "@S1@",
 //       abbr: "Source 1",
 //       title: "Title 1",
-//       repositoryCitations: [],
+//       repositoryLinks: [],
 //       unknownRecords: [],
 //       multimediaLinks: [],
 //     });
@@ -73,7 +73,7 @@
 //       abbr: "Source 1",
 //       title: "Title 1",
 //       text: undefined,
-//       repositoryCitations: [],
+//       repositoryLinks: [],
 //       unknownRecords: [],
 //       multimediaLinks: [],
 //     });
@@ -96,10 +96,10 @@
 
 //   it("add repositories", async () => {
 //     expect(component.xref()).toEqual("@S1@");
-//     expect(component.vm()?.repositoryCitations).toEqual([]);
+//     expect(component.vm()?.repositoryLinks).toEqual([]);
 //     component.addRepository();
 //     await waitForAncestryResource();
-//     expect(component.vm()?.repositoryCitations).toEqual([
+//     expect(component.vm()?.repositoryLinks).toEqual([
 //       { repositoryXref: "", callNumber: "" },
 //     ]);
 

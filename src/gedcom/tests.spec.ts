@@ -289,7 +289,7 @@ const testCases: {
       sources: [
         {
           xref: "@S1@",
-          repositoryCitations: [],
+          repositoryLinks: [],
           unknownRecords: [],
           multimediaLinks: [],
         },
@@ -299,7 +299,7 @@ const testCases: {
           title: "title",
           text: "text and more text",
           multimediaLinks: [],
-          repositoryCitations: [],
+          repositoryLinks: [],
           unknownRecords: [
             {
               xref: undefined,

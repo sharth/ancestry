@@ -37,7 +37,7 @@
 //     expect(ancestryResource.value()!.sources.keys().toArray()).toEqual([]);
 //     await ancestryDatabase.sources.add({
 //       xref: "@S10@",
-//       repositoryCitations: [],
+//       repositoryLinks: [],
 //       unknownRecords: [],
 //       multimediaLinks: [],
 //     });

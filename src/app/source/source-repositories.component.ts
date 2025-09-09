@@ -24,10 +24,10 @@ export class SourceRepositoriesComponent {
     }
 
     return {
-      citations: source.repositoryCitations.map((citation) => ({
-        repositoryXref: citation.repositoryXref,
-        callNumbers: citation.callNumbers,
-        repository: ancestry.repositories.get(citation.repositoryXref),
+      citations: source.repositoryLinks.map((repositoryLink) => ({
+        repositoryXref: repositoryLink.repositoryXref,
+        callNumbers: repositoryLink.callNumbers,
+        repository: ancestry.repositories.get(repositoryLink.repositoryXref),
       })),
     };
   });
