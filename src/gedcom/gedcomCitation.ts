@@ -52,20 +52,7 @@ export function parseGedcomCitation(
         gedcomCitation.page = childRecord.value;
         break;
       case "DATA":
-        if (childRecord.xref != null) throw new Error();
-        if (childRecord.value != null) throw new Error();
-        for (const grandchildRecord of childRecord.children) {
-          switch (grandchildRecord.tag) {
-            case "TEXT":
-              if (grandchildRecord.xref != null) throw new Error();
-              if (grandchildRecord.value != null) {
-                gedcomCitation.text = grandchildRecord.value;
-              }
-              break;
-            default:
-              reportUnparsedRecord(grandchildRecord);
-          }
-        }
+        gedcomCitation.text = parseGedcomCitationData(childRecord);
         break;
       default:
         reportUnparsedRecord(childRecord);
@@ -74,6 +61,29 @@ export function parseGedcomCitation(
   }
 
   return gedcomCitation;
+}
+
+function parseGedcomCitationData(gedcomRecord: GedcomRecord): string {
+  if (gedcomRecord.tag != "DATA") throw new Error();
+  if (gedcomRecord.xref != null) throw new Error();
+  if (gedcomRecord.value != null) throw new Error();
+
+  let text = "";
+
+  for (const childRecord of gedcomRecord.children) {
+    switch (childRecord.tag) {
+      case "TEXT":
+        if (childRecord.xref != null) throw new Error();
+        if (childRecord.value == null) throw new Error();
+        if (childRecord.children.length) throw new Error();
+        text = childRecord.value;
+        break;
+      default:
+        reportUnparsedRecord(childRecord);
+    }
+  }
+
+  return text;
 }
 
 export function serializeGedcomCitation(
