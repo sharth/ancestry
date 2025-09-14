@@ -1,5 +1,5 @@
 import { AncestryService } from "../../database/ancestry.service";
-import { type GedcomIndividual, fullname } from "../../gedcom/gedcomIndividual";
+import type { GedcomIndividual } from "../../gedcom/gedcomIndividual";
 import { IndividualLinkComponent } from "../individual-link/individual-link.component";
 import { Component, computed, inject, input } from "@angular/core";
 
@@ -75,8 +75,6 @@ export class IndividualRelativesComponent {
       ],
     };
   });
-
-  fullname = fullname;
 }
 
 function parentDescription(gedcomIndividual: GedcomIndividual): string {
