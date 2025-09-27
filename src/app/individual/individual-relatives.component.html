@@ -1,20 +1,48 @@
 @if (vm(); as vm) {
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th scope="col">Relation</th>
-        <th scope="col">Name</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (relative of vm.relatives; track relative.individual.xref) {
-        <tr>
-          <td>{{ relative.relationship }}</td>
-          <td>
-            <app-individual-link [xref]="relative.individual.xref" />
-          </td>
-        </tr>
+  <dl>
+    @for (group of vm.parentGroups; track group.family.xref) {
+      <dt>Parents</dt>
+      @for (parent of group.parents; track parent.xref) {
+        <dd>
+          <app-individual-link [xref]="parent.xref"></app-individual-link>
+        </dd>
+      } @empty {
+        <dd>None</dd>
       }
-    </tbody>
-  </table>
+      <dt>Siblings</dt>
+      @for (sibling of group.siblings; track sibling.xref) {
+        <dd>
+          <app-individual-link [xref]="sibling.xref"></app-individual-link>
+        </dd>
+      } @empty {
+        <dd>None</dd>
+      }
+      <dt>Halfsiblings</dt>
+      @for (halfsibling of group.halfsiblings; track halfsibling.xref) {
+        <dd>
+          <app-individual-link [xref]="halfsibling.xref"></app-individual-link>
+        </dd>
+      } @empty {
+        <dd>None</dd>
+      }
+    }
+    @for (group of vm.spouseGroups; track group.family.xref) {
+      <dt>Spouse</dt>
+      @if (group.spouse) {
+        <dd>
+          <app-individual-link [xref]="group.spouse.xref"></app-individual-link>
+        </dd>
+      } @else {
+        <dd>None</dd>
+      }
+      <dt>Children</dt>
+      @for (child of group.children; track child.xref) {
+        <dd>
+          <app-individual-link [xref]="child.xref"></app-individual-link>
+        </dd>
+      } @empty {
+        <dd>None</dd>
+      }
+    }
+  </dl>
 }

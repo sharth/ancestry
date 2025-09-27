@@ -7,7 +7,6 @@ import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
 import { IndividualEditorComponent } from "../individual-editor/individual-editor.component";
 import { IndividualAncestorsComponent } from "./individual-ancestors.component";
 import { IndividualEventsComponent } from "./individual-events.component";
-import { IndividualFamiliesComponent } from "./individual-families.component";
 import { IndividualRelativesComponent } from "./individual-relatives.component";
 import { Component, computed, inject, input } from "@angular/core";
 
@@ -18,7 +17,6 @@ import { Component, computed, inject, input } from "@angular/core";
     IndividualAncestorsComponent,
     IndividualEventsComponent,
     IndividualEditorComponent,
-    IndividualFamiliesComponent,
   ],
   templateUrl: "./individual.component.html",
   styleUrl: "./individual.component.css",

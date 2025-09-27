@@ -1,5 +1,4 @@
 import { AncestryService } from "../../database/ancestry.service";
-import type { GedcomIndividual } from "../../gedcom/gedcomIndividual";
 import { IndividualLinkComponent } from "../individual-link/individual-link.component";
 import { Component, computed, inject, input } from "@angular/core";
 
@@ -25,97 +24,49 @@ export class IndividualRelativesComponent {
       return undefined;
     }
 
-    const parents: GedcomIndividual[] = individual.childOfFamilyXrefs
-      .map((familyXref) => ancestry.families.get(familyXref))
-      .filter((family) => family != null)
-      .flatMap((family) => [family.husbandXref, family.wifeXref])
-      .filter((parentXref) => parentXref != null)
-      .map((parentXref) => ancestry.individuals.get(parentXref))
-      .filter((parent) => parent != null);
-    const siblings: GedcomIndividual[] = individual.childOfFamilyXrefs
-      .map((familyXref) => ancestry.families.get(familyXref))
-      .filter((family) => family != null)
-      .flatMap((family) => family.childXrefs)
-      .map((siblingXref) => ancestry.individuals.get(siblingXref))
-      .filter((sibling) => sibling != null)
-      .filter((sibling) => sibling.xref != xref);
-    const spouses: GedcomIndividual[] = individual.parentOfFamilyXrefs
-      .map((familyXref) => ancestry.families.get(familyXref))
-      .filter((family) => family != null)
-      .flatMap((family) => [family.husbandXref, family.wifeXref])
-      .filter((spouseXref) => spouseXref != null)
-      .map((spouseXref) => ancestry.individuals.get(spouseXref))
-      .filter((spouse) => spouse != null)
-      .filter((spouse) => spouse.xref != xref);
-    const children: GedcomIndividual[] = individual.parentOfFamilyXrefs
-      .map((familyXref) => ancestry.families.get(familyXref))
-      .filter((family) => family != null)
-      .flatMap((family) => family.childXrefs)
-      .map((childXref) => ancestry.individuals.get(childXref))
-      .filter((child) => child != null);
-
     return {
-      relatives: [
-        ...parents.map((parent) => ({
-          individual: parent,
-          relationship: parentDescription(parent),
+      parentGroups: individual.childOfFamilyXrefs
+        .map((familyXref) => ancestry.families.get(familyXref))
+        .filter((family) => family !== undefined)
+        .map((family) => ({
+          family: family,
+          parents: [family.husbandXref, family.wifeXref]
+            .filter((parentXref) => parentXref !== undefined)
+            .map((parentXref) => ancestry.individuals.get(parentXref))
+            .filter((parent) => parent !== undefined),
+          siblings: family.childXrefs
+            .map((siblingXref) => ancestry.individuals.get(siblingXref))
+            .filter((sibling) => sibling !== undefined)
+            .filter((sibling) => sibling.xref !== individual.xref),
+          halfsiblings: [family.husbandXref, family.wifeXref]
+            .filter((parentXref) => parentXref !== undefined)
+            .map((parentXref) => ancestry.individuals.get(parentXref))
+            .filter((parent) => parent !== undefined)
+            .flatMap((parent) => parent.parentOfFamilyXrefs)
+            .map((familyXref) => ancestry.families.get(familyXref))
+            .filter((family) => family !== undefined)
+            .flatMap((family) => family.childXrefs)
+            .map((siblingXref) => ancestry.individuals.get(siblingXref))
+            .filter((sibling) => sibling !== undefined)
+            .filter((sibling) => !family.childXrefs.includes(sibling.xref)),
         })),
-        ...siblings.map((sibling) => ({
-          individual: sibling,
-          relationship: siblingDescription(sibling),
-        })),
-        ...spouses.map((spouse) => ({
-          individual: spouse,
-          relationship: spouseDescription(spouse),
-        })),
-        ...children.map((child) => ({
-          individual: child,
-          relationship: childDescription(child),
-        })),
-      ],
+
+      spouseGroups: individual.parentOfFamilyXrefs
+        .map((familyXref) => ancestry.families.get(familyXref))
+        .filter((family) => family !== undefined)
+        .map((family) => {
+          const spouseXref =
+            family.husbandXref != individual.xref
+              ? family.husbandXref
+              : family.wifeXref;
+          const spouse = spouseXref
+            ? ancestry.individuals.get(spouseXref)
+            : undefined;
+          const children = family.childXrefs
+            .map((childXref) => ancestry.individuals.get(childXref))
+            .filter((child) => child !== undefined);
+          return { family, spouse, children };
+        }),
     };
   });
-}
-
-function parentDescription(gedcomIndividual: GedcomIndividual): string {
-  switch (gedcomIndividual.sex?.sex) {
-    case "M":
-      return "Father";
-    case "F":
-      return "Mother";
-    default:
-      return "Parent";
-  }
-}
-function siblingDescription(gedcomIndividual: GedcomIndividual): string {
-  switch (gedcomIndividual.sex?.sex) {
-    case "M":
-      return "Brother";
-    case "F":
-      return "Sister";
-    default:
-      return "Sibling";
-  }
-}
-
-function spouseDescription(gedcomIndividual: GedcomIndividual): string {
-  switch (gedcomIndividual.sex?.sex) {
-    case "M":
-      return "Husband";
-    case "F":
-      return "Wife";
-    default:
-      return "Spouse";
-  }
-}
-
-function childDescription(gedcomIndividual: GedcomIndividual): string {
-  switch (gedcomIndividual.sex?.sex) {
-    case "M":
-      return "Son";
-    case "F":
-      return "Daughter";
-    default:
-      return "Child";
-  }
 }
