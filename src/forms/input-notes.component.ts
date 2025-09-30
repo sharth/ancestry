@@ -43,13 +43,14 @@ export class InputNotesComponent implements ControlValueAccessor {
   ]);
 
   writeValue(gedcomNotes: GedcomNote[]): void {
-    this.formArray.clear();
+    this.formArray.clear({ emitEvent: false });
     this.formArray.push(
       gedcomNotes.map((gedcomNote) =>
         this.formBuilder.group({
           text: gedcomNote.text,
         }),
       ),
+      { emitEvent: false },
     );
   }
 

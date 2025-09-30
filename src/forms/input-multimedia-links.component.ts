@@ -45,7 +45,7 @@ export class InputMultimediaLinksComponent implements ControlValueAccessor {
   ]);
 
   writeValue(multimediaLinks: GedcomMultimediaLink[]): void {
-    this.formArray.clear();
+    this.formArray.clear({ emitEvent: false });
     this.formArray.push(
       multimediaLinks.map((multimediaLink) =>
         this.formBuilder.group({

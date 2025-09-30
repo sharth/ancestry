@@ -62,7 +62,7 @@ export class InputCitationsComponent implements ControlValueAccessor {
   >([]);
 
   writeValue(citations: GedcomCitation[]): void {
-    this.form.clear();
+    this.form.clear({ emitEvent: false });
     this.form.push(
       citations.map((citation) =>
         this.formBuilder.group({
@@ -76,6 +76,7 @@ export class InputCitationsComponent implements ControlValueAccessor {
           ),
         }),
       ),
+      { emitEvent: false },
     );
   }
 
