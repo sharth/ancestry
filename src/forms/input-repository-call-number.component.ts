@@ -1,5 +1,5 @@
 import type { AncestryDatabase } from "../database/ancestry.service";
-import { Component, DestroyRef, inject, input } from "@angular/core";
+import { Component, DestroyRef, inject, model } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type { ControlValueAccessor } from "@angular/forms";
 import {
@@ -28,7 +28,7 @@ export class InputRepositoryCallNumberComponent
   private readonly destroyRef = inject(DestroyRef);
   private readonly formBuilder = inject(NonNullableFormBuilder);
 
-  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly ancestryDatabase = model.required<AncestryDatabase>();
 
   readonly formGroup = this.formBuilder.group({
     callNumber: "",

@@ -6,7 +6,7 @@ import {
   DestroyRef,
   ViewChildren,
   inject,
-  input,
+  model,
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type { ControlValueAccessor } from "@angular/forms";
@@ -34,7 +34,7 @@ export class InputNotesComponent implements ControlValueAccessor {
   private readonly destroyRef = inject(DestroyRef);
   private readonly formBuilder = inject(NonNullableFormBuilder);
 
-  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly ancestryDatabase = model.required<AncestryDatabase>();
 
   readonly formArray = this.formBuilder.array([
     this.formBuilder.group({

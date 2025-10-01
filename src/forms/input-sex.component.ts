@@ -1,8 +1,8 @@
 import type { AncestryDatabase } from "../database/ancestry.service";
 import type { GedcomCitation } from "../gedcom/gedcomCitation";
 import type { GedcomSex } from "../gedcom/gedcomSex";
-import { InputCitationsComponent } from "./input-citations.component";
-import { Component, DestroyRef, inject, input } from "@angular/core";
+import { InputSourceCitationsComponent } from "./input-source-citations.component";
+import { Component, DestroyRef, inject, model } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type { ControlValueAccessor } from "@angular/forms";
 import {
@@ -14,7 +14,7 @@ import { startWith } from "rxjs/operators";
 
 @Component({
   selector: "app-input-sex",
-  imports: [ReactiveFormsModule, InputCitationsComponent],
+  imports: [ReactiveFormsModule, InputSourceCitationsComponent],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -29,7 +29,7 @@ export class InputSexComponent implements ControlValueAccessor {
   private readonly destroyRef = inject(DestroyRef);
   private readonly formBuilder = inject(NonNullableFormBuilder);
 
-  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly ancestryDatabase = model.required<AncestryDatabase>();
 
   readonly form = this.formBuilder.group({
     sex: "",

@@ -73,17 +73,17 @@
       </tr>
       <tr>
         <td colspan="7">
-          <app-input-citations
+          <app-input-source-citations
             [formControl]="event.controls.citations"
-            [ancestryDatabase]="ancestryDatabase()"
-          ></app-input-citations>
+            [(ancestryDatabase)]="ancestryDatabase"
+          ></app-input-source-citations>
         </td>
       </tr>
       <tr>
         <td colspan="7">
           <app-input-shared-with
             [formControl]="event.controls.sharedWith"
-            [ancestryDatabase]="ancestryDatabase()"
+            [(ancestryDatabase)]="ancestryDatabase"
           ></app-input-shared-with>
         </td>
       </tr>
@@ -91,7 +91,7 @@
         <td colspan="7">
           <app-input-notes
             [formControl]="event.controls.notes"
-            [ancestryDatabase]="ancestryDatabase()"
+            [(ancestryDatabase)]="ancestryDatabase"
           ></app-input-notes>
         </td>
       </tr>

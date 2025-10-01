@@ -12,10 +12,10 @@
   </tr>
   <tr>
     <td>
-      <app-input-citations
+      <app-input-source-citations
         [formControl]="form.controls.citations"
-        [ancestryDatabase]="ancestryDatabase()"
-      ></app-input-citations>
+        [(ancestryDatabase)]="ancestryDatabase"
+      ></app-input-source-citations>
     </td>
   </tr>
 </table>

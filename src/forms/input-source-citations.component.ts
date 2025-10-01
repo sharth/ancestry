@@ -11,7 +11,7 @@ import {
   DestroyRef,
   ViewChildren,
   inject,
-  input,
+  model,
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type {
@@ -27,28 +27,28 @@ import {
 import { startWith } from "rxjs/operators";
 
 @Component({
-  selector: "app-input-citations",
+  selector: "app-input-source-citations",
   imports: [
     ReactiveFormsModule,
     InputSourceXrefComponent,
     InputNotesComponent,
     InputMultimediaLinksComponent,
   ],
-  templateUrl: "./input-citations.component.html",
+  templateUrl: "./input-source-citations.component.html",
   styleUrl: "./input.component.css",
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: InputCitationsComponent,
+      useExisting: InputSourceCitationsComponent,
       multi: true,
     },
   ],
 })
-export class InputCitationsComponent implements ControlValueAccessor {
+export class InputSourceCitationsComponent implements ControlValueAccessor {
   private readonly destroyRef = inject(DestroyRef);
   private readonly formBuilder = inject(NonNullableFormBuilder);
 
-  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly ancestryDatabase = model.required<AncestryDatabase>();
 
   readonly form = this.formBuilder.array<
     FormGroup<{

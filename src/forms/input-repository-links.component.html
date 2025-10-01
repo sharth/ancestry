@@ -20,13 +20,13 @@
           <app-input-repository-xref
             #focusTarget
             [formControl]="citation.controls.repositoryXref"
-            [ancestryDatabase]="ancestryDatabase()"
+            [(ancestryDatabase)]="ancestryDatabase"
           ></app-input-repository-xref>
         </td>
         <td>
           <app-input-repository-call-number
             [formControl]="citation.controls.callNumber"
-            [ancestryDatabase]="ancestryDatabase()"
+            [(ancestryDatabase)]="ancestryDatabase"
           ></app-input-repository-call-number>
         </td>
       </tr>

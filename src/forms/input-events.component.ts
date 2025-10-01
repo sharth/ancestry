@@ -3,16 +3,16 @@ import type { GedcomCitation } from "../gedcom/gedcomCitation";
 import type { GedcomEvent, GedcomEventSharedWith } from "../gedcom/gedcomEvent";
 import { gedcomEventTags } from "../gedcom/gedcomEvent";
 import type { GedcomNote } from "../gedcom/gedcomNote";
-import { InputCitationsComponent } from "./input-citations.component";
 import { InputNotesComponent } from "./input-notes.component";
 import { InputSharedWithComponent } from "./input-shared-with.component";
+import { InputSourceCitationsComponent } from "./input-source-citations.component";
 import type { ElementRef, QueryList } from "@angular/core";
 import {
   Component,
   DestroyRef,
   ViewChildren,
   inject,
-  input,
+  model,
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type { ControlValueAccessor } from "@angular/forms";
@@ -27,7 +27,7 @@ import { startWith } from "rxjs/operators";
   selector: "app-input-events",
   imports: [
     ReactiveFormsModule,
-    InputCitationsComponent,
+    InputSourceCitationsComponent,
     InputNotesComponent,
     InputSharedWithComponent,
   ],
@@ -45,7 +45,7 @@ export class InputEventsComponent implements ControlValueAccessor {
   private readonly destroyRef = inject(DestroyRef);
   private readonly formBuilder = inject(NonNullableFormBuilder);
 
-  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly ancestryDatabase = model.required<AncestryDatabase>();
 
   readonly formArray = this.formBuilder.array([
     this.formBuilder.group({

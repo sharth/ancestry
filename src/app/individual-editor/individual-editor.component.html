@@ -1,20 +1,17 @@
-@if (vm(); as vm) {
-  <form (ngSubmit)="submitForm()" class="vstack gap-3">
-    <app-input-individual
-      [ancestryDatabase]="vm.computedDatabase"
-      [formControl]="this.form"
-      name="individual"
-    ></app-input-individual>
+<form (submit)="submitForm()" class="vstack gap-3">
+  <app-input-individual
+    [(ancestryDatabase)]="computedDatabase"
+    [xref]="xref()!"
+  ></app-input-individual>
 
-    <h2>Gedcom Delta</h2>
-    @for (r of vm.differences; track $index) {
-      <app-gedcom-diff
-        [oldGedcomRecord]="r.canonicalRecord"
-        [newGedcomRecord]="r.currentRecord"
-      ></app-gedcom-diff>
-    }
+  <h2>Gedcom Delta</h2>
+  @for (r of differences(); track $index) {
+    <app-gedcom-diff
+      [oldGedcomRecord]="r.canonicalRecord"
+      [newGedcomRecord]="r.currentRecord"
+    ></app-gedcom-diff>
+  }
 
-    <input type="submit" />
-    <input type="button" value="Cancel" (click)="cancelForm()" />
-  </form>
-}
+  <input type="submit" />
+  <input type="button" value="Cancel" (click)="cancelForm()" />
+</form>

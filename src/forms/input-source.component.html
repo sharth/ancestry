@@ -25,17 +25,17 @@
 <h2>Repositories</h2>
 <app-input-repository-links
   [formControl]="form.controls.repositoryLinks"
-  [ancestryDatabase]="ancestryDatabase()"
+  [(ancestryDatabase)]="ancestryDatabase"
 ></app-input-repository-links>
 
 <h2>Multimedia</h2>
 <app-input-multimedia-links
   [formControl]="form.controls.multimediaLinks"
-  [ancestryDatabase]="ancestryDatabase()"
+  [(ancestryDatabase)]="ancestryDatabase"
 ></app-input-multimedia-links>
 
 <h2>Unknown Records</h2>
 <app-input-unknown-records
   [formControl]="form.controls.unknownRecords"
-  [ancestryDatabase]="ancestryDatabase()"
+  [(ancestryDatabase)]="ancestryDatabase"
 ></app-input-unknown-records>

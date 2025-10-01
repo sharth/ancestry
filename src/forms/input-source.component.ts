@@ -6,7 +6,7 @@ import type { GedcomSource } from "../gedcom/gedcomSource";
 import { InputMultimediaLinksComponent } from "./input-multimedia-links.component";
 import { InputRepositoryLinksComponent } from "./input-repository-links.component";
 import { InputUnknownRecordsComponent } from "./input-unknown-records.component";
-import { Component, DestroyRef, inject, input } from "@angular/core";
+import { Component, DestroyRef, inject, model } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type { ControlValueAccessor } from "@angular/forms";
 import {
@@ -38,7 +38,7 @@ export class InputSourceComponent implements ControlValueAccessor {
   private readonly destroyRef = inject(DestroyRef);
   private readonly formBuilder = inject(NonNullableFormBuilder);
 
-  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly ancestryDatabase = model.required<AncestryDatabase>();
 
   readonly form = this.formBuilder.group({
     xref: "",

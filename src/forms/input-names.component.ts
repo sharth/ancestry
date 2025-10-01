@@ -1,14 +1,14 @@
 import type { AncestryDatabase } from "../database/ancestry.service";
 import type { GedcomCitation } from "../gedcom/gedcomCitation";
 import type { GedcomName } from "../gedcom/gedcomName";
-import { InputCitationsComponent } from "./input-citations.component";
+import { InputSourceCitationsComponent } from "./input-source-citations.component";
 import type { ElementRef, QueryList } from "@angular/core";
 import {
   Component,
   DestroyRef,
   ViewChildren,
   inject,
-  input,
+  model,
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type { ControlValueAccessor } from "@angular/forms";
@@ -21,7 +21,7 @@ import { startWith } from "rxjs/operators";
 
 @Component({
   selector: "app-input-names",
-  imports: [ReactiveFormsModule, InputCitationsComponent],
+  imports: [ReactiveFormsModule, InputSourceCitationsComponent],
   templateUrl: "./input-names.component.html",
   styleUrl: "./input.component.css",
   providers: [
@@ -36,7 +36,7 @@ export class InputNamesComponent implements ControlValueAccessor {
   private readonly destroyRef = inject(DestroyRef);
   private readonly formBuilder = inject(NonNullableFormBuilder);
 
-  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly ancestryDatabase = model.required<AncestryDatabase>();
 
   readonly formArray = this.formBuilder.array([
     this.formBuilder.group({

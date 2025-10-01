@@ -51,7 +51,7 @@
               <summary>Multimedia</summary>
               <app-input-multimedia-links
                 [formControl]="formGroup.controls.multimediaLinks"
-                [ancestryDatabase]="ancestryDatabase()"
+                [(ancestryDatabase)]="ancestryDatabase"
               ></app-input-multimedia-links>
             </details>
           </td>
@@ -60,7 +60,7 @@
           <td colspan="7">
             <app-input-notes
               [formControl]="formGroup.controls.notes"
-              [ancestryDatabase]="ancestryDatabase()"
+              [(ancestryDatabase)]="ancestryDatabase"
             ></app-input-notes>
           </td>
         </tr>

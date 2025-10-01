@@ -10,9 +10,9 @@ import { InputNamesComponent } from "./input-names.component";
 import { InputNotesComponent } from "./input-notes.component";
 import { InputSexComponent } from "./input-sex.component";
 import { InputUnknownRecordsComponent } from "./input-unknown-records.component";
-import { Component, DestroyRef, inject, input } from "@angular/core";
+import type { OnInit } from "@angular/core";
+import { Component, DestroyRef, inject, input, model } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import type { ControlValueAccessor } from "@angular/forms";
 import {
   FormsModule,
   NG_VALUE_ACCESSOR,
@@ -42,11 +42,12 @@ import { startWith } from "rxjs/operators";
     },
   ],
 })
-export class InputIndividualComponent implements ControlValueAccessor {
+export class InputIndividualComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly formBuilder = inject(NonNullableFormBuilder);
 
-  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly ancestryDatabase = model.required<AncestryDatabase>();
+  readonly xref = input.required<string>();
 
   readonly form = this.formBuilder.group({
     xref: this.formBuilder.control<string>(""),
@@ -59,7 +60,9 @@ export class InputIndividualComponent implements ControlValueAccessor {
     unknownRecords: this.formBuilder.control<GedcomRecord[]>([]),
   });
 
-  writeValue(individual: GedcomIndividual | undefined): void {
+  ngOnInit(): void {
+    console.log("InputIndividualComponent.ngOnInit", this.xref());
+    const individual = this.ancestryDatabase().individuals.get(this.xref());
     this.form.setValue(
       {
         // FIXME: If the xref (or individual) is not set, we should discover a new one.
@@ -74,17 +77,12 @@ export class InputIndividualComponent implements ControlValueAccessor {
       },
       { emitEvent: false },
     );
-  }
-
-  registerOnChange(
-    onChange: (individual: GedcomIndividual | undefined) => void,
-  ): void {
     this.form.valueChanges
       .pipe(startWith(this.form.value))
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         const formValue = this.form.getRawValue();
-        onChange({
+        const individual: GedcomIndividual = {
           xref: formValue.xref,
           changeDate: {
             value: new Date()
@@ -98,18 +96,12 @@ export class InputIndividualComponent implements ControlValueAccessor {
           parentOfFamilyXrefs: formValue.parentOfFamilies,
           notes: formValue.notes,
           unknownRecords: formValue.unknownRecords,
+        };
+        this.ancestryDatabase.update((ancestryDatabase) => {
+          const individuals = new Map(ancestryDatabase.individuals);
+          individuals.set(individual.xref, individual);
+          return { ...ancestryDatabase, individuals };
         });
-      });
-  }
-
-  registerOnTouched(onTouch: () => void): void {
-    this.form.statusChanges
-      .pipe(startWith(this.form.status))
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        if (this.form.touched) {
-          onTouch();
-        }
       });
   }
 }
