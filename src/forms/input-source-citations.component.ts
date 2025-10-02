@@ -50,7 +50,7 @@ export class InputSourceCitationsComponent implements ControlValueAccessor {
 
   readonly ancestryDatabase = model.required<AncestryDatabase>();
 
-  readonly form = this.formBuilder.array<
+  readonly formArray = this.formBuilder.array<
     FormGroup<{
       sourceXref: FormControl<string>;
       notes: FormControl<GedcomNote[]>;
@@ -62,8 +62,8 @@ export class InputSourceCitationsComponent implements ControlValueAccessor {
   >([]);
 
   writeValue(citations: GedcomCitation[]): void {
-    this.form.clear({ emitEvent: false });
-    this.form.push(
+    this.formArray.clear({ emitEvent: false });
+    this.formArray.push(
       citations.map((citation) =>
         this.formBuilder.group({
           sourceXref: citation.sourceXref,
@@ -81,12 +81,12 @@ export class InputSourceCitationsComponent implements ControlValueAccessor {
   }
 
   registerOnChange(onChange: (citations: GedcomCitation[]) => void): void {
-    this.form.valueChanges
-      .pipe(startWith(this.form.value))
+    this.formArray.valueChanges
+      .pipe(startWith(this.formArray.value))
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         onChange(
-          this.form.getRawValue().map((citation) => ({
+          this.formArray.getRawValue().map((citation) => ({
             sourceXref: citation.sourceXref,
             notes: citation.notes,
             text: citation.text || undefined,
@@ -99,11 +99,11 @@ export class InputSourceCitationsComponent implements ControlValueAccessor {
   }
 
   registerOnTouched(onTouch: () => void): void {
-    this.form.statusChanges
-      .pipe(startWith(this.form.status))
+    this.formArray.statusChanges
+      .pipe(startWith(this.formArray.status))
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
-        if (this.form.touched) {
+        if (this.formArray.touched) {
           onTouch();
         }
       });
@@ -113,7 +113,7 @@ export class InputSourceCitationsComponent implements ControlValueAccessor {
   private focusTargets!: QueryList<InputSourceXrefComponent>;
 
   appendCitation() {
-    this.form.push(
+    this.formArray.push(
       this.formBuilder.group({
         sourceXref: this.formBuilder.control(""),
         notes: this.formBuilder.control<GedcomNote[]>([]),
@@ -129,6 +129,6 @@ export class InputSourceCitationsComponent implements ControlValueAccessor {
   }
 
   removeCitation(index: number) {
-    this.form.removeAt(index);
+    this.formArray.removeAt(index);
   }
 }

@@ -1,8 +1,8 @@
 <details>
-  <summary>Citations ({{ form.controls.length }})</summary>
+  <summary>Citations ({{ formArray.length }})</summary>
   <table>
     <tbody>
-      @for (formGroup of form.controls; track $index) {
+      @for (formGroup of formArray.controls; track $index) {
         <tr style="border: 0">
           <td rowspan="4" class="align-top">
             <button
@@ -47,13 +47,10 @@
         </tr>
         <tr>
           <td colspan="7">
-            <details>
-              <summary>Multimedia</summary>
-              <app-input-multimedia-links
-                [formControl]="formGroup.controls.multimediaLinks"
-                [(ancestryDatabase)]="ancestryDatabase"
-              ></app-input-multimedia-links>
-            </details>
+            <app-input-multimedia-links
+              [formControl]="formGroup.controls.multimediaLinks"
+              [(ancestryDatabase)]="ancestryDatabase"
+            ></app-input-multimedia-links>
           </td>
         </tr>
         <tr>

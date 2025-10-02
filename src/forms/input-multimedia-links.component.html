@@ -1,54 +1,57 @@
-<table>
-  <tbody>
-    @for (link of formArray.controls; track link) {
+<details>
+  <summary>Multimedia ({{ formArray.length }})</summary>
+  <table>
+    <tbody>
+      @for (link of formArray.controls; track link) {
+        <tr>
+          <td>
+            <button
+              class="btn btn-outline-secondary bi bi-trash"
+              type="button"
+              (click)="removeMultimediaLink($index)"
+            ></button>
+          </td>
+          <td class="form-floating">
+            <select
+              #focusTarget
+              class="form-select"
+              [formControl]="link.controls.xref"
+              name="multimediaXref"
+            >
+              <option selected value="">Multimedia...</option>
+              @for (
+                multimedia of ancestryDatabase().multimedias.values();
+                track multimedia.xref
+              ) {
+                <option value="{{ multimedia.xref }}">
+                  {{ multimedia.xref }}
+                </option>
+              }
+            </select>
+            <label>Multimedia</label>
+          </td>
+          <td class="form-floating">
+            <input
+              class="form-control"
+              type="text"
+              [formControl]="link.controls.title"
+              name="Title"
+            />
+            <label>Custom Title</label>
+          </td>
+        </tr>
+      }
+    </tbody>
+    <tfoot>
       <tr>
-        <td>
+        <td colpsan="3" class="input-group">
           <button
-            class="btn btn-outline-secondary bi bi-trash"
+            class="btn btn-outline-secondary bi bi-plus"
             type="button"
-            (click)="removeMultimediaLink($index)"
+            (click)="appendMultimediaLink()"
           ></button>
         </td>
-        <td class="form-floating">
-          <select
-            #focusTarget
-            class="form-select"
-            [formControl]="link.controls.xref"
-            name="multimediaXref"
-          >
-            <option selected value="">Multimedia...</option>
-            @for (
-              multimedia of ancestryDatabase().multimedias.values();
-              track multimedia.xref
-            ) {
-              <option value="{{ multimedia.xref }}">
-                {{ multimedia.xref }}
-              </option>
-            }
-          </select>
-          <label>Multimedia</label>
-        </td>
-        <td class="form-floating">
-          <input
-            class="form-control"
-            type="text"
-            [formControl]="link.controls.title"
-            name="Title"
-          />
-          <label>Custom Title</label>
-        </td>
       </tr>
-    }
-  </tbody>
-  <tfoot>
-    <tr>
-      <td colpsan="3" class="input-group">
-        <button
-          class="btn btn-outline-secondary bi bi-plus"
-          type="button"
-          (click)="appendMultimediaLink()"
-        ></button>
-      </td>
-    </tr>
-  </tfoot>
-</table>
+    </tfoot>
+  </table>
+</details>
