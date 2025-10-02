@@ -1,44 +1,47 @@
-<table>
-  <thead>
-    <tr>
-      <th></th>
-      <th>Repository</th>
-      <th>Call Number</th>
-    </tr>
-  </thead>
-  <tbody>
-    @for (citation of formArray.controls; track $index) {
+<details>
+  <summary>Repositories ({{ formArray.length }})</summary>
+  <table>
+    <thead>
       <tr>
-        <td>
-          <button
-            class="btn btn-outline-secondary bi bi-trash"
-            type="button"
-            (click)="removeCitation($index)"
-          ></button>
-        </td>
-        <td>
-          <app-input-repository-xref
-            #focusTarget
-            [formControl]="citation.controls.repositoryXref"
-            [(ancestryDatabase)]="ancestryDatabase"
-          ></app-input-repository-xref>
-        </td>
-        <td>
-          <app-input-repository-call-number
-            [formControl]="citation.controls.callNumber"
-            [(ancestryDatabase)]="ancestryDatabase"
-          ></app-input-repository-call-number>
-        </td>
+        <th></th>
+        <th>Repository</th>
+        <th>Call Number</th>
       </tr>
-    }
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      @for (citation of formArray.controls; track $index) {
+        <tr>
+          <td>
+            <button
+              class="btn btn-outline-secondary bi bi-trash"
+              type="button"
+              (click)="removeCitation($index)"
+            ></button>
+          </td>
+          <td>
+            <app-input-repository-xref
+              #focusTarget
+              [formControl]="citation.controls.repositoryXref"
+              [(ancestryDatabase)]="ancestryDatabase"
+            ></app-input-repository-xref>
+          </td>
+          <td>
+            <app-input-repository-call-number
+              [formControl]="citation.controls.callNumber"
+              [(ancestryDatabase)]="ancestryDatabase"
+            ></app-input-repository-call-number>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
 
-<div class="input-group">
-  <button
-    class="btn btn-outline-secondary bi bi-plus"
-    type="button"
-    (click)="appendCitation()"
-  ></button>
-  <span class="input-group-text">Associate with another repository</span>
-</div>
+  <div class="input-group">
+    <button
+      class="btn btn-outline-secondary bi bi-plus"
+      type="button"
+      (click)="appendCitation()"
+    ></button>
+    <span class="input-group-text">Associate with another repository</span>
+  </div>
+</details>
