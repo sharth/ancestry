@@ -1,21 +1,24 @@
-<table>
-  <tr>
-    <td rowspan="2" class="align-top"></td>
-    <td class="form-floating">
-      <select class="form-select" id="sex" [formControl]="form.controls.sex">
-        <option value=""></option>
-        <option value="M">Male</option>
-        <option value="F">Female</option>
-      </select>
-      <label for="sex">Sex</label>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <app-input-source-citations
-        [formControl]="form.controls.citations"
-        [(ancestryDatabase)]="ancestryDatabase"
-      ></app-input-source-citations>
-    </td>
-  </tr>
-</table>
+<details [open]="open()">
+  <summary>Sex</summary>
+  <table>
+    <tr>
+      <td rowspan="2" class="align-top"></td>
+      <td class="form-floating">
+        <select class="form-select" id="sex" [formControl]="form.controls.sex">
+          <option value=""></option>
+          <option value="M">Male</option>
+          <option value="F">Female</option>
+        </select>
+        <label for="sex">Sex</label>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <app-input-source-citations
+          [formControl]="form.controls.citations"
+          [(ancestryDatabase)]="ancestryDatabase"
+        ></app-input-source-citations>
+      </td>
+    </tr>
+  </table>
+</details>

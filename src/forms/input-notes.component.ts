@@ -6,6 +6,7 @@ import {
   DestroyRef,
   ViewChildren,
   inject,
+  input,
   model,
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -33,6 +34,8 @@ import { startWith } from "rxjs/operators";
 export class InputNotesComponent implements ControlValueAccessor {
   private readonly destroyRef = inject(DestroyRef);
   private readonly formBuilder = inject(NonNullableFormBuilder);
+
+  readonly open = input<boolean>(false);
 
   readonly ancestryDatabase = model.required<AncestryDatabase>();
 

@@ -1,89 +1,92 @@
-<table>
-  <tbody>
-    @for (name of formArray.controls; track $index; let i = $index) {
+<details [open]="open()">
+  <summary>Names ({{ formArray.length }})</summary>
+  <table>
+    <tbody>
+      @for (name of formArray.controls; track $index; let i = $index) {
+        <tr>
+          <td rowspan="2" class="align-top">
+            <button
+              type="button"
+              class="btn btn-danger bi-trash"
+              (click)="removeName(i)"
+            ></button>
+          </td>
+          <td class="form-floating">
+            <input
+              #focusTarget
+              class="form-control"
+              id="prefix_{{ $index }}"
+              [formControl]="name.controls.prefix"
+            />
+            <label for="prefix_{{ $index }}">Prefix</label>
+          </td>
+          <td class="form-floating">
+            <input
+              class="form-control"
+              id="given_{{ $index }}"
+              [formControl]="name.controls.givenName"
+            />
+            <label for="given_{{ $index }}">Given Name</label>
+          </td>
+          <td class="form-floating">
+            <input
+              class="form-control"
+              id="nick_{{ $index }}"
+              [formControl]="name.controls.nickName"
+            />
+            <label for="nick_{{ $index }}">Nickname</label>
+          </td>
+          <td class="form-floating">
+            <input
+              class="form-control"
+              id="surnamePrefix_{{ $index }}"
+              [formControl]="name.controls.surnamePrefix"
+            />
+            <label for="surnamePrefix_{{ $index }}">Surname Prefix</label>
+          </td>
+          <td class="form-floating">
+            <input
+              class="form-control"
+              id="surname_{{ $index }}"
+              [formControl]="name.controls.surname"
+            />
+            <label for="surname_{{ $index }}">Surname</label>
+          </td>
+          <td class="form-floating">
+            <input
+              class="form-control"
+              id="suffix_{{ $index }}"
+              [formControl]="name.controls.suffix"
+            />
+            <label for="suffix_{{ $index }}">Suffix</label>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="6">
+            <app-input-source-citations
+              [formControl]="name.controls.citations"
+              [(ancestryDatabase)]="ancestryDatabase"
+            ></app-input-source-citations>
+          </td>
+        </tr>
+      }
+    </tbody>
+    <tfoot>
       <tr>
-        <td rowspan="2" class="align-top">
+        <th>
           <button
             type="button"
-            class="btn btn-danger bi-trash"
-            (click)="removeName(i)"
+            class="btn btn-outline-primary bi-plus"
+            (click)="appendName()"
           ></button>
-        </td>
-        <td class="form-floating">
-          <input
-            #focusTarget
-            class="form-control"
-            id="prefix_{{ $index }}"
-            [formControl]="name.controls.prefix"
-          />
-          <label for="prefix_{{ $index }}">Prefix</label>
-        </td>
-        <td class="form-floating">
-          <input
-            class="form-control"
-            id="given_{{ $index }}"
-            [formControl]="name.controls.givenName"
-          />
-          <label for="given_{{ $index }}">Given Name</label>
-        </td>
-        <td class="form-floating">
-          <input
-            class="form-control"
-            id="nick_{{ $index }}"
-            [formControl]="name.controls.nickName"
-          />
-          <label for="nick_{{ $index }}">Nickname</label>
-        </td>
-        <td class="form-floating">
-          <input
-            class="form-control"
-            id="surnamePrefix_{{ $index }}"
-            [formControl]="name.controls.surnamePrefix"
-          />
-          <label for="surnamePrefix_{{ $index }}">Surname Prefix</label>
-        </td>
-        <td class="form-floating">
-          <input
-            class="form-control"
-            id="surname_{{ $index }}"
-            [formControl]="name.controls.surname"
-          />
-          <label for="surname_{{ $index }}">Surname</label>
-        </td>
-        <td class="form-floating">
-          <input
-            class="form-control"
-            id="suffix_{{ $index }}"
-            [formControl]="name.controls.suffix"
-          />
-          <label for="suffix_{{ $index }}">Suffix</label>
-        </td>
+        </th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
       </tr>
-      <tr>
-        <td colspan="6">
-          <app-input-source-citations
-            [formControl]="name.controls.citations"
-            [(ancestryDatabase)]="ancestryDatabase"
-          ></app-input-source-citations>
-        </td>
-      </tr>
-    }
-  </tbody>
-  <tfoot>
-    <tr>
-      <th>
-        <button
-          type="button"
-          class="btn btn-outline-primary bi-plus"
-          (click)="appendName()"
-        ></button>
-      </th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </tfoot>
-</table>
+    </tfoot>
+  </table>
+</details>

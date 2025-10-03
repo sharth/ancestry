@@ -1,7 +1,7 @@
 import type { AncestryDatabase } from "../database/ancestry.service";
 import { serializeGedcomRecordToText } from "../gedcom/gedcomRecord";
 import type { GedcomRecord } from "../gedcom/gedcomRecord";
-import { Component, DestroyRef, inject, model } from "@angular/core";
+import { Component, DestroyRef, inject, input, model } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type { ControlValueAccessor } from "@angular/forms";
 import {
@@ -30,6 +30,8 @@ export class InputUnknownRecordsComponent implements ControlValueAccessor {
   private readonly formBuilder = inject(NonNullableFormBuilder);
 
   readonly ancestryDatabase = model.required<AncestryDatabase>();
+
+  readonly open = input<boolean>(false);
 
   readonly formArray = this.formBuilder.array<GedcomRecord[]>([]);
 
