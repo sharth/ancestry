@@ -34,13 +34,6 @@ import { startWith } from "rxjs/operators";
   ],
   templateUrl: "./input-individual.component.html",
   styleUrl: "./input.component.css",
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: InputIndividualComponent,
-      multi: true,
-    },
-  ],
 })
 export class InputIndividualComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);

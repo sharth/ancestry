@@ -6,14 +6,10 @@ import type { GedcomSource } from "../gedcom/gedcomSource";
 import { InputMultimediaLinksComponent } from "./input-multimedia-links.component";
 import { InputRepositoryLinksComponent } from "./input-repository-links.component";
 import { InputUnknownRecordsComponent } from "./input-unknown-records.component";
-import { Component, DestroyRef, inject, model } from "@angular/core";
+import type { OnInit } from "@angular/core";
+import { Component, DestroyRef, inject, input, model } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import type { ControlValueAccessor } from "@angular/forms";
-import {
-  NG_VALUE_ACCESSOR,
-  NonNullableFormBuilder,
-  ReactiveFormsModule,
-} from "@angular/forms";
+import { NonNullableFormBuilder, ReactiveFormsModule } from "@angular/forms";
 import { startWith } from "rxjs/operators";
 
 @Component({
@@ -26,19 +22,13 @@ import { startWith } from "rxjs/operators";
   ],
   templateUrl: "./input-source.component.html",
   styleUrl: "./input.component.css",
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: InputSourceComponent,
-      multi: true,
-    },
-  ],
 })
-export class InputSourceComponent implements ControlValueAccessor {
+export class InputSourceComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly formBuilder = inject(NonNullableFormBuilder);
 
   readonly ancestryDatabase = model.required<AncestryDatabase>();
+  readonly xref = input.required<string>();
 
   readonly form = this.formBuilder.group({
     xref: "",
@@ -50,10 +40,11 @@ export class InputSourceComponent implements ControlValueAccessor {
     unknownRecords: this.formBuilder.control<GedcomRecord[]>([]),
   });
 
-  writeValue(source?: GedcomSource): void {
+  ngOnInit(): void {
+    const source = this.ancestryDatabase().sources.get(this.xref());
     this.form.setValue(
       {
-        xref: source?.xref ?? "",
+        xref: this.xref(),
         abbr: source?.abbr ?? "",
         title: source?.title ?? "",
         text: source?.text ?? "",
@@ -63,15 +54,12 @@ export class InputSourceComponent implements ControlValueAccessor {
       },
       { emitEvent: false },
     );
-  }
-
-  registerOnChange(onChange: (source?: GedcomSource) => void): void {
     this.form.valueChanges
       .pipe(startWith(this.form.value))
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         const formValue = this.form.getRawValue();
-        onChange({
+        const source: GedcomSource = {
           xref: formValue.xref,
           abbr: formValue.abbr || undefined,
           title: formValue.title || undefined,
@@ -79,18 +67,12 @@ export class InputSourceComponent implements ControlValueAccessor {
           repositoryLinks: formValue.repositoryLinks,
           multimediaLinks: formValue.multimediaLinks,
           unknownRecords: formValue.unknownRecords,
+        };
+        this.ancestryDatabase.update((ancestryDatabase) => {
+          const sources = new Map(ancestryDatabase.sources);
+          sources.set(source.xref, source);
+          return { ...ancestryDatabase, sources };
         });
-      });
-  }
-
-  registerOnTouched(onTouch: () => void): void {
-    this.form.statusChanges
-      .pipe(startWith(this.form.status))
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        if (this.form.touched) {
-          onTouch();
-        }
       });
   }
 }
