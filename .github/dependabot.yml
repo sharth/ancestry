@@ -8,10 +8,9 @@ updates:
     schedule:
       interval: "weekly"
     groups:
-      angular-dependencies:
+      angular:
         patterns:
           - "@angular/*"
-          - "@angular-devkit/build-angular"
       eslint:
         patterns:
           - "@eslint/js"
