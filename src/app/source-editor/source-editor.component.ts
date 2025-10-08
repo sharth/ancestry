@@ -9,7 +9,6 @@ import type { GedcomRepository } from "../../gedcom/gedcomRepository";
 import type { GedcomSource } from "../../gedcom/gedcomSource";
 import type { GedcomSubmitter } from "../../gedcom/gedcomSubmitter";
 import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
-import type { OnInit } from "@angular/core";
 import {
   Component,
   computed,
@@ -18,7 +17,6 @@ import {
   output,
   signal,
 } from "@angular/core";
-import { toSignal } from "@angular/core/rxjs-interop";
 import {
   FormsModule,
   NonNullableFormBuilder,

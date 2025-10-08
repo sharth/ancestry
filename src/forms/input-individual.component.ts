@@ -15,7 +15,6 @@ import { Component, DestroyRef, inject, input, model } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import {
   FormsModule,
-  NG_VALUE_ACCESSOR,
   NonNullableFormBuilder,
   ReactiveFormsModule,
 } from "@angular/forms";
@@ -54,7 +53,6 @@ export class InputIndividualComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    console.log("InputIndividualComponent.ngOnInit", this.xref());
     const individual = this.ancestryDatabase().individuals.get(this.xref());
     this.form.setValue(
       {
