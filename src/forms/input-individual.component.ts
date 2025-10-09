@@ -40,6 +40,7 @@ export class InputIndividualComponent implements OnInit {
 
   readonly ancestryDatabase = model.required<AncestryDatabase>();
   readonly xref = input.required<string>();
+  readonly open = input<boolean>(false);
 
   readonly form = this.formBuilder.group({
     xref: this.formBuilder.control<string>(""),
