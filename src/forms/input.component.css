@@ -25,3 +25,7 @@ textarea {
   field-sizing: content;
   height: auto !important;
 }
+
+details::details-content {
+  padding-left: 1em;
+}
