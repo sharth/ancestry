@@ -11,6 +11,7 @@ import {
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import type {
+  AbstractControl,
   ControlValueAccessor,
   FormControl,
   FormGroup,
@@ -47,6 +48,8 @@ export class InputSharedWithComponent implements ControlValueAccessor {
       role: FormControl<string>;
     }>
   >([]);
+
+  readonly newControls = new WeakSet<AbstractControl>([]);
 
   writeValue(sharedWith: GedcomEventSharedWith[]): void {
     this.form.clear({ emitEvent: false });
@@ -92,12 +95,12 @@ export class InputSharedWithComponent implements ControlValueAccessor {
   private focusTargets!: QueryList<InputIndividualXrefComponent>;
 
   appendSharedEvent() {
-    this.form.push(
-      this.formBuilder.group({
-        xref: this.formBuilder.control(""),
-        role: this.formBuilder.control(""),
-      }),
-    );
+    const formGroup = this.formBuilder.group({
+      xref: this.formBuilder.control(""),
+      role: this.formBuilder.control(""),
+    });
+    this.newControls.add(formGroup);
+    this.form.push(formGroup);
     setTimeout(() => {
       this.focusTargets.last.focus();
     });
