@@ -12,7 +12,7 @@ import {
   model,
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import type { ControlValueAccessor } from "@angular/forms";
+import type { AbstractControl, ControlValueAccessor } from "@angular/forms";
 import {
   NG_VALUE_ACCESSOR,
   NonNullableFormBuilder,
@@ -54,6 +54,9 @@ export class InputNamesComponent implements ControlValueAccessor {
     }),
   ]);
 
+  // Keep track of the controls thaat were added by a user interation.
+  readonly newControls = new WeakSet<AbstractControl>([]);
+
   writeValue(names: GedcomName[]): void {
     this.formArray.clear({ emitEvent: false });
     this.formArray.push(
@@ -71,6 +74,7 @@ export class InputNamesComponent implements ControlValueAccessor {
       { emitEvent: false },
     );
   }
+
   registerOnChange(onChange: (names: GedcomName[]) => void): void {
     this.formArray.valueChanges
       .pipe(startWith(this.formArray.value))
@@ -90,6 +94,7 @@ export class InputNamesComponent implements ControlValueAccessor {
         );
       });
   }
+
   registerOnTouched(onTouch: () => void): void {
     this.formArray.statusChanges
       .pipe(startWith(this.formArray.status))
@@ -106,17 +111,17 @@ export class InputNamesComponent implements ControlValueAccessor {
   >;
 
   appendName() {
-    this.formArray.push(
-      this.formBuilder.group({
-        prefix: "",
-        givenName: "",
-        nickName: "",
-        surnamePrefix: "",
-        surname: "",
-        suffix: "",
-        citations: this.formBuilder.control<GedcomCitation[]>([]),
-      }),
-    );
+    const formGroup = this.formBuilder.group({
+      prefix: "",
+      givenName: "",
+      nickName: "",
+      surnamePrefix: "",
+      surname: "",
+      suffix: "",
+      citations: this.formBuilder.control<GedcomCitation[]>([]),
+    });
+    this.formArray.push(formGroup);
+    this.newControls.add(formGroup);
     setTimeout(() => {
       this.focusTargets.last.nativeElement.focus();
     });

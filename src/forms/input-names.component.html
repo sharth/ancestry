@@ -7,8 +7,8 @@
       (click)="appendName()"
     ></button>
   </summary>
-  @for (name of formArray.controls; track $index; let i = $index) {
-    <details>
+  @for (name of formArray.controls; track name) {
+    <details [open]="newControls.has(name)">
       <summary>
         {{ name.controls.prefix.value }}
         {{ name.controls.givenName.value }}
@@ -18,7 +18,7 @@
         <button
           type="button"
           class="btn btn-sm btn-outline-danger bi-trash"
-          (click)="removeName(i)"
+          (click)="removeName($index)"
         ></button>
       </summary>
       <div class="form-floating">
