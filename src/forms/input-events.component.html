@@ -8,7 +8,7 @@
     ></button>
   </summary>
   @for (event of formArray.controls; track $index) {
-    <details>
+    <details #container (toggle)="(true)">
       <summary>
         {{ event.controls.tag.value }}
         <button
@@ -17,79 +17,81 @@
           (click)="removeEvent($index)"
         ></button>
       </summary>
-      <div class="form-floating">
-        <select
-          #focusTarget
-          class="form-control"
-          id="tag_{{ $index }}"
-          [formControl]="event.controls.tag"
-        >
-          @for (event of gedcomEventTags; track event.tag) {
-            <option [ngValue]="event.tag">{{ event.description }}</option>
-          }
-        </select>
-        <label for="tag_{{ $index }}">Tag</label>
-      </div>
-      <div class="form-floating">
-        <input
-          class="form-control"
-          id="type_{{ $index }}"
-          [formControl]="event.controls.type"
-        />
-        <label for="type_{{ $index }}">Type</label>
-      </div>
-      <div class="form-floating">
-        <input
-          class="form-control"
-          id="address_{{ $index }}"
-          [formControl]="event.controls.address"
-        />
-        <label for="address_{{ $index }}">Address</label>
-      </div>
-      <div class="form-floating">
-        <input
-          class="form-control"
-          id="place_{{ $index }}"
-          [formControl]="event.controls.place"
-        />
-        <label for="place_{{ $index }}">Place</label>
-      </div>
-      <div class="form-floating">
-        <input
-          class="form-control"
-          id="cause_{{ $index }}"
-          [formControl]="event.controls.cause"
-        />
-        <label for="cause_{{ $index }}">Cause</label>
-      </div>
-      <div class="form-floating">
-        <input
-          class="form-control"
-          id="date_{{ $index }}"
-          [formControl]="event.controls.date"
-        />
-        <label for="date_{{ $index }}">Date</label>
-      </div>
-      <div class="form-floating">
-        <input
-          class="form-control"
-          id="sdate_{{ $index }}"
-          [formControl]="event.controls.sortDate"
-        />
-        <label for="sdate_{{ $index }}">Sort Date</label>
-      </div>
-      <app-input-source-citations
-        [formControl]="event.controls.citations"
-        [(ancestryDatabase)]="ancestryDatabase"
-      ></app-input-source-citations>
-      <app-input-shared-with
-        [formControl]="event.controls.sharedWith"
-        [(ancestryDatabase)]="ancestryDatabase"
-      ></app-input-shared-with>
-      <app-input-notes
-        [formControl]="event.controls.notes"
-        [(ancestryDatabase)]="ancestryDatabase"
-      ></app-input-notes>
+      @defer (when container.open) {
+        <div class="form-floating">
+          <select
+            #focusTarget
+            class="form-control"
+            id="tag_{{ $index }}"
+            [formControl]="event.controls.tag"
+          >
+            @for (event of gedcomEventTags; track event.tag) {
+              <option [ngValue]="event.tag">{{ event.description }}</option>
+            }
+          </select>
+          <label for="tag_{{ $index }}">Tag</label>
+        </div>
+        <div class="form-floating">
+          <input
+            class="form-control"
+            id="type_{{ $index }}"
+            [formControl]="event.controls.type"
+          />
+          <label for="type_{{ $index }}">Type</label>
+        </div>
+        <div class="form-floating">
+          <input
+            class="form-control"
+            id="address_{{ $index }}"
+            [formControl]="event.controls.address"
+          />
+          <label for="address_{{ $index }}">Address</label>
+        </div>
+        <div class="form-floating">
+          <input
+            class="form-control"
+            id="place_{{ $index }}"
+            [formControl]="event.controls.place"
+          />
+          <label for="place_{{ $index }}">Place</label>
+        </div>
+        <div class="form-floating">
+          <input
+            class="form-control"
+            id="cause_{{ $index }}"
+            [formControl]="event.controls.cause"
+          />
+          <label for="cause_{{ $index }}">Cause</label>
+        </div>
+        <div class="form-floating">
+          <input
+            class="form-control"
+            id="date_{{ $index }}"
+            [formControl]="event.controls.date"
+          />
+          <label for="date_{{ $index }}">Date</label>
+        </div>
+        <div class="form-floating">
+          <input
+            class="form-control"
+            id="sdate_{{ $index }}"
+            [formControl]="event.controls.sortDate"
+          />
+          <label for="sdate_{{ $index }}">Sort Date</label>
+        </div>
+        <app-input-source-citations
+          [formControl]="event.controls.citations"
+          [(ancestryDatabase)]="ancestryDatabase"
+        ></app-input-source-citations>
+        <app-input-shared-with
+          [formControl]="event.controls.sharedWith"
+          [(ancestryDatabase)]="ancestryDatabase"
+        ></app-input-shared-with>
+        <app-input-notes
+          [formControl]="event.controls.notes"
+          [(ancestryDatabase)]="ancestryDatabase"
+        ></app-input-notes>
+      }
     </details>
   }
 </details>

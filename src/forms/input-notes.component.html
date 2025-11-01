@@ -1,38 +1,40 @@
-<details [open]="open()">
+<details #container (toggle)="(true)" [open]="open()">
   <summary>Notes ({{ formArray.length }})</summary>
-  <table>
-    <tbody>
-      @for (note of formArray.controls; track $index; let i = $index) {
+  @defer (when container.open) {
+    <table>
+      <tbody>
+        @for (note of formArray.controls; track $index; let i = $index) {
+          <tr>
+            <td>
+              <button
+                type="button"
+                class="btn btn-danger bi-trash"
+                (click)="removeNote(i)"
+              ></button>
+            </td>
+            <td class="form-floating">
+              <textarea
+                #focusTarget
+                class="form-control"
+                [formControl]="note.controls.text"
+              ></textarea>
+              <label>Text</label>
+            </td>
+          </tr>
+        }
+      </tbody>
+      <tfoot>
         <tr>
-          <td>
+          <th>
             <button
               type="button"
-              class="btn btn-danger bi-trash"
-              (click)="removeNote(i)"
+              class="btn btn-outline-primary bi-plus"
+              (click)="appendNote()"
             ></button>
-          </td>
-          <td class="form-floating">
-            <textarea
-              #focusTarget
-              class="form-control"
-              [formControl]="note.controls.text"
-            ></textarea>
-            <label>Text</label>
-          </td>
+          </th>
+          <th></th>
         </tr>
-      }
-    </tbody>
-    <tfoot>
-      <tr>
-        <th>
-          <button
-            type="button"
-            class="btn btn-outline-primary bi-plus"
-            (click)="appendNote()"
-          ></button>
-        </th>
-        <th></th>
-      </tr>
-    </tfoot>
-  </table>
+      </tfoot>
+    </table>
+  }
 </details>

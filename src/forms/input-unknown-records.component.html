@@ -1,29 +1,31 @@
-<details [open]="open()">
+<details #container (toggle)="(true)" [open]="open()">
   <summary>Unknown Records ({{ formArray.length }})</summary>
-  <table>
-    <thead>
-      <tr>
-        <th></th>
-        <th>Unknown Gedcom Record</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (unknownRecord of formArray.controls; track $index) {
+  @defer (when container.open) {
+    <table>
+      <thead>
         <tr>
-          <td>
-            <button
-              class="btn btn-outline-secondary bi bi-trash"
-              type="button"
-              (click)="removeUnknownRecord($index)"
-            ></button>
-          </td>
-          <td>
-            <pre>{{
-              serializeGedcomRecordToText(unknownRecord.value).join("\n")
-            }}</pre>
-          </td>
+          <th></th>
+          <th>Unknown Gedcom Record</th>
         </tr>
-      }
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        @for (unknownRecord of formArray.controls; track $index) {
+          <tr>
+            <td>
+              <button
+                class="btn btn-outline-secondary bi bi-trash"
+                type="button"
+                (click)="removeUnknownRecord($index)"
+              ></button>
+            </td>
+            <td>
+              <pre>{{
+                serializeGedcomRecordToText(unknownRecord.value).join("\n")
+              }}</pre>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
 </details>

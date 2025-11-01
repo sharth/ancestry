@@ -1,4 +1,4 @@
-<details>
+<details #container (toggle)="(true)">
   <summary>
     Shared With ({{ form.controls.length }})
     <button
@@ -7,29 +7,31 @@
       (click)="appendSharedEvent()"
     ></button>
   </summary>
-  @for (formGroup of form.controls; track formGroup) {
-    <details [open]="newControls.has(formGroup)">
-      <summary>
-        {{ formGroup.controls.xref.value }}
-        <button
-          type="button"
-          class="btn btn-sm btn-outline-danger bi-trash"
-          (click)="removeSharedEvent($index)"
-        ></button>
-      </summary>
-      <app-input-individual-xref
-        #focusTarget
-        [formControl]="formGroup.controls.xref"
-        [ancestryDatabase]="ancestryDatabase()"
-      ></app-input-individual-xref>
-      <div class="form-floating">
-        <input
-          class="form-control"
-          id="role_{{ $index }}"
-          [formControl]="formGroup.controls.role"
-        />
-        <label for="role_{{ $index }}">Role</label>
-      </div>
-    </details>
+  @defer (when container.open) {
+    @for (formGroup of form.controls; track formGroup) {
+      <details [open]="newControls.has(formGroup)">
+        <summary>
+          {{ formGroup.controls.xref.value }}
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-danger bi-trash"
+            (click)="removeSharedEvent($index)"
+          ></button>
+        </summary>
+        <app-input-individual-xref
+          #focusTarget
+          [formControl]="formGroup.controls.xref"
+          [ancestryDatabase]="ancestryDatabase()"
+        ></app-input-individual-xref>
+        <div class="form-floating">
+          <input
+            class="form-control"
+            id="role_{{ $index }}"
+            [formControl]="formGroup.controls.role"
+          />
+          <label for="role_{{ $index }}">Role</label>
+        </div>
+      </details>
+    }
   }
 </details>
