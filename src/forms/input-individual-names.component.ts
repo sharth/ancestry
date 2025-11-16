@@ -21,19 +21,19 @@ import {
 import { startWith } from "rxjs/operators";
 
 @Component({
-  selector: "app-input-names",
+  selector: "app-input-individual-names",
   imports: [ReactiveFormsModule, InputSourceCitationsComponent],
-  templateUrl: "./input-names.component.html",
+  templateUrl: "./input-individual-names.component.html",
   styleUrl: "./input.component.css",
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: InputNamesComponent,
+      useExisting: InputIndividualNamesComponent,
       multi: true,
     },
   ],
 })
-export class InputNamesComponent implements ControlValueAccessor {
+export class InputIndividualNamesComponent implements ControlValueAccessor {
   private readonly destroyRef = inject(DestroyRef);
   private readonly formBuilder = inject(NonNullableFormBuilder);
 

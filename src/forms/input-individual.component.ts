@@ -5,10 +5,10 @@ import type { GedcomName } from "../gedcom/gedcomName";
 import type { GedcomNote } from "../gedcom/gedcomNote";
 import type { GedcomRecord } from "../gedcom/gedcomRecord";
 import type { GedcomSex } from "../gedcom/gedcomSex";
-import { InputEventsComponent } from "./input-events.component";
-import { InputNamesComponent } from "./input-names.component";
+import { InputIndividualEventsComponent } from "./input-individual-events.component";
+import { InputIndividualNamesComponent } from "./input-individual-names.component";
+import { InputIndividualSexComponent } from "./input-individual-sex.component";
 import { InputNotesComponent } from "./input-notes.component";
-import { InputSexComponent } from "./input-sex.component";
 import { InputUnknownRecordsComponent } from "./input-unknown-records.component";
 import type { OnInit } from "@angular/core";
 import { Component, DestroyRef, inject, input, model } from "@angular/core";
@@ -25,9 +25,9 @@ import { startWith } from "rxjs/operators";
   imports: [
     FormsModule,
     ReactiveFormsModule,
-    InputNamesComponent,
-    InputEventsComponent,
-    InputSexComponent,
+    InputIndividualEventsComponent,
+    InputIndividualSexComponent,
+    InputIndividualNamesComponent,
     InputUnknownRecordsComponent,
     InputNotesComponent,
   ],

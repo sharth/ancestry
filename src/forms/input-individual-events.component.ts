@@ -25,24 +25,24 @@ import {
 import { startWith } from "rxjs/operators";
 
 @Component({
-  selector: "app-input-events",
+  selector: "app-input-individual-events",
   imports: [
     ReactiveFormsModule,
     InputSourceCitationsComponent,
     InputNotesComponent,
     InputSharedWithComponent,
   ],
-  templateUrl: "./input-events.component.html",
+  templateUrl: "./input-individual-events.component.html",
   styleUrl: "./input.component.css",
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: InputEventsComponent,
+      useExisting: InputIndividualEventsComponent,
       multi: true,
     },
   ],
 })
-export class InputEventsComponent implements ControlValueAccessor {
+export class InputIndividualEventsComponent implements ControlValueAccessor {
   private readonly destroyRef = inject(DestroyRef);
   private readonly formBuilder = inject(NonNullableFormBuilder);
 

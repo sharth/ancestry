@@ -13,19 +13,19 @@ import {
 import { startWith } from "rxjs/operators";
 
 @Component({
-  selector: "app-input-sex",
+  selector: "app-input-individual-sex",
   imports: [ReactiveFormsModule, InputSourceCitationsComponent],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: InputSexComponent,
+      useExisting: InputIndividualSexComponent,
       multi: true,
     },
   ],
-  templateUrl: "./input-sex.component.html",
+  templateUrl: "./input-individual-sex.component.html",
   styleUrl: "./input.component.css",
 })
-export class InputSexComponent implements ControlValueAccessor {
+export class InputIndividualSexComponent implements ControlValueAccessor {
   private readonly destroyRef = inject(DestroyRef);
   private readonly formBuilder = inject(NonNullableFormBuilder);
 
