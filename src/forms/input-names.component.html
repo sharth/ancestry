@@ -1,26 +1,19 @@
 <details #container (toggle)="(true)" [open]="open()">
-  <summary>
-    Names ({{ formArray.length }})
-    <button
-      type="button"
-      class="btn btn-sm btn-outline-primary bi-plus"
-      (click)="appendName()"
-    ></button>
-  </summary>
+  <summary>Names ({{ formArray.length }})</summary>
   @defer (when container.open) {
     @for (name of formArray.controls; track name) {
       <details [open]="newControls.has(name)">
         <summary>
-          {{ name.controls.prefix.value }}
-          {{ name.controls.givenName.value }}
-          {{ name.controls.surnamePrefix.value }}
-          {{ name.controls.surname.value }}
-          {{ name.controls.suffix.value }}
           <button
             type="button"
             class="btn btn-sm btn-outline-danger bi-trash"
             (click)="removeName($index)"
           ></button>
+          {{ name.controls.prefix.value }}
+          {{ name.controls.givenName.value }}
+          {{ name.controls.surnamePrefix.value }}
+          {{ name.controls.surname.value }}
+          {{ name.controls.suffix.value }}
         </summary>
         <div class="form-floating">
           <input
@@ -77,5 +70,13 @@
         ></app-input-source-citations>
       </details>
     }
+    <div class="details-lookalike" (click)="appendName()">
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-primary bi-plus"
+        (click)="$event.preventDefault()"
+      ></button>
+      Append another name
+    </div>
   }
 </details>

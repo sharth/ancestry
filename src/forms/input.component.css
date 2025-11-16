@@ -9,10 +9,6 @@ table thead {
   font-weight: bold;
 }
 
-/* table tbody tr {
-  border: 3px solid black;
-} */
-
 div {
   white-space: pre-wrap;
 }
@@ -28,4 +24,10 @@ textarea {
 
 details::details-content {
   padding-left: 1em;
+}
+
+div.details-lookalike {
+  cursor: pointer;
+  display: list-item;
+  list-style: inside disclosure-closed;
 }

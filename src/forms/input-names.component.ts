@@ -54,7 +54,7 @@ export class InputNamesComponent implements ControlValueAccessor {
     }),
   ]);
 
-  // Keep track of the controls thaat were added by a user interation.
+  // Keep track of the controls that were added by a user interation.
   readonly newControls = new WeakSet<AbstractControl>([]);
 
   writeValue(names: GedcomName[]): void {

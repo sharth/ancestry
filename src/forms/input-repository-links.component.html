@@ -1,49 +1,37 @@
 <details #container (toggle)="(true)">
   <summary>Repositories ({{ formArray.length }})</summary>
   @defer (when container.open) {
-    <table>
-      <thead>
-        <tr>
-          <th></th>
-          <th>Repository</th>
-          <th>Call Number</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (citation of formArray.controls; track $index) {
-          <tr>
-            <td>
-              <button
-                class="btn btn-outline-secondary bi bi-trash"
-                type="button"
-                (click)="removeCitation($index)"
-              ></button>
-            </td>
-            <td>
-              <app-input-repository-xref
-                #focusTarget
-                [formControl]="citation.controls.repositoryXref"
-                [(ancestryDatabase)]="ancestryDatabase"
-              ></app-input-repository-xref>
-            </td>
-            <td>
-              <app-input-repository-call-number
-                [formControl]="citation.controls.callNumber"
-                [(ancestryDatabase)]="ancestryDatabase"
-              ></app-input-repository-call-number>
-            </td>
-          </tr>
-        }
-      </tbody>
-    </table>
-
-    <div class="input-group">
+    @for (formGroup of formArray.controls; track formGroup) {
+      @let repositoryXref = formGroup.controls.repositoryXref.value;
+      <details [open]="newControls.has(formGroup)">
+        <summary>
+          <button
+            class="btn btn-sm btn-outline-danger bi-trash"
+            type="button"
+            (click)="removeCitation($index)"
+          ></button>
+          {{
+            ancestryDatabase().repositories.get(repositoryXref)?.name ??
+              "Unknown repository"
+          }}
+        </summary>
+        <app-input-repository-xref
+          #focusTarget
+          [formControl]="formGroup.controls.repositoryXref"
+          [(ancestryDatabase)]="ancestryDatabase"
+        ></app-input-repository-xref>
+        <app-input-repository-call-number
+          [formControl]="formGroup.controls.callNumber"
+          [(ancestryDatabase)]="ancestryDatabase"
+        ></app-input-repository-call-number>
+      </details>
+    }
+    <div class="details-lookalike" (click)="appendCitation()">
       <button
-        class="btn btn-outline-secondary bi bi-plus"
-        type="button"
-        (click)="appendCitation()"
+        class="btn btn-sm btn-outline-primary bi-plus"
+        (click)="$event.preventDefault()"
       ></button>
-      <span class="input-group-text">Associate with another repository</span>
+      Associate with another repository
     </div>
   }
 </details>

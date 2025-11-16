@@ -11,7 +11,7 @@ import {
   model,
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import type { ControlValueAccessor } from "@angular/forms";
+import type { AbstractControl, ControlValueAccessor } from "@angular/forms";
 import {
   NG_VALUE_ACCESSOR,
   NonNullableFormBuilder,
@@ -96,13 +96,16 @@ export class InputRepositoryLinksComponent implements ControlValueAccessor {
   @ViewChildren("focusTarget")
   focusTargets!: QueryList<InputRepositoryXrefComponent>;
 
+  // Keep track of the controls that were added by a user interation.
+  readonly newControls = new WeakSet<AbstractControl>([]);
+
   appendCitation() {
-    this.formArray.push(
-      this.formBuilder.group({
-        repositoryXref: "",
-        callNumber: "",
-      }),
-    );
+    const formGroup = this.formBuilder.group({
+      repositoryXref: "",
+      callNumber: "",
+    });
+    this.formArray.push(formGroup);
+    this.newControls.add(formGroup);
     setTimeout(() => {
       this.focusTargets.last.focus();
     });
