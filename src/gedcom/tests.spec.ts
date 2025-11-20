@@ -31,6 +31,7 @@ import {
 } from "./gedcomSubmitter";
 import type { GedcomTrailer } from "./gedcomTrailer";
 import { parseGedcomTrailer, serializeGedcomTrailer } from "./gedcomTrailer";
+import { beforeAll, describe, expect, it } from "vitest";
 
 const testCases: {
   name: string;

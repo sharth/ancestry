@@ -16,7 +16,6 @@
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "assets": ["src/favicon.ico", "src/assets"],
-            "polyfills": ["src/polyfills.ts"],
             "styles": [
               "src/styles.css",
               "node_modules/@fontsource/roboto/300.css",
@@ -60,18 +59,7 @@
           }
         },
         "test": {
-          "builder": "@angular/build:karma",
-          "options": {
-            "assets": [
-              "src/assets",
-              "src/favicon.ico",
-              { "input": "src/tests", "output": "tests", "glob": "*.ged" }
-            ],
-            "browsers": "ChromeHeadless",
-            "tsConfig": "tsconfig.spec.json",
-            "polyfills": ["src/polyfills.ts"],
-            "main": "src/test.ts"
-          }
+          "builder": "@angular/build:unit-test"
         }
       }
     }
