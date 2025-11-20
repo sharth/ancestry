@@ -13,10 +13,8 @@ updates:
           - "@angular/*"
       eslint:
         patterns:
-          - "@eslint/js"
+          - "@eslint/*"
           - "eslint"
-          - "eslint-config-google"
-          - "eslint-plugin-markdown"
           - "typescript-eslint"
       fonts:
         patterns:
