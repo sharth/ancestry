@@ -5,15 +5,14 @@
     "outDir": "./dist/out-tsc",
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "noImplicitOverride": true,
     "paths": {
-      "gedcom": [
-        "./dist/gedcom"
-      ]
+      "gedcom": ["./dist/gedcom"]
     },
     "noPropertyAccessFromIndexSignature": true,
+    "noImplicitOverride": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
+    "noImplicitThis": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "sourceMap": true,
@@ -24,12 +23,7 @@
     "target": "es2023",
     "module": "esnext",
     "useDefineForClassFields": false,
-    "lib": [
-      "es2023",
-      "ESNext.Collection",
-      "ESNext.Iterator",
-      "dom"
-    ]
+    "lib": ["es2023", "ESNext.Collection", "ESNext.Iterator", "dom"]
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
