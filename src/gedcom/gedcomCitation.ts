@@ -1,6 +1,6 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
+import type { GedcomMultimediaLink } from "./gedcomMultimediaLink";
 import {
-  type GedcomMultimediaLink,
   parseGedcomMultimediaLink,
   serializeGedcomMultimediaLink,
 } from "./gedcomMultimediaLink";
@@ -11,9 +11,9 @@ import type { GedcomRecord } from "./gedcomRecord";
 export interface GedcomCitation {
   sourceXref: string;
   notes: GedcomNote[];
-  text?: string;
-  page?: string;
-  quality?: string;
+  text: string;
+  page: string;
+  quality: string;
   multimediaLinks: GedcomMultimediaLink[];
 }
 
@@ -26,18 +26,18 @@ export function parseGedcomCitation(
 
   const gedcomCitation: GedcomCitation = {
     sourceXref: gedcomRecord.value,
+    text: "",
+    page: "",
+    quality: "",
     notes: [],
     multimediaLinks: [],
   };
 
   for (const childRecord of gedcomRecord.children) {
     switch (childRecord.tag) {
-      case "_TMPLT":
-      case "_QUAL":
-        break;
       case "QUAY":
         childRecord.children.forEach(reportUnparsedRecord);
-        gedcomCitation.quality = childRecord.value;
+        gedcomCitation.quality = childRecord.value ?? "";
         break;
       case "OBJE":
         gedcomCitation.multimediaLinks.push(
@@ -49,7 +49,7 @@ export function parseGedcomCitation(
         break;
       case "PAGE":
         childRecord.children.forEach(reportUnparsedRecord);
-        gedcomCitation.page = childRecord.value;
+        gedcomCitation.page = childRecord.value ?? "";
         break;
       case "DATA":
         gedcomCitation.text = parseGedcomCitationData(childRecord);

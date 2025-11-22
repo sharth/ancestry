@@ -68,9 +68,9 @@ export class InputSourceCitationsComponent implements ControlValueAccessor {
         this.formBuilder.group({
           sourceXref: citation.sourceXref,
           notes: this.formBuilder.control<GedcomNote[]>(citation.notes),
-          text: citation.text ?? "",
-          page: citation.page ?? "",
-          quality: citation.quality ?? "",
+          text: citation.text,
+          page: citation.page,
+          quality: citation.quality,
           multimediaLinks: this.formBuilder.control<GedcomMultimediaLink[]>(
             citation.multimediaLinks,
           ),
@@ -89,9 +89,9 @@ export class InputSourceCitationsComponent implements ControlValueAccessor {
           this.formArray.getRawValue().map((citation) => ({
             sourceXref: citation.sourceXref,
             notes: citation.notes,
-            text: citation.text || undefined,
-            page: citation.page || undefined,
-            quality: citation.quality || undefined,
+            text: citation.text,
+            page: citation.page,
+            quality: citation.quality,
             multimediaLinks: citation.multimediaLinks,
           })),
         );
