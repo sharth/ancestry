@@ -22,7 +22,6 @@
     "importHelpers": true,
     "target": "es2023",
     "module": "esnext",
-    "useDefineForClassFields": false,
     "lib": ["es2023", "ESNext.Collection", "ESNext.Iterator", "dom"]
   },
   "angularCompilerOptions": {
