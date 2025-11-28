@@ -3,33 +3,32 @@ import type { GedcomRecord } from "./gedcomRecord";
 
 export interface GedcomMultimediaLink {
   xref: string;
-  title?: string;
+  title: string;
 }
 
 export function parseGedcomMultimediaLink(
   record: GedcomRecord,
 ): GedcomMultimediaLink {
-  if (record.abstag !== "OBJE") throw new Error();
+  if (record.tag !== "OBJE") throw new Error();
   if (record.xref != null) throw new Error();
   if (record.value == null) throw new Error();
 
   const gedcomMultimediaLink: GedcomMultimediaLink = {
     xref: record.value,
+    title: "",
   };
 
   for (const childRecord of record.children) {
     switch (childRecord.tag) {
       case "TITL":
         if (childRecord.xref != null) throw new Error();
-        if (childRecord.value != null) throw new Error();
+        if (childRecord.value == null) throw new Error();
+        if (childRecord.children.length) throw new Error();
+        if (gedcomMultimediaLink.title !== "") throw new Error();
 
-        childRecord.children.forEach((grandchildRecord) => {
-          reportUnparsedRecord(grandchildRecord);
-        });
-
-        if (gedcomMultimediaLink.title !== undefined) throw new Error();
         gedcomMultimediaLink.title = childRecord.value;
         break;
+
       default:
         reportUnparsedRecord(childRecord);
         break;
@@ -47,14 +46,12 @@ export function serializeGedcomMultimediaLink(
     abstag: "",
     value: gedcomMultimediaLink.xref,
     children: [
-      gedcomMultimediaLink.title
-        ? {
-            tag: "TITL",
-            abstag: "",
-            value: gedcomMultimediaLink.title,
-            children: [],
-          }
-        : undefined,
-    ].filter((gedcomRecord) => gedcomRecord != undefined),
+      {
+        tag: "TITL",
+        abstag: "",
+        value: gedcomMultimediaLink.title,
+        children: [],
+      },
+    ].filter((record) => record.value || record.children.length),
   };
 }

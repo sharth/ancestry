@@ -3,8 +3,8 @@ import type { GedcomRecord } from "./gedcomRecord";
 
 export interface GedcomSubmitter {
   xref: string;
-  name?: string;
-  email?: string;
+  name: string;
+  email: string;
 }
 
 export function parseGedcomSubmitter(
@@ -16,6 +16,8 @@ export function parseGedcomSubmitter(
 
   const gedcomSubmitter: GedcomSubmitter = {
     xref: gedcomRecord.xref,
+    name: "",
+    email: "",
   };
 
   for (const childRecord of gedcomRecord.children) {
@@ -59,6 +61,6 @@ export function serializeGedcomSubmitter(
         value: gedcomSubmitter.email,
         children: [],
       },
-    ].filter((childRecord) => childRecord.value),
+    ].filter((record) => record.value || record.children.length),
   };
 }

@@ -8,8 +8,8 @@ import type { GedcomRecord } from "./gedcomRecord";
 
 export interface GedcomFamily {
   xref: string;
-  husbandXref?: string;
-  wifeXref?: string;
+  husbandXref: string;
+  wifeXref: string;
   childXrefs: string[];
   events: GedcomEvent[];
   citations: GedcomCitation[];
@@ -22,6 +22,8 @@ export function parseGedcomFamily(record: GedcomRecord): GedcomFamily {
 
   const gedcomFamily: GedcomFamily = {
     xref: record.xref,
+    husbandXref: "",
+    wifeXref: "",
     childXrefs: [],
     events: [],
     citations: [],

@@ -10,18 +10,18 @@ import type { GedcomRecord } from "./gedcomRecord";
 
 export interface GedcomEventSharedWith {
   xref: string;
-  role?: string;
+  role: string;
 }
 
 export interface GedcomEvent {
   tag: string;
-  type?: string;
-  address?: string;
-  place?: string;
-  cause?: string;
+  type: string;
+  address: string;
+  place: string;
+  cause: string;
   date?: GedcomDate;
   sortDate?: GedcomDate;
-  value?: string;
+  value: string;
   citations: GedcomCitation[];
   sharedWith: GedcomEventSharedWith[];
   notes: GedcomNote[];
@@ -59,7 +59,11 @@ export function parseGedcomEvent(record: GedcomRecord): GedcomEvent {
 
   const gedcomEvent: GedcomEvent = {
     tag: record.tag,
-    value: record.value,
+    type: "",
+    address: "",
+    place: "",
+    value: record.value ?? "",
+    cause: "",
     citations: [],
     sharedWith: [],
     notes: [],
@@ -129,8 +133,9 @@ function parseGedcomShareEvent(
   if (gedcomRecord.tag != "_SHAR") throw new Error();
   if (gedcomRecord.value == null) throw new Error();
 
-  const result: { xref: string; role?: string } = {
+  const result: GedcomEventSharedWith = {
     xref: gedcomRecord.value,
+    role: "",
   };
 
   for (const childRecord of gedcomRecord.children) {

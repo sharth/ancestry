@@ -1,5 +1,5 @@
 @if (vm(); as vm) {
-  <h1>{{ vm.source.abbr ?? vm.source.xref }}</h1>
+  <h1>{{ vm.source.abbr || vm.source.xref }}</h1>
 
   <h2>Title</h2>
   <div>{{ vm.source.title }}</div>

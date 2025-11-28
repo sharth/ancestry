@@ -13,9 +13,9 @@ import {
 
 export interface GedcomSource {
   xref: string;
-  abbr?: string;
-  title?: string;
-  text?: string;
+  abbr: string;
+  title: string;
+  text: string;
   repositoryLinks: GedcomRepositoryLink[];
   unknownRecords: GedcomRecord[];
   multimediaLinks: GedcomMultimediaLink[];
@@ -28,6 +28,9 @@ export function parseGedcomSource(record: GedcomRecord): GedcomSource {
 
   const gedcomSource: GedcomSource = {
     xref: record.xref,
+    abbr: "",
+    title: "",
+    text: "",
     repositoryLinks: [],
     unknownRecords: [],
     multimediaLinks: [],
@@ -38,21 +41,21 @@ export function parseGedcomSource(record: GedcomRecord): GedcomSource {
       case "ABBR":
         if (childRecord.xref != null) throw new Error();
         if (childRecord.value == null) throw new Error();
-        if (gedcomSource.abbr != null) throw new Error();
+        if (gedcomSource.abbr != "") throw new Error();
         childRecord.children.forEach(reportUnparsedRecord);
         gedcomSource.abbr = childRecord.value;
         break;
       case "TEXT":
         if (childRecord.xref != null) throw new Error();
         if (childRecord.value == null) throw new Error();
-        if (gedcomSource.text != null) throw new Error();
+        if (gedcomSource.text != "") throw new Error();
         childRecord.children.forEach(reportUnparsedRecord);
         gedcomSource.text = childRecord.value;
         break;
       case "TITL":
         if (childRecord.xref != null) throw new Error();
         if (childRecord.value == null) throw new Error();
-        if (gedcomSource.title != null) throw new Error();
+        if (gedcomSource.title != "") throw new Error();
         childRecord.children.forEach(reportUnparsedRecord);
         gedcomSource.title = childRecord.value;
         break;

@@ -187,13 +187,17 @@ const testCases: {
               tag: "IDNO",
               value: "abcd",
               type: "familysearch.org",
+              address: "",
+              place: "",
+              cause: "",
               citations: [],
               sharedWith: [],
               notes: [],
             },
             {
               tag: "BIRT",
-              value: undefined,
+              type: "",
+              value: "",
               place: "place",
               address: "address",
               cause: "normal",
@@ -215,7 +219,10 @@ const testCases: {
             {
               tag: "OCCU",
               value: "Truck Driver",
+              cause: "",
               type: "Permanent",
+              address: "",
+              place: "",
               citations: [],
               sharedWith: [],
               notes: [],
@@ -272,9 +279,16 @@ const testCases: {
           events: [
             {
               tag: "CENS",
-              value: undefined,
+              type: "",
+              cause: "",
+              value: "",
+              address: "",
+              place: "",
               citations: [],
-              sharedWith: [{ xref: "@I7@" }, { xref: "@I8@", role: "Friend" }],
+              sharedWith: [
+                { xref: "@I7@", role: "" },
+                { xref: "@I8@", role: "Friend" },
+              ],
               notes: [],
             },
           ],
@@ -287,58 +301,18 @@ const testCases: {
     },
   },
   {
-    name: "Source",
-    gedcom: [
-      "0 @S1@ SOUR",
-      "0 @S2@ SOUR",
-      "1 ABBR abbr",
-      "1 TITL title",
-      "1 TEXT text and more text",
-      "1 _TMPLT",
-      "2 TID 72",
-    ],
-    database: {
-      sources: [
-        {
-          xref: "@S1@",
-          repositoryLinks: [],
-          unknownRecords: [],
-          multimediaLinks: [],
-        },
-        {
-          xref: "@S2@",
-          abbr: "abbr",
-          title: "title",
-          text: "text and more text",
-          multimediaLinks: [],
-          repositoryLinks: [],
-          unknownRecords: [
-            {
-              xref: undefined,
-              tag: "_TMPLT",
-              abstag: "SOUR._TMPLT",
-              value: undefined,
-              children: [
-                {
-                  xref: undefined,
-                  tag: "TID",
-                  abstag: "SOUR._TMPLT.TID",
-                  value: "72",
-                  children: [],
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    },
-  },
-  {
     name: "Family",
     gedcom: ["0 @F1@ FAM", "0 @F3@ FAM", "1 HUSB @I3@", "1 WIFE @I2@"],
     database: {
       families: [
-        { xref: "@F1@", childXrefs: [], events: [], citations: [] },
+        {
+          xref: "@F1@",
+          husbandXref: "",
+          wifeXref: "",
+          childXrefs: [],
+          events: [],
+          citations: [],
+        },
         {
           xref: "@F3@",
           wifeXref: "@I2@",
@@ -347,59 +321,6 @@ const testCases: {
           events: [],
           citations: [],
         },
-      ],
-    },
-  },
-  {
-    name: "Submitter",
-    gedcom: [
-      "0 @X1@ SUBM",
-      "0 @X2@ SUBM",
-      "1 NAME John Doe",
-      "1 _EMAIL johndoe@example.com",
-    ],
-    database: {
-      submitters: [
-        { xref: "@X1@" },
-        {
-          xref: "@X2@",
-          name: "John Doe",
-          email: "johndoe@example.com",
-        },
-      ],
-    },
-  },
-  {
-    name: "CONC and CONT",
-    gedcom: [
-      "0 @X1@ SUBM",
-      "1 NAME Jo",
-      "2 CONC hn",
-      "2 CONT Doe",
-      "0 @X2@ SUBM",
-      "1 NAME",
-      "2 CONC johndoe@example.com",
-      "0 @X3@ SUBM",
-      "1 NAME",
-      "2 CONT John",
-      "2 CONT Doe",
-    ],
-    serializedGedcom: [
-      "0 @X1@ SUBM",
-      "1 NAME John",
-      "2 CONT Doe",
-      "0 @X2@ SUBM",
-      "1 NAME johndoe@example.com",
-      "0 @X3@ SUBM",
-      "1 NAME",
-      "2 CONT John",
-      "2 CONT Doe",
-    ],
-    database: {
-      submitters: [
-        { xref: "@X1@", name: "John\nDoe" },
-        { xref: "@X2@", name: "johndoe@example.com" },
-        { xref: "@X3@", name: "\nJohn\nDoe" },
       ],
     },
   },

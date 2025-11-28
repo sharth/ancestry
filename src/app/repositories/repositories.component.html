@@ -4,7 +4,7 @@
     @for (repository of vm.repositories; track repository) {
       <li>
         <a routerLink="/repository/{{ repository.xref }}">{{
-          repository.name ?? repository.xref
+          repository.name || repository.xref
         }}</a>
       </li>
     }

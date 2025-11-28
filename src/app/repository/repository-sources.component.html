@@ -11,7 +11,7 @@
         <tr>
           <td>
             <a routerLink="/source/{{ source.xref }}">{{
-              source.abbr ?? source.xref
+              source.abbr || source.xref
             }}</a>
           </td>
           <td>{{ source.callNumbers }}</td>

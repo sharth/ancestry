@@ -54,12 +54,7 @@ export class InputSharedWithComponent implements ControlValueAccessor {
   writeValue(sharedWith: GedcomEventSharedWith[]): void {
     this.form.clear({ emitEvent: false });
     this.form.push(
-      sharedWith.map((friend) =>
-        this.formBuilder.group({
-          xref: friend.xref,
-          role: friend.role ?? "",
-        }),
-      ),
+      sharedWith.map((friend) => this.formBuilder.group(friend)),
       { emitEvent: false },
     );
   }
@@ -71,12 +66,8 @@ export class InputSharedWithComponent implements ControlValueAccessor {
       .pipe(startWith(this.form.value))
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
-        onChange(
-          this.form.getRawValue().map((friend) => ({
-            xref: friend.xref,
-            role: friend.role || undefined,
-          })),
-        );
+        const sharedWith: GedcomEventSharedWith[] = this.form.getRawValue();
+        onChange(sharedWith);
       });
   }
 

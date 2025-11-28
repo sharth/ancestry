@@ -3,8 +3,8 @@ import type { GedcomRecord } from "./gedcomRecord";
 
 export interface GedcomMultimedia {
   xref: string;
-  filePath?: string;
-  mediaType?: string;
+  filePath: string;
+  mediaType: string;
 }
 
 export function parseGedcomMultimedia(record: GedcomRecord): GedcomMultimedia {
@@ -14,21 +14,24 @@ export function parseGedcomMultimedia(record: GedcomRecord): GedcomMultimedia {
 
   const gedcomMultimedia: GedcomMultimedia = {
     xref: record.xref,
+    filePath: "",
+    mediaType: "",
   };
 
   for (const childRecord of record.children) {
     switch (childRecord.tag) {
       case "FILE":
         if (childRecord.xref != null) throw new Error();
-        if (gedcomMultimedia.filePath != null)
+        if (gedcomMultimedia.filePath != "")
           throw new Error("Multiple filePaths are not supported.");
-        gedcomMultimedia.filePath = childRecord.value;
+        gedcomMultimedia.filePath = childRecord.value ?? "";
 
         for (const grandchildRecord of childRecord.children) {
           switch (grandchildRecord.tag) {
             case "FORM":
               if (grandchildRecord.xref != null) throw new Error();
-              if (gedcomMultimedia.mediaType != null)
+              if (grandchildRecord.value == null) throw new Error();
+              if (gedcomMultimedia.mediaType != "")
                 throw new Error("Multiple mediaTypes are not allowed");
               gedcomMultimedia.mediaType = grandchildRecord.value;
               grandchildRecord.children.forEach(reportUnparsedRecord);
@@ -67,8 +70,8 @@ export function serializeGedcomMultimedia(
             value: gedcomMultimedia.mediaType,
             children: [],
           },
-        ],
+        ].filter((record) => record.value || record.children.length),
       },
-    ],
+    ].filter((record) => record.value || record.children.length),
   };
 }

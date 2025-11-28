@@ -61,9 +61,9 @@ export class InputSourceComponent implements OnInit {
         const formValue = this.form.getRawValue();
         const source: GedcomSource = {
           xref: formValue.xref,
-          abbr: formValue.abbr || undefined,
-          title: formValue.title || undefined,
-          text: formValue.text || undefined,
+          abbr: formValue.abbr,
+          title: formValue.title,
+          text: formValue.text,
           repositoryLinks: formValue.repositoryLinks,
           multimediaLinks: formValue.multimediaLinks,
           unknownRecords: formValue.unknownRecords,

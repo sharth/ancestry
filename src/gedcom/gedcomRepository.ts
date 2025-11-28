@@ -3,7 +3,7 @@ import type { GedcomRecord } from "./gedcomRecord";
 
 export interface GedcomRepository {
   xref: string;
-  name?: string;
+  name: string;
 }
 
 export function parseGedcomRepository(
@@ -15,6 +15,7 @@ export function parseGedcomRepository(
 
   const gedcomRepository: GedcomRepository = {
     xref: gedcomRecord.xref,
+    name: "",
   };
 
   for (const childRecord of gedcomRecord.children) {
