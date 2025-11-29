@@ -3,8 +3,14 @@
   "eslint.format.enable": true,
   "eslint.lintTask.enable": true,
   "eslint.codeActionsOnSave.rules": null,
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.defaultFormatter": null,
   "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "prettier.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "prettier.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "prettier.prettier-vscode"
   }
 }
