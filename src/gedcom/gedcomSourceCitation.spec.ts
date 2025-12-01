@@ -1,8 +1,11 @@
-import { parseGedcomCitation, serializeGedcomCitation } from "./gedcomCitation";
 import type { GedcomRecord } from "./gedcomRecord";
+import {
+  parseGedcomSourceCitation,
+  serializeGedcomSourceCitation,
+} from "./gedcomSourceCitation";
 import { describe, expect, it } from "vitest";
 
-describe("gedcomCitation", () => {
+describe("gedcomSourceCitation", () => {
   const gedcomRecord: GedcomRecord = {
     tag: "SOUR",
     abstag: "",
@@ -23,7 +26,7 @@ describe("gedcomCitation", () => {
     ],
   };
   it("parser", () => {
-    expect(parseGedcomCitation(gedcomRecord)).toEqual({
+    expect(parseGedcomSourceCitation(gedcomRecord)).toEqual({
       sourceXref: "@S1@",
       text: "text",
       page: "page 123",
@@ -33,8 +36,8 @@ describe("gedcomCitation", () => {
     });
   });
   it("serializer", () => {
-    expect(serializeGedcomCitation(parseGedcomCitation(gedcomRecord))).toEqual(
-      gedcomRecord,
-    );
+    expect(
+      serializeGedcomSourceCitation(parseGedcomSourceCitation(gedcomRecord)),
+    ).toEqual(gedcomRecord);
   });
 });

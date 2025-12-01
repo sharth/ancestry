@@ -8,7 +8,7 @@ import type { GedcomNote } from "./gedcomNote";
 import { parseGedcomNote, serializeGedcomNote } from "./gedcomNote";
 import type { GedcomRecord } from "./gedcomRecord";
 
-export interface GedcomCitation {
+export interface GedcomSourceCitation {
   sourceXref: string;
   notes: GedcomNote[];
   text: string;
@@ -17,14 +17,14 @@ export interface GedcomCitation {
   multimediaLinks: GedcomMultimediaLink[];
 }
 
-export function parseGedcomCitation(
+export function parseGedcomSourceCitation(
   gedcomRecord: GedcomRecord,
-): GedcomCitation {
+): GedcomSourceCitation {
   if (gedcomRecord.tag !== "SOUR") throw new Error();
   if (gedcomRecord.xref != "") throw new Error();
   if (gedcomRecord.value == "") throw new Error();
 
-  const gedcomCitation: GedcomCitation = {
+  const gedcomCitation: GedcomSourceCitation = {
     sourceXref: gedcomRecord.value,
     text: "",
     page: "",
@@ -52,7 +52,7 @@ export function parseGedcomCitation(
         gedcomCitation.page = childRecord.value;
         break;
       case "DATA":
-        gedcomCitation.text = parseGedcomCitationData(childRecord);
+        gedcomCitation.text = parseGedcomSourceCitationData(childRecord);
         break;
       default:
         reportUnparsedRecord(childRecord);
@@ -63,7 +63,7 @@ export function parseGedcomCitation(
   return gedcomCitation;
 }
 
-function parseGedcomCitationData(gedcomRecord: GedcomRecord): string {
+function parseGedcomSourceCitationData(gedcomRecord: GedcomRecord): string {
   if (gedcomRecord.tag != "DATA") throw new Error();
   if (gedcomRecord.xref != "") throw new Error();
   if (gedcomRecord.value != "") throw new Error();
@@ -86,8 +86,8 @@ function parseGedcomCitationData(gedcomRecord: GedcomRecord): string {
   return text;
 }
 
-export function serializeGedcomCitation(
-  gedcomCitation: GedcomCitation,
+export function serializeGedcomSourceCitation(
+  gedcomCitation: GedcomSourceCitation,
 ): GedcomRecord {
   return {
     tag: "SOUR",

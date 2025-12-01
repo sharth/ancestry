@@ -1,7 +1,7 @@
 import type { AncestryDatabase } from "../database/ancestry.service";
-import type { GedcomCitation } from "../gedcom/gedcomCitation";
 import type { GedcomMultimediaLink } from "../gedcom/gedcomMultimediaLink";
 import type { GedcomNote } from "../gedcom/gedcomNote";
+import type { GedcomSourceCitation } from "../gedcom/gedcomSourceCitation";
 import { InputMultimediaLinksComponent } from "./input-multimedia-links.component";
 import { InputNotesComponent } from "./input-notes.component";
 import { InputSourceXrefComponent } from "./input-source-xref.component";
@@ -61,7 +61,7 @@ export class InputSourceCitationsComponent implements ControlValueAccessor {
     }>
   >([]);
 
-  writeValue(citations: GedcomCitation[]): void {
+  writeValue(citations: GedcomSourceCitation[]): void {
     this.formArray.clear({ emitEvent: false });
     this.formArray.push(
       citations.map((citation) =>
@@ -80,7 +80,9 @@ export class InputSourceCitationsComponent implements ControlValueAccessor {
     );
   }
 
-  registerOnChange(onChange: (citations: GedcomCitation[]) => void): void {
+  registerOnChange(
+    onChange: (citations: GedcomSourceCitation[]) => void,
+  ): void {
     this.formArray.valueChanges
       .pipe(startWith(this.formArray.value))
       .pipe(takeUntilDestroyed(this.destroyRef))

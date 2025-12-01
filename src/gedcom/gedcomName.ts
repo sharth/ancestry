@@ -1,13 +1,13 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
-import type { GedcomCitation } from "./gedcomCitation";
-import { parseGedcomCitation } from "./gedcomCitation";
-import { serializeGedcomCitation } from "./gedcomCitation";
 import {
   type GedcomNote,
   parseGedcomNote,
   serializeGedcomNote,
 } from "./gedcomNote";
 import type { GedcomRecord } from "./gedcomRecord";
+import type { GedcomSourceCitation } from "./gedcomSourceCitation";
+import { parseGedcomSourceCitation } from "./gedcomSourceCitation";
+import { serializeGedcomSourceCitation } from "./gedcomSourceCitation";
 
 export interface GedcomName {
   prefix?: string;
@@ -17,7 +17,7 @@ export interface GedcomName {
   surname?: string;
   suffix?: string;
   nameType?: string;
-  citations: GedcomCitation[];
+  citations: GedcomSourceCitation[];
   notes: GedcomNote[];
 }
 
@@ -31,7 +31,7 @@ export function parseGedcomName(gedcomRecord: GedcomRecord): GedcomName {
   const surnamePrefixes: string[] = [];
   const surnames: string[] = [];
   const suffixes: string[] = [];
-  const citations: GedcomCitation[] = [];
+  const citations: GedcomSourceCitation[] = [];
   const notes: GedcomNote[] = [];
   let nameType: string | undefined = undefined;
 
@@ -68,7 +68,7 @@ export function parseGedcomName(gedcomRecord: GedcomRecord): GedcomName {
         suffixes.push(childRecord.value);
         break;
       case "SOUR":
-        citations.push(parseGedcomCitation(childRecord));
+        citations.push(parseGedcomSourceCitation(childRecord));
         break;
       case "TYPE":
         if (childRecord.xref != "") throw new Error();
@@ -175,7 +175,9 @@ export function serializeGedcomName(name: GedcomName): GedcomRecord {
         children: [],
       },
       ...name.notes.map((n) => serializeGedcomNote(n)),
-      ...name.citations.map((citation) => serializeGedcomCitation(citation)),
+      ...name.citations.map((citation) =>
+        serializeGedcomSourceCitation(citation),
+      ),
     ].filter((record) => record.children.length || record.value),
   };
 }

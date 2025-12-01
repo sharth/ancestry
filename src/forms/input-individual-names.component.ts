@@ -1,6 +1,6 @@
 import type { AncestryDatabase } from "../database/ancestry.service";
-import type { GedcomCitation } from "../gedcom/gedcomCitation";
 import type { GedcomName } from "../gedcom/gedcomName";
+import type { GedcomSourceCitation } from "../gedcom/gedcomSourceCitation";
 import { InputSourceCitationsComponent } from "./input-source-citations.component";
 import type { ElementRef, QueryList } from "@angular/core";
 import {
@@ -50,7 +50,7 @@ export class InputIndividualNamesComponent implements ControlValueAccessor {
       surnamePrefix: "",
       surname: "",
       suffix: "",
-      citations: this.formBuilder.control<GedcomCitation[]>([]),
+      citations: this.formBuilder.control<GedcomSourceCitation[]>([]),
     }),
   ]);
 
@@ -68,7 +68,9 @@ export class InputIndividualNamesComponent implements ControlValueAccessor {
           surnamePrefix: name.surnamePrefix ?? "",
           surname: name.surname ?? "",
           suffix: name.suffix ?? "",
-          citations: this.formBuilder.control<GedcomCitation[]>(name.citations),
+          citations: this.formBuilder.control<GedcomSourceCitation[]>(
+            name.citations,
+          ),
         }),
       ),
       { emitEvent: false },
@@ -118,7 +120,7 @@ export class InputIndividualNamesComponent implements ControlValueAccessor {
       surnamePrefix: "",
       surname: "",
       suffix: "",
-      citations: this.formBuilder.control<GedcomCitation[]>([]),
+      citations: this.formBuilder.control<GedcomSourceCitation[]>([]),
     });
     this.formArray.push(formGroup);
     this.newControls.add(formGroup);

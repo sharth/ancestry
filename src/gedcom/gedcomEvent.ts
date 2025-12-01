@@ -1,12 +1,15 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
-import type { GedcomCitation } from "./gedcomCitation";
-import { parseGedcomCitation, serializeGedcomCitation } from "./gedcomCitation";
 import type { GedcomDate } from "./gedcomDate";
 import { parseGedcomDate } from "./gedcomDate";
 import { serializeGedcomDate, serializeGedcomSortDate } from "./gedcomDate";
 import type { GedcomNote } from "./gedcomNote";
 import { parseGedcomNote, serializeGedcomNote } from "./gedcomNote";
 import type { GedcomRecord } from "./gedcomRecord";
+import type { GedcomSourceCitation } from "./gedcomSourceCitation";
+import {
+  parseGedcomSourceCitation,
+  serializeGedcomSourceCitation,
+} from "./gedcomSourceCitation";
 
 export interface GedcomEventSharedWith {
   xref: string;
@@ -22,7 +25,7 @@ export interface GedcomEvent {
   date?: GedcomDate;
   sortDate?: GedcomDate;
   value: string;
-  citations: GedcomCitation[];
+  citations: GedcomSourceCitation[];
   sharedWith: GedcomEventSharedWith[];
   notes: GedcomNote[];
 }
@@ -75,7 +78,7 @@ export function parseGedcomEvent(record: GedcomRecord): GedcomEvent {
         gedcomEvent.sharedWith.push(parseGedcomShareEvent(childRecord));
         break;
       case "SOUR":
-        gedcomEvent.citations.push(parseGedcomCitation(childRecord));
+        gedcomEvent.citations.push(parseGedcomSourceCitation(childRecord));
         break;
       case "DATE":
         if (gedcomEvent.date != null) throw new Error();
@@ -195,7 +198,7 @@ export function serializeGedcomEvent(gedcomEvent: GedcomEvent): GedcomRecord {
       },
       ...gedcomEvent.sharedWith.map((s) => serializeGedcomSharedEvent(s)),
       ...gedcomEvent.notes.map((n) => serializeGedcomNote(n)),
-      ...gedcomEvent.citations.map((c) => serializeGedcomCitation(c)),
+      ...gedcomEvent.citations.map((c) => serializeGedcomSourceCitation(c)),
     ]
       .filter((r) => r != null)
       .filter((r) => r.children.length || r.value),

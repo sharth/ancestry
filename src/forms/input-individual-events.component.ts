@@ -1,8 +1,8 @@
 import type { AncestryDatabase } from "../database/ancestry.service";
-import type { GedcomCitation } from "../gedcom/gedcomCitation";
 import type { GedcomEvent, GedcomEventSharedWith } from "../gedcom/gedcomEvent";
 import { gedcomEventTags } from "../gedcom/gedcomEvent";
 import type { GedcomNote } from "../gedcom/gedcomNote";
+import type { GedcomSourceCitation } from "../gedcom/gedcomSourceCitation";
 import { InputNotesComponent } from "./input-notes.component";
 import { InputSharedWithComponent } from "./input-shared-with.component";
 import { InputSourceCitationsComponent } from "./input-source-citations.component";
@@ -60,7 +60,7 @@ export class InputIndividualEventsComponent implements ControlValueAccessor {
       date: "",
       sortDate: "",
       value: "",
-      citations: this.formBuilder.control<GedcomCitation[]>([]),
+      citations: this.formBuilder.control<GedcomSourceCitation[]>([]),
       sharedWith: this.formBuilder.control<GedcomEventSharedWith[]>([]),
       notes: this.formBuilder.control<GedcomNote[]>([]),
     }),
@@ -137,7 +137,7 @@ export class InputIndividualEventsComponent implements ControlValueAccessor {
         date: "",
         sortDate: "",
         value: "",
-        citations: this.formBuilder.control<GedcomCitation[]>([]),
+        citations: this.formBuilder.control<GedcomSourceCitation[]>([]),
         sharedWith: this.formBuilder.control<GedcomEventSharedWith[]>([]),
         notes: this.formBuilder.control<GedcomNote[]>([]),
       }),

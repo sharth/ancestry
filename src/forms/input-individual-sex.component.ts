@@ -1,6 +1,6 @@
 import type { AncestryDatabase } from "../database/ancestry.service";
-import type { GedcomCitation } from "../gedcom/gedcomCitation";
 import type { GedcomSex } from "../gedcom/gedcomSex";
+import type { GedcomSourceCitation } from "../gedcom/gedcomSourceCitation";
 import { InputSourceCitationsComponent } from "./input-source-citations.component";
 import { Component, DestroyRef, inject, input, model } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -35,7 +35,7 @@ export class InputIndividualSexComponent implements ControlValueAccessor {
 
   readonly form = this.formBuilder.group({
     sex: "",
-    citations: this.formBuilder.control<GedcomCitation[]>([]),
+    citations: this.formBuilder.control<GedcomSourceCitation[]>([]),
   });
 
   writeValue(sex: GedcomSex | null): void {

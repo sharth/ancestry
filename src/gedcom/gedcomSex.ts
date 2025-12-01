@@ -1,12 +1,12 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
-import type { GedcomCitation } from "./gedcomCitation";
-import { serializeGedcomCitation } from "./gedcomCitation";
-import { parseGedcomCitation } from "./gedcomCitation";
 import type { GedcomRecord } from "./gedcomRecord";
+import type { GedcomSourceCitation } from "./gedcomSourceCitation";
+import { serializeGedcomSourceCitation } from "./gedcomSourceCitation";
+import { parseGedcomSourceCitation } from "./gedcomSourceCitation";
 
 export interface GedcomSex {
   sex: string;
-  citations: GedcomCitation[];
+  citations: GedcomSourceCitation[];
 }
 
 export function parseGedcomSex(gedcomRecord: GedcomRecord): GedcomSex {
@@ -22,7 +22,7 @@ export function parseGedcomSex(gedcomRecord: GedcomRecord): GedcomSex {
   for (const childRecord of gedcomRecord.children) {
     switch (childRecord.tag) {
       case "SOUR":
-        gedcomSex.citations.push(parseGedcomCitation(childRecord));
+        gedcomSex.citations.push(parseGedcomSourceCitation(childRecord));
         break;
       default:
         reportUnparsedRecord(childRecord);
@@ -39,6 +39,8 @@ export function serializeSex(gedcomSex: GedcomSex): GedcomRecord {
     abstag: "INDI.SEX",
     xref: "",
     value: gedcomSex.sex,
-    children: [...gedcomSex.citations.map((c) => serializeGedcomCitation(c))],
+    children: [
+      ...gedcomSex.citations.map((c) => serializeGedcomSourceCitation(c)),
+    ],
   };
 }
