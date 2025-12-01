@@ -55,14 +55,14 @@ export const gedcomEventTags = new Map([
 
 export function parseGedcomEvent(record: GedcomRecord): GedcomEvent {
   if (!gedcomEventTags.get(record.tag)) throw new Error();
-  if (record.xref != null) throw new Error();
+  if (record.xref != "") throw new Error();
 
   const gedcomEvent: GedcomEvent = {
     tag: record.tag,
     type: "",
     address: "",
     place: "",
-    value: record.value ?? "",
+    value: record.value,
     cause: "",
     citations: [],
     sharedWith: [],
@@ -87,26 +87,26 @@ export function parseGedcomEvent(record: GedcomRecord): GedcomEvent {
         gedcomEvent.sortDate = parseGedcomDate(childRecord);
         break;
       case "TYPE":
-        if (childRecord.xref != null) throw new Error();
-        if (childRecord.value == null) throw new Error();
+        if (childRecord.xref != "") throw new Error();
+        if (childRecord.value == "") throw new Error();
         childRecord.children.forEach(reportUnparsedRecord);
         gedcomEvent.type = childRecord.value;
         break;
       case "ADDR":
-        if (childRecord.xref != null) throw new Error();
-        if (childRecord.value == null) throw new Error();
+        if (childRecord.xref != "") throw new Error();
+        if (childRecord.value == "") throw new Error();
         childRecord.children.forEach(reportUnparsedRecord);
         gedcomEvent.address = childRecord.value;
         break;
       case "PLAC":
-        if (childRecord.xref != null) throw new Error();
-        if (childRecord.value == null) throw new Error();
+        if (childRecord.xref != "") throw new Error();
+        if (childRecord.value == "") throw new Error();
         childRecord.children.forEach(reportUnparsedRecord);
         gedcomEvent.place = childRecord.value;
         break;
       case "CAUS":
-        if (childRecord.xref != null) throw new Error();
-        if (childRecord.value == null) throw new Error();
+        if (childRecord.xref != "") throw new Error();
+        if (childRecord.value == "") throw new Error();
         childRecord.children.forEach(reportUnparsedRecord);
         gedcomEvent.cause = childRecord.value;
         break;
@@ -129,9 +129,9 @@ export function parseGedcomEvent(record: GedcomRecord): GedcomEvent {
 function parseGedcomShareEvent(
   gedcomRecord: GedcomRecord,
 ): GedcomEventSharedWith {
-  if (gedcomRecord.xref != null) throw new Error();
+  if (gedcomRecord.xref != "") throw new Error();
   if (gedcomRecord.tag != "_SHAR") throw new Error();
-  if (gedcomRecord.value == null) throw new Error();
+  if (gedcomRecord.value == "") throw new Error();
 
   const result: GedcomEventSharedWith = {
     xref: gedcomRecord.value,
@@ -141,8 +141,8 @@ function parseGedcomShareEvent(
   for (const childRecord of gedcomRecord.children) {
     switch (childRecord.tag) {
       case "ROLE":
-        if (childRecord.xref != null) throw new Error();
-        if (childRecord.value == null) throw new Error();
+        if (childRecord.xref != "") throw new Error();
+        if (childRecord.value == "") throw new Error();
         if (childRecord.children.length > 0) throw new Error();
         result.role = childRecord.value;
         break;
@@ -158,16 +158,41 @@ export function serializeGedcomEvent(gedcomEvent: GedcomEvent): GedcomRecord {
   return {
     tag: gedcomEvent.tag,
     abstag: "",
+    xref: "",
     value: gedcomEvent.value,
     children: [
-      { tag: "TYPE", abstag: "", value: gedcomEvent.type, children: [] },
-      { tag: "CAUS", abstag: "", value: gedcomEvent.cause, children: [] },
+      {
+        tag: "TYPE",
+        abstag: "",
+        xref: "",
+        value: gedcomEvent.type,
+        children: [],
+      },
+      {
+        tag: "CAUS",
+        abstag: "",
+        xref: "",
+        value: gedcomEvent.cause,
+        children: [],
+      },
       gedcomEvent.date ? serializeGedcomDate(gedcomEvent.date) : null,
       gedcomEvent.sortDate
         ? serializeGedcomSortDate(gedcomEvent.sortDate)
         : null,
-      { tag: "PLAC", abstag: "", value: gedcomEvent.place, children: [] },
-      { tag: "ADDR", abstag: "", value: gedcomEvent.address, children: [] },
+      {
+        tag: "PLAC",
+        abstag: "",
+        xref: "",
+        value: gedcomEvent.place,
+        children: [],
+      },
+      {
+        tag: "ADDR",
+        abstag: "",
+        xref: "",
+        value: gedcomEvent.address,
+        children: [],
+      },
       ...gedcomEvent.sharedWith.map((s) => serializeGedcomSharedEvent(s)),
       ...gedcomEvent.notes.map((n) => serializeGedcomNote(n)),
       ...gedcomEvent.citations.map((c) => serializeGedcomCitation(c)),
@@ -177,13 +202,22 @@ export function serializeGedcomEvent(gedcomEvent: GedcomEvent): GedcomRecord {
   };
 }
 
-function serializeGedcomSharedEvent(sharedWith: GedcomEventSharedWith) {
+function serializeGedcomSharedEvent(
+  sharedWith: GedcomEventSharedWith,
+): GedcomRecord {
   return {
     tag: "_SHAR",
     abstag: "",
+    xref: "",
     value: sharedWith.xref,
     children: [
-      { tag: "ROLE", abstag: "", value: sharedWith.role, children: [] },
+      {
+        tag: "ROLE",
+        abstag: "",
+        xref: "",
+        value: sharedWith.role,
+        children: [],
+      },
     ].filter((r) => r.children.length || r.value),
   };
 }

@@ -7,8 +7,8 @@ export interface GedcomNote {
 
 export function parseGedcomNote(gedcomRecord: GedcomRecord): GedcomNote {
   if (gedcomRecord.tag !== "NOTE") throw new Error();
-  if (gedcomRecord.xref != null) throw new Error();
-  if (gedcomRecord.value == null) throw new Error();
+  if (gedcomRecord.xref != "") throw new Error();
+  if (gedcomRecord.value == "") throw new Error();
 
   const gedcomNote: GedcomNote = {
     text: gedcomRecord.value,
@@ -29,6 +29,7 @@ export function serializeGedcomNote(gedcomNote: GedcomNote): GedcomRecord {
   return {
     tag: "NOTE",
     abstag: "",
+    xref: "",
     value: gedcomNote.text,
     children: [],
   };

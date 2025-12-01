@@ -6,8 +6,8 @@ export interface GedcomTrailer {
 
 export function parseGedcomTrailer(gedcomRecord: GedcomRecord): GedcomTrailer {
   if (gedcomRecord.abstag !== "TRLR") throw new Error();
-  if (gedcomRecord.xref != null) throw new Error();
-  if (gedcomRecord.value != null) throw new Error();
+  if (gedcomRecord.xref != "") throw new Error();
+  if (gedcomRecord.value != "") throw new Error();
   if (gedcomRecord.children.length != 0) throw new Error();
 
   return {
@@ -22,6 +22,8 @@ export function serializeGedcomTrailer(
   return {
     tag: "TRLR",
     abstag: "TRLR",
+    xref: "",
+    value: "",
     children: [],
   };
 }

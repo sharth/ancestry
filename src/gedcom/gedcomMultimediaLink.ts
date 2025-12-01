@@ -10,8 +10,8 @@ export function parseGedcomMultimediaLink(
   record: GedcomRecord,
 ): GedcomMultimediaLink {
   if (record.tag !== "OBJE") throw new Error();
-  if (record.xref != null) throw new Error();
-  if (record.value == null) throw new Error();
+  if (record.xref != "") throw new Error();
+  if (record.value == "") throw new Error();
 
   const gedcomMultimediaLink: GedcomMultimediaLink = {
     xref: record.value,
@@ -21,8 +21,8 @@ export function parseGedcomMultimediaLink(
   for (const childRecord of record.children) {
     switch (childRecord.tag) {
       case "TITL":
-        if (childRecord.xref != null) throw new Error();
-        if (childRecord.value == null) throw new Error();
+        if (childRecord.xref != "") throw new Error();
+        if (childRecord.value == "") throw new Error();
         if (childRecord.children.length) throw new Error();
         if (gedcomMultimediaLink.title !== "") throw new Error();
 
@@ -44,11 +44,13 @@ export function serializeGedcomMultimediaLink(
   return {
     tag: "OBJE",
     abstag: "",
+    xref: "",
     value: gedcomMultimediaLink.xref,
     children: [
       {
         tag: "TITL",
         abstag: "",
+        xref: "",
         value: gedcomMultimediaLink.title,
         children: [],
       },

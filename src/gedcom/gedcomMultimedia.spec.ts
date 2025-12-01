@@ -10,6 +10,7 @@ describe("gedcomMultimedia", () => {
     tag: "OBJE",
     abstag: "OBJE",
     xref: "@M1@",
+    value: "",
     children: [],
   };
   it("parser", () => {

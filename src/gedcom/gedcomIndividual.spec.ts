@@ -10,8 +10,8 @@ function normalize(record: GedcomRecord): GedcomRecord {
   return {
     tag: record.tag,
     abstag: "",
-    xref: record.xref ?? "",
-    value: record.value ?? "",
+    xref: record.xref,
+    value: record.value,
     children: record.children.map(normalize),
   };
 }
@@ -22,6 +22,7 @@ describe("gedcomIndividual", () => {
       tag: "INDI",
       abstag: "INDI",
       xref: "@I1@",
+      value: "",
       children: [],
     };
     expect(parseGedcomIndividual(gedcomRecord)).toEqual({

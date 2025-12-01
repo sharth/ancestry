@@ -6,15 +6,19 @@ describe("gedcomCitation", () => {
   const gedcomRecord: GedcomRecord = {
     tag: "SOUR",
     abstag: "",
+    xref: "",
     value: "@S1@",
     children: [
-      { tag: "PAGE", abstag: "", value: "page 123", children: [] },
-      { tag: "QUAY", abstag: "", value: "0", children: [] },
+      { tag: "PAGE", abstag: "", xref: "", value: "page 123", children: [] },
+      { tag: "QUAY", abstag: "", xref: "", value: "0", children: [] },
       {
         tag: "DATA",
         abstag: "",
-        value: undefined,
-        children: [{ tag: "TEXT", abstag: "", value: "text", children: [] }],
+        xref: "",
+        value: "",
+        children: [
+          { tag: "TEXT", abstag: "", xref: "", value: "text", children: [] },
+        ],
       },
     ],
   };

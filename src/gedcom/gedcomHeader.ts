@@ -6,8 +6,8 @@ export interface GedcomHeader {
 
 export function parseGedcomHeader(record: GedcomRecord): GedcomHeader {
   if (record.abstag !== "HEAD") throw new Error();
-  if (record.xref != null) throw new Error();
-  if (record.value != null) throw new Error();
+  if (record.xref != "") throw new Error();
+  if (record.value != "") throw new Error();
 
   return {
     record,

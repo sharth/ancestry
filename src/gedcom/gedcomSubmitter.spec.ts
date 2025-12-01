@@ -15,6 +15,7 @@ describe("GedcomSubmitter", () => {
       tag: "SUBM",
       abstag: "SUBM",
       xref: "@SUBMITTER1@",
+      value: "",
       children: [],
     };
     expect(parseGedcomSubmitter(gedcomRecord)).toEqual({

@@ -23,7 +23,7 @@ export interface GedcomName {
 
 export function parseGedcomName(gedcomRecord: GedcomRecord): GedcomName {
   if (gedcomRecord.abstag !== "INDI.NAME") throw new Error();
-  if (gedcomRecord.xref != null) throw new Error();
+  if (gedcomRecord.xref != "") throw new Error();
 
   const prefixes: string[] = [];
   const givenNames: string[] = [];
@@ -38,41 +38,41 @@ export function parseGedcomName(gedcomRecord: GedcomRecord): GedcomName {
   for (const childRecord of gedcomRecord.children) {
     switch (childRecord.tag) {
       case "NPFX":
-        if (childRecord.xref != null) throw new Error();
-        if (childRecord.value == null) throw new Error();
+        if (childRecord.xref != "") throw new Error();
+        if (childRecord.value == "") throw new Error();
         prefixes.push(childRecord.value);
         break;
       case "GIVN":
-        if (childRecord.xref != null) throw new Error();
-        if (childRecord.value == null) throw new Error();
+        if (childRecord.xref != "") throw new Error();
+        if (childRecord.value == "") throw new Error();
         givenNames.push(childRecord.value);
         break;
       case "NICK":
-        if (childRecord.xref != null) throw new Error();
-        if (childRecord.value == null) throw new Error();
+        if (childRecord.xref != "") throw new Error();
+        if (childRecord.value == "") throw new Error();
         nickNames.push(childRecord.value);
         break;
       case "SPFX":
-        if (childRecord.xref != null) throw new Error();
-        if (childRecord.value == null) throw new Error();
+        if (childRecord.xref != "") throw new Error();
+        if (childRecord.value == "") throw new Error();
         surnamePrefixes.push(childRecord.value);
         break;
       case "SURN":
-        if (childRecord.xref != null) throw new Error();
-        if (childRecord.value == null) throw new Error();
+        if (childRecord.xref != "") throw new Error();
+        if (childRecord.value == "") throw new Error();
         surnames.push(childRecord.value);
         break;
       case "NSFX":
-        if (childRecord.xref != null) throw new Error();
-        if (childRecord.value == null) throw new Error();
+        if (childRecord.xref != "") throw new Error();
+        if (childRecord.value == "") throw new Error();
         suffixes.push(childRecord.value);
         break;
       case "SOUR":
         citations.push(parseGedcomCitation(childRecord));
         break;
       case "TYPE":
-        if (childRecord.xref != null) throw new Error();
-        if (childRecord.value == null) throw new Error();
+        if (childRecord.xref != "") throw new Error();
+        if (childRecord.value == "") throw new Error();
         if (nameType != null) throw new Error();
         childRecord.children.forEach(reportUnparsedRecord);
         nameType = childRecord.value;
@@ -122,48 +122,56 @@ export function serializeGedcomName(name: GedcomName): GedcomRecord {
   return {
     tag: "NAME",
     abstag: "INDI.NAME",
+    xref: "",
     value: displayGedcomName(name),
     children: [
       {
         tag: "NPFX",
         abstag: "INDI.NAME.NPFX",
-        value: name.prefix,
+        xref: "",
+        value: name.prefix ?? "",
         children: [],
       },
       {
         tag: "GIVN",
         abstag: "INDI.NAME.GIVN",
-        value: name.givenName,
+        xref: "",
+        value: name.givenName ?? "",
         children: [],
       },
       {
         tag: "SPFX",
         abstag: "INDI.NAME.SPFX",
-        value: name.surnamePrefix,
+        xref: "",
+        value: name.surnamePrefix ?? "",
         children: [],
       },
       {
         tag: "SURN",
         abstag: "INDI.NAME.SURN",
-        value: name.surname,
+        xref: "",
+        value: name.surname ?? "",
         children: [],
       },
       {
         tag: "NSFX",
         abstag: "INDI.NAME.NSFX",
-        value: name.suffix,
+        xref: "",
+        value: name.suffix ?? "",
         children: [],
       },
       {
         tag: "NICK",
         abstag: "INDI.NAME.NICK",
-        value: name.nickName,
+        xref: "",
+        value: name.nickName ?? "",
         children: [],
       },
       {
         tag: "TYPE",
         abstag: "INDI.NAME.TYPE",
-        value: name.nameType,
+        xref: "",
+        value: name.nameType ?? "",
         children: [],
       },
       ...name.notes.map((n) => serializeGedcomNote(n)),

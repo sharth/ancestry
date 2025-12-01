@@ -1,8 +1,8 @@
 export interface GedcomRecord {
-  xref?: string;
+  xref: string;
   tag: string;
   abstag: string;
-  value?: string;
+  value: string;
   children: GedcomRecord[];
 }
 
@@ -18,7 +18,7 @@ export function* generateGedcomRecords(text: string): Generator<GedcomRecord> {
     if (line == "") {
       continue;
     }
-    const match = /^([0-9]+) *(@[^@]+@)? *([A-Za-z0-9_]+) *(.*)$/.exec(line);
+    const match = /^([0-9]+) *((?:@[^@]+@)?) *([A-Z0-9_]+) *(.*)$/.exec(line);
     if (match == null) {
       throw new Error(`Failed to parse line number ${lineNumber + 1}: ${line}`);
     }
@@ -28,13 +28,7 @@ export function* generateGedcomRecords(text: string): Generator<GedcomRecord> {
       ...ladder.slice(0, level).map((record) => record.tag),
       tag,
     ].join(".");
-    const record = {
-      xref,
-      tag,
-      abstag,
-      value: value || undefined,
-      children: [],
-    };
+    const record = { xref, tag, abstag, value, children: [] };
 
     if (level == 0) {
       if (ladder.length > 0) {
@@ -61,12 +55,10 @@ export function mergeConcContRecords(gedcomRecord: GedcomRecord): GedcomRecord {
   const newRecord: GedcomRecord = { ...gedcomRecord, children: [] };
   for (const childRecord of gedcomRecord.children) {
     if (childRecord.tag == "CONC") {
-      newRecord.value ??= "";
-      newRecord.value += childRecord.value ?? "";
+      newRecord.value += childRecord.value;
     } else if (childRecord.tag == "CONT") {
-      newRecord.value ??= "";
       newRecord.value += "\n";
-      newRecord.value += childRecord.value ?? "";
+      newRecord.value += childRecord.value;
     } else {
       newRecord.children.push(mergeConcContRecords(childRecord));
     }
@@ -78,8 +70,7 @@ export function serializeGedcomRecordToText(
   gedcomRecord: GedcomRecord,
   level = 0,
 ): string[] {
-  const [firstValue, ...remainingValues] =
-    gedcomRecord.value?.split("\n") ?? [];
+  const [firstValue, ...remainingValues] = gedcomRecord.value.split("\n");
   return [
     `${level}` +
       (gedcomRecord.xref ? ` ${gedcomRecord.xref}` : "") +

@@ -1,5 +1,5 @@
-import { type GedcomRecord, mergeConcContRecords } from "./gedcomRecord";
 import {
+  mergeConcContRecords,
   parseGedcomRecords,
   serializeGedcomRecordToText,
 } from "./gedcomRecord";
@@ -22,25 +22,25 @@ describe("GedcomRecord", () => {
         tag: "SUBM",
         abstag: "SUBM",
         xref: "@X1@",
-        value: undefined,
+        value: "",
         children: [
           {
             tag: "NAME",
             abstag: "SUBM.NAME",
-            xref: undefined,
+            xref: "",
             value: "Jo",
             children: [
               {
                 tag: "CONC",
                 abstag: "SUBM.NAME.CONC",
-                xref: undefined,
+                xref: "",
                 value: "hn",
                 children: [],
               },
               {
                 tag: "CONT",
                 abstag: "SUBM.NAME.CONT",
-                xref: undefined,
+                xref: "",
                 value: "Doe",
                 children: [],
               },
@@ -52,18 +52,18 @@ describe("GedcomRecord", () => {
         tag: "SUBM",
         abstag: "SUBM",
         xref: "@X2@",
-        value: undefined,
+        value: "",
         children: [
           {
             tag: "EMAIL",
             abstag: "SUBM.EMAIL",
-            xref: undefined,
-            value: undefined,
+            xref: "",
+            value: "",
             children: [
               {
                 tag: "CONC",
                 abstag: "SUBM.EMAIL.CONC",
-                xref: undefined,
+                xref: "",
                 value: "johndoe@example.com",
                 children: [],
               },
@@ -103,19 +103,19 @@ describe("GedcomRecord", () => {
         tag: "SUBM",
         abstag: "SUBM",
         xref: "@X1@",
-        value: undefined,
+        value: "",
         children: [
           {
             tag: "NAME",
             abstag: "SUBM.NAME",
-            xref: undefined,
+            xref: "",
             value: "John\nDoe",
             children: [],
           },
           {
             tag: "EMAIL",
             abstag: "SUBM.EMAIL",
-            xref: undefined,
+            xref: "",
             value: "johndoe@example.com",
             children: [],
           },

@@ -23,8 +23,8 @@ export interface GedcomSource {
 
 export function parseGedcomSource(record: GedcomRecord): GedcomSource {
   if (record.abstag !== "SOUR") throw new Error();
-  if (record.xref == null) throw new Error();
-  if (record.value != null) throw new Error();
+  if (record.xref == "") throw new Error();
+  if (record.value != "") throw new Error();
 
   const gedcomSource: GedcomSource = {
     xref: record.xref,
@@ -39,22 +39,22 @@ export function parseGedcomSource(record: GedcomRecord): GedcomSource {
   for (const childRecord of record.children) {
     switch (childRecord.tag) {
       case "ABBR":
-        if (childRecord.xref != null) throw new Error();
-        if (childRecord.value == null) throw new Error();
+        if (childRecord.xref != "") throw new Error();
+        if (childRecord.value == "") throw new Error();
         if (gedcomSource.abbr != "") throw new Error();
         childRecord.children.forEach(reportUnparsedRecord);
         gedcomSource.abbr = childRecord.value;
         break;
       case "TEXT":
-        if (childRecord.xref != null) throw new Error();
-        if (childRecord.value == null) throw new Error();
+        if (childRecord.xref != "") throw new Error();
+        if (childRecord.value == "") throw new Error();
         if (gedcomSource.text != "") throw new Error();
         childRecord.children.forEach(reportUnparsedRecord);
         gedcomSource.text = childRecord.value;
         break;
       case "TITL":
-        if (childRecord.xref != null) throw new Error();
-        if (childRecord.value == null) throw new Error();
+        if (childRecord.xref != "") throw new Error();
+        if (childRecord.value == "") throw new Error();
         if (gedcomSource.title != "") throw new Error();
         childRecord.children.forEach(reportUnparsedRecord);
         gedcomSource.title = childRecord.value;
@@ -83,12 +83,31 @@ export function serializeGedcomSource(source: GedcomSource): GedcomRecord {
     xref: source.xref,
     tag: "SOUR",
     abstag: "SOUR",
+    value: "",
     children: [
-      { tag: "ABBR", abstag: "SOUR.ABBR", value: source.abbr, children: [] },
-      { tag: "TITL", abstag: "SOUR.TITL", value: source.title, children: [] },
+      {
+        tag: "ABBR",
+        abstag: "SOUR.ABBR",
+        xref: "",
+        value: source.abbr,
+        children: [],
+      },
+      {
+        tag: "TITL",
+        abstag: "SOUR.TITL",
+        xref: "",
+        value: source.title,
+        children: [],
+      },
       ...source.unknownRecords.filter((record) => record.tag == "_SUBQ"),
       ...source.unknownRecords.filter((record) => record.tag == "_BIBL"),
-      { tag: "TEXT", abstag: "SOUR.TEXT", value: source.text, children: [] },
+      {
+        tag: "TEXT",
+        abstag: "SOUR.TEXT",
+        xref: "",
+        value: source.text,
+        children: [],
+      },
       ...source.repositoryLinks.map((repositoryLink) =>
         serializeGedcomRepositoryLink(repositoryLink),
       ),

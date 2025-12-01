@@ -7,10 +7,29 @@ describe("gedcomFamily", () => {
     tag: "FAM",
     abstag: "FAM",
     xref: "@F1@",
+    value: "",
     children: [
-      { tag: "HUSB", abstag: "FAM.HUSB", value: "@I1@", children: [] },
-      { tag: "CHIL", abstag: "FAM.CHIL", value: "@I10@", children: [] },
-      { tag: "CHIL", abstag: "FAM.CHIL", value: "@I11@", children: [] },
+      {
+        tag: "HUSB",
+        abstag: "FAM.HUSB",
+        xref: "",
+        value: "@I1@",
+        children: [],
+      },
+      {
+        tag: "CHIL",
+        abstag: "FAM.CHIL",
+        xref: "",
+        value: "@I10@",
+        children: [],
+      },
+      {
+        tag: "CHIL",
+        abstag: "FAM.CHIL",
+        xref: "",
+        value: "@I11@",
+        children: [],
+      },
     ],
   };
   it("parser", () => {

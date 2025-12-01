@@ -6,8 +6,11 @@ describe("gedcomEvent", () => {
   const gedcomRecord: GedcomRecord = {
     tag: "BIRT",
     abstag: "",
+    xref: "",
     value: "",
-    children: [{ tag: "DATE", abstag: "", value: "JAN 1 2025", children: [] }],
+    children: [
+      { tag: "DATE", abstag: "", xref: "", value: "JAN 1 2025", children: [] },
+    ],
   };
   it("parser", () => {
     expect(parseGedcomEvent(gedcomRecord)).toEqual({

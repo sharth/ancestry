@@ -9,6 +9,7 @@ describe("GedcomSource", () => {
       tag: "SOUR",
       abstag: "SOUR",
       xref: "@S1@",
+      value: "",
       children: [],
     };
     const gedcomSource: GedcomSource = {
@@ -47,13 +48,13 @@ describe("GedcomSource", () => {
         {
           tag: "_TMPLT",
           abstag: "SOUR._TMPLT",
-          xref: undefined,
-          value: undefined,
+          xref: "",
+          value: "",
           children: [
             {
               tag: "TID",
               abstag: "SOUR._TMPLT.TID",
-              xref: undefined,
+              xref: "",
               value: "72",
               children: [],
             },

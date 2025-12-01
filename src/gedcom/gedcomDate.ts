@@ -21,8 +21,8 @@ export const monthNames = [
 ];
 
 export function parseGedcomDate(gedcomRecord: GedcomRecord): GedcomDate {
-  if (gedcomRecord.xref != null) throw new Error();
-  if (gedcomRecord.value == null) throw new Error();
+  if (gedcomRecord.xref != "") throw new Error();
+  if (gedcomRecord.value == "") throw new Error();
 
   const gedcomDate: GedcomDate = {
     value: gedcomRecord.value,
@@ -42,6 +42,7 @@ export function serializeGedcomDate(gedcomDate: GedcomDate): GedcomRecord {
   return {
     tag: "DATE",
     abstag: "",
+    xref: "",
     value: gedcomDate.value,
     children: [],
   };
@@ -51,6 +52,7 @@ export function serializeGedcomSortDate(gedcomDate: GedcomDate): GedcomRecord {
   return {
     tag: "SDATE",
     abstag: "",
+    xref: "",
     value: gedcomDate.value,
     children: [],
   };

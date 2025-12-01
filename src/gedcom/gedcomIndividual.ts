@@ -37,7 +37,7 @@ export function fullname(gedcomIndividual: GedcomIndividual): string {
     gedcomName.surname,
     gedcomName.suffix,
   ]
-    .filter((part) => part != null)
+    .filter((part) => part != "")
     .join(" ");
 }
 
@@ -48,8 +48,8 @@ export function surname(gedcomIndividual: GedcomIndividual): string {
 
 export function parseGedcomIndividual(record: GedcomRecord): GedcomIndividual {
   if (record.abstag !== "INDI") throw new Error();
-  if (record.xref == null) throw new Error();
-  if (record.value != null) throw new Error();
+  if (record.xref == "") throw new Error();
+  if (record.value != "") throw new Error();
 
   const gedcomIndividual: GedcomIndividual = {
     xref: record.xref,
@@ -94,14 +94,14 @@ export function parseGedcomIndividual(record: GedcomRecord): GedcomIndividual {
         gedcomIndividual.sex = parseGedcomSex(childRecord);
         break;
       case "FAMS":
-        if (childRecord.xref != null) throw new Error();
-        if (childRecord.value == null) throw new Error();
+        if (childRecord.xref != "") throw new Error();
+        if (childRecord.value == "") throw new Error();
         childRecord.children.forEach(reportUnparsedRecord);
         gedcomIndividual.parentOfFamilyXrefs.push(childRecord.value);
         break;
       case "FAMC":
-        if (childRecord.xref != null) throw new Error();
-        if (childRecord.value == null) throw new Error();
+        if (childRecord.xref != "") throw new Error();
+        if (childRecord.value == "") throw new Error();
         childRecord.children.forEach(reportUnparsedRecord);
         gedcomIndividual.childOfFamilyXrefs.push(childRecord.value);
         break;
@@ -123,8 +123,8 @@ export function parseGedcomIndividual(record: GedcomRecord): GedcomIndividual {
 
 function parseGedcomChangeDate(gedcomRecord: GedcomRecord): GedcomDate {
   if (gedcomRecord.abstag !== "INDI.CHAN") throw new Error();
-  if (gedcomRecord.xref != null) throw new Error();
-  if (gedcomRecord.value != null) throw new Error();
+  if (gedcomRecord.xref != "") throw new Error();
+  if (gedcomRecord.value != "") throw new Error();
 
   let date: GedcomDate | null = null;
 
@@ -152,6 +152,7 @@ export function serializeGedcomIndividual(
     xref: gedcomIndividual.xref,
     tag: "INDI",
     abstag: "INDI",
+    value: "",
     children: [
       ...gedcomIndividual.names.map((name) => serializeGedcomName(name)),
       gedcomIndividual.sex ? serializeSex(gedcomIndividual.sex) : null,
@@ -174,12 +175,14 @@ export function serializeGedcomIndividual(
       ...gedcomIndividual.parentOfFamilyXrefs.map((xref) => ({
         tag: "FAMS",
         abstag: "",
+        xref: "",
         value: xref,
         children: [],
       })),
       ...gedcomIndividual.childOfFamilyXrefs.map((xref) => ({
         tag: "FAMC",
         abstag: "",
+        xref: "",
         value: xref,
         children: [],
       })),
@@ -201,7 +204,8 @@ function serializeChangeDate(date: GedcomDate): GedcomRecord {
   return {
     tag: "CHAN",
     abstag: "INDI.CHAN",
-    value: undefined,
+    xref: "",
+    value: "",
     children: [serializeGedcomDate(date)],
   };
 }

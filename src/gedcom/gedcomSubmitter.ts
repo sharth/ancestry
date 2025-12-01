@@ -11,8 +11,8 @@ export function parseGedcomSubmitter(
   gedcomRecord: GedcomRecord,
 ): GedcomSubmitter {
   if (gedcomRecord.tag !== "SUBM") throw new Error();
-  if (gedcomRecord.xref == null) throw new Error();
-  if (gedcomRecord.value != null) throw new Error();
+  if (gedcomRecord.xref == "") throw new Error();
+  if (gedcomRecord.value != "") throw new Error();
 
   const gedcomSubmitter: GedcomSubmitter = {
     xref: gedcomRecord.xref,
@@ -23,13 +23,13 @@ export function parseGedcomSubmitter(
   for (const childRecord of gedcomRecord.children) {
     switch (childRecord.tag) {
       case "NAME":
-        if (childRecord.xref != null) throw new Error();
-        if (childRecord.value == null) throw new Error();
+        if (childRecord.xref != "") throw new Error();
+        if (childRecord.value == "") throw new Error();
         gedcomSubmitter.name = childRecord.value;
         break;
       case "_EMAIL":
-        if (childRecord.xref != null) throw new Error();
-        if (childRecord.value == null) throw new Error();
+        if (childRecord.xref != "") throw new Error();
+        if (childRecord.value == "") throw new Error();
         gedcomSubmitter.email = childRecord.value;
         break;
       default:
@@ -48,16 +48,19 @@ export function serializeGedcomSubmitter(
     xref: gedcomSubmitter.xref,
     tag: "SUBM",
     abstag: "SUBM",
+    value: "",
     children: [
       {
         tag: "NAME",
         abstag: "SUBM.NAME",
+        xref: "",
         value: gedcomSubmitter.name,
         children: [],
       },
       {
         tag: "_EMAIL",
         abstag: "SUBM._EMAIL",
+        xref: "",
         value: gedcomSubmitter.email,
         children: [],
       },

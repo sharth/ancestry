@@ -9,6 +9,7 @@ describe("gedcomMultimediaLink", () => {
   const gedcomRecord: GedcomRecord = {
     tag: "OBJE",
     abstag: "",
+    xref: "",
     value: "@M1@",
     children: [],
   };

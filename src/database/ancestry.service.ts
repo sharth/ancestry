@@ -226,14 +226,19 @@ export class AncestryService {
       {
         tag: "HEAD",
         abstag: "HEAD",
+        xref: "",
+        value: "",
         children: [
           {
             tag: "GEDC",
             abstag: "HEAD.GEDC",
+            xref: "",
+            value: "",
             children: [
               {
                 tag: "VERS",
                 abstag: "HEAD.GEDC.VERS",
+                xref: "",
                 value: "7.0.14",
                 children: [],
               },
@@ -242,12 +247,14 @@ export class AncestryService {
           {
             tag: "SOUR",
             abstag: "HEAD.SOUR",
+            xref: "",
             value: "https://github.com/sharth/ancestry",
             children: [],
           },
           {
             tag: "DATE",
             abstag: "HEAD.DATE",
+            xref: "",
             value: `${day} ${month} ${year}`,
             children: [],
           },
@@ -269,7 +276,7 @@ export class AncestryService {
       ...ancestryDatabase.multimedias
         .values()
         .map((m) => serializeGedcomMultimedia(m)),
-      { tag: "TRLR", abstag: "TRLR", children: [] },
+      { tag: "TRLR", abstag: "TRLR", xref: "", value: "", children: [] },
     ].forEach((gedcomRecord: GedcomRecord) => {
       const h = hash(gedcomRecord);
       const r = recordMap.get(h);
