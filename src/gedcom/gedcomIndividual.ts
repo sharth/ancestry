@@ -1,6 +1,9 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
-import type { GedcomDate } from "./gedcomDate";
-import { parseGedcomDate, serializeGedcomDate } from "./gedcomDate";
+import type { GedcomChangeDate } from "./gedcomChangeDate";
+import {
+  parseGedcomChangeDate,
+  serializeGedcomChangeDate,
+} from "./gedcomChangeDate";
 import type { GedcomEvent } from "./gedcomEvent";
 import { parseGedcomEvent, serializeGedcomEvent } from "./gedcomEvent";
 import type { GedcomName } from "./gedcomName";
@@ -19,7 +22,7 @@ export interface GedcomIndividual {
   names: GedcomName[];
   events: GedcomEvent[];
   sex?: GedcomSex;
-  changeDate?: GedcomDate; // Should only be a GedcomExactDate.
+  changeDate?: GedcomChangeDate;
   childOfFamilyXrefs: string[];
   parentOfFamilyXrefs: string[];
   notes: GedcomNote[];
@@ -121,30 +124,6 @@ export function parseGedcomIndividual(record: GedcomRecord): GedcomIndividual {
   return gedcomIndividual;
 }
 
-function parseGedcomChangeDate(gedcomRecord: GedcomRecord): GedcomDate {
-  if (gedcomRecord.abstag !== "INDI.CHAN") throw new Error();
-  if (gedcomRecord.xref != "") throw new Error();
-  if (gedcomRecord.value != "") throw new Error();
-
-  let date: GedcomDate | null = null;
-
-  for (const childRecord of gedcomRecord.children) {
-    switch (childRecord.tag) {
-      case "DATE":
-        date = parseGedcomDate(childRecord);
-        break;
-      default:
-        reportUnparsedRecord(childRecord);
-    }
-  }
-
-  if (date == null) {
-    throw new Error();
-  }
-
-  return date;
-}
-
 export function serializeGedcomIndividual(
   gedcomIndividual: GedcomIndividual,
 ): GedcomRecord {
@@ -166,7 +145,7 @@ export function serializeGedcomIndividual(
         (record) => record.tag == "_AMTID",
       ),
       gedcomIndividual.changeDate
-        ? serializeChangeDate(gedcomIndividual.changeDate)
+        ? serializeGedcomChangeDate(gedcomIndividual.changeDate)
         : null,
       ...gedcomIndividual.unknownRecords.filter(
         (record) => record.tag == "SOUR",
@@ -197,15 +176,5 @@ export function serializeGedcomIndividual(
           record.tag != "SOUR",
       ),
     ].filter((record) => record != null),
-  };
-}
-
-function serializeChangeDate(date: GedcomDate): GedcomRecord {
-  return {
-    tag: "CHAN",
-    abstag: "INDI.CHAN",
-    xref: "",
-    value: "",
-    children: [serializeGedcomDate(date)],
   };
 }

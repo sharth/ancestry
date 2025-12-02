@@ -46,10 +46,15 @@ describe("gedcomIndividual", () => {
       "2 SURN Doe",
       "2 SOUR @S1@",
       "2 SOUR @S2@",
+      "1 CHAN",
+      "2 DATE 1 JAN 1900",
     ];
     const [gedcomRecord] = parseGedcomRecords(gedcomText.join("\n"));
     expect(parseGedcomIndividual(gedcomRecord)).toEqual({
       xref: "@I1@",
+      changeDate: {
+        date: { value: "1 JAN 1900" },
+      },
       childOfFamilyXrefs: [],
       events: [],
       parentOfFamilyXrefs: [],

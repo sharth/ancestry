@@ -77,9 +77,11 @@ export class InputIndividualComponent implements OnInit {
         const individual: GedcomIndividual = {
           xref: formValue.xref,
           changeDate: {
-            value: new Date()
-              .toLocaleString("en-gb", { dateStyle: "medium" })
-              .toLocaleUpperCase(),
+            date: {
+              value: new Date()
+                .toLocaleString("en-gb", { dateStyle: "medium" })
+                .toLocaleUpperCase(),
+            },
           },
           sex: formValue.sex ?? undefined,
           names: formValue.names,

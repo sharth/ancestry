@@ -1,4 +1,3 @@
-import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import type { GedcomRecord } from "./gedcomRecord";
 
 export interface GedcomDate {
@@ -23,19 +22,11 @@ export const monthNames = [
 export function parseGedcomDate(gedcomRecord: GedcomRecord): GedcomDate {
   if (gedcomRecord.xref != "") throw new Error();
   if (gedcomRecord.value == "") throw new Error();
+  if (gedcomRecord.children.length != 0) throw new Error();
 
-  const gedcomDate: GedcomDate = {
+  return {
     value: gedcomRecord.value,
   };
-
-  for (const childRecord of gedcomRecord.children) {
-    switch (childRecord.tag) {
-      default:
-        reportUnparsedRecord(childRecord);
-        break;
-    }
-  }
-  return gedcomDate;
 }
 
 export function serializeGedcomDate(gedcomDate: GedcomDate): GedcomRecord {

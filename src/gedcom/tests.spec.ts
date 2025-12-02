@@ -256,7 +256,7 @@ const testCases: {
         },
         {
           xref: "@I7@",
-          changeDate: { value: "1 Jan 2000" },
+          changeDate: { date: { value: "1 Jan 2000" } },
           names: [],
           events: [],
           parentOfFamilyXrefs: [],
