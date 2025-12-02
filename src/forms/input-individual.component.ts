@@ -44,7 +44,7 @@ export class InputIndividualComponent implements OnInit {
 
   readonly form = this.formBuilder.group({
     xref: this.formBuilder.control<string>(""),
-    sex: this.formBuilder.control<GedcomSex | null>(null),
+    sex: this.formBuilder.control<GedcomSex>({ sex: "", citations: [] }),
     names: this.formBuilder.control<GedcomName[]>([]),
     events: this.formBuilder.control<GedcomEvent[]>([]),
     childOfFamilies: this.formBuilder.control<string[]>([]),
@@ -59,7 +59,7 @@ export class InputIndividualComponent implements OnInit {
       {
         // FIXME: If the xref (or individual) is not set, we should discover a new one.
         xref: individual?.xref ?? "",
-        sex: individual?.sex ?? null,
+        sex: individual?.sex ?? { sex: "", citations: [] },
         names: individual?.names ?? [],
         events: individual?.events ?? [],
         childOfFamilies: individual?.childOfFamilyXrefs ?? [],
@@ -83,7 +83,7 @@ export class InputIndividualComponent implements OnInit {
                 .toLocaleUpperCase(),
             },
           },
-          sex: formValue.sex ?? undefined,
+          sex: formValue.sex,
           names: formValue.names,
           events: formValue.events,
           childOfFamilyXrefs: formValue.childOfFamilies,

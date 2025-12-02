@@ -38,30 +38,20 @@ export class InputIndividualSexComponent implements ControlValueAccessor {
     citations: this.formBuilder.control<GedcomSourceCitation[]>([]),
   });
 
-  writeValue(sex: GedcomSex | null): void {
-    this.form.setValue(
-      {
-        sex: sex?.sex ?? "",
-        citations: sex?.citations ?? [],
-      },
-      { emitEvent: false },
-    );
+  writeValue(sex: GedcomSex): void {
+    this.form.setValue(sex, { emitEvent: false });
   }
 
-  registerOnChange(onChange: (sex: GedcomSex | null) => void): void {
+  registerOnChange(onChange: (sex: GedcomSex) => void): void {
     this.form.valueChanges
       .pipe(startWith(this.form.value))
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         const rawFormValue = this.form.getRawValue();
-        if (rawFormValue.sex == "" && rawFormValue.citations.length == 0) {
-          onChange(null);
-        } else {
-          onChange({
-            sex: rawFormValue.sex,
-            citations: rawFormValue.citations,
-          });
-        }
+        onChange({
+          sex: rawFormValue.sex,
+          citations: rawFormValue.citations,
+        });
       });
   }
 

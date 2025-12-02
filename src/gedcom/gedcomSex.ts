@@ -33,7 +33,10 @@ export function parseGedcomSex(gedcomRecord: GedcomRecord): GedcomSex {
   return gedcomSex;
 }
 
-export function serializeSex(gedcomSex: GedcomSex): GedcomRecord {
+export function serializeGedcomSex(gedcomSex: GedcomSex): GedcomRecord | null {
+  if (gedcomSex.sex == "" && gedcomSex.citations.length === 0) {
+    return null;
+  }
   return {
     tag: "SEX",
     abstag: "INDI.SEX",

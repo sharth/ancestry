@@ -137,6 +137,7 @@ const testCases: {
           childOfFamilyXrefs: [],
           unknownRecords: [],
           notes: [],
+          sex: { sex: "", citations: [] },
         },
         {
           xref: "@I2@",
@@ -178,6 +179,7 @@ const testCases: {
           childOfFamilyXrefs: [],
           unknownRecords: [],
           notes: [],
+          sex: { sex: "", citations: [] },
         },
         {
           xref: "@I5@",
@@ -232,6 +234,7 @@ const testCases: {
           childOfFamilyXrefs: [],
           unknownRecords: [],
           notes: [],
+          sex: { sex: "", citations: [] },
         },
         {
           xref: "@I6@",
@@ -253,6 +256,7 @@ const testCases: {
           childOfFamilyXrefs: [],
           unknownRecords: [],
           notes: [],
+          sex: { sex: "", citations: [] },
         },
         {
           xref: "@I7@",
@@ -263,6 +267,7 @@ const testCases: {
           childOfFamilyXrefs: [],
           unknownRecords: [],
           notes: [],
+          sex: { sex: "", citations: [] },
         },
         {
           xref: "@I8@",
@@ -272,6 +277,7 @@ const testCases: {
           childOfFamilyXrefs: ["@F2@"],
           unknownRecords: [],
           notes: [],
+          sex: { sex: "", citations: [] },
         },
         {
           xref: "@I9@",
@@ -296,6 +302,7 @@ const testCases: {
           childOfFamilyXrefs: [],
           unknownRecords: [],
           notes: [],
+          sex: { sex: "", citations: [] },
         },
       ],
     },

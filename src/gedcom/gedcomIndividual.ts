@@ -15,13 +15,13 @@ import {
 } from "./gedcomNote";
 import type { GedcomRecord } from "./gedcomRecord";
 import type { GedcomSex } from "./gedcomSex";
-import { parseGedcomSex, serializeSex } from "./gedcomSex";
+import { parseGedcomSex, serializeGedcomSex } from "./gedcomSex";
 
 export interface GedcomIndividual {
   xref: string;
   names: GedcomName[];
   events: GedcomEvent[];
-  sex?: GedcomSex;
+  sex: GedcomSex;
   changeDate?: GedcomChangeDate;
   childOfFamilyXrefs: string[];
   parentOfFamilyXrefs: string[];
@@ -62,6 +62,7 @@ export function parseGedcomIndividual(record: GedcomRecord): GedcomIndividual {
     childOfFamilyXrefs: [],
     unknownRecords: [],
     notes: [],
+    sex: { sex: "", citations: [] },
   };
 
   for (const childRecord of record.children) {
@@ -93,7 +94,6 @@ export function parseGedcomIndividual(record: GedcomRecord): GedcomIndividual {
         gedcomIndividual.names.push(parseGedcomName(childRecord));
         break;
       case "SEX":
-        if (gedcomIndividual.sex != null) throw new Error();
         gedcomIndividual.sex = parseGedcomSex(childRecord);
         break;
       case "FAMS":
@@ -134,7 +134,7 @@ export function serializeGedcomIndividual(
     value: "",
     children: [
       ...gedcomIndividual.names.map((name) => serializeGedcomName(name)),
-      gedcomIndividual.sex ? serializeSex(gedcomIndividual.sex) : null,
+      serializeGedcomSex(gedcomIndividual.sex),
       ...gedcomIndividual.unknownRecords.filter(
         (record) => record.tag == "_UID",
       ),

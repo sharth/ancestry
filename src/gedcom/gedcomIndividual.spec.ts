@@ -18,16 +18,16 @@ function normalize(record: GedcomRecord): GedcomRecord {
 
 describe("gedcomIndividual", () => {
   it("no fields", () => {
-    const gedcomRecord = {
-      tag: "INDI",
-      abstag: "INDI",
-      xref: "@I1@",
-      value: "",
-      children: [],
-    };
+    const gedcomText = [
+      "0 @I1@ INDI", //
+    ];
+    const [gedcomRecord]: GedcomRecord[] = parseGedcomRecords(
+      gedcomText.join("\n"),
+    );
     expect(parseGedcomIndividual(gedcomRecord)).toEqual({
       xref: "@I1@",
       names: [],
+      sex: { sex: "", citations: [] },
       events: [],
       parentOfFamilyXrefs: [],
       childOfFamilyXrefs: [],
@@ -52,6 +52,7 @@ describe("gedcomIndividual", () => {
     const [gedcomRecord] = parseGedcomRecords(gedcomText.join("\n"));
     expect(parseGedcomIndividual(gedcomRecord)).toEqual({
       xref: "@I1@",
+      sex: { sex: "", citations: [] },
       changeDate: {
         date: { value: "1 JAN 1900" },
       },
