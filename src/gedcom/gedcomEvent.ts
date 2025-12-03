@@ -22,8 +22,8 @@ export interface GedcomEvent {
   address: string;
   place: string;
   cause: string;
-  date?: GedcomDate;
-  sortDate?: GedcomDate;
+  date: GedcomDate;
+  sortDate: GedcomDate;
   value: string;
   citations: GedcomSourceCitation[];
   sharedWith: GedcomEventSharedWith[];
@@ -67,6 +67,8 @@ export function parseGedcomEvent(record: GedcomRecord): GedcomEvent {
     place: "",
     value: record.value,
     cause: "",
+    date: { value: "" },
+    sortDate: { value: "" },
     citations: [],
     sharedWith: [],
     notes: [],
@@ -81,12 +83,10 @@ export function parseGedcomEvent(record: GedcomRecord): GedcomEvent {
         gedcomEvent.citations.push(parseGedcomSourceCitation(childRecord));
         break;
       case "DATE":
-        if (gedcomEvent.date != null) throw new Error();
         gedcomEvent.date = parseGedcomDate(childRecord);
         break;
       case "SDATE":
       case "_SDATE":
-        if (gedcomEvent.sortDate != null) throw new Error();
         gedcomEvent.sortDate = parseGedcomDate(childRecord);
         break;
       case "TYPE":
@@ -178,10 +178,8 @@ export function serializeGedcomEvent(gedcomEvent: GedcomEvent): GedcomRecord {
         value: gedcomEvent.cause,
         children: [],
       },
-      gedcomEvent.date ? serializeGedcomDate(gedcomEvent.date) : null,
-      gedcomEvent.sortDate
-        ? serializeGedcomSortDate(gedcomEvent.sortDate)
-        : null,
+      serializeGedcomDate(gedcomEvent.date),
+      serializeGedcomSortDate(gedcomEvent.sortDate),
       {
         tag: "PLAC",
         abstag: "",

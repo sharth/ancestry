@@ -1,3 +1,4 @@
+import type { GedcomEvent } from "./gedcomEvent";
 import { parseGedcomEvent, serializeGedcomEvent } from "./gedcomEvent";
 import type { GedcomRecord } from "./gedcomRecord";
 import { describe, expect, it } from "vitest";
@@ -24,7 +25,8 @@ describe("gedcomEvent", () => {
       sharedWith: [],
       notes: [],
       date: { value: "JAN 1 2025" },
-    });
+      sortDate: { value: "" },
+    } as GedcomEvent);
   });
   it("serializer", () => {
     expect(serializeGedcomEvent(parseGedcomEvent(gedcomRecord))).toEqual(

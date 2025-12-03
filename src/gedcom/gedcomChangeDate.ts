@@ -14,13 +14,12 @@ export function parseGedcomChangeDate(
   if (gedcomRecord.xref !== "") throw new Error();
   if (gedcomRecord.value !== "") throw new Error();
 
-  let date: GedcomDate | null = null;
+  const gedcomChangeDate: GedcomChangeDate = { date: { value: "" } };
 
   for (const childRecord of gedcomRecord.children) {
     switch (childRecord.tag) {
       case "DATE":
-        if (date) throw new Error();
-        date = parseGedcomDate(childRecord);
+        gedcomChangeDate.date = parseGedcomDate(childRecord);
         break;
 
       default:
@@ -29,20 +28,24 @@ export function parseGedcomChangeDate(
     }
   }
 
-  if (date == null) {
-    throw new Error("A GedcomChangeDate must have a DATE record");
-  }
-  return { date };
+  return gedcomChangeDate;
 }
 
 export function serializeGedcomChangeDate(
   gedcomChangeDate: GedcomChangeDate,
-): GedcomRecord {
-  return {
+): GedcomRecord | null {
+  const gedcomRecord: GedcomRecord = {
     tag: "CHAN",
     abstag: "",
     xref: "",
     value: "",
-    children: [serializeGedcomDate(gedcomChangeDate.date)],
+    children: [serializeGedcomDate(gedcomChangeDate.date)].filter(
+      (r) => r !== null,
+    ),
   };
+  if (gedcomRecord.xref || gedcomRecord.value || gedcomRecord.children.length) {
+    return gedcomRecord;
+  } else {
+    return null;
+  }
 }

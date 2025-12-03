@@ -29,22 +29,36 @@ export function parseGedcomDate(gedcomRecord: GedcomRecord): GedcomDate {
   };
 }
 
-export function serializeGedcomDate(gedcomDate: GedcomDate): GedcomRecord {
-  return {
+export function serializeGedcomDate(
+  gedcomDate: GedcomDate,
+): GedcomRecord | null {
+  const gedcomRecord = {
     tag: "DATE",
     abstag: "",
     xref: "",
     value: gedcomDate.value,
     children: [],
   };
+  if (gedcomRecord.xref || gedcomRecord.value || gedcomRecord.children.length) {
+    return gedcomRecord;
+  } else {
+    return null;
+  }
 }
 
-export function serializeGedcomSortDate(gedcomDate: GedcomDate): GedcomRecord {
-  return {
+export function serializeGedcomSortDate(
+  gedcomDate: GedcomDate,
+): GedcomRecord | null {
+  const gedcomRecord = {
     tag: "SDATE",
     abstag: "",
     xref: "",
     value: gedcomDate.value,
     children: [],
   };
+  if (gedcomRecord.xref || gedcomRecord.value || gedcomRecord.children.length) {
+    return gedcomRecord;
+  } else {
+    return null;
+  }
 }
