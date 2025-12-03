@@ -96,13 +96,13 @@ const testCases: {
           xref: "@I1@",
           names: [
             {
-              prefix: undefined,
+              prefix: "",
               givenName: "John",
-              nickName: undefined,
-              surnamePrefix: undefined,
+              nickName: "",
+              surnamePrefix: "",
               surname: "Doe",
-              suffix: undefined,
-              nameType: undefined,
+              suffix: "",
+              nameType: "",
               citations: [
                 {
                   sourceXref: "@S1@",
@@ -244,10 +244,10 @@ const testCases: {
           xref: "@I6@",
           names: [
             {
-              prefix: undefined,
+              prefix: "",
               givenName: "John",
-              nickName: undefined,
-              surnamePrefix: undefined,
+              nickName: "",
+              surnamePrefix: "",
               surname: "Doe",
               suffix: "Jr",
               nameType: "Traditional",

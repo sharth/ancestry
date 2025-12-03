@@ -1,6 +1,5 @@
-import type { GedcomDate } from "./gedcomDate";
-import { parseGedcomDate, serializeGedcomDate } from "./gedcomDate";
-import { GedcomName, parseGedcomName, serializeGedcomName } from "./gedcomName";
+import type { GedcomName } from "./gedcomName";
+import { parseGedcomName, serializeGedcomName } from "./gedcomName";
 import { type GedcomRecord, parseGedcomRecords } from "./gedcomRecord";
 import { describe, expect, it } from "vitest";
 
@@ -44,6 +43,6 @@ describe("GedcomName", () => {
       citations: [],
       notes: [],
     };
-    expect(serializeGedcomDate(gedcomName)).toBeNull();
+    expect(serializeGedcomName(gedcomName)).toBeNull();
   });
 });

@@ -63,13 +63,13 @@ describe("gedcomIndividual", () => {
       notes: [],
       names: [
         {
-          prefix: undefined,
+          prefix: "",
           givenName: "John",
-          nickName: undefined,
-          surnamePrefix: undefined,
+          nickName: "",
+          surnamePrefix: "",
           surname: "Doe",
-          suffix: undefined,
-          nameType: undefined,
+          suffix: "",
+          nameType: "",
           notes: [],
           citations: [
             {
