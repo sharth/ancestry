@@ -19,7 +19,7 @@ export interface GedcomName {
 }
 
 export function parseGedcomName(gedcomRecord: GedcomRecord): GedcomName {
-  if (gedcomRecord.abstag !== "INDI.NAME") throw new Error();
+  if (gedcomRecord.tag !== "NAME") throw new Error();
   if (gedcomRecord.xref != "") throw new Error();
 
   const gedcomName: GedcomName = {
@@ -149,7 +149,11 @@ export function serializeGedcomName(name: GedcomName): GedcomRecord | null {
       ),
     ].filter((record) => record.children.length || record.value),
   };
-  if (gedcomRecord.xref || gedcomRecord.value || gedcomRecord.children.length) {
+  if (
+    gedcomRecord.xref ||
+    gedcomRecord.value != "//" ||
+    gedcomRecord.children.length
+  ) {
     return gedcomRecord;
   } else {
     return null;
