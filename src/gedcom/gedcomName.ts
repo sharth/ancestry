@@ -1,22 +1,19 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
-import {
-  type GedcomNote,
-  parseGedcomNote,
-  serializeGedcomNote,
-} from "./gedcomNote";
+import type { GedcomNote } from "./gedcomNote";
+import { parseGedcomNote, serializeGedcomNote } from "./gedcomNote";
 import type { GedcomRecord } from "./gedcomRecord";
 import type { GedcomSourceCitation } from "./gedcomSourceCitation";
 import { parseGedcomSourceCitation } from "./gedcomSourceCitation";
 import { serializeGedcomSourceCitation } from "./gedcomSourceCitation";
 
 export interface GedcomName {
-  prefix?: string;
-  givenName?: string;
-  nickName?: string;
-  surnamePrefix?: string;
-  surname?: string;
-  suffix?: string;
-  nameType?: string;
+  prefix: string;
+  givenName: string;
+  nickName: string;
+  surnamePrefix: string;
+  surname: string;
+  suffix: string;
+  nameType: string;
   citations: GedcomSourceCitation[];
   notes: GedcomNote[];
 }
@@ -25,60 +22,61 @@ export function parseGedcomName(gedcomRecord: GedcomRecord): GedcomName {
   if (gedcomRecord.abstag !== "INDI.NAME") throw new Error();
   if (gedcomRecord.xref != "") throw new Error();
 
-  const prefixes: string[] = [];
-  const givenNames: string[] = [];
-  const nickNames: string[] = [];
-  const surnamePrefixes: string[] = [];
-  const surnames: string[] = [];
-  const suffixes: string[] = [];
-  const citations: GedcomSourceCitation[] = [];
-  const notes: GedcomNote[] = [];
-  let nameType: string | undefined = undefined;
+  const gedcomName: GedcomName = {
+    prefix: "",
+    givenName: "",
+    nickName: "",
+    surnamePrefix: "",
+    surname: "",
+    suffix: "",
+    nameType: "",
+    citations: [],
+    notes: [],
+  };
 
   for (const childRecord of gedcomRecord.children) {
     switch (childRecord.tag) {
       case "NPFX":
         if (childRecord.xref != "") throw new Error();
         if (childRecord.value == "") throw new Error();
-        prefixes.push(childRecord.value);
+        gedcomName.prefix = childRecord.value;
         break;
       case "GIVN":
         if (childRecord.xref != "") throw new Error();
         if (childRecord.value == "") throw new Error();
-        givenNames.push(childRecord.value);
+        gedcomName.givenName = childRecord.value;
         break;
       case "NICK":
         if (childRecord.xref != "") throw new Error();
         if (childRecord.value == "") throw new Error();
-        nickNames.push(childRecord.value);
+        gedcomName.nickName = childRecord.value;
         break;
       case "SPFX":
         if (childRecord.xref != "") throw new Error();
         if (childRecord.value == "") throw new Error();
-        surnamePrefixes.push(childRecord.value);
+        gedcomName.surnamePrefix = childRecord.value;
         break;
       case "SURN":
         if (childRecord.xref != "") throw new Error();
         if (childRecord.value == "") throw new Error();
-        surnames.push(childRecord.value);
+        gedcomName.surname = childRecord.value;
         break;
       case "NSFX":
         if (childRecord.xref != "") throw new Error();
         if (childRecord.value == "") throw new Error();
-        suffixes.push(childRecord.value);
+        gedcomName.suffix = childRecord.value;
         break;
       case "SOUR":
-        citations.push(parseGedcomSourceCitation(childRecord));
+        gedcomName.citations.push(parseGedcomSourceCitation(childRecord));
         break;
       case "TYPE":
         if (childRecord.xref != "") throw new Error();
         if (childRecord.value == "") throw new Error();
-        if (nameType != null) throw new Error();
         childRecord.children.forEach(reportUnparsedRecord);
-        nameType = childRecord.value;
+        gedcomName.nameType = childRecord.value;
         break;
       case "NOTE":
-        notes.push(parseGedcomNote(childRecord));
+        gedcomName.notes.push(parseGedcomNote(childRecord));
         break;
       default:
         reportUnparsedRecord(childRecord);
@@ -86,40 +84,11 @@ export function parseGedcomName(gedcomRecord: GedcomRecord): GedcomName {
     }
   }
 
-  if (
-    gedcomRecord.value &&
-    prefixes.length == 0 &&
-    givenNames.length == 0 &&
-    nickNames.length == 0 &&
-    surnamePrefixes.length == 0 &&
-    surnames.length == 0 &&
-    suffixes.length == 0
-  ) {
-    const match = new RegExp(`(.*)/(.*)/(.*)`).exec(gedcomRecord.value);
-    if (match) {
-      if (match[1]) givenNames.push(match[1]);
-      if (match[2]) surnames.push(match[2]);
-      if (match[3]) suffixes.push(match[3]);
-    } else {
-      givenNames.push(gedcomRecord.value);
-    }
-  }
-
-  return {
-    prefix: prefixes.join(" ") || undefined,
-    givenName: givenNames.join(" ") || undefined,
-    nickName: nickNames.join(" ") || undefined,
-    surnamePrefix: surnamePrefixes.join(" ") || undefined,
-    surname: surnames.join(" ") || undefined,
-    suffix: suffixes.join(" ") || undefined,
-    nameType,
-    citations,
-    notes,
-  };
+  return gedcomName;
 }
 
-export function serializeGedcomName(name: GedcomName): GedcomRecord {
-  return {
+export function serializeGedcomName(name: GedcomName): GedcomRecord | null {
+  const gedcomRecord: GedcomRecord = {
     tag: "NAME",
     abstag: "INDI.NAME",
     xref: "",
@@ -129,49 +98,49 @@ export function serializeGedcomName(name: GedcomName): GedcomRecord {
         tag: "NPFX",
         abstag: "INDI.NAME.NPFX",
         xref: "",
-        value: name.prefix ?? "",
+        value: name.prefix,
         children: [],
       },
       {
         tag: "GIVN",
         abstag: "INDI.NAME.GIVN",
         xref: "",
-        value: name.givenName ?? "",
+        value: name.givenName,
         children: [],
       },
       {
         tag: "SPFX",
         abstag: "INDI.NAME.SPFX",
         xref: "",
-        value: name.surnamePrefix ?? "",
+        value: name.surnamePrefix,
         children: [],
       },
       {
         tag: "SURN",
         abstag: "INDI.NAME.SURN",
         xref: "",
-        value: name.surname ?? "",
+        value: name.surname,
         children: [],
       },
       {
         tag: "NSFX",
         abstag: "INDI.NAME.NSFX",
         xref: "",
-        value: name.suffix ?? "",
+        value: name.suffix,
         children: [],
       },
       {
         tag: "NICK",
         abstag: "INDI.NAME.NICK",
         xref: "",
-        value: name.nickName ?? "",
+        value: name.nickName,
         children: [],
       },
       {
         tag: "TYPE",
         abstag: "INDI.NAME.TYPE",
         xref: "",
-        value: name.nameType ?? "",
+        value: name.nameType,
         children: [],
       },
       ...name.notes.map((n) => serializeGedcomNote(n)),
@@ -180,6 +149,11 @@ export function serializeGedcomName(name: GedcomName): GedcomRecord {
       ),
     ].filter((record) => record.children.length || record.value),
   };
+  if (gedcomRecord.xref || gedcomRecord.value || gedcomRecord.children.length) {
+    return gedcomRecord;
+  } else {
+    return null;
+  }
 }
 
 export function displayGedcomName(gedcomName: GedcomName) {
@@ -191,7 +165,6 @@ export function displayGedcomName(gedcomName: GedcomName) {
     gedcomName.surname ? `/${gedcomName.surname}/` : "//",
     // gedcomName.suffix,
   ]
-    .filter((part) => part != undefined)
     .filter((part) => part != "")
     .join(" ");
 }

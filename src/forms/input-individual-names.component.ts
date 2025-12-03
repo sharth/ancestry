@@ -50,6 +50,7 @@ export class InputIndividualNamesComponent implements ControlValueAccessor {
       surnamePrefix: "",
       surname: "",
       suffix: "",
+      nameType: "",
       citations: this.formBuilder.control<GedcomSourceCitation[]>([]),
     }),
   ]);
@@ -62,12 +63,13 @@ export class InputIndividualNamesComponent implements ControlValueAccessor {
     this.formArray.push(
       names.map((name) =>
         this.formBuilder.group({
-          prefix: name.prefix ?? "",
-          givenName: name.givenName ?? "",
-          nickName: name.nickName ?? "",
-          surnamePrefix: name.surnamePrefix ?? "",
-          surname: name.surname ?? "",
-          suffix: name.suffix ?? "",
+          prefix: name.prefix,
+          givenName: name.givenName,
+          nickName: name.nickName,
+          surnamePrefix: name.surnamePrefix,
+          surname: name.surname,
+          suffix: name.suffix,
+          nameType: name.nameType,
           citations: this.formBuilder.control<GedcomSourceCitation[]>(
             name.citations,
           ),
@@ -84,13 +86,14 @@ export class InputIndividualNamesComponent implements ControlValueAccessor {
       .subscribe(() => {
         onChange(
           this.formArray.getRawValue().map((formValue) => ({
-            prefix: formValue.prefix || undefined,
-            givenName: formValue.givenName || undefined,
-            nickName: formValue.nickName || undefined,
-            surnamePrefix: formValue.surnamePrefix || undefined,
-            surname: formValue.surname || undefined,
-            suffix: formValue.suffix || undefined,
+            prefix: formValue.prefix,
+            givenName: formValue.givenName,
+            nickName: formValue.nickName,
+            surnamePrefix: formValue.surnamePrefix,
+            surname: formValue.surname,
+            suffix: formValue.suffix,
             citations: formValue.citations,
+            nameType: formValue.nameType,
             notes: [],
           })),
         );
@@ -120,6 +123,7 @@ export class InputIndividualNamesComponent implements ControlValueAccessor {
       surnamePrefix: "",
       surname: "",
       suffix: "",
+      nameType: "",
       citations: this.formBuilder.control<GedcomSourceCitation[]>([]),
     });
     this.formArray.push(formGroup);
