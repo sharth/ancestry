@@ -33,7 +33,7 @@ export class RepositorySourcesComponent {
         .map(({ source, repositoryLink }) => ({
           xref: source.xref,
           abbr: source.abbr,
-          callNumbers: repositoryLink.callNumbers,
+          callNumber: repositoryLink.callNumber,
         }))
         .toArray(),
     };

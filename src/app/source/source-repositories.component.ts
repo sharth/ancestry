@@ -26,7 +26,7 @@ export class SourceRepositoriesComponent {
     return {
       citations: source.repositoryLinks.map((repositoryLink) => ({
         repositoryXref: repositoryLink.repositoryXref,
-        callNumbers: repositoryLink.callNumbers,
+        callNumber: repositoryLink.callNumber,
         repository: ancestry.repositories.get(repositoryLink.repositoryXref),
       })),
     };

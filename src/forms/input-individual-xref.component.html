@@ -1,9 +1,5 @@
 <div class="form-floating">
-  <select
-    #focusTarget
-    class="form-select"
-    [formControl]="formGroup.controls.individualXref"
-  >
+  <select #focusTarget class="form-select" [field]="form">
     <option selected value="">Individuals...</option>
     @for (
       individual of ancestryDatabase().individuals.values();

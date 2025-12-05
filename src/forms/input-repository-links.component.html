@@ -1,8 +1,8 @@
 <details #container (toggle)="(true)">
-  <summary>Repositories ({{ formArray.length }})</summary>
+  <summary>Repositories ({{ form.length }})</summary>
   @defer (when container.open) {
-    @for (formGroup of formArray.controls; track formGroup) {
-      @let repositoryXref = formGroup.controls.repositoryXref.value;
+    @for (formGroup of form; track formGroup) {
+      @let repositoryXref = formGroup.repositoryXref().value();
       <details [open]="newControls.has(formGroup)">
         <summary>
           <button
@@ -17,11 +17,11 @@
         </summary>
         <app-input-repository-xref
           #focusTarget
-          [formControl]="formGroup.controls.repositoryXref"
+          [field]="formGroup.repositoryXref"
           [(ancestryDatabase)]="ancestryDatabase"
         ></app-input-repository-xref>
         <app-input-repository-call-number
-          [formControl]="formGroup.controls.callNumber"
+          [field]="formGroup.callNumber"
           [(ancestryDatabase)]="ancestryDatabase"
         ></app-input-repository-call-number>
       </details>

@@ -1,22 +1,22 @@
 <details #container (toggle)="(true)" [open]="open()">
-  <summary>Notes ({{ formArray.length }})</summary>
+  <summary>Notes ({{ form.length }})</summary>
   @defer (when container.open) {
     <table>
       <tbody>
-        @for (note of formArray.controls; track $index; let i = $index) {
+        @for (note of form; track note) {
           <tr>
             <td>
-              <button
+              <button 
                 type="button"
                 class="btn btn-danger bi-trash"
-                (click)="removeNote(i)"
+                (click)="removeNote($index)"
               ></button>
             </td>
             <td class="form-floating">
               <textarea
                 #focusTarget
                 class="form-control"
-                [formControl]="note.controls.text"
+                [field]="note.text"
               ></textarea>
               <label>Text</label>
             </td>

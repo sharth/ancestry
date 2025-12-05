@@ -1,62 +1,20 @@
 import type { AncestryDatabase } from "../database/ancestry.service";
 import { displayGedcomName } from "../gedcom/gedcomName";
 import type { ElementRef } from "@angular/core";
-import { Component, DestroyRef, ViewChild, inject, model } from "@angular/core";
-import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import type { ControlValueAccessor } from "@angular/forms";
-import {
-  NG_VALUE_ACCESSOR,
-  NonNullableFormBuilder,
-  ReactiveFormsModule,
-} from "@angular/forms";
-import { startWith } from "rxjs/operators";
+import { Component, ViewChild, model } from "@angular/core";
+import type { FormValueControl } from "@angular/forms/signals";
+import { Field, form } from "@angular/forms/signals";
 
 @Component({
   selector: "app-input-source-xref",
-  imports: [ReactiveFormsModule],
+  imports: [Field],
   templateUrl: "./input-source-xref.component.html",
   styleUrl: "./input.component.css",
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: InputSourceXrefComponent,
-      multi: true,
-    },
-  ],
 })
-export class InputSourceXrefComponent implements ControlValueAccessor {
-  private readonly destroyRef = inject(DestroyRef);
-  private readonly formBuilder = inject(NonNullableFormBuilder);
-
+export class InputSourceXrefComponent implements FormValueControl<string> {
   readonly ancestryDatabase = model.required<AncestryDatabase>();
-
-  readonly formGroup = this.formBuilder.group({
-    sourceXref: "",
-  });
-
-  writeValue(sourceXref: string): void {
-    this.formGroup.setValue({ sourceXref }, { emitEvent: false });
-  }
-
-  registerOnChange(onChange: (sourceXref: string) => void): void {
-    this.formGroup.valueChanges
-      .pipe(startWith(this.formGroup.value))
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        onChange(this.formGroup.getRawValue().sourceXref);
-      });
-  }
-
-  registerOnTouched(onTouch: () => void): void {
-    this.formGroup.statusChanges
-      .pipe(startWith(this.formGroup.status))
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        if (this.formGroup.touched) {
-          onTouch();
-        }
-      });
-  }
+  readonly value = model<string>("");
+  readonly form = form(this.value);
 
   public readonly displayGedcomName = displayGedcomName;
 

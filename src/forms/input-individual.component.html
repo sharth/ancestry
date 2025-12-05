@@ -1,29 +1,29 @@
 <app-input-individual-names
   [open]="open()"
-  [formControl]="form.controls.names"
+  [field]="form.names"
   [(ancestryDatabase)]="ancestryDatabase"
 ></app-input-individual-names>
 
 <app-input-individual-sex
   [open]="open()"
-  [formControl]="form.controls.sex"
+  [field]="form.sex"
   [(ancestryDatabase)]="ancestryDatabase"
 ></app-input-individual-sex>
 
 <app-input-individual-events
   [open]="open()"
-  [formControl]="form.controls.events"
+  [field]="form.events"
   [(ancestryDatabase)]="ancestryDatabase"
 ></app-input-individual-events>
 
 <app-input-notes
   [open]="open()"
-  [formControl]="form.controls.notes"
+  [field]="form.notes"
   [(ancestryDatabase)]="ancestryDatabase"
 ></app-input-notes>
 
 <app-input-unknown-records
   [open]="open()"
-  [formControl]="form.controls.unknownRecords"
+  [field]="form.unknownRecords"
   [(ancestryDatabase)]="ancestryDatabase"
 ></app-input-unknown-records>

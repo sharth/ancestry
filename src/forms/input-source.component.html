@@ -1,38 +1,29 @@
 <div class="form-floating">
-  <textarea
-    class="form-control h-auto"
-    [formControl]="form.controls.abbr"
-  ></textarea>
+  <textarea class="form-control h-auto" [field]="form.abbr"></textarea>
   <label>Short Title</label>
 </div>
 
 <div class="form-floating">
-  <textarea
-    class="form-control h-auto"
-    [formControl]="form.controls.title"
-  ></textarea>
+  <textarea class="form-control h-auto" [field]="form.title"></textarea>
   <label>Title</label>
 </div>
 
 <div class="form-floating">
-  <textarea
-    class="form-control h-auto"
-    [formControl]="form.controls.text"
-  ></textarea>
+  <textarea class="form-control h-auto" [field]="form.text"></textarea>
   <label>Text</label>
 </div>
 
 <app-input-repository-links
-  [formControl]="form.controls.repositoryLinks"
+  [field]="form.repositoryLinks"
   [(ancestryDatabase)]="ancestryDatabase"
 ></app-input-repository-links>
 
 <app-input-multimedia-links
-  [formControl]="form.controls.multimediaLinks"
+  [field]="form.multimediaLinks"
   [(ancestryDatabase)]="ancestryDatabase"
 ></app-input-multimedia-links>
 
 <app-input-unknown-records
-  [formControl]="form.controls.unknownRecords"
+  [field]="form.unknownRecords"
   [(ancestryDatabase)]="ancestryDatabase"
 ></app-input-unknown-records>

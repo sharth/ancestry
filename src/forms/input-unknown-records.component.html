@@ -1,5 +1,5 @@
 <details #container (toggle)="(true)" [open]="open()">
-  <summary>Unknown Records ({{ formArray.length }})</summary>
+  <summary>Unknown Records ({{ value().length }})</summary>
   @defer (when container.open) {
     <table>
       <thead>
@@ -9,7 +9,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (unknownRecord of formArray.controls; track $index) {
+        @for (unknownRecord of value(); track $index) {
           <tr>
             <td>
               <button
@@ -20,7 +20,7 @@
             </td>
             <td>
               <pre>{{
-                serializeGedcomRecordToText(unknownRecord.value).join("\n")
+                serializeGedcomRecordToText(unknownRecord).join("\n")
               }}</pre>
             </td>
           </tr>

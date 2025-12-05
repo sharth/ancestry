@@ -1,9 +1,9 @@
 <details #container (toggle)="(true)">
-  <summary>Citations ({{ formArray.length }})</summary>
+  <summary>Citations ({{ form.length }})</summary>
   @defer (when container.open) {
     <table>
       <tbody>
-        @for (formGroup of formArray.controls; track $index) {
+        @for (formGroup of form; track formGroup) {
           <tr style="border: 0">
             <td rowspan="4" class="align-top">
               <button
@@ -15,7 +15,7 @@
             <td>
               <app-input-source-xref
                 #focusTarget
-                [formControl]="formGroup.controls.sourceXref"
+                [field]="formGroup.sourceXref"
                 [ancestryDatabase]="ancestryDatabase()"
               ></app-input-source-xref>
             </td>
@@ -23,7 +23,7 @@
               <input
                 class="form-control"
                 id="page_{{ $index }}"
-                [formControl]="formGroup.controls.page"
+                [field]="formGroup.page"
               />
               <label for="`page_{{ $index }}`">Page</label>
             </td>
@@ -31,7 +31,7 @@
               <input
                 class="form-control"
                 id="quality_{{ $index }}"
-                [formControl]="formGroup.controls.quality"
+                [field]="formGroup.quality"
               />
               <label for="`quality_{{ $index }}`">Quality</label>
             </td>
@@ -41,7 +41,7 @@
               <textarea
                 class="form-control"
                 id="text_{{ $index }}"
-                [formControl]="formGroup.controls.text"
+                [field]="formGroup.text"
               ></textarea>
               <label for="`text_{{ $index }}`">Text</label>
             </td>
@@ -49,7 +49,7 @@
           <tr>
             <td colspan="7">
               <app-input-multimedia-links
-                [formControl]="formGroup.controls.multimediaLinks"
+                [field]="formGroup.multimediaLinks"
                 [(ancestryDatabase)]="ancestryDatabase"
               ></app-input-multimedia-links>
             </td>
@@ -57,7 +57,7 @@
           <tr>
             <td colspan="7">
               <app-input-notes
-                [formControl]="formGroup.controls.notes"
+                [field]="formGroup.notes"
                 [(ancestryDatabase)]="ancestryDatabase"
               ></app-input-notes>
             </td>

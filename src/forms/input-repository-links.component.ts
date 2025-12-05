@@ -3,115 +3,49 @@ import type { GedcomRepositoryLink } from "../gedcom/gedcomRepositoryLink";
 import { InputRepositoryCallNumberComponent } from "./input-repository-call-number.component";
 import { InputRepositoryXrefComponent } from "./input-repository-xref.component";
 import type { QueryList } from "@angular/core";
-import {
-  Component,
-  DestroyRef,
-  ViewChildren,
-  inject,
-  model,
-} from "@angular/core";
-import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import type { AbstractControl, ControlValueAccessor } from "@angular/forms";
-import {
-  NG_VALUE_ACCESSOR,
-  NonNullableFormBuilder,
-  ReactiveFormsModule,
-} from "@angular/forms";
+import { Component, ViewChildren, model } from "@angular/core";
+import type { FieldTree, FormValueControl } from "@angular/forms/signals";
+import { Field, form } from "@angular/forms/signals";
 import { RouterModule } from "@angular/router";
-import { startWith } from "rxjs/operators";
 
 @Component({
   selector: "app-input-repository-links",
   templateUrl: "./input-repository-links.component.html",
   styleUrl: "./input.component.css",
   imports: [
+    Field,
     RouterModule,
-    ReactiveFormsModule,
     InputRepositoryCallNumberComponent,
     InputRepositoryXrefComponent,
   ],
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: InputRepositoryLinksComponent,
-      multi: true,
-    },
-  ],
 })
-export class InputRepositoryLinksComponent implements ControlValueAccessor {
-  private readonly destroyRef = inject(DestroyRef);
-  private readonly formBuilder = inject(NonNullableFormBuilder);
-
+export class InputRepositoryLinksComponent implements FormValueControl<
+  GedcomRepositoryLink[]
+> {
   readonly ancestryDatabase = model.required<AncestryDatabase>();
-
-  readonly formArray = this.formBuilder.array([
-    this.formBuilder.group({
-      repositoryXref: "",
-      callNumber: "",
-    }),
-  ]);
-
-  writeValue(repositoryLinks: GedcomRepositoryLink[]): void {
-    this.formArray.clear({ emitEvent: false });
-    this.formArray.push(
-      repositoryLinks.flatMap((repositoryLink) =>
-        repositoryLink.callNumbers.map((callNumber) =>
-          this.formBuilder.group({
-            repositoryXref: repositoryLink.repositoryXref,
-            callNumber,
-          }),
-        ),
-      ),
-      { emitEvent: false },
-    );
-  }
-
-  registerOnChange(
-    onChange: (repositoryLink: GedcomRepositoryLink[]) => void,
-  ): void {
-    this.formArray.valueChanges
-      .pipe(startWith(this.formArray.value))
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        onChange(
-          this.formArray.getRawValue().map((formGroup) => ({
-            repositoryXref: formGroup.repositoryXref,
-            callNumbers: formGroup.callNumber ? [formGroup.callNumber] : [],
-          })),
-        );
-      });
-  }
-
-  registerOnTouched(onTouch: () => void): void {
-    this.formArray.statusChanges
-      .pipe(startWith(this.formArray.status))
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        if (this.formArray.touched) {
-          onTouch();
-        }
-      });
-  }
+  readonly value = model<GedcomRepositoryLink[]>([]);
+  readonly form = form(this.value);
 
   @ViewChildren("focusTarget")
   focusTargets!: QueryList<InputRepositoryXrefComponent>;
 
   // Keep track of the controls that were added by a user interation.
-  readonly newControls = new WeakSet<AbstractControl>([]);
+  readonly newControls = new WeakSet<FieldTree<GedcomRepositoryLink, number>>(
+    [],
+  );
 
   appendCitation() {
-    const formGroup = this.formBuilder.group({
-      repositoryXref: "",
-      callNumber: "",
-    });
-    this.formArray.push(formGroup);
-    this.newControls.add(formGroup);
+    this.value.update((repostitoryLinks) => [
+      ...repostitoryLinks,
+      { repositoryXref: "", callNumber: "" },
+    ]);
+    this.newControls.add(this.form[-1]);
     setTimeout(() => {
       this.focusTargets.last.focus();
     });
   }
 
   removeCitation(index: number) {
-    this.formArray.removeAt(index);
+    this.value.update((repositoryLinks) => repositoryLinks.toSpliced(index, 1));
   }
 }

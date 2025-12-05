@@ -1,30 +1,19 @@
 import type { AncestryDatabase } from "../database/ancestry.service";
-import type { GedcomEvent } from "../gedcom/gedcomEvent";
+import type { GedcomDate } from "../gedcom/gedcomDate";
 import type { GedcomIndividual } from "../gedcom/gedcomIndividual";
-import type { GedcomName } from "../gedcom/gedcomName";
-import type { GedcomNote } from "../gedcom/gedcomNote";
-import type { GedcomRecord } from "../gedcom/gedcomRecord";
-import type { GedcomSex } from "../gedcom/gedcomSex";
 import { InputIndividualEventsComponent } from "./input-individual-events.component";
 import { InputIndividualNamesComponent } from "./input-individual-names.component";
 import { InputIndividualSexComponent } from "./input-individual-sex.component";
 import { InputNotesComponent } from "./input-notes.component";
 import { InputUnknownRecordsComponent } from "./input-unknown-records.component";
 import type { OnInit } from "@angular/core";
-import { Component, DestroyRef, inject, input, model } from "@angular/core";
-import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import {
-  FormsModule,
-  NonNullableFormBuilder,
-  ReactiveFormsModule,
-} from "@angular/forms";
-import { startWith } from "rxjs/operators";
+import { Component, effect, input, model, signal } from "@angular/core";
+import { Field, form } from "@angular/forms/signals";
 
 @Component({
   selector: "app-input-individual",
   imports: [
-    FormsModule,
-    ReactiveFormsModule,
+    Field,
     InputIndividualEventsComponent,
     InputIndividualSexComponent,
     InputIndividualNamesComponent,
@@ -35,67 +24,56 @@ import { startWith } from "rxjs/operators";
   styleUrl: "./input.component.css",
 })
 export class InputIndividualComponent implements OnInit {
-  private readonly destroyRef = inject(DestroyRef);
-  private readonly formBuilder = inject(NonNullableFormBuilder);
-
   readonly ancestryDatabase = model.required<AncestryDatabase>();
   readonly xref = input.required<string>();
   readonly open = input<boolean>(false);
 
-  readonly form = this.formBuilder.group({
-    xref: this.formBuilder.control<string>(""),
-    sex: this.formBuilder.control<GedcomSex>({ sex: "", citations: [] }),
-    names: this.formBuilder.control<GedcomName[]>([]),
-    events: this.formBuilder.control<GedcomEvent[]>([]),
-    childOfFamilies: this.formBuilder.control<string[]>([]),
-    parentOfFamilies: this.formBuilder.control<string[]>([]),
-    notes: this.formBuilder.control<GedcomNote[]>([]),
-    unknownRecords: this.formBuilder.control<GedcomRecord[]>([]),
+  readonly individual = signal<GedcomIndividual>({
+    xref: "",
+    names: [],
+    events: [],
+    sex: {
+      sex: "",
+      citations: [],
+    },
+    childOfFamilyXrefs: [],
+    parentOfFamilyXrefs: [],
+    notes: [],
+    unknownRecords: [],
+  });
+  readonly form = form<GedcomIndividual>(this.individual);
+
+  readonly updateAngularDatabase = effect(() => {
+    const now: GedcomDate = {
+      value: new Date()
+        .toLocaleString("en-gb", { dateStyle: "medium" })
+        .toLocaleUpperCase(),
+    };
+    const individual = {
+      ...this.individual(),
+      changeDate: { date: now },
+    };
+    if (individual.xref !== "") {
+      this.ancestryDatabase.update((ancestryDatabase) => {
+        const individuals = new Map(ancestryDatabase.individuals);
+        individuals.set(individual.xref, individual);
+        return { ...ancestryDatabase, individuals };
+      });
+    }
   });
 
   ngOnInit(): void {
-    const individual = this.ancestryDatabase().individuals.get(this.xref());
-    this.form.setValue(
-      {
-        // FIXME: If the xref (or individual) is not set, we should discover a new one.
-        xref: individual?.xref ?? "",
-        sex: individual?.sex ?? { sex: "", citations: [] },
-        names: individual?.names ?? [],
-        events: individual?.events ?? [],
-        childOfFamilies: individual?.childOfFamilyXrefs ?? [],
-        parentOfFamilies: individual?.parentOfFamilyXrefs ?? [],
-        notes: individual?.notes ?? [],
-        unknownRecords: individual?.unknownRecords ?? [],
+    this.individual.set(
+      this.ancestryDatabase().individuals.get(this.xref()) ?? {
+        xref: this.xref(),
+        names: [],
+        events: [],
+        sex: { sex: "", citations: [] },
+        childOfFamilyXrefs: [],
+        parentOfFamilyXrefs: [],
+        notes: [],
+        unknownRecords: [],
       },
-      { emitEvent: false },
     );
-    this.form.valueChanges
-      .pipe(startWith(this.form.value))
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        const formValue = this.form.getRawValue();
-        const individual: GedcomIndividual = {
-          xref: formValue.xref,
-          changeDate: {
-            date: {
-              value: new Date()
-                .toLocaleString("en-gb", { dateStyle: "medium" })
-                .toLocaleUpperCase(),
-            },
-          },
-          sex: formValue.sex,
-          names: formValue.names,
-          events: formValue.events,
-          childOfFamilyXrefs: formValue.childOfFamilies,
-          parentOfFamilyXrefs: formValue.parentOfFamilies,
-          notes: formValue.notes,
-          unknownRecords: formValue.unknownRecords,
-        };
-        this.ancestryDatabase.update((ancestryDatabase) => {
-          const individuals = new Map(ancestryDatabase.individuals);
-          individuals.set(individual.xref, individual);
-          return { ...ancestryDatabase, individuals };
-        });
-      });
   }
 }

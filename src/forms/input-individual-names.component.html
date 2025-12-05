@@ -1,7 +1,7 @@
 <details #container (toggle)="(true)" [open]="open()">
-  <summary>Names ({{ formArray.length }})</summary>
+  <summary>Names ({{ form.length }})</summary>
   @defer (when container.open) {
-    @for (name of formArray.controls; track name) {
+    @for (name of form; track name) {
       <details [open]="newControls.has(name)">
         <summary>
           <button
@@ -9,18 +9,18 @@
             class="btn btn-sm btn-outline-danger bi-trash"
             (click)="removeName($index)"
           ></button>
-          {{ name.controls.prefix.value }}
-          {{ name.controls.givenName.value }}
-          {{ name.controls.surnamePrefix.value }}
-          {{ name.controls.surname.value }}
-          {{ name.controls.suffix.value }}
+          {{ name.prefix().value() }}
+          {{ name.givenName().value() }}
+          {{ name.surnamePrefix().value() }}
+          {{ name.surname().value() }}
+          {{ name.suffix().value() }}
         </summary>
         <div class="form-floating">
           <input
             #focusTarget
             class="form-control"
             id="prefix_{{ $index }}"
-            [formControl]="name.controls.prefix"
+            [field]="name.prefix"
           />
           <label for="prefix_{{ $index }}">Prefix</label>
         </div>
@@ -28,7 +28,7 @@
           <input
             class="form-control"
             id="given_{{ $index }}"
-            [formControl]="name.controls.givenName"
+            [field]="name.givenName"
           />
           <label for="given_{{ $index }}">Given Name</label>
         </div>
@@ -36,7 +36,7 @@
           <input
             class="form-control"
             id="nick_{{ $index }}"
-            [formControl]="name.controls.nickName"
+            [field]="name.nickName"
           />
           <label for="nick_{{ $index }}">Nickname</label>
         </div>
@@ -44,7 +44,7 @@
           <input
             class="form-control"
             id="surnamePrefix_{{ $index }}"
-            [formControl]="name.controls.surnamePrefix"
+            [field]="name.surnamePrefix"
           />
           <label for="surnamePrefix_{{ $index }}">Surname Prefix</label>
         </div>
@@ -52,7 +52,7 @@
           <input
             class="form-control"
             id="surname_{{ $index }}"
-            [formControl]="name.controls.surname"
+            [field]="name.surname"
           />
           <label for="surname_{{ $index }}">Surname</label>
         </div>
@@ -60,12 +60,12 @@
           <input
             class="form-control"
             id="suffix_{{ $index }}"
-            [formControl]="name.controls.suffix"
+            [field]="name.suffix"
           />
           <label for="suffix_{{ $index }}">Suffix</label>
         </div>
         <app-input-source-citations
-          [formControl]="name.controls.citations"
+          [field]="name.citations"
           [(ancestryDatabase)]="ancestryDatabase"
         ></app-input-source-citations>
       </details>

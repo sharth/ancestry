@@ -1,9 +1,9 @@
 <details #container (toggle)="(true)">
-  <summary>Multimedia ({{ formArray.length }})</summary>
+  <summary>Multimedia ({{ form.length }})</summary>
   @defer (when container.open) {
     <table>
       <tbody>
-        @for (link of formArray.controls; track link) {
+        @for (link of form; track link) {
           <tr>
             <td>
               <button
@@ -13,12 +13,7 @@
               ></button>
             </td>
             <td class="form-floating">
-              <select
-                #focusTarget
-                class="form-select"
-                [formControl]="link.controls.xref"
-                name="multimediaXref"
-              >
+              <select #focusTarget class="form-select" [field]="link.xref">
                 <option selected value="">Multimedia...</option>
                 @for (
                   multimedia of ancestryDatabase().multimedias.values();
@@ -32,12 +27,7 @@
               <label>Multimedia</label>
             </td>
             <td class="form-floating">
-              <input
-                class="form-control"
-                type="text"
-                [formControl]="link.controls.title"
-                name="Title"
-              />
+              <input class="form-control" type="text" [field]="link.title" />
               <label>Custom Title</label>
             </td>
           </tr>

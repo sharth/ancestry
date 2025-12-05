@@ -1,6 +1,6 @@
 <details #container (toggle)="(true)">
   <summary>
-    Shared With ({{ form.controls.length }})
+    Shared With ({{ form.length }})
     <button
       type="button"
       class="btn btn-outline-primary bi-plus"
@@ -8,10 +8,10 @@
     ></button>
   </summary>
   @defer (when container.open) {
-    @for (formGroup of form.controls; track formGroup) {
+    @for (formGroup of form; track formGroup) {
       <details [open]="newControls.has(formGroup)">
         <summary>
-          {{ formGroup.controls.xref.value }}
+          {{ formGroup.xref().value() }}
           <button
             type="button"
             class="btn btn-sm btn-outline-danger bi-trash"
@@ -20,14 +20,14 @@
         </summary>
         <app-input-individual-xref
           #focusTarget
-          [formControl]="formGroup.controls.xref"
+          [field]="formGroup.xref"
           [ancestryDatabase]="ancestryDatabase()"
         ></app-input-individual-xref>
         <div class="form-floating">
           <input
             class="form-control"
             id="role_{{ $index }}"
-            [formControl]="formGroup.controls.role"
+            [field]="formGroup.role"
           />
           <label for="role_{{ $index }}">Role</label>
         </div>

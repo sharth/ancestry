@@ -1,16 +1,16 @@
 <details [open]="open()">
   <summary>
-    Events ({{ formArray.length }})
+    Events ({{ form.length }})
     <button
       type="button"
       class="btn btn-sm btn-outline-primary bi-plus"
       (click)="appendEvent()"
     ></button>
   </summary>
-  @for (event of formArray.controls; track $index) {
+  @for (event of form; track $index) {
     <details #container (toggle)="(true)">
       <summary>
-        {{ event.controls.tag.value }}
+        {{ event.tag().value() }}
         <button
           type="button"
           class="btn btn-sm btn-outline-danger bi-trash"
@@ -23,10 +23,10 @@
             #focusTarget
             class="form-control"
             id="tag_{{ $index }}"
-            [formControl]="event.controls.tag"
+            [field]="event.tag"
           >
             @for (event of gedcomEventTags; track event.tag) {
-              <option [ngValue]="event.tag">{{ event.description }}</option>
+              <option [value]="event.tag">{{ event.description }}</option>
             }
           </select>
           <label for="tag_{{ $index }}">Tag</label>
@@ -35,7 +35,7 @@
           <input
             class="form-control"
             id="type_{{ $index }}"
-            [formControl]="event.controls.type"
+            [field]="event.type"
           />
           <label for="type_{{ $index }}">Type</label>
         </div>
@@ -43,7 +43,7 @@
           <input
             class="form-control"
             id="address_{{ $index }}"
-            [formControl]="event.controls.address"
+            [field]="event.address"
           />
           <label for="address_{{ $index }}">Address</label>
         </div>
@@ -51,7 +51,7 @@
           <input
             class="form-control"
             id="place_{{ $index }}"
-            [formControl]="event.controls.place"
+            [field]="event.place"
           />
           <label for="place_{{ $index }}">Place</label>
         </div>
@@ -59,7 +59,7 @@
           <input
             class="form-control"
             id="cause_{{ $index }}"
-            [formControl]="event.controls.cause"
+            [field]="event.cause"
           />
           <label for="cause_{{ $index }}">Cause</label>
         </div>
@@ -67,7 +67,7 @@
           <input
             class="form-control"
             id="date_{{ $index }}"
-            [formControl]="event.controls.date"
+            [field]="event.date.value"
           />
           <label for="date_{{ $index }}">Date</label>
         </div>
@@ -75,20 +75,20 @@
           <input
             class="form-control"
             id="sdate_{{ $index }}"
-            [formControl]="event.controls.sortDate"
+            [field]="event.sortDate.value"
           />
           <label for="sdate_{{ $index }}">Sort Date</label>
         </div>
         <app-input-source-citations
-          [formControl]="event.controls.citations"
+          [field]="event.citations"
           [(ancestryDatabase)]="ancestryDatabase"
         ></app-input-source-citations>
         <app-input-shared-with
-          [formControl]="event.controls.sharedWith"
+          [field]="event.sharedWith"
           [(ancestryDatabase)]="ancestryDatabase"
         ></app-input-shared-with>
         <app-input-notes
-          [formControl]="event.controls.notes"
+          [field]="event.notes"
           [(ancestryDatabase)]="ancestryDatabase"
         ></app-input-notes>
       }

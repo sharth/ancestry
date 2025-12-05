@@ -3,7 +3,7 @@ import type { GedcomRecord } from "./gedcomRecord";
 
 export interface GedcomRepositoryLink {
   repositoryXref: string;
-  callNumbers: string[];
+  callNumber: string;
 }
 
 export function parseGedcomRepositoryLink(
@@ -15,7 +15,7 @@ export function parseGedcomRepositoryLink(
 
   const repositoryLink: GedcomRepositoryLink = {
     repositoryXref: gedcomRecord.value,
-    callNumbers: [],
+    callNumber: "",
   };
 
   for (const childRecord of gedcomRecord.children) {
@@ -25,7 +25,7 @@ export function parseGedcomRepositoryLink(
         if (childRecord.xref != "") throw new Error();
         if (childRecord.value == "") throw new Error();
         if (childRecord.children.length > 0) throw new Error();
-        repositoryLink.callNumbers.push(childRecord.value);
+        repositoryLink.callNumber = childRecord.value;
         break;
       default:
         reportUnparsedRecord(childRecord);
@@ -44,12 +44,14 @@ export function serializeGedcomRepositoryLink(
     abstag: "",
     xref: "",
     value: repositoryLink.repositoryXref,
-    children: repositoryLink.callNumbers.map((callNumber) => ({
-      tag: "CALN",
-      abstag: "SOUR.REPO.CALN",
-      xref: "",
-      value: callNumber,
-      children: [],
-    })),
+    children: [
+      {
+        tag: "CALN",
+        abstag: "SOUR.REPO.CALN",
+        xref: "",
+        value: repositoryLink.callNumber,
+        children: [],
+      },
+    ].filter((r) => r.value || r.children.length > 0),
   };
 }

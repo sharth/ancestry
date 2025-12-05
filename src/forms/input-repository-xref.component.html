@@ -1,9 +1,5 @@
 <div class="form-floating">
-  <select
-    class="form-select"
-    #selectElement
-    [formControl]="formGroup.controls.repositoryXref"
-  >
+  <select class="form-select" #selectElement [field]="form">
     <option selected value="">Repositories...</option>
     @for (
       repository of ancestryDatabase().repositories.values();
