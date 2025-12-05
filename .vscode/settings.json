@@ -12,5 +12,8 @@
   },
   "[jsonc]": {
     "editor.defaultFormatter": "prettier.prettier-vscode"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "prettier.prettier-vscode"
   }
 }
