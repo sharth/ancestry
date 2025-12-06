@@ -24,6 +24,7 @@ describe("GedcomSource", () => {
       repositoryLinks: [],
       unknownRecords: [],
       multimediaLinks: [],
+      changeDate: { date: { value: "" } },
     };
     expect(parseGedcomSource(gedcomRecord)).toEqual(gedcomSource);
     expect(serializeGedcomSource(parseGedcomSource(gedcomRecord))).toEqual(
@@ -49,6 +50,7 @@ describe("GedcomSource", () => {
       text: "text and more text",
       multimediaLinks: [],
       repositoryLinks: [],
+      changeDate: { date: { value: "" } },
       unknownRecords: [
         {
           tag: "_TMPLT",

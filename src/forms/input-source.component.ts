@@ -31,6 +31,7 @@ export class InputSourceComponent implements OnInit {
     repositoryLinks: [],
     multimediaLinks: [],
     unknownRecords: [],
+    changeDate: { date: { value: "" } },
   });
   readonly form = form(this.source);
 
@@ -40,7 +41,7 @@ export class InputSourceComponent implements OnInit {
         .toLocaleString("en-gb", { dateStyle: "medium" })
         .toLocaleUpperCase(),
     };
-    const source = {
+    const source: GedcomSource = {
       ...this.source(),
       changeDate: { date: now },
     };
@@ -62,6 +63,7 @@ export class InputSourceComponent implements OnInit {
         repositoryLinks: [],
         multimediaLinks: [],
         unknownRecords: [],
+        changeDate: { date: { value: "" } },
       },
     );
   }

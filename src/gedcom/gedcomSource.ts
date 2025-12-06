@@ -1,4 +1,9 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
+import type { GedcomChangeDate } from "./gedcomChangeDate";
+import {
+  parseGedcomChangeDate,
+  serializeGedcomChangeDate,
+} from "./gedcomChangeDate";
 import type { GedcomMultimediaLink } from "./gedcomMultimediaLink";
 import {
   parseGedcomMultimediaLink,
@@ -19,6 +24,7 @@ export interface GedcomSource {
   repositoryLinks: GedcomRepositoryLink[];
   unknownRecords: GedcomRecord[];
   multimediaLinks: GedcomMultimediaLink[];
+  changeDate: GedcomChangeDate;
 }
 
 export function parseGedcomSource(record: GedcomRecord): GedcomSource {
@@ -34,6 +40,7 @@ export function parseGedcomSource(record: GedcomRecord): GedcomSource {
     repositoryLinks: [],
     unknownRecords: [],
     multimediaLinks: [],
+    changeDate: { date: { value: "" } },
   };
 
   for (const childRecord of record.children) {
@@ -68,6 +75,9 @@ export function parseGedcomSource(record: GedcomRecord): GedcomSource {
         gedcomSource.multimediaLinks.push(
           parseGedcomMultimediaLink(childRecord),
         );
+        break;
+      case "CHAN":
+        gedcomSource.changeDate = parseGedcomChangeDate(childRecord);
         break;
       default:
         gedcomSource.unknownRecords.push(childRecord);
@@ -108,6 +118,7 @@ export function serializeGedcomSource(source: GedcomSource): GedcomRecord {
         value: source.text,
         children: [],
       },
+      serializeGedcomChangeDate(source.changeDate),
       ...source.repositoryLinks.map((repositoryLink) =>
         serializeGedcomRepositoryLink(repositoryLink),
       ),
@@ -117,6 +128,8 @@ export function serializeGedcomSource(source: GedcomSource): GedcomRecord {
       ...source.unknownRecords.filter(
         (record) => record.tag != "_SUBQ" && record.tag != "_BIBL",
       ),
-    ].filter((record) => record.children.length || record.value),
+    ]
+      .filter((record) => record != null)
+      .filter((record) => record.children.length || record.value),
   };
 }
