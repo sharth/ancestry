@@ -109,7 +109,7 @@ class ArrayView<T> {
     callback: (element: T, index: number, arrayView: ArrayView<T>) => void,
   ): void {
     for (let i = 0; i < this._length; i++) {
-      callback(this._arr[this._offset + i], i, this);
+      callback(this._arr[this._offset + i]!, i, this);
     }
   }
 }
@@ -194,16 +194,16 @@ function diffArrayViews(
   const jaggedArray: JaggedEntry[][] = [];
   for (const [lhsIndex, rhsIndex] of commonStrings.values()) {
     let i = 0;
-    while (jaggedArray[i] && jaggedArray[i].at(-1)!.rhsIndex < rhsIndex) {
+    while (jaggedArray[i] && jaggedArray[i]!.at(-1)!.rhsIndex < rhsIndex) {
       i += 1;
     }
     if (i == jaggedArray.length) {
       jaggedArray.push([]);
     }
-    jaggedArray[i].push({
+    jaggedArray[i]!.push({
       lhsIndex,
       rhsIndex,
-      previousEntry: i == 0 ? undefined : jaggedArray[i - 1].at(-1)!,
+      previousEntry: i == 0 ? undefined : jaggedArray[i - 1]!.at(-1)!,
     });
   }
 
@@ -249,8 +249,8 @@ function diffArrayViews(
     for (let i = 1; i < chunks.length; i++) {
       differences.push(
         ...diffArrayViews(
-          lhs.slice(chunks[i - 1].lhsIndex, chunks[i].lhsIndex - 1),
-          rhs.slice(chunks[i - 1].rhsIndex, chunks[i].rhsIndex - 1),
+          lhs.slice(chunks[i - 1]!.lhsIndex, chunks[i]!.lhsIndex - 1),
+          rhs.slice(chunks[i - 1]!.rhsIndex, chunks[i]!.rhsIndex - 1),
         ),
       );
     }

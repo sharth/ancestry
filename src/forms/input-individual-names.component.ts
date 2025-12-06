@@ -45,7 +45,7 @@ export class InputIndividualNamesComponent implements FormValueControl<
         notes: [],
       },
     ]);
-    this.newControls.add(this.form[-1]);
+    this.newControls.add(this.form[-1]!);
     setTimeout(() => {
       this.focusTargets.last.nativeElement.focus();
     });

@@ -337,7 +337,7 @@ export class AncestryService {
       .values()
       .map((individual) => /^@I(\d+)@/.exec(individual.xref))
       .filter((match) => match != undefined)
-      .map((match) => parseInt(match[1]))
+      .map((match) => parseInt(match[1]!))
       .reduce((acc, index) => Math.max(acc, index + 1), 0);
     return `@I${nextIndex}@`;
   });
@@ -348,7 +348,7 @@ export class AncestryService {
       .values()
       .map((source) => /^S@(\d+)@/.exec(source.xref))
       .filter((match) => match != undefined)
-      .map((match) => parseInt(match[1], 10))
+      .map((match) => parseInt(match[1]!, 10))
       .reduce((acc, index) => Math.max(acc, index + 1), 0);
     return `@S${nextIndex}@`;
   });

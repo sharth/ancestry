@@ -22,21 +22,27 @@ export function* generateGedcomRecords(text: string): Generator<GedcomRecord> {
     if (match == null) {
       throw new Error(`Failed to parse line number ${lineNumber + 1}: ${line}`);
     }
-    const level = parseInt(match[1], 10);
+    const level = parseInt(match[1]!, 10);
     const [xref, tag, value] = match.slice(2);
     const abstag = [
       ...ladder.slice(0, level).map((record) => record.tag),
       tag,
     ].join(".");
-    const record = { xref, tag, abstag, value, children: [] };
+    const record: GedcomRecord = {
+      xref: xref!,
+      tag: tag!,
+      abstag,
+      value: value!,
+      children: [],
+    };
 
     if (level == 0) {
       if (ladder.length > 0) {
-        yield ladder[0];
+        yield ladder[0]!;
       }
       ladder = [record];
     } else if (level <= ladder.length) {
-      const parent = ladder[level - 1];
+      const parent: GedcomRecord = ladder[level - 1]!;
       parent.children.push(record);
       ladder.length = level;
       ladder.push(record);
@@ -47,7 +53,7 @@ export function* generateGedcomRecords(text: string): Generator<GedcomRecord> {
     }
   }
   if (ladder.length > 0) {
-    yield ladder[0];
+    yield ladder[0]!;
   }
 }
 

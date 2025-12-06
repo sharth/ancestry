@@ -39,7 +39,7 @@ export class InputRepositoryLinksComponent implements FormValueControl<
       ...repostitoryLinks,
       { repositoryXref: "", callNumber: "" },
     ]);
-    this.newControls.add(this.form[-1]);
+    this.newControls.add(this.form[-1]!);
     setTimeout(() => {
       this.focusTargets.last.focus();
     });

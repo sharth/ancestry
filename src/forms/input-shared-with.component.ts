@@ -28,7 +28,7 @@ export class InputSharedWithComponent implements FormValueControl<
 
   appendSharedEvent() {
     this.value.update((sharedWith) => [...sharedWith, { xref: "", role: "" }]);
-    this.newControls.add(this.form[-1]);
+    this.newControls.add(this.form[-1]!);
     setTimeout(() => {
       this.focusTargets.last.focus();
     });
