@@ -15,10 +15,7 @@
             <td class="form-floating">
               <select #focusTarget class="form-select" [field]="link.xref">
                 <option selected value="">Multimedia...</option>
-                @for (
-                  multimedia of ancestryDatabase().multimedias.values();
-                  track multimedia.xref
-                ) {
+                @for (multimedia of multimedias(); track multimedia.xref) {
                   <option value="{{ multimedia.xref }}">
                     {{ multimedia.xref }}
                   </option>

@@ -54,17 +54,19 @@ export class InputIndividualComponent implements OnInit {
       changeDate: { date: now },
     };
     if (individual.xref !== "") {
-      this.ancestryDatabase.update((ancestryDatabase) => {
-        const individuals = new Map(ancestryDatabase.individuals);
-        individuals.set(individual.xref, individual);
-        return { ...ancestryDatabase, individuals };
-      });
+      this.ancestryDatabase.update((ancestryDatabase) => ({
+        ...ancestryDatabase,
+        individuals: {
+          ...ancestryDatabase.individuals,
+          [individual.xref]: individual,
+        },
+      }));
     }
   });
 
   ngOnInit(): void {
     this.individual.set(
-      this.ancestryDatabase().individuals.get(this.xref()) ?? {
+      this.ancestryDatabase().individuals[this.xref()] ?? {
         xref: this.xref(),
         names: [],
         events: [],

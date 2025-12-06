@@ -19,7 +19,7 @@ export class SourceUnknownsComponent {
     if (ancestry === undefined) {
       return undefined;
     }
-    const source = ancestry.sources.get(this.xref());
+    const source = ancestry.sources[this.xref()];
     if (source == undefined) {
       return undefined;
     }

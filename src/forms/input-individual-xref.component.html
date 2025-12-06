@@ -2,7 +2,7 @@
   <select #focusTarget class="form-select" [field]="form">
     <option selected value="">Individuals...</option>
     @for (
-      individual of ancestryDatabase().individuals.values();
+      individual of Object.values(ancestryDatabase().individuals);
       track individual.xref
     ) {
       <option value="{{ individual.xref }}">

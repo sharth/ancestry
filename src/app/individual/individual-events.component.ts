@@ -17,7 +17,7 @@ export class IndividualEventsComponent {
     if (ancestry === undefined) {
       return undefined;
     }
-    const individual = ancestry.individuals.get(this.xref());
+    const individual = ancestry.individuals[this.xref()];
     if (individual === undefined) {
       return undefined;
     }

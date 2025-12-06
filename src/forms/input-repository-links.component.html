@@ -11,7 +11,7 @@
             (click)="removeCitation($index)"
           ></button>
           {{
-            ancestryDatabase().repositories.get(repositoryXref)?.name ??
+            ancestryDatabase().repositories[repositoryXref]?.name ??
               "Unknown repository"
           }}
         </summary>

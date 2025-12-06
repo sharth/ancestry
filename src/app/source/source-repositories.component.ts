@@ -18,7 +18,7 @@ export class SourceRepositoriesComponent {
     if (ancestry == undefined) {
       return undefined;
     }
-    const source = ancestry.sources.get(this.xref());
+    const source = ancestry.sources[this.xref()];
     if (source == undefined) {
       return undefined;
     }
@@ -27,7 +27,7 @@ export class SourceRepositoriesComponent {
       citations: source.repositoryLinks.map((repositoryLink) => ({
         repositoryXref: repositoryLink.repositoryXref,
         callNumber: repositoryLink.callNumber,
-        repository: ancestry.repositories.get(repositoryLink.repositoryXref),
+        repository: ancestry.repositories[repositoryLink.repositoryXref],
       })),
     };
   });

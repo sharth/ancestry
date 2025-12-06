@@ -24,8 +24,7 @@ export class SourceCitationsComponent {
     return {
       citations: [
         // Individual Event Citations
-        ...ancestry.individuals
-          .values()
+        ...Object.values(ancestry.individuals)
           .flatMap((individual) =>
             individual.events
               .filter((event) => event.citations.length > 0)
@@ -42,11 +41,10 @@ export class SourceCitationsComponent {
             citation,
           })),
         // Individual Sex Citations
-        ...ancestry.individuals
-          .values()
+        ...Object.values(ancestry.individuals)
           .map((individual) => ({
             individual,
-            citations: individual.sex?.citations ?? [],
+            citations: individual.sex.citations,
           }))
           .flatMap(({ individual, citations }) =>
             citations.map((citation) => ({

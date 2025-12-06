@@ -20,7 +20,7 @@ export class RepositoryComponent {
     if (ancestry == undefined) {
       return undefined;
     }
-    const repository = ancestry.repositories.get(this.xref());
+    const repository = ancestry.repositories[this.xref()];
     if (repository == undefined) {
       return undefined;
     }

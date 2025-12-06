@@ -18,7 +18,7 @@ export class RepositoriesComponent {
     }
 
     return {
-      repositories: ancestry.repositories.values().toArray(),
+      repositories: Object.values(ancestry.repositories),
     };
   });
 }

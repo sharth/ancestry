@@ -1,10 +1,7 @@
 <div class="form-floating">
   <select class="form-select" #selectElement [field]="form">
     <option selected value="">Repositories...</option>
-    @for (
-      repository of ancestryDatabase().repositories.values();
-      track repository.xref
-    ) {
+    @for (repository of repositories(); track repository.xref) {
       <option value="{{ repository.xref }}">
         {{ repository.name }}
       </option>

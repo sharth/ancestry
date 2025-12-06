@@ -30,13 +30,13 @@ export class IndividualComponent {
     if (ancestry === undefined) {
       return undefined;
     }
-    const individual = ancestry.individuals.get(this.xref());
+    const individual = ancestry.individuals[this.xref()];
     if (individual === undefined) {
       return undefined;
     }
     return {
       name: fullname(individual),
-      sex: individual.sex?.sex ?? "Unknown",
+      sex: individual.sex.sex || "Unknown",
       gedcom: serializeGedcomRecordToText(
         serializeGedcomIndividual(individual),
       ).join("\n"),

@@ -17,6 +17,7 @@ export class InputIndividualXrefComponent implements FormValueControl<string> {
   readonly value = model<string>("");
   readonly form = form(this.value);
 
+  public readonly Object = Object;
   public readonly displayGedcomName = displayGedcomName;
 
   @ViewChild("focusTarget") private focusTarget!: ElementRef<HTMLElement>;

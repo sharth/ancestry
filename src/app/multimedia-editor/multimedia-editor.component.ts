@@ -27,13 +27,13 @@ export class MultimediaEditorComponent {
       };
     }
 
-    const multimedia = ancestry.multimedias.get(xref);
+    const multimedia = ancestry.multimedias[xref];
     if (multimedia == null) return;
 
     return {
       filePath: multimedia.filePath,
       mimeType: multimedia.mediaType,
-      nextXref: this.nextXref(ancestry.multimedias.values().toArray()),
+      nextXref: this.nextXref(Object.values(ancestry.multimedias)),
     };
   });
 

@@ -21,22 +21,19 @@ export class IndividualsComponent {
     }
 
     return {
-      individuals: ancestry.individuals,
+      individuals: Object.values(ancestry.individuals),
       individualsBySurname: this.individualsBySurname(ancestry.individuals),
     };
   });
 
   private individualsBySurname(
-    individuals: Map<string, GedcomIndividual>,
+    individuals: Record<string, GedcomIndividual>,
   ): { surname?: string; individuals: GedcomIndividual[] }[] {
-    const individualsList = individuals
-      .values()
-      .toArray()
-      .sort(
-        (lhs, rhs) =>
-          surname(lhs).localeCompare(surname(rhs)) ||
-          fullname(lhs).localeCompare(fullname(rhs)),
-      );
+    const individualsList = Object.values(individuals).sort(
+      (lhs, rhs) =>
+        surname(lhs).localeCompare(surname(rhs)) ||
+        fullname(lhs).localeCompare(fullname(rhs)),
+    );
     return Map.groupBy(individualsList, (individual) => surname(individual))
       .entries()
       .map(([surname, individuals]) => ({ surname, individuals }))

@@ -102,12 +102,12 @@ export class AncestryService {
 
     const headers = new Array<GedcomHeader>();
     const trailers = new Array<GedcomTrailer>();
-    const submitters = new Map<string, GedcomSubmitter>();
-    const individuals = new Map<string, GedcomIndividual>();
-    const families = new Map<string, GedcomFamily>();
-    const repositories = new Map<string, GedcomRepository>();
-    const sources = new Map<string, GedcomSource>();
-    const multimedias = new Map<string, GedcomMultimedia>();
+    const submitters: Record<string, GedcomSubmitter> = {};
+    const individuals: Record<string, GedcomIndividual> = {};
+    const families: Record<string, GedcomFamily> = {};
+    const repositories: Record<string, GedcomRepository> = {};
+    const sources: Record<string, GedcomSource> = {};
+    const multimedias: Record<string, GedcomMultimedia> = {};
 
     for (const gedcomRecord of gedcomRecords) {
       switch (gedcomRecord.tag) {
@@ -119,32 +119,32 @@ export class AncestryService {
           break;
         case "SUBM": {
           const submitter = parseGedcomSubmitter(gedcomRecord);
-          submitters.set(submitter.xref, submitter);
+          submitters[submitter.xref] = submitter;
           break;
         }
         case "INDI": {
           const individual = parseGedcomIndividual(gedcomRecord);
-          individuals.set(individual.xref, individual);
+          individuals[individual.xref] = individual;
           break;
         }
         case "FAM": {
           const family = parseGedcomFamily(gedcomRecord);
-          families.set(family.xref, family);
+          families[family.xref] = family;
           break;
         }
         case "REPO": {
           const repository = parseGedcomRepository(gedcomRecord);
-          repositories.set(repository.xref, repository);
+          repositories[repository.xref] = repository;
           break;
         }
         case "SOUR": {
           const source = parseGedcomSource(gedcomRecord);
-          sources.set(source.xref, source);
+          sources[source.xref] = source;
           break;
         }
         case "OBJE": {
           const multimedia = parseGedcomMultimedia(gedcomRecord);
-          multimedias.set(multimedia.xref, multimedia);
+          multimedias[multimedia.xref] = multimedia;
           break;
         }
         default:
@@ -155,27 +155,27 @@ export class AncestryService {
 
     // For whatever reason, GEDCOM has the family references in both the FAM and INDI.
     // Ensure that these are consistent.
-    for (const family of families.values()) {
+    for (const family of Object.values(families)) {
       if (family.husbandXref) {
-        const husband = individuals.get(family.husbandXref);
+        const husband = individuals[family.husbandXref];
         if (!husband) throw new Error();
         if (!husband.parentOfFamilyXrefs.includes(family.xref))
           throw new Error();
       }
       if (family.wifeXref) {
-        const wife = individuals.get(family.wifeXref);
+        const wife = individuals[family.wifeXref];
         if (!wife) throw new Error();
         if (!wife.parentOfFamilyXrefs.includes(family.xref)) throw new Error();
       }
       for (const childXref of family.childXrefs) {
-        const child = individuals.get(childXref);
+        const child = individuals[childXref];
         if (!child) throw new Error();
         if (!child.childOfFamilyXrefs.includes(family.xref)) throw new Error();
       }
     }
-    for (const individual of individuals.values()) {
+    for (const individual of Object.values(individuals)) {
       for (const familyXref of individual.parentOfFamilyXrefs) {
-        const family = families.get(familyXref);
+        const family = families[familyXref];
         const parents = [family?.husbandXref, family?.wifeXref].filter(
           (e) => e != null,
         );
@@ -183,7 +183,7 @@ export class AncestryService {
         if (!parents.includes(individual.xref)) throw new Error();
       }
       for (const familyXref of individual.childOfFamilyXrefs) {
-        const family = families.get(familyXref);
+        const family = families[familyXref];
         if (!family) throw new Error();
         if (!family.childXrefs.includes(individual.xref)) throw new Error();
       }
@@ -260,22 +260,24 @@ export class AncestryService {
           },
         ],
       },
-      ...ancestryDatabase.submitters
-        .values()
-        .map((s) => serializeGedcomSubmitter(s)),
-      ...ancestryDatabase.individuals
-        .values()
-        .map((i) => serializeGedcomIndividual(i)),
-      ...ancestryDatabase.families
-        .values()
-        .map((f) => serializeGedcomFamily(f)),
-      ...ancestryDatabase.sources.values().map((s) => serializeGedcomSource(s)),
-      ...ancestryDatabase.repositories
-        .values()
-        .map((r) => serializeGedcomRepository(r)),
-      ...ancestryDatabase.multimedias
-        .values()
-        .map((m) => serializeGedcomMultimedia(m)),
+      ...Object.values(ancestryDatabase.submitters).map((s) =>
+        serializeGedcomSubmitter(s),
+      ),
+      ...Object.values(ancestryDatabase.individuals).map((i) =>
+        serializeGedcomIndividual(i),
+      ),
+      ...Object.values(ancestryDatabase.families).map((f) =>
+        serializeGedcomFamily(f),
+      ),
+      ...Object.values(ancestryDatabase.sources).map((s) =>
+        serializeGedcomSource(s),
+      ),
+      ...Object.values(ancestryDatabase.repositories).map((r) =>
+        serializeGedcomRepository(r),
+      ),
+      ...Object.values(ancestryDatabase.multimedias).map((m) =>
+        serializeGedcomMultimedia(m),
+      ),
       { tag: "TRLR", abstag: "TRLR", xref: "", value: "", children: [] },
     ].forEach((gedcomRecord: GedcomRecord) => {
       const h = hash(gedcomRecord);
@@ -332,9 +334,8 @@ export class AncestryService {
   }
 
   readonly nextIndividualXref = computed<string>(() => {
-    const individuals = this.ancestryDatabase()?.individuals ?? [];
-    const nextIndex = individuals
-      .values()
+    const individuals = this.ancestryDatabase()?.individuals ?? {};
+    const nextIndex = Object.values(individuals)
       .map((individual) => /^@I(\d+)@/.exec(individual.xref))
       .filter((match) => match != undefined)
       .map((match) => parseInt(match[1]!))
@@ -344,8 +345,7 @@ export class AncestryService {
 
   readonly nextSourceXref = computed<string>(() => {
     const sources = this.ancestryDatabase()?.sources ?? [];
-    const nextIndex = sources
-      .values()
+    const nextIndex = Object.values(sources)
       .map((source) => /^S@(\d+)@/.exec(source.xref))
       .filter((match) => match != undefined)
       .map((match) => parseInt(match[1]!, 10))
@@ -355,10 +355,10 @@ export class AncestryService {
 }
 
 export interface AncestryDatabase {
-  submitters: Map<string, GedcomSubmitter>;
-  individuals: Map<string, GedcomIndividual>;
-  families: Map<string, GedcomFamily>;
-  sources: Map<string, GedcomSource>;
-  repositories: Map<string, GedcomRepository>;
-  multimedias: Map<string, GedcomMultimedia>;
+  submitters: Record<string, GedcomSubmitter>;
+  individuals: Record<string, GedcomIndividual>;
+  families: Record<string, GedcomFamily>;
+  sources: Record<string, GedcomSource>;
+  repositories: Record<string, GedcomRepository>;
+  multimedias: Record<string, GedcomMultimedia>;
 }

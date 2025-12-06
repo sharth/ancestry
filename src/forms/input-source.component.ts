@@ -45,17 +45,16 @@ export class InputSourceComponent implements OnInit {
       changeDate: { date: now },
     };
     if (source.xref !== "") {
-      this.ancestryDatabase.update((ancestryDatabase) => {
-        const sources = new Map(ancestryDatabase.sources);
-        sources.set(source.xref, source);
-        return { ...ancestryDatabase, sources };
-      });
+      this.ancestryDatabase.update((ancestryDatabase) => ({
+        ...ancestryDatabase,
+        sources: { ...ancestryDatabase.sources, [source.xref]: source },
+      }));
     }
   });
 
   ngOnInit(): void {
     this.source.set(
-      this.ancestryDatabase().sources.get(this.xref()) ?? {
+      this.ancestryDatabase().sources[this.xref()] ?? {
         xref: this.xref(),
         abbr: "",
         title: "",

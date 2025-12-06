@@ -20,7 +20,7 @@ export class MultimediaComponent {
       return undefined;
     }
 
-    const multimedia = ancestry.multimedias.get(this.xref());
+    const multimedia = ancestry.multimedias[this.xref()];
     if (multimedia == undefined) {
       return undefined;
     }

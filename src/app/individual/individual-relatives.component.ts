@@ -19,40 +19,40 @@ export class IndividualRelativesComponent {
     }
 
     const xref = this.xref();
-    const individual = ancestry.individuals.get(xref);
+    const individual = ancestry.individuals[xref];
     if (individual === undefined) {
       return undefined;
     }
 
     return {
       parentGroups: individual.childOfFamilyXrefs
-        .map((familyXref) => ancestry.families.get(familyXref))
+        .map((familyXref) => ancestry.families[familyXref])
         .filter((family) => family !== undefined)
         .map((family) => ({
           family: family,
           parents: [family.husbandXref, family.wifeXref]
-            .filter((parentXref) => parentXref !== undefined)
-            .map((parentXref) => ancestry.individuals.get(parentXref))
+            .filter((parentXref) => parentXref !== "")
+            .map((parentXref) => ancestry.individuals[parentXref])
             .filter((parent) => parent !== undefined),
           siblings: family.childXrefs
-            .map((siblingXref) => ancestry.individuals.get(siblingXref))
+            .map((siblingXref) => ancestry.individuals[siblingXref])
             .filter((sibling) => sibling !== undefined)
             .filter((sibling) => sibling.xref !== individual.xref),
           halfsiblings: [family.husbandXref, family.wifeXref]
-            .filter((parentXref) => parentXref !== undefined)
-            .map((parentXref) => ancestry.individuals.get(parentXref))
+            .filter((parentXref) => parentXref !== "")
+            .map((parentXref) => ancestry.individuals[parentXref])
             .filter((parent) => parent !== undefined)
             .flatMap((parent) => parent.parentOfFamilyXrefs)
-            .map((familyXref) => ancestry.families.get(familyXref))
+            .map((familyXref) => ancestry.families[familyXref])
             .filter((family) => family !== undefined)
             .flatMap((family) => family.childXrefs)
-            .map((siblingXref) => ancestry.individuals.get(siblingXref))
+            .map((siblingXref) => ancestry.individuals[siblingXref])
             .filter((sibling) => sibling !== undefined)
             .filter((sibling) => !family.childXrefs.includes(sibling.xref)),
         })),
 
       spouseGroups: individual.parentOfFamilyXrefs
-        .map((familyXref) => ancestry.families.get(familyXref))
+        .map((familyXref) => ancestry.families[familyXref])
         .filter((family) => family !== undefined)
         .map((family) => {
           const spouseXref =
@@ -60,10 +60,10 @@ export class IndividualRelativesComponent {
               ? family.husbandXref
               : family.wifeXref;
           const spouse = spouseXref
-            ? ancestry.individuals.get(spouseXref)
+            ? ancestry.individuals[spouseXref]
             : undefined;
           const children = family.childXrefs
-            .map((childXref) => ancestry.individuals.get(childXref))
+            .map((childXref) => ancestry.individuals[childXref])
             .filter((child) => child !== undefined);
           return { family, spouse, children };
         }),

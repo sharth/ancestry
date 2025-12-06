@@ -15,11 +15,11 @@ export class IndexComponent {
     if (ancestry == undefined) return undefined;
 
     return {
-      individuals: ancestry.individuals.values().toArray(),
-      families: ancestry.families.values().toArray(),
-      sources: ancestry.sources.values().toArray(),
-      repositories: ancestry.repositories.values().toArray(),
-      submitters: ancestry.submitters.values().toArray(),
+      individuals: Object.values(ancestry.individuals),
+      families: Object.values(ancestry.families),
+      sources: Object.values(ancestry.sources),
+      repositories: Object.values(ancestry.repositories),
+      submitters: Object.values(ancestry.submitters),
     };
   });
 }

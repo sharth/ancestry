@@ -1,7 +1,7 @@
 import type { AncestryDatabase } from "../database/ancestry.service";
 import type { GedcomMultimediaLink } from "../gedcom/gedcomMultimediaLink";
 import type { ElementRef, QueryList } from "@angular/core";
-import { Component, ViewChildren, model } from "@angular/core";
+import { Component, ViewChildren, computed, model } from "@angular/core";
 import { Field, type FormValueControl, form } from "@angular/forms/signals";
 import { RouterModule } from "@angular/router";
 
@@ -17,6 +17,10 @@ export class InputMultimediaLinksComponent implements FormValueControl<
   readonly ancestryDatabase = model.required<AncestryDatabase>();
   readonly value = model<GedcomMultimediaLink[]>([]);
   readonly form = form(this.value);
+
+  readonly multimedias = computed(() =>
+    Object.values(this.ancestryDatabase().multimedias),
+  );
 
   @ViewChildren("focusTarget") private focusTargets!: QueryList<
     ElementRef<HTMLElement>

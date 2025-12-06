@@ -19,8 +19,7 @@ export class RepositorySourcesComponent {
     }
 
     return {
-      sources: ancestry.sources
-        .values()
+      sources: Object.values(ancestry.sources)
         .flatMap((source) =>
           source.repositoryLinks.map((repositoryLink) => ({
             source,
@@ -34,8 +33,7 @@ export class RepositorySourcesComponent {
           xref: source.xref,
           abbr: source.abbr,
           callNumber: repositoryLink.callNumber,
-        }))
-        .toArray(),
+        })),
     };
   });
 }

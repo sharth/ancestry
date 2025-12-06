@@ -1,13 +1,7 @@
 import type { AncestryDatabase } from "../../database/ancestry.service";
 import { AncestryService } from "../../database/ancestry.service";
 import { InputSourceComponent } from "../../forms/input-source.component";
-import type { GedcomFamily } from "../../gedcom/gedcomFamily";
-import type { GedcomIndividual } from "../../gedcom/gedcomIndividual";
-import type { GedcomMultimedia } from "../../gedcom/gedcomMultimedia";
 import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
-import type { GedcomRepository } from "../../gedcom/gedcomRepository";
-import type { GedcomSource } from "../../gedcom/gedcomSource";
-import type { GedcomSubmitter } from "../../gedcom/gedcomSubmitter";
 import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
 import {
   Component,
@@ -45,12 +39,12 @@ export class SourceEditorComponent {
 
   readonly computedDatabase = signal<AncestryDatabase>(
     this.ancestryService.ancestryDatabase() ?? {
-      individuals: new Map<string, GedcomIndividual>(),
-      families: new Map<string, GedcomFamily>(),
-      sources: new Map<string, GedcomSource>(),
-      multimedias: new Map<string, GedcomMultimedia>(),
-      submitters: new Map<string, GedcomSubmitter>(),
-      repositories: new Map<string, GedcomRepository>(),
+      individuals: {},
+      families: {},
+      sources: {},
+      multimedias: {},
+      submitters: {},
+      repositories: {},
     },
   );
 

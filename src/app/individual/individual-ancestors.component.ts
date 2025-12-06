@@ -19,10 +19,10 @@ export class IndividualAncestorsComponent {
     if (ancestry === undefined) {
       return undefined;
     }
-    const families = [...ancestry.families.values()];
+    const families = Object.values(ancestry.families);
 
     const ancestors: (GedcomIndividual | undefined)[] = [];
-    ancestors[1] = ancestry.individuals.get(this.xref());
+    ancestors[1] = ancestry.individuals[this.xref()];
     for (let i = 1; i < ancestors.length && i < 16384; i++) {
       const child = ancestors[i];
       if (child != null) {
@@ -30,10 +30,10 @@ export class IndividualAncestorsComponent {
           family.childXrefs.includes(child.xref),
         );
         if (family?.husbandXref) {
-          ancestors[2 * i + 0] = ancestry.individuals.get(family.husbandXref);
+          ancestors[2 * i + 0] = ancestry.individuals[family.husbandXref];
         }
         if (family?.wifeXref) {
-          ancestors[2 * i + 1] = ancestry.individuals.get(family.wifeXref);
+          ancestors[2 * i + 1] = ancestry.individuals[family.wifeXref];
         }
       }
     }

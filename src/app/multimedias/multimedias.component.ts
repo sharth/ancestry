@@ -19,7 +19,7 @@ export class MultimediasComponent {
     }
 
     return {
-      multimedias: ancestry.multimedias.values().toArray(),
+      multimedias: Object.values(ancestry.multimedias),
     };
   });
 }
