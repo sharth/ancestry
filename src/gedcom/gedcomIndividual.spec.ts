@@ -16,6 +16,10 @@ function normalize(record: GedcomRecord): GedcomRecord {
   };
 }
 
+function expectToBeDefined<T>(value: T | undefined): asserts value is T {
+  expect(value).toBeDefined();
+}
+
 describe("gedcomIndividual", () => {
   it("no fields", () => {
     const gedcomText = [
@@ -24,6 +28,7 @@ describe("gedcomIndividual", () => {
     const [gedcomRecord]: GedcomRecord[] = parseGedcomRecords(
       gedcomText.join("\n"),
     );
+    expectToBeDefined(gedcomRecord);
     expect(parseGedcomIndividual(gedcomRecord)).toEqual({
       xref: "@I1@",
       names: [],
@@ -50,6 +55,7 @@ describe("gedcomIndividual", () => {
       "2 DATE 1 JAN 1900",
     ];
     const [gedcomRecord] = parseGedcomRecords(gedcomText.join("\n"));
+    expectToBeDefined(gedcomRecord);
     expect(parseGedcomIndividual(gedcomRecord)).toEqual({
       xref: "@I1@",
       sex: { sex: "", citations: [] },

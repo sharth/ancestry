@@ -9,6 +9,10 @@ function parseGedcomRecordsFromArray(lines: string[]): GedcomRecord[] {
   return parseGedcomRecords(lines.join("\n"));
 }
 
+function expectToBeDefined<T>(value: T | undefined): asserts value is T {
+  expect(value).toBeDefined();
+}
+
 describe("GedcomSubmitter", () => {
   it("no fields", () => {
     const gedcomRecord: GedcomRecord = {
@@ -33,6 +37,7 @@ describe("GedcomSubmitter", () => {
       "1 NAME John Doe",
       "1 _EMAIL johndoe@example.com",
     ]);
+    expectToBeDefined(gedcomRecord);
     expect(parseGedcomSubmitter(gedcomRecord)).toEqual({
       xref: "@X2@",
       name: "John Doe",

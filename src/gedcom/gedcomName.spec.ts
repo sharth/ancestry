@@ -16,6 +16,10 @@ function normalize(record: GedcomRecord | null): GedcomRecord | null {
   };
 }
 
+function expectToBeDefined<T>(value: T | undefined): asserts value is T {
+  expect(value).toBeDefined();
+}
+
 describe("GedcomName", () => {
   it("Simple Name", () => {
     const gedcomText = [
@@ -29,6 +33,7 @@ describe("GedcomName", () => {
       gedcomText.join("\n"),
     );
 
+    expectToBeDefined(gedcomRecord);
     expect(parseGedcomName(gedcomRecord)).toEqual({
       prefix: "Mr.",
       givenName: "John",

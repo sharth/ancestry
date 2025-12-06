@@ -8,6 +8,10 @@ import type { GedcomSex } from "./gedcomSex";
 import { serializeGedcomSex } from "./gedcomSex";
 import { describe, expect, it } from "vitest";
 
+function expectToBeDefined<T>(value: T | undefined): asserts value is T {
+  expect(value).toBeDefined();
+}
+
 describe("GedcomSex", () => {
   it("male", () => {
     const gedcomText = [
@@ -30,6 +34,7 @@ describe("GedcomSex", () => {
       notes: [],
       unknownRecords: [],
     };
+    expectToBeDefined(gedcomRecord);
     expect(parseGedcomIndividual(gedcomRecord)).toEqual(gedcomIndividual);
     expect(
       serializeGedcomIndividual(parseGedcomIndividual(gedcomRecord)),
@@ -57,6 +62,7 @@ describe("GedcomSex", () => {
       notes: [],
       unknownRecords: [],
     };
+    expectToBeDefined(gedcomRecord);
     expect(parseGedcomIndividual(gedcomRecord)).toEqual(gedcomIndividual);
     expect(
       serializeGedcomIndividual(parseGedcomIndividual(gedcomRecord)),
@@ -83,6 +89,7 @@ describe("GedcomSex", () => {
       notes: [],
       unknownRecords: [],
     };
+    expectToBeDefined(gedcomRecord);
     expect(parseGedcomIndividual(gedcomRecord)).toEqual(gedcomIndividual);
     expect(
       serializeGedcomIndividual(parseGedcomIndividual(gedcomRecord)),

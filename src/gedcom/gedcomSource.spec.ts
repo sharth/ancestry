@@ -3,6 +3,10 @@ import type { GedcomSource } from "./gedcomSource";
 import { parseGedcomSource, serializeGedcomSource } from "./gedcomSource";
 import { describe, expect, it } from "vitest";
 
+function expectToBeDefined<T>(value: T | undefined): asserts value is T {
+  expect(value).toBeDefined();
+}
+
 describe("GedcomSource", () => {
   it("no fields", () => {
     const gedcomRecord: GedcomRecord = {
@@ -37,6 +41,7 @@ describe("GedcomSource", () => {
       "2 TID 72",
     ];
     const [gedcomRecord] = parseGedcomRecords(gedcomText.join("\n"));
+    expectToBeDefined(gedcomRecord);
     expect(parseGedcomSource(gedcomRecord)).toEqual({
       xref: "@S2@",
       abbr: "abbr",
