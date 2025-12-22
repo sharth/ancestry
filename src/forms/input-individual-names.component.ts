@@ -2,7 +2,15 @@ import type { AncestryDatabase } from "../database/ancestry.service";
 import type { GedcomName } from "../gedcom/gedcomName";
 import { InputSourceCitationsComponent } from "./input-source-citations.component";
 import type { ElementRef, QueryList } from "@angular/core";
-import { Component, ViewChildren, input, model } from "@angular/core";
+import {
+  Component,
+  Injector,
+  ViewChildren,
+  afterNextRender,
+  inject,
+  input,
+  model,
+} from "@angular/core";
 import type { FieldTree, FormValueControl } from "@angular/forms/signals";
 import { Field, form } from "@angular/forms/signals";
 
@@ -15,6 +23,8 @@ import { Field, form } from "@angular/forms/signals";
 export class InputIndividualNamesComponent implements FormValueControl<
   GedcomName[]
 > {
+  private readonly _injector = inject(Injector);
+
   readonly ancestryDatabase = model.required<AncestryDatabase>();
 
   // Set true to expand the details by default.
@@ -45,10 +55,15 @@ export class InputIndividualNamesComponent implements FormValueControl<
         notes: [],
       },
     ]);
-    this.newControls.add(this.form[-1]!);
-    setTimeout(() => {
-      this.focusTargets.last.nativeElement.focus();
-    });
+    this.newControls.add(this.form[this.form.length - 1]!);
+    afterNextRender(
+      {
+        read: () => {
+          this.focusTargets.last.nativeElement.focus();
+        },
+      },
+      { injector: this._injector },
+    );
   }
 
   removeName(index: number) {
