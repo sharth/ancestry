@@ -1,21 +1,14 @@
 <details [open]="open()">
-  <summary>
-    Events ({{ form.length }})
-    <button
-      type="button"
-      class="btn btn-sm btn-outline-primary bi-plus"
-      (click)="appendEvent()"
-    ></button>
-  </summary>
+  <summary>Events ({{ form.length }})</summary>
   @for (event of form; track $index) {
     <details #container (toggle)="(true)">
       <summary>
-        {{ event.tag().value() }}
         <button
           type="button"
           class="btn btn-sm btn-outline-danger bi-trash"
           (click)="removeEvent($index)"
         ></button>
+        {{ event.tag().value() }}
       </summary>
       @defer (when container.open) {
         <div class="form-floating">
@@ -94,4 +87,13 @@
       }
     </details>
   }
+
+  <div class="details-lookalike" (click)="appendEvent()">
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-primary bi-plus"
+      (click)="$event.preventDefault()"
+    ></button>
+    Append another event
+  </div>
 </details>
