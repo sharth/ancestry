@@ -1,80 +1,66 @@
 <details #container (toggle)="(true)">
   <summary>Citations ({{ form.length }})</summary>
   @defer (when container.open) {
-    <table>
-      <tbody>
-        @for (formGroup of form; track formGroup) {
-          <tr style="border: 0">
-            <td rowspan="4" class="align-top">
-              <button
-                type="button"
-                class="btn btn-danger bi-trash"
-                (click)="removeCitation($index)"
-              ></button>
-            </td>
-            <td>
-              <app-input-source-xref
-                #focusTarget
-                [field]="formGroup.sourceXref"
-                [ancestryDatabase]="ancestryDatabase()"
-              ></app-input-source-xref>
-            </td>
-            <td class="form-floating">
-              <input
-                class="form-control"
-                id="page_{{ $index }}"
-                [field]="formGroup.page"
-              />
-              <label for="`page_{{ $index }}`">Page</label>
-            </td>
-            <td class="form-floating">
-              <input
-                class="form-control"
-                id="quality_{{ $index }}"
-                [field]="formGroup.quality"
-              />
-              <label for="`quality_{{ $index }}`">Quality</label>
-            </td>
-          </tr>
-          <tr style="border: 0">
-            <td class="form-floating" colspan="7">
-              <textarea
-                class="form-control"
-                id="text_{{ $index }}"
-                [field]="formGroup.text"
-              ></textarea>
-              <label for="`text_{{ $index }}`">Text</label>
-            </td>
-          </tr>
-          <tr>
-            <td colspan="7">
-              <app-input-multimedia-links
-                [field]="formGroup.multimediaLinks"
-                [(ancestryDatabase)]="ancestryDatabase"
-              ></app-input-multimedia-links>
-            </td>
-          </tr>
-          <tr>
-            <td colspan="7">
-              <app-input-notes
-                [field]="formGroup.notes"
-                [(ancestryDatabase)]="ancestryDatabase"
-              ></app-input-notes>
-            </td>
-          </tr>
-        }
-      </tbody>
-      <tfoot>
-        <tr>
-          <th>
-            <button
-              type="button"
-              class="btn btn-outline-primary bi-plus"
-              (click)="appendCitation()"
-            ></button>
-          </th>
-        </tr>
-      </tfoot>
-    </table>
+    @for (formGroup of form; track formGroup) {
+      <details>
+        <summary>
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-danger bi-trash"
+            (click)="removeCitation($index)"
+          ></button>
+          @let sourceXref = formGroup.sourceXref().value();
+          @let source = ancestryDatabase().sources[sourceXref];
+          {{ source?.abbr || sourceXref }}
+        </summary>
+        <div class="form-floating">
+          <app-input-source-xref
+            #focusTarget
+            [field]="formGroup.sourceXref"
+            [ancestryDatabase]="ancestryDatabase()"
+          ></app-input-source-xref>
+        </div>
+        <div class="form-floating">
+          <input
+            class="form-control"
+            id="page_{{ $index }}"
+            [field]="formGroup.page"
+          />
+          <label for="`page_{{ $index }}`">Page</label>
+        </div>
+        <div class="form-floating">
+          <input
+            class="form-control"
+            id="quality_{{ $index }}"
+            [field]="formGroup.quality"
+          />
+          <label for="`quality_{{ $index }}`">Quality</label>
+        </div>
+        <div class="form-floating">
+          <textarea
+            class="form-control"
+            id="text_{{ $index }}"
+            [field]="formGroup.text"
+          ></textarea>
+          <label for="`text_{{ $index }}`">Text</label>
+        </div>
+        <app-input-multimedia-links
+          [field]="formGroup.multimediaLinks"
+          [(ancestryDatabase)]="ancestryDatabase"
+        ></app-input-multimedia-links>
+        <app-input-notes
+          [field]="formGroup.notes"
+          [(ancestryDatabase)]="ancestryDatabase"
+        ></app-input-notes>
+      </details>
+    }
+    <div class="details-lookalike" (click)="appendCitation()">
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-primary bi-plus"
+        (click)="$event.preventDefault()"
+      ></button>
+      Append another citation
+    </div>
   }
 </details>
