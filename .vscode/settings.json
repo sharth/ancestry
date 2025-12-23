@@ -3,7 +3,7 @@
   "eslint.format.enable": true,
   "eslint.lintTask.enable": true,
   "eslint.codeActionsOnSave.rules": null,
-  "editor.defaultFormatter": null,
+  "editor.defaultFormatter": "prettier.prettier-vscode",
   "[javascript]": {
     "editor.defaultFormatter": "prettier.prettier-vscode"
   },
