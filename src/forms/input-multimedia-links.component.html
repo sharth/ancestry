@@ -1,46 +1,51 @@
 <details #container (toggle)="(true)">
   <summary>Multimedia ({{ form.length }})</summary>
   @defer (when container.open) {
-    <table>
-      <tbody>
-        @for (link of form; track link) {
-          <tr>
-            <td>
-              <button
-                class="btn btn-outline-secondary bi bi-trash"
-                type="button"
-                (click)="removeMultimediaLink($index)"
-              ></button>
-            </td>
-            <td class="form-floating">
-              <select #focusTarget class="form-select" [field]="link.xref">
-                <option selected value="">Multimedia...</option>
-                @for (multimedia of multimedias(); track multimedia.xref) {
-                  <option value="{{ multimedia.xref }}">
-                    {{ multimedia.xref }}
-                  </option>
-                }
-              </select>
-              <label>Multimedia</label>
-            </td>
-            <td class="form-floating">
-              <input class="form-control" type="text" [field]="link.title" />
-              <label>Custom Title</label>
-            </td>
-          </tr>
-        }
-      </tbody>
-      <tfoot>
-        <tr>
-          <td colpsan="3" class="input-group">
-            <button
-              class="btn btn-outline-secondary bi bi-plus"
-              type="button"
-              (click)="appendMultimediaLink()"
-            ></button>
-          </td>
-        </tr>
-      </tfoot>
-    </table>
+    @for (multimediaLink of form; track multimediaLink) {
+      <details [open]="newControls.has(multimediaLink)">
+        <summary>
+          <button
+            class="btn btn-sm btn-outline-danger bi-trash"
+            type="button"
+            (click)="removeMultimediaLink($index)"
+          ></button>
+          {{
+            multimediaLink.title().value() ||
+              multimediaLink.xref().value() ||
+              "Untitled"
+          }}
+        </summary>
+        <div class="form-floating">
+          <select
+            #focusTarget
+            class="form-select"
+            [field]="multimediaLink.xref"
+          >
+            <option selected value="">Multimedia...</option>
+            @for (multimedia of multimedias(); track multimedia.xref) {
+              <option value="{{ multimedia.xref }}">
+                {{ multimedia.xref }}
+              </option>
+            }
+          </select>
+        </div>
+        <div class="form-floating">
+          <input
+            class="form-control"
+            type="text"
+            [field]="multimediaLink.title"
+          />
+          <label>Custom Title</label>
+        </div>
+      </details>
+    }
+    <div class="details-lookalike" (click)="appendMultimediaLink()">
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-primary bi-plus"
+        (click)="$event.preventDefault()"
+      ></button>
+      Append multimedia
+    </div>
   }
 </details>
