@@ -3,7 +3,14 @@ import type { GedcomRepositoryLink } from "../gedcom/gedcomRepositoryLink";
 import { InputRepositoryCallNumberComponent } from "./input-repository-call-number.component";
 import { InputRepositoryXrefComponent } from "./input-repository-xref.component";
 import type { QueryList } from "@angular/core";
-import { Component, ViewChildren, model } from "@angular/core";
+import {
+  Component,
+  Injector,
+  ViewChildren,
+  afterNextRender,
+  inject,
+  model,
+} from "@angular/core";
 import type { FieldTree, FormValueControl } from "@angular/forms/signals";
 import { Field, form } from "@angular/forms/signals";
 import { RouterModule } from "@angular/router";
@@ -22,6 +29,8 @@ import { RouterModule } from "@angular/router";
 export class InputRepositoryLinksComponent implements FormValueControl<
   GedcomRepositoryLink[]
 > {
+  private readonly _injector = inject(Injector);
+
   readonly ancestryDatabase = model.required<AncestryDatabase>();
   readonly value = model<GedcomRepositoryLink[]>([]);
   readonly form = form(this.value);
@@ -39,10 +48,15 @@ export class InputRepositoryLinksComponent implements FormValueControl<
       ...repostitoryLinks,
       { repositoryXref: "", callNumber: "" },
     ]);
-    this.newControls.add(this.form[-1]!);
-    setTimeout(() => {
-      this.focusTargets.last.focus();
-    });
+    this.newControls.add(this.form[this.form.length - 1]!);
+    afterNextRender(
+      {
+        read: () => {
+          this.focusTargets.last.focus();
+        },
+      },
+      { injector: this._injector },
+    );
   }
 
   removeCitation(index: number) {
