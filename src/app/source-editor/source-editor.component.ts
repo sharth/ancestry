@@ -11,28 +11,16 @@ import {
   output,
   signal,
 } from "@angular/core";
-import {
-  FormsModule,
-  NonNullableFormBuilder,
-  ReactiveFormsModule,
-} from "@angular/forms";
 import { RouterModule } from "@angular/router";
 
 @Component({
   selector: "app-source-editor",
   templateUrl: "./source-editor.component.html",
   styleUrl: "./source-editor.component.css",
-  imports: [
-    FormsModule,
-    RouterModule,
-    ReactiveFormsModule,
-    InputSourceComponent,
-    GedcomDiffComponent,
-  ],
+  imports: [RouterModule, InputSourceComponent, GedcomDiffComponent],
 })
 export class SourceEditorComponent {
   private readonly ancestryService = inject(AncestryService);
-  private readonly formBuilder = inject(NonNullableFormBuilder);
 
   readonly xref = input<string>();
   readonly finished = output();

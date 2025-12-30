@@ -1,11 +1,9 @@
 import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomMultimedia } from "../../gedcom/gedcomMultimedia";
 import { Component, inject, input, linkedSignal, output } from "@angular/core";
-import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 
 @Component({
   selector: "app-multimedia-editor",
-  imports: [FormsModule, ReactiveFormsModule],
   templateUrl: "./multimedia-editor.component.html",
   styleUrl: "./multimedia-editor.component.css",
 })
