@@ -1,7 +1,13 @@
 import type { AncestryDatabase } from "../database/ancestry.service";
 import type { GedcomNote } from "../gedcom/gedcomNote";
 import type { ElementRef, QueryList } from "@angular/core";
-import { Component, ViewChildren, input, model } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ViewChildren,
+  input,
+  model,
+} from "@angular/core";
 import type { FormValueControl } from "@angular/forms/signals";
 import { Field, form } from "@angular/forms/signals";
 
@@ -10,6 +16,7 @@ import { Field, form } from "@angular/forms/signals";
   imports: [Field],
   templateUrl: "./input-notes.component.html",
   styleUrl: "./input.component.css",
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputNotesComponent implements FormValueControl<GedcomNote[]> {
   readonly value = model<GedcomNote[]>([]);

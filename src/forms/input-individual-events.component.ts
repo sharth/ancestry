@@ -5,7 +5,13 @@ import { InputNotesComponent } from "./input-notes.component";
 import { InputSharedWithComponent } from "./input-shared-with.component";
 import { InputSourceCitationsComponent } from "./input-source-citations.component";
 import type { ElementRef, QueryList } from "@angular/core";
-import { Component, ViewChildren, input, model } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ViewChildren,
+  input,
+  model,
+} from "@angular/core";
 import type { FormValueControl } from "@angular/forms/signals";
 import { Field, form } from "@angular/forms/signals";
 
@@ -19,6 +25,7 @@ import { Field, form } from "@angular/forms/signals";
   ],
   templateUrl: "./input-individual-events.component.html",
   styleUrl: "./input.component.css",
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputIndividualEventsComponent implements FormValueControl<
   GedcomEvent[]

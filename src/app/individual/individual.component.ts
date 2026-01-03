@@ -8,7 +8,13 @@ import { IndividualEditorComponent } from "../individual-editor/individual-edito
 import { IndividualAncestorsComponent } from "./individual-ancestors.component";
 import { IndividualEventsComponent } from "./individual-events.component";
 import { IndividualRelativesComponent } from "./individual-relatives.component";
-import { Component, computed, inject, input } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  input,
+} from "@angular/core";
 
 @Component({
   selector: "app-individual",
@@ -20,6 +26,7 @@ import { Component, computed, inject, input } from "@angular/core";
   ],
   templateUrl: "./individual.component.html",
   styleUrl: "./individual.component.css",
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IndividualComponent {
   readonly xref = input.required<string>();

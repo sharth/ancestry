@@ -3,6 +3,7 @@ import type { GedcomName } from "../gedcom/gedcomName";
 import { InputSourceCitationsComponent } from "./input-source-citations.component";
 import type { ElementRef, QueryList } from "@angular/core";
 import {
+  ChangeDetectionStrategy,
   Component,
   Injector,
   ViewChildren,
@@ -19,6 +20,7 @@ import { Field, form } from "@angular/forms/signals";
   imports: [Field, InputSourceCitationsComponent],
   templateUrl: "./input-individual-names.component.html",
   styleUrl: "./input.component.css",
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputIndividualNamesComponent implements FormValueControl<
   GedcomName[]

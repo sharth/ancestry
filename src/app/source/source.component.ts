@@ -7,7 +7,14 @@ import { SourceMultimediaComponent } from "./source-multimedia.component";
 import { SourceRepositoriesComponent } from "./source-repositories.component";
 import { SourceUnknownsComponent } from "./source-unknowns.component";
 import type { ElementRef } from "@angular/core";
-import { Component, computed, inject, input, viewChild } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  input,
+  viewChild,
+} from "@angular/core";
 import { RouterModule } from "@angular/router";
 
 @Component({
@@ -22,6 +29,7 @@ import { RouterModule } from "@angular/router";
     SourceEditorComponent,
     SourceUnknownsComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SourceComponent {
   readonly xref = input.required<string>();

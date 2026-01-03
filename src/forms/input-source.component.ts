@@ -5,7 +5,14 @@ import { InputMultimediaLinksComponent } from "./input-multimedia-links.componen
 import { InputRepositoryLinksComponent } from "./input-repository-links.component";
 import { InputUnknownRecordsComponent } from "./input-unknown-records.component";
 import type { OnInit } from "@angular/core";
-import { Component, effect, input, model, signal } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  input,
+  model,
+  signal,
+} from "@angular/core";
 import { Field, form } from "@angular/forms/signals";
 
 @Component({
@@ -18,6 +25,7 @@ import { Field, form } from "@angular/forms/signals";
   ],
   templateUrl: "./input-source.component.html",
   styleUrl: "./input.component.css",
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputSourceComponent implements OnInit {
   readonly ancestryDatabase = model.required<AncestryDatabase>();

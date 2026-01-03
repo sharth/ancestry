@@ -1,11 +1,17 @@
 import { AncestryService } from "../../database/ancestry.service";
-import { Component, computed, inject } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+} from "@angular/core";
 
 @Component({
   selector: "app-index",
   imports: [],
   templateUrl: "./index.component.html",
   styleUrl: "./index.component.css",
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IndexComponent {
   private readonly ancestryService = inject(AncestryService);

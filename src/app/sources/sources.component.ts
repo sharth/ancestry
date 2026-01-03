@@ -1,6 +1,11 @@
 import { AncestryService } from "../../database/ancestry.service";
 import { SourceEditorComponent } from "../source-editor/source-editor.component";
-import { Component, computed, inject } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+} from "@angular/core";
 import { RouterLink } from "@angular/router";
 
 @Component({
@@ -8,6 +13,7 @@ import { RouterLink } from "@angular/router";
   imports: [RouterLink, SourceEditorComponent],
   templateUrl: "./sources.component.html",
   styleUrl: "./sources.component.css",
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SourcesComponent {
   private readonly ancestryService = inject(AncestryService);

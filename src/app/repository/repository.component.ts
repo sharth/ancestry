@@ -2,7 +2,13 @@ import { AncestryService } from "../../database/ancestry.service";
 import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
 import { serializeGedcomRepository } from "../../gedcom/gedcomRepository";
 import { RepositorySourcesComponent } from "./repository-sources.component";
-import { Component, computed, inject, input } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  input,
+} from "@angular/core";
 import { RouterModule } from "@angular/router";
 
 @Component({
@@ -10,6 +16,7 @@ import { RouterModule } from "@angular/router";
   imports: [RouterModule, RepositorySourcesComponent],
   templateUrl: "./repository.component.html",
   styleUrl: "./repository.component.css",
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RepositoryComponent {
   readonly xref = input.required<string>();

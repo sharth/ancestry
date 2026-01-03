@@ -1,6 +1,11 @@
 import { AncestryService } from "../../database/ancestry.service";
 import { MultimediaEditorComponent } from "../multimedia-editor/multimedia-editor.component";
-import { Component, computed, inject } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+} from "@angular/core";
 import { RouterLink } from "@angular/router";
 
 @Component({
@@ -8,6 +13,7 @@ import { RouterLink } from "@angular/router";
   imports: [RouterLink, MultimediaEditorComponent],
   templateUrl: "./multimedias.component.html",
   styleUrl: "./multimedias.component.css",
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MultimediasComponent {
   private readonly ancestryService = inject(AncestryService);

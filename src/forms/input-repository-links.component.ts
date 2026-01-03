@@ -4,6 +4,7 @@ import { InputRepositoryCallNumberComponent } from "./input-repository-call-numb
 import { InputRepositoryXrefComponent } from "./input-repository-xref.component";
 import type { QueryList } from "@angular/core";
 import {
+  ChangeDetectionStrategy,
   Component,
   Injector,
   ViewChildren,
@@ -25,6 +26,7 @@ import { RouterModule } from "@angular/router";
     InputRepositoryCallNumberComponent,
     InputRepositoryXrefComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputRepositoryLinksComponent implements FormValueControl<
   GedcomRepositoryLink[]

@@ -4,6 +4,7 @@ import { InputIndividualComponent } from "../../forms/input-individual.component
 import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
 import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   inject,
@@ -17,6 +18,7 @@ import {
   imports: [InputIndividualComponent, GedcomDiffComponent],
   templateUrl: "./individual-editor.component.html",
   styleUrl: "./individual-editor.component.css",
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IndividualEditorComponent {
   private readonly ancestryService = inject(AncestryService);

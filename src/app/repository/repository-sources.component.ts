@@ -1,5 +1,11 @@
 import { AncestryService } from "../../database/ancestry.service";
-import { Component, computed, inject, input } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  input,
+} from "@angular/core";
 import { RouterModule } from "@angular/router";
 
 @Component({
@@ -7,6 +13,7 @@ import { RouterModule } from "@angular/router";
   imports: [RouterModule],
   templateUrl: "./repository-sources.component.html",
   styleUrl: "./repository.component.css",
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RepositorySourcesComponent {
   readonly xref = input.required<string>();

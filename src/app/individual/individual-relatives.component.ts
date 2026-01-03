@@ -1,12 +1,19 @@
 import { AncestryService } from "../../database/ancestry.service";
 import { IndividualLinkComponent } from "../individual-link/individual-link.component";
-import { Component, computed, inject, input } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  input,
+} from "@angular/core";
 
 @Component({
   selector: "app-individual-relatives",
   imports: [IndividualLinkComponent],
   templateUrl: "./individual-relatives.component.html",
   styleUrl: "./individual.component.css",
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IndividualRelativesComponent {
   readonly xref = input.required<string>();

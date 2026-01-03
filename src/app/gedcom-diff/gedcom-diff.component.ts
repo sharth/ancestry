@@ -1,12 +1,18 @@
 import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
 import type { GedcomRecord } from "../../gedcom/gedcomRecord";
-import { Component, computed, input } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+} from "@angular/core";
 
 @Component({
   selector: "app-gedcom-diff",
   templateUrl: "./gedcom-diff.component.html",
   styleUrl: "./gedcom-diff.component.css",
   imports: [],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GedcomDiffComponent {
   readonly newGedcomRecord = input.required<GedcomRecord | undefined>();

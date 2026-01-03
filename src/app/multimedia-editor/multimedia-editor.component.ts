@@ -1,11 +1,19 @@
 import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomMultimedia } from "../../gedcom/gedcomMultimedia";
-import { Component, inject, input, linkedSignal, output } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  input,
+  linkedSignal,
+  output,
+} from "@angular/core";
 
 @Component({
   selector: "app-multimedia-editor",
   templateUrl: "./multimedia-editor.component.html",
   styleUrl: "./multimedia-editor.component.css",
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MultimediaEditorComponent {
   private readonly ancestryService = inject(AncestryService);

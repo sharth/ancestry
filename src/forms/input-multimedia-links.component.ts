@@ -2,6 +2,7 @@ import type { AncestryDatabase } from "../database/ancestry.service";
 import type { GedcomMultimediaLink } from "../gedcom/gedcomMultimediaLink";
 import type { ElementRef, QueryList } from "@angular/core";
 import {
+  ChangeDetectionStrategy,
   Component,
   Injector,
   ViewChildren,
@@ -19,6 +20,7 @@ import { RouterModule } from "@angular/router";
   templateUrl: "./input-multimedia-links.component.html",
   styleUrl: "./input.component.css",
   imports: [RouterModule, Field],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputMultimediaLinksComponent implements FormValueControl<
   GedcomMultimediaLink[]

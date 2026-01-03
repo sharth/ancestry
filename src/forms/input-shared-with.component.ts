@@ -2,7 +2,12 @@ import type { AncestryDatabase } from "../database/ancestry.service";
 import type { GedcomEventSharedWith } from "../gedcom/gedcomEvent";
 import { InputIndividualXrefComponent } from "./input-individual-xref.component";
 import type { QueryList } from "@angular/core";
-import { Component, ViewChildren, model } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ViewChildren,
+  model,
+} from "@angular/core";
 import type { FieldTree, FormValueControl } from "@angular/forms/signals";
 import { Field, form } from "@angular/forms/signals";
 
@@ -11,6 +16,7 @@ import { Field, form } from "@angular/forms/signals";
   imports: [Field, InputIndividualXrefComponent],
   templateUrl: "./input-shared-with.component.html",
   styleUrl: "./input.component.css",
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputSharedWithComponent implements FormValueControl<
   GedcomEventSharedWith[]

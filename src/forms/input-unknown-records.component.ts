@@ -1,7 +1,12 @@
 import type { AncestryDatabase } from "../database/ancestry.service";
 import { serializeGedcomRecordToText } from "../gedcom/gedcomRecord";
 import type { GedcomRecord } from "../gedcom/gedcomRecord";
-import { Component, input, model } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  input,
+  model,
+} from "@angular/core";
 import type { FormValueControl } from "@angular/forms/signals";
 
 @Component({
@@ -9,6 +14,7 @@ import type { FormValueControl } from "@angular/forms/signals";
   templateUrl: "./input-unknown-records.component.html",
   styleUrl: "./input.component.css",
   imports: [],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputUnknownRecordsComponent implements FormValueControl<
   GedcomRecord[]
