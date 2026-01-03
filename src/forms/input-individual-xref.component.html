@@ -7,7 +7,7 @@
     ) {
       <option value="{{ individual.xref }}">
         @let name = individual.names.at(0);
-        @if (name == undefined) {
+        @if (name === undefined) {
           Unnamed Person ({{ individual.xref }})
         } @else {
           {{ displayGedcomName(name) }} ({{ individual.xref }})

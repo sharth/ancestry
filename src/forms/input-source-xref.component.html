@@ -3,7 +3,7 @@
     <option selected value="">Sources...</option>
     @for (source of sources(); track source.xref) {
       <option value="{{ source.xref }}">
-        @if (source.abbr == undefined) {
+        @if (source.abbr === undefined) {
           Untitled Source ({{ source.xref }})
         } @else {
           {{ source.abbr }} ({{ source.xref }})

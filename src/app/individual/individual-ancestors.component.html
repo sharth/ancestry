@@ -1,7 +1,7 @@
 @if (vm(); as vm) {
   <ol>
     @for (ancestor of vm.ancestors; let ahnentafel = $index; track $index) {
-      @if (ancestor != null) {
+      @if (ancestor !== undefined) {
         <li value="{{ ahnentafel }}">
           <app-individual-link [xref]="ancestor.xref" />
         </li>
