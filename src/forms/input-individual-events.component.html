@@ -1,6 +1,6 @@
 <details [open]="open()">
   <summary>Events ({{ form.length }})</summary>
-  @for (event of form; track $index) {
+  @for (event of form; track event) {
     <details #container (toggle)="(true)">
       <summary>
         <button
