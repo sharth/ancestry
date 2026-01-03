@@ -1,12 +1,5 @@
 <details #container (toggle)="(true)">
-  <summary>
-    Shared With ({{ form.length }})
-    <button
-      type="button"
-      class="btn btn-outline-primary bi-plus"
-      (click)="appendSharedEvent()"
-    ></button>
-  </summary>
+  <summary>Shared With ({{ form.length }})</summary>
   @defer (when container.open) {
     @for (formGroup of form; track formGroup) {
       <details [open]="newControls.has(formGroup)">
@@ -33,5 +26,13 @@
         </div>
       </details>
     }
+    <div class="details-lookalike" (click)="appendSharedEvent()">
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-primary bi-plus"
+        (click)="$event.preventDefault()"
+      ></button>
+      Share event with another individual
+    </div>
   }
 </details>
