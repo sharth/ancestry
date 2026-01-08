@@ -13,11 +13,11 @@ import {
   model,
 } from "@angular/core";
 import type { FieldTree, FormValueControl } from "@angular/forms/signals";
-import { Field, form } from "@angular/forms/signals";
+import { FormField, form } from "@angular/forms/signals";
 
 @Component({
   selector: "app-input-individual-names",
-  imports: [Field, InputSourceCitationsComponent],
+  imports: [FormField, InputSourceCitationsComponent],
   templateUrl: "./input-individual-names.component.html",
   styleUrl: "./input.component.css",
   changeDetection: ChangeDetectionStrategy.OnPush,

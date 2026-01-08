@@ -9,11 +9,11 @@ import {
   model,
 } from "@angular/core";
 import type { FieldTree, FormValueControl } from "@angular/forms/signals";
-import { Field, form } from "@angular/forms/signals";
+import { FormField, form } from "@angular/forms/signals";
 
 @Component({
   selector: "app-input-shared-with",
-  imports: [Field, InputIndividualXrefComponent],
+  imports: [FormField, InputIndividualXrefComponent],
   templateUrl: "./input-shared-with.component.html",
   styleUrl: "./input.component.css",
   changeDetection: ChangeDetectionStrategy.OnPush,

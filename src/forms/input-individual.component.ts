@@ -15,12 +15,12 @@ import {
   model,
   signal,
 } from "@angular/core";
-import { Field, form } from "@angular/forms/signals";
+import { FormField, form } from "@angular/forms/signals";
 
 @Component({
   selector: "app-input-individual",
   imports: [
-    Field,
+    FormField,
     InputIndividualEventsComponent,
     InputIndividualSexComponent,
     InputIndividualNamesComponent,

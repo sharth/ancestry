@@ -13,14 +13,14 @@
         </summary>
         <app-input-individual-xref
           #focusTarget
-          [field]="formGroup.xref"
+          [formField]="formGroup.xref"
           [ancestryDatabase]="ancestryDatabase()"
         ></app-input-individual-xref>
         <div class="form-floating">
           <input
             class="form-control"
             id="role_{{ $index }}"
-            [field]="formGroup.role"
+            [formField]="formGroup.role"
           />
           <label for="role_{{ $index }}">Role</label>
         </div>

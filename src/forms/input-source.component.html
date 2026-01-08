@@ -1,29 +1,29 @@
 <div class="form-floating">
-  <textarea class="form-control h-auto" [field]="form.abbr"></textarea>
+  <textarea class="form-control h-auto" [formField]="form.abbr"></textarea>
   <label>Short Title</label>
 </div>
 
 <div class="form-floating">
-  <textarea class="form-control h-auto" [field]="form.title"></textarea>
+  <textarea class="form-control h-auto" [formField]="form.title"></textarea>
   <label>Title</label>
 </div>
 
 <div class="form-floating">
-  <textarea class="form-control h-auto" [field]="form.text"></textarea>
+  <textarea class="form-control h-auto" [formField]="form.text"></textarea>
   <label>Text</label>
 </div>
 
 <app-input-repository-links
-  [field]="form.repositoryLinks"
+  [formField]="form.repositoryLinks"
   [(ancestryDatabase)]="ancestryDatabase"
 ></app-input-repository-links>
 
 <app-input-multimedia-links
-  [field]="form.multimediaLinks"
+  [formField]="form.multimediaLinks"
   [(ancestryDatabase)]="ancestryDatabase"
 ></app-input-multimedia-links>
 
 <app-input-unknown-records
-  [field]="form.unknownRecords"
+  [formField]="form.unknownRecords"
   [(ancestryDatabase)]="ancestryDatabase"
 ></app-input-unknown-records>

@@ -13,12 +13,12 @@ import {
   model,
 } from "@angular/core";
 import type { FormValueControl } from "@angular/forms/signals";
-import { Field, form } from "@angular/forms/signals";
+import { FormField, form } from "@angular/forms/signals";
 
 @Component({
   selector: "app-input-individual-events",
   imports: [
-    Field,
+    FormField,
     InputSourceCitationsComponent,
     InputNotesComponent,
     InputSharedWithComponent,

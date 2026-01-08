@@ -19,7 +19,7 @@
           <select
             #focusTarget
             class="form-select"
-            [field]="multimediaLink.xref"
+            [formField]="multimediaLink.xref"
           >
             <option selected value="">Multimedia...</option>
             @for (multimedia of multimedias(); track multimedia.xref) {
@@ -33,7 +33,7 @@
           <input
             class="form-control"
             type="text"
-            [field]="multimediaLink.title"
+            [formField]="multimediaLink.title"
           />
           <label>Custom Title</label>
         </div>

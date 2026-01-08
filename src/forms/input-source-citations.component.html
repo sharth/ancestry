@@ -16,7 +16,7 @@
         <div class="form-floating">
           <app-input-source-xref
             #focusTarget
-            [field]="formGroup.sourceXref"
+            [formField]="formGroup.sourceXref"
             [ancestryDatabase]="ancestryDatabase()"
           ></app-input-source-xref>
         </div>
@@ -24,7 +24,7 @@
           <input
             class="form-control"
             id="page_{{ $index }}"
-            [field]="formGroup.page"
+            [formField]="formGroup.page"
           />
           <label for="`page_{{ $index }}`">Page</label>
         </div>
@@ -32,7 +32,7 @@
           <input
             class="form-control"
             id="quality_{{ $index }}"
-            [field]="formGroup.quality"
+            [formField]="formGroup.quality"
           />
           <label for="`quality_{{ $index }}`">Quality</label>
         </div>
@@ -40,16 +40,16 @@
           <textarea
             class="form-control"
             id="text_{{ $index }}"
-            [field]="formGroup.text"
+            [formField]="formGroup.text"
           ></textarea>
           <label for="`text_{{ $index }}`">Text</label>
         </div>
         <app-input-multimedia-links
-          [field]="formGroup.multimediaLinks"
+          [formField]="formGroup.multimediaLinks"
           [(ancestryDatabase)]="ancestryDatabase"
         ></app-input-multimedia-links>
         <app-input-notes
-          [field]="formGroup.notes"
+          [formField]="formGroup.notes"
           [(ancestryDatabase)]="ancestryDatabase"
         ></app-input-notes>
       </details>

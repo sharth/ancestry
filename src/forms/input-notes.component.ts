@@ -9,11 +9,11 @@ import {
   model,
 } from "@angular/core";
 import type { FormValueControl } from "@angular/forms/signals";
-import { Field, form } from "@angular/forms/signals";
+import { FormField, form } from "@angular/forms/signals";
 
 @Component({
   selector: "app-input-notes",
-  imports: [Field],
+  imports: [FormField],
   templateUrl: "./input-notes.component.html",
   styleUrl: "./input.component.css",
   changeDetection: ChangeDetectionStrategy.OnPush,

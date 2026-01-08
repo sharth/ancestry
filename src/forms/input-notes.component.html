@@ -6,7 +6,7 @@
         @for (note of form; track note) {
           <tr>
             <td>
-              <button 
+              <button
                 type="button"
                 class="btn btn-danger bi-trash"
                 (click)="removeNote($index)"
@@ -16,7 +16,7 @@
               <textarea
                 #focusTarget
                 class="form-control"
-                [field]="note.text"
+                [formField]="note.text"
               ></textarea>
               <label>Text</label>
             </td>

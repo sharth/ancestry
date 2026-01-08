@@ -16,7 +16,7 @@
             #focusTarget
             class="form-control"
             id="tag_{{ $index }}"
-            [field]="event.tag"
+            [formField]="event.tag"
           >
             @for (event of gedcomEventTags; track event.tag) {
               <option [value]="event.tag">{{ event.description }}</option>
@@ -28,7 +28,7 @@
           <input
             class="form-control"
             id="type_{{ $index }}"
-            [field]="event.type"
+            [formField]="event.type"
           />
           <label for="type_{{ $index }}">Type</label>
         </div>
@@ -36,7 +36,7 @@
           <input
             class="form-control"
             id="address_{{ $index }}"
-            [field]="event.address"
+            [formField]="event.address"
           />
           <label for="address_{{ $index }}">Address</label>
         </div>
@@ -44,7 +44,7 @@
           <input
             class="form-control"
             id="place_{{ $index }}"
-            [field]="event.place"
+            [formField]="event.place"
           />
           <label for="place_{{ $index }}">Place</label>
         </div>
@@ -52,7 +52,7 @@
           <input
             class="form-control"
             id="cause_{{ $index }}"
-            [field]="event.cause"
+            [formField]="event.cause"
           />
           <label for="cause_{{ $index }}">Cause</label>
         </div>
@@ -60,7 +60,7 @@
           <input
             class="form-control"
             id="date_{{ $index }}"
-            [field]="event.date.value"
+            [formField]="event.date.value"
           />
           <label for="date_{{ $index }}">Date</label>
         </div>
@@ -68,20 +68,20 @@
           <input
             class="form-control"
             id="sdate_{{ $index }}"
-            [field]="event.sortDate.value"
+            [formField]="event.sortDate.value"
           />
           <label for="sdate_{{ $index }}">Sort Date</label>
         </div>
         <app-input-source-citations
-          [field]="event.citations"
+          [formField]="event.citations"
           [(ancestryDatabase)]="ancestryDatabase"
         ></app-input-source-citations>
         <app-input-shared-with
-          [field]="event.sharedWith"
+          [formField]="event.sharedWith"
           [(ancestryDatabase)]="ancestryDatabase"
         ></app-input-shared-with>
         <app-input-notes
-          [field]="event.notes"
+          [formField]="event.notes"
           [(ancestryDatabase)]="ancestryDatabase"
         ></app-input-notes>
       }

@@ -1,10 +1,10 @@
 import type { AncestryDatabase } from "../database/ancestry.service";
 import { ChangeDetectionStrategy, Component, model } from "@angular/core";
-import { Field, type FormValueControl, form } from "@angular/forms/signals";
+import { FormField, type FormValueControl, form } from "@angular/forms/signals";
 
 @Component({
   selector: "app-input-repository-call-number",
-  imports: [Field],
+  imports: [FormField],
   templateUrl: "./input-repository-call-number.component.html",
   styleUrl: "./input.component.css",
   changeDetection: ChangeDetectionStrategy.OnPush,

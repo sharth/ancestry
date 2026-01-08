@@ -2,7 +2,7 @@
   <summary>Sex ({{ form.sex().value() }})</summary>
   @defer (when container.open) {
     <div class="form-floating">
-      <select class="form-select" [field]="form.sex">
+      <select class="form-select" [formField]="form.sex">
         <option value=""></option>
         <option value="M">Male</option>
         <option value="F">Female</option>
@@ -10,7 +10,7 @@
       <label for="sex">Sex</label>
     </div>
     <app-input-source-citations
-      [field]="form.citations"
+      [formField]="form.citations"
       [(ancestryDatabase)]="ancestryDatabase"
     ></app-input-source-citations>
   }

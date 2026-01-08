@@ -1,5 +1,5 @@
 <div class="form-floating">
-  <select #focusTarget class="form-select" [field]="form">
+  <select #focusTarget class="form-select" [formField]="form">
     <option selected value="">Individuals...</option>
     @for (
       individual of Object.values(ancestryDatabase().individuals);

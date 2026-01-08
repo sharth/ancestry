@@ -17,11 +17,11 @@
         </summary>
         <app-input-repository-xref
           #focusTarget
-          [field]="formGroup.repositoryXref"
+          [formField]="formGroup.repositoryXref"
           [(ancestryDatabase)]="ancestryDatabase"
         ></app-input-repository-xref>
         <app-input-repository-call-number
-          [field]="formGroup.callNumber"
+          [formField]="formGroup.callNumber"
           [(ancestryDatabase)]="ancestryDatabase"
         ></app-input-repository-call-number>
       </details>

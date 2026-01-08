@@ -13,7 +13,7 @@ import {
   model,
 } from "@angular/core";
 import type { FieldTree, FormValueControl } from "@angular/forms/signals";
-import { Field, form } from "@angular/forms/signals";
+import { FormField, form } from "@angular/forms/signals";
 import { RouterModule } from "@angular/router";
 
 @Component({
@@ -21,7 +21,7 @@ import { RouterModule } from "@angular/router";
   templateUrl: "./input-repository-links.component.html",
   styleUrl: "./input.component.css",
   imports: [
-    Field,
+    FormField,
     RouterModule,
     InputRepositoryCallNumberComponent,
     InputRepositoryXrefComponent,

@@ -20,7 +20,7 @@
             #focusTarget
             class="form-control"
             id="prefix_{{ $index }}"
-            [field]="name.prefix"
+            [formField]="name.prefix"
           />
           <label for="prefix_{{ $index }}">Prefix</label>
         </div>
@@ -28,7 +28,7 @@
           <input
             class="form-control"
             id="given_{{ $index }}"
-            [field]="name.givenName"
+            [formField]="name.givenName"
           />
           <label for="given_{{ $index }}">Given Name</label>
         </div>
@@ -36,7 +36,7 @@
           <input
             class="form-control"
             id="nick_{{ $index }}"
-            [field]="name.nickName"
+            [formField]="name.nickName"
           />
           <label for="nick_{{ $index }}">Nickname</label>
         </div>
@@ -44,7 +44,7 @@
           <input
             class="form-control"
             id="surnamePrefix_{{ $index }}"
-            [field]="name.surnamePrefix"
+            [formField]="name.surnamePrefix"
           />
           <label for="surnamePrefix_{{ $index }}">Surname Prefix</label>
         </div>
@@ -52,7 +52,7 @@
           <input
             class="form-control"
             id="surname_{{ $index }}"
-            [field]="name.surname"
+            [formField]="name.surname"
           />
           <label for="surname_{{ $index }}">Surname</label>
         </div>
@@ -60,12 +60,12 @@
           <input
             class="form-control"
             id="suffix_{{ $index }}"
-            [field]="name.suffix"
+            [formField]="name.suffix"
           />
           <label for="suffix_{{ $index }}">Suffix</label>
         </div>
         <app-input-source-citations
-          [field]="name.citations"
+          [formField]="name.citations"
           [(ancestryDatabase)]="ancestryDatabase"
         ></app-input-source-citations>
       </details>

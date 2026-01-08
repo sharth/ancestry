@@ -12,14 +12,14 @@ import {
   model,
 } from "@angular/core";
 import type { FieldTree } from "@angular/forms/signals";
-import { Field, type FormValueControl, form } from "@angular/forms/signals";
+import { FormField, type FormValueControl, form } from "@angular/forms/signals";
 import { RouterModule } from "@angular/router";
 
 @Component({
   selector: "app-input-multimedia-links",
   templateUrl: "./input-multimedia-links.component.html",
   styleUrl: "./input.component.css",
-  imports: [RouterModule, Field],
+  imports: [RouterModule, FormField],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputMultimediaLinksComponent implements FormValueControl<

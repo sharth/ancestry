@@ -1,5 +1,5 @@
 <div class="form-floating">
-  <select class="form-select" #selectElement [field]="form">
+  <select class="form-select" #selectElement [formField]="form">
     <option selected value="">Repositories...</option>
     @for (repository of repositories(); track repository.xref) {
       <option value="{{ repository.xref }}">
