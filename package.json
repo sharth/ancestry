@@ -31,7 +31,7 @@
     "@fontsource/material-symbols-rounded": "^5.2.30",
     "@fontsource/roboto": "^5.2.9",
     "@popperjs/core": "^2.11.8",
-    "@testing-library/angular": "^18.1.1",
+    "@testing-library/angular": "^19.0.0",
     "@testing-library/dom": "^10.4.1",
     "@trivago/prettier-plugin-sort-imports": "^6.0.1",
     "@types/wicg-file-system-access": "^2023.10.7",
