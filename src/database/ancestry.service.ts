@@ -338,7 +338,9 @@ export class AncestryService {
     const nextIndex = Object.values(individuals)
       .map((individual) => /^@I(\d+)@/.exec(individual.xref))
       .filter((match) => match != undefined)
-      .map((match) => parseInt(match[1]!))
+      .map((match) => match[1])
+      .filter((id) => id !== undefined)
+      .map((id) => parseInt(id))
       .reduce((acc, index) => Math.max(acc, index + 1), 0);
     return `@I${nextIndex}@`;
   });
@@ -348,7 +350,9 @@ export class AncestryService {
     const nextIndex = Object.values(sources)
       .map((source) => /^S@(\d+)@/.exec(source.xref))
       .filter((match) => match != undefined)
-      .map((match) => parseInt(match[1]!, 10))
+      .map((match) => match[1])
+      .filter((id) => id !== undefined)
+      .map((id) => parseInt(id))
       .reduce((acc, index) => Math.max(acc, index + 1), 0);
     return `@S${nextIndex}@`;
   });
