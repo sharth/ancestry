@@ -14,18 +14,7 @@ export class NavbarComponent {
 
   async openFile() {
     try {
-      const [fileHandle] = await window.showOpenFilePicker({
-        types: [
-          {
-            description: "Gedcom",
-            accept: {
-              "text/plain": [".ged"],
-            },
-          },
-        ],
-      });
-      await this.ancestryService.openGedcom(fileHandle);
-      console.log("Parsing complete");
+      await this.ancestryService.openGedcom();
     } catch (err) {
       console.error(err);
     }

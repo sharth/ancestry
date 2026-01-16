@@ -314,7 +314,17 @@ export class AncestryService {
     this.gedcomResource.reload();
   }
 
-  async openGedcom(fileHandle: FileSystemFileHandle) {
+  async openGedcom() {
+    const [fileHandle] = await window.showOpenFilePicker({
+      types: [
+        {
+          description: "Gedcom",
+          accept: {
+            "text/plain": [".ged"],
+          },
+        },
+      ],
+    });
     await this.dexieDatabase.transaction(
       "rw",
       this.dexieDatabase.gedcomFiles,
@@ -323,6 +333,7 @@ export class AncestryService {
         await this.dexieDatabase.gedcomFiles.put(fileHandle);
       },
     );
+    console.log("Parsing complete");
   }
 
   async requestPermissions() {
