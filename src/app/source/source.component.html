@@ -31,6 +31,8 @@
   </div>
 
   <dialog #editDialog>
-    <app-source-editor [xref]="xref()" (finished)="closeSourceEditor()" />
+    @defer (when editDialog.open) {
+      <app-source-editor [xref]="xref()" (finished)="closeSourceEditor()" />
+    }
   </dialog>
 }

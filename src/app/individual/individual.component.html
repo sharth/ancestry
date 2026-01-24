@@ -27,6 +27,8 @@
   </div>
 
   <dialog #editDialog>
-    <app-individual-editor [xref]="xref()" (finished)="editDialog.close()" />
+    @defer (when editDialog.open) {
+      <app-individual-editor [xref]="xref()" (finished)="editDialog.close()" />
+    }
   </dialog>
 }

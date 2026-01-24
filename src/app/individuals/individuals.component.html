@@ -22,7 +22,7 @@
   </div>
 
   <dialog #editDialog>
-    @if (editDialog.open) {
+    @defer (when editDialog.open) {
       <app-individual-editor (finished)="editDialog.close()" />
     }
   </dialog>
