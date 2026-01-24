@@ -13,7 +13,6 @@ import {
   serializeGedcomMultimedia,
 } from "./gedcomMultimedia";
 import {
-  mergeConcContRecords,
   parseGedcomRecords,
   serializeGedcomRecordToText,
 } from "./gedcomRecord";
@@ -356,9 +355,7 @@ describe("Gedcom Tests", () => {
       const database: Database = {};
 
       beforeAll(() => {
-        const gedcomRecords = parseGedcomRecords(
-          testCase.gedcom.join("\n"),
-        ).map((record) => mergeConcContRecords(record));
+        const gedcomRecords = parseGedcomRecords(testCase.gedcom.join("\n"));
 
         gedcomRecords.forEach((gedcomRecord) => {
           switch (gedcomRecord.tag) {

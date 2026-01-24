@@ -18,7 +18,6 @@ import {
 } from "../gedcom/gedcomMultimedia";
 import type { GedcomRecord } from "../gedcom/gedcomRecord";
 import {
-  mergeConcContRecords,
   parseGedcomRecords,
   serializeGedcomRecordToText,
 } from "../gedcom/gedcomRecord";
@@ -100,10 +99,6 @@ export class AncestryService {
       return undefined;
     }
 
-    const gedcomRecords = gedcomResourceValue.gedcomRecords.map(
-      (gedcomRecord) => mergeConcContRecords(gedcomRecord),
-    );
-
     const headers = new Array<GedcomHeader>();
     const trailers = new Array<GedcomTrailer>();
     const submitters: Record<string, GedcomSubmitter> = {};
@@ -113,7 +108,7 @@ export class AncestryService {
     const sources: Record<string, GedcomSource> = {};
     const multimedias: Record<string, GedcomMultimedia> = {};
 
-    for (const gedcomRecord of gedcomRecords) {
+    for (const gedcomRecord of gedcomResourceValue.gedcomRecords) {
       switch (gedcomRecord.tag) {
         case "HEAD":
           headers.push(parseGedcomHeader(gedcomRecord));

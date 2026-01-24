@@ -1,12 +1,12 @@
 import {
-  mergeConcContRecords,
   parseGedcomRecords,
   serializeGedcomRecordToText,
 } from "./gedcomRecord";
 import { describe, expect, it } from "vitest";
 
 describe("GedcomRecord", () => {
-  // CONC will be discarded during parsing, and will not be preserved.
+  // CONC and CONT will be discarded during parsing, and will not be preserved by the parser.
+  // CONT will be generated when serializing.
   it("Simple Parsing and Serializing", () => {
     const gedcomText = [
       "0 @X1@ SUBM",
@@ -28,23 +28,8 @@ describe("GedcomRecord", () => {
             tag: "NAME",
             abstag: "SUBM.NAME",
             xref: "",
-            value: "Jo",
-            children: [
-              {
-                tag: "CONC",
-                abstag: "SUBM.NAME.CONC",
-                xref: "",
-                value: "hn",
-                children: [],
-              },
-              {
-                tag: "CONT",
-                abstag: "SUBM.NAME.CONT",
-                xref: "",
-                value: "Doe",
-                children: [],
-              },
-            ],
+            value: "John\nDoe",
+            children: [],
           },
         ],
       },
@@ -58,16 +43,8 @@ describe("GedcomRecord", () => {
             tag: "EMAIL",
             abstag: "SUBM.EMAIL",
             xref: "",
-            value: "",
-            children: [
-              {
-                tag: "CONC",
-                abstag: "SUBM.EMAIL.CONC",
-                xref: "",
-                value: "johndoe@example.com",
-                children: [],
-              },
-            ],
+            value: "johndoe@example.com",
+            children: [],
           },
         ],
       },
@@ -78,49 +55,10 @@ describe("GedcomRecord", () => {
       ),
     ).toEqual([
       "0 @X1@ SUBM",
-      "1 NAME Jo",
-      "2 CONC hn",
+      "1 NAME John",
       "2 CONT Doe",
       "0 @X2@ SUBM",
-      "1 EMAIL",
-      "2 CONC johndoe@example.com",
-    ]);
-  });
-
-  it("Merging CONC and CONT", () => {
-    const gedcomText = [
-      "0 @X1@ SUBM",
-      "1 NAME Jo",
-      "2 CONC hn",
-      "2 CONT Doe",
-      "1 EMAIL",
-      "2 CONC johndoe@example.com",
-    ].join("\n");
-
-    const gedcomRecords = parseGedcomRecords(gedcomText);
-    expect(gedcomRecords.map((r) => mergeConcContRecords(r))).toEqual([
-      {
-        tag: "SUBM",
-        abstag: "SUBM",
-        xref: "@X1@",
-        value: "",
-        children: [
-          {
-            tag: "NAME",
-            abstag: "SUBM.NAME",
-            xref: "",
-            value: "John\nDoe",
-            children: [],
-          },
-          {
-            tag: "EMAIL",
-            abstag: "SUBM.EMAIL",
-            xref: "",
-            value: "johndoe@example.com",
-            children: [],
-          },
-        ],
-      },
+      "1 EMAIL johndoe@example.com",
     ]);
   });
 });

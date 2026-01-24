@@ -7,11 +7,8 @@ export interface GedcomRecord {
 }
 
 export function parseGedcomRecords(text: string): GedcomRecord[] {
-  return generateGedcomRecords(text).toArray();
-}
-
-export function* generateGedcomRecords(text: string): Generator<GedcomRecord> {
   const lines = text.split(/\r?\n/);
+  const records: GedcomRecord[] = [];
   let ladder: GedcomRecord[] = [];
 
   for (const [lineNumber, line] of lines.entries()) {
@@ -23,53 +20,36 @@ export function* generateGedcomRecords(text: string): Generator<GedcomRecord> {
       throw new Error(`Failed to parse line number ${lineNumber + 1}: ${line}`);
     }
     const level = parseInt(match[1]!, 10);
-    const [xref, tag, value] = match.slice(2);
+    const [xref, tag, value] = match.slice(2) as [string, string, string];
     const abstag = [
       ...ladder.slice(0, level).map((record) => record.tag),
       tag,
     ].join(".");
-    const record: GedcomRecord = {
-      xref: xref!,
-      tag: tag!,
-      abstag,
-      value: value!,
-      children: [],
-    };
+    const record: GedcomRecord = { xref, tag, abstag, value, children: [] };
 
     if (level == 0) {
-      if (ladder.length > 0) {
-        yield ladder[0]!;
-      }
       ladder = [record];
+      records.push(record);
     } else if (level <= ladder.length) {
       const parent: GedcomRecord = ladder[level - 1]!;
-      parent.children.push(record);
-      ladder.length = level;
-      ladder.push(record);
+      if (record.tag == "CONC") {
+        parent.value += record.value;
+      } else if (record.tag == "CONT") {
+        parent.value += "\n";
+        parent.value += record.value;
+      } else {
+        parent.children.push(record);
+        ladder.length = level;
+        ladder.push(record);
+      }
     } else {
       throw new Error(
         `Skipped parent level on line number ${lineNumber + 1}: ${line}`,
       );
     }
   }
-  if (ladder.length > 0) {
-    yield ladder[0]!;
-  }
-}
 
-export function mergeConcContRecords(gedcomRecord: GedcomRecord): GedcomRecord {
-  const newRecord: GedcomRecord = { ...gedcomRecord, children: [] };
-  for (const childRecord of gedcomRecord.children) {
-    if (childRecord.tag == "CONC") {
-      newRecord.value += childRecord.value;
-    } else if (childRecord.tag == "CONT") {
-      newRecord.value += "\n";
-      newRecord.value += childRecord.value;
-    } else {
-      newRecord.children.push(mergeConcContRecords(childRecord));
-    }
-  }
-  return newRecord;
+  return records;
 }
 
 export function serializeGedcomRecordToText(
