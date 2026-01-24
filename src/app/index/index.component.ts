@@ -1,9 +1,9 @@
-import { AncestryService } from "../../database/ancestry.service";
+import type { AncestryDatabase } from "../../database/ancestry.service";
 import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  inject,
+  input,
 } from "@angular/core";
 
 @Component({
@@ -14,18 +14,17 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IndexComponent {
-  private readonly ancestryService = inject(AncestryService);
+  readonly ancestryDatabase = input.required<AncestryDatabase>();
 
   readonly vm = computed(() => {
-    const ancestry = this.ancestryService.ancestryDatabase();
-    if (ancestry == undefined) return undefined;
+    const ancestryDatabase = this.ancestryDatabase();
 
     return {
-      individuals: Object.values(ancestry.individuals),
-      families: Object.values(ancestry.families),
-      sources: Object.values(ancestry.sources),
-      repositories: Object.values(ancestry.repositories),
-      submitters: Object.values(ancestry.submitters),
+      individuals: Object.values(ancestryDatabase.individuals),
+      families: Object.values(ancestryDatabase.families),
+      sources: Object.values(ancestryDatabase.sources),
+      repositories: Object.values(ancestryDatabase.repositories),
+      submitters: Object.values(ancestryDatabase.submitters),
     };
   });
 }

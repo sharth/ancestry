@@ -1,10 +1,10 @@
-import { AncestryService } from "../../database/ancestry.service";
+import type { AncestryDatabase } from "../../database/ancestry.service";
 import { SourceEditorComponent } from "../source-editor/source-editor.component";
 import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  inject,
+  input,
 } from "@angular/core";
 import { RouterLink } from "@angular/router";
 
@@ -16,13 +16,11 @@ import { RouterLink } from "@angular/router";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SourcesComponent {
-  private readonly ancestryService = inject(AncestryService);
+  readonly ancestryDatabase = input.required<AncestryDatabase>();
 
   vm = computed(() => {
-    const ancestry = this.ancestryService.ancestryDatabase();
-    if (ancestry == undefined) return undefined;
-
-    const sources = Object.values(ancestry.sources);
+    const ancestryDatabase = this.ancestryDatabase();
+    const sources = Object.values(ancestryDatabase.sources);
     sources.sort((lhs, rhs) => lhs.abbr.localeCompare(rhs.abbr));
 
     return { sources };

@@ -1,4 +1,4 @@
-import { AncestryService } from "../../database/ancestry.service";
+import type { AncestryDatabase } from "../../database/ancestry.service";
 import type { GedcomIndividual } from "../../gedcom/gedcomIndividual";
 import { fullname, surname } from "../../gedcom/gedcomIndividual";
 import { IndividualEditorComponent } from "../individual-editor/individual-editor.component";
@@ -7,7 +7,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  inject,
+  input,
 } from "@angular/core";
 
 @Component({
@@ -18,17 +18,15 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IndividualsComponent {
-  private ancestryService = inject(AncestryService);
+  readonly ancestryDatabase = input.required<AncestryDatabase>();
 
   readonly vm = computed(() => {
-    const ancestry = this.ancestryService.ancestryDatabase();
-    if (ancestry === undefined) {
-      return undefined;
-    }
-
+    const ancestryDatabase = this.ancestryDatabase();
     return {
-      individuals: Object.values(ancestry.individuals),
-      individualsBySurname: this.individualsBySurname(ancestry.individuals),
+      individuals: Object.values(ancestryDatabase.individuals),
+      individualsBySurname: this.individualsBySurname(
+        ancestryDatabase.individuals,
+      ),
     };
   });
 

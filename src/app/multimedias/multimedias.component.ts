@@ -1,10 +1,10 @@
-import { AncestryService } from "../../database/ancestry.service";
+import type { AncestryDatabase } from "../../database/ancestry.service";
 import { MultimediaEditorComponent } from "../multimedia-editor/multimedia-editor.component";
 import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  inject,
+  input,
 } from "@angular/core";
 import { RouterLink } from "@angular/router";
 
@@ -16,16 +16,12 @@ import { RouterLink } from "@angular/router";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MultimediasComponent {
-  private readonly ancestryService = inject(AncestryService);
+  readonly ancestryDatabase = input.required<AncestryDatabase>();
 
   readonly vm = computed(() => {
-    const ancestry = this.ancestryService.ancestryDatabase();
-    if (ancestry == undefined) {
-      return undefined;
-    }
-
+    const ancestryDatabase = this.ancestryDatabase();
     return {
-      multimedias: Object.values(ancestry.multimedias),
+      multimedias: Object.values(ancestryDatabase.multimedias),
     };
   });
 }

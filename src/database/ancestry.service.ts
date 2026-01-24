@@ -40,8 +40,12 @@ import {
 import type { GedcomTrailer } from "../gedcom/gedcomTrailer";
 import { parseGedcomTrailer } from "../gedcom/gedcomTrailer";
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
-import { Injectable, computed, resource, signal } from "@angular/core";
+import { Injectable, computed, inject, resource, signal } from "@angular/core";
+import { toObservable } from "@angular/core/rxjs-interop";
+import type { ResolveFn } from "@angular/router";
+import { RedirectCommand, Router } from "@angular/router";
 import Dexie from "dexie";
+import { filter, firstValueFrom } from "rxjs";
 
 class DexieDatabase extends Dexie {
   gedcomFiles!: Dexie.Table<FileSystemFileHandle>;
@@ -377,3 +381,21 @@ export interface AncestryDatabase {
   repositories: Record<string, GedcomRepository>;
   multimedias: Record<string, GedcomMultimedia>;
 }
+
+export const ancestryDatabaseResolver: ResolveFn<
+  AncestryDatabase | RedirectCommand
+> = async () => {
+  const ancestryService = inject(AncestryService);
+  const router = inject(Router);
+
+  await firstValueFrom(
+    toObservable(ancestryService.gedcomResource.isLoading).pipe(
+      filter((isLoading) => !isLoading),
+    ),
+  );
+  const database = ancestryService.ancestryDatabase();
+  if (database === undefined) {
+    return new RedirectCommand(router.parseUrl("/hello"));
+  }
+  return database;
+};

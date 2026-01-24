@@ -1,4 +1,4 @@
-import { AncestryService } from "../../database/ancestry.service";
+import type { AncestryDatabase } from "../../database/ancestry.service";
 import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
 import { serializeGedcomRepository } from "../../gedcom/gedcomRepository";
 import { RepositorySourcesComponent } from "./repository-sources.component";
@@ -6,7 +6,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  inject,
   input,
 } from "@angular/core";
 import { RouterModule } from "@angular/router";
@@ -19,15 +18,12 @@ import { RouterModule } from "@angular/router";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RepositoryComponent {
+  readonly ancestryDatabase = input.required<AncestryDatabase>();
   readonly xref = input.required<string>();
-  private readonly ancestryService = inject(AncestryService);
 
   readonly vm = computed(() => {
-    const ancestry = this.ancestryService.ancestryDatabase();
-    if (ancestry == undefined) {
-      return undefined;
-    }
-    const repository = ancestry.repositories[this.xref()];
+    const ancestryDatabase = this.ancestryDatabase();
+    const repository = ancestryDatabase.repositories[this.xref()];
     if (repository == undefined) {
       return undefined;
     }

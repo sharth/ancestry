@@ -1,4 +1,4 @@
-import { AncestryService } from "../../database/ancestry.service";
+import type { AncestryDatabase } from "../../database/ancestry.service";
 import {
   fullname,
   serializeGedcomIndividual,
@@ -12,7 +12,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  inject,
   input,
 } from "@angular/core";
 
@@ -30,14 +29,11 @@ import {
 })
 export class IndividualComponent {
   readonly xref = input.required<string>();
-  private ancestryService = inject(AncestryService);
+  readonly ancestryDatabase = input.required<AncestryDatabase>();
 
   readonly vm = computed(() => {
-    const ancestry = this.ancestryService.ancestryDatabase();
-    if (ancestry === undefined) {
-      return undefined;
-    }
-    const individual = ancestry.individuals[this.xref()];
+    const ancestryDatabase = this.ancestryDatabase();
+    const individual = ancestryDatabase.individuals[this.xref()];
     if (individual === undefined) {
       return undefined;
     }

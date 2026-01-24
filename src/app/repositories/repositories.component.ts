@@ -1,9 +1,9 @@
-import { AncestryService } from "../../database/ancestry.service";
+import type { AncestryDatabase } from "../../database/ancestry.service";
 import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  inject,
+  input,
 } from "@angular/core";
 import { RouterLink } from "@angular/router";
 
@@ -15,16 +15,12 @@ import { RouterLink } from "@angular/router";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RepositoriesComponent {
-  private readonly ancestryService = inject(AncestryService);
+  readonly ancestryDatabase = input.required<AncestryDatabase>();
 
   readonly vm = computed(() => {
-    const ancestry = this.ancestryService.ancestryDatabase();
-    if (ancestry == undefined) {
-      return undefined;
-    }
-
+    const ancestryDatabase = this.ancestryDatabase();
     return {
-      repositories: Object.values(ancestry.repositories),
+      repositories: Object.values(ancestryDatabase.repositories),
     };
   });
 }

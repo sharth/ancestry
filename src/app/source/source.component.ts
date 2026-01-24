@@ -1,4 +1,4 @@
-import { AncestryService } from "../../database/ancestry.service";
+import type { AncestryDatabase } from "../../database/ancestry.service";
 import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
 import { serializeGedcomSource } from "../../gedcom/gedcomSource";
 import { SourceEditorComponent } from "../source-editor/source-editor.component";
@@ -11,7 +11,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  inject,
   input,
   viewChild,
 } from "@angular/core";
@@ -32,15 +31,12 @@ import { RouterModule } from "@angular/router";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SourceComponent {
+  readonly ancestryDatabase = input.required<AncestryDatabase>();
   readonly xref = input.required<string>();
-  private readonly ancestryService = inject(AncestryService);
 
   readonly vm = computed(() => {
-    const ancestry = this.ancestryService.ancestryDatabase();
-    if (ancestry == undefined) {
-      return undefined;
-    }
-    const source = ancestry.sources[this.xref()];
+    const ancestryDatabase = this.ancestryDatabase();
+    const source = ancestryDatabase.sources[this.xref()];
     if (source == undefined) {
       return undefined;
     }
