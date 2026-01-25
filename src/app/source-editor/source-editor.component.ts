@@ -12,7 +12,7 @@ import {
   output,
   signal,
 } from "@angular/core";
-import { RouterModule } from "@angular/router";
+import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 
 @Component({
   selector: "app-source-editor",
@@ -23,6 +23,8 @@ import { RouterModule } from "@angular/router";
 })
 export class SourceEditorComponent {
   private readonly ancestryService = inject(AncestryService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   readonly xref = input<string>();
   readonly finished = output();
@@ -53,6 +55,10 @@ export class SourceEditorComponent {
   async submitForm() {
     const computedDatabase = this.computedDatabase();
     await this.ancestryService.updateGedcomDatabase(computedDatabase);
+    await this.router.navigate([], {
+      relativeTo: this.route,
+      onSameUrlNavigation: "reload",
+    });
     this.finished.emit();
   }
 

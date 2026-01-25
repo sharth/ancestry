@@ -8,6 +8,7 @@ import {
   linkedSignal,
   output,
 } from "@angular/core";
+import { ActivatedRoute, Router } from "@angular/router";
 
 @Component({
   selector: "app-multimedia-editor",
@@ -17,6 +18,8 @@ import {
 })
 export class MultimediaEditorComponent {
   private readonly ancestryService = inject(AncestryService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   readonly xref = input<string>();
   readonly finished = output();
@@ -72,6 +75,10 @@ export class MultimediaEditorComponent {
     //   }
     // );
 
+    await this.router.navigate([], {
+      relativeTo: this.route,
+      onSameUrlNavigation: "reload",
+    });
     this.finished.emit();
   }
 

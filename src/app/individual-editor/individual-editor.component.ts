@@ -12,6 +12,7 @@ import {
   output,
   signal,
 } from "@angular/core";
+import { ActivatedRoute, Router } from "@angular/router";
 
 @Component({
   selector: "app-individual-editor",
@@ -22,6 +23,8 @@ import {
 })
 export class IndividualEditorComponent {
   private readonly ancestryService = inject(AncestryService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   readonly xref = input<string>();
   readonly finished = output();
@@ -52,6 +55,10 @@ export class IndividualEditorComponent {
   async submitForm() {
     const computedDatabase = this.computedDatabase();
     await this.ancestryService.updateGedcomDatabase(computedDatabase);
+    await this.router.navigate([], {
+      relativeTo: this.route,
+      onSameUrlNavigation: "reload",
+    });
     this.finished.emit();
   }
 
