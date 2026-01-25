@@ -58,6 +58,7 @@ export class IndividualEditorComponent {
     await this.router.navigate([], {
       relativeTo: this.route,
       onSameUrlNavigation: "reload",
+      skipLocationChange: true,
     });
     this.finished.emit();
   }
