@@ -36,7 +36,7 @@
     "@trivago/prettier-plugin-sort-imports": "^6.0.2",
     "@types/wicg-file-system-access": "^2023.10.7",
     "@vitest/browser-playwright": "^4.0.16",
-    "angular-eslint": "^21.1.0",
+    "angular-eslint": "^21.2.0",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
     "dexie": "^4.3.0",
