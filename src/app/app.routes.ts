@@ -1,4 +1,5 @@
 import { ancestryDatabaseResolver } from "../database/ancestry.service";
+import { HelloComponent } from "./hello/hello.component";
 import { IndexComponent } from "./index/index.component";
 import { IndividualComponent } from "./individual/individual.component";
 import { IndividualsComponent } from "./individuals/individuals.component";
@@ -17,6 +18,10 @@ export const routes: Routes = [
     path: "",
     component: IndexComponent,
     resolve: { ancestryDatabase: ancestryDatabaseResolver },
+  },
+  {
+    path: "hello",
+    component: HelloComponent,
   },
   {
     path: "individuals",

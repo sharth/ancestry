@@ -46,13 +46,19 @@ import { RedirectCommand, Router } from "@angular/router";
 import Dexie from "dexie";
 import { filter, firstValueFrom } from "rxjs";
 
+interface DatabaseState {
+  id?: number;
+  gedcomHandle?: FileSystemFileHandle;
+  multimediaHandle?: FileSystemDirectoryHandle;
+}
+
 class DexieDatabase extends Dexie {
-  gedcomFiles!: Dexie.Table<FileSystemFileHandle>;
+  metadata!: Dexie.Table<DatabaseState, number>;
 
   constructor() {
     super("AncestryDatabase");
-    this.version(2).stores({
-      gedcomFiles: "++, fileHandle",
+    this.version(5).stores({
+      metadata: "++id",
     });
   }
 }
@@ -77,25 +83,40 @@ export class AncestryService {
       changeCount: this.ancestryChanges(),
     }),
     loader: async () => {
-      const gedcomFileHandle = await this.dexieDatabase.gedcomFiles
-        .toCollection()
-        .first();
+      const metadata = await this.dexieDatabase.metadata.get(1);
+      const gedcomFileHandle = metadata?.gedcomHandle;
+      const directoryHandle = metadata?.multimediaHandle;
 
       if (gedcomFileHandle == undefined) {
-        return undefined;
+        return {
+          gedcomFileHandle: undefined,
+          gedcomFile: undefined,
+          gedcomText: undefined,
+          gedcomRecords: [],
+          directoryHandle,
+        };
       }
 
       const gedcomFile = await gedcomFileHandle.getFile();
       const gedcomText = await gedcomFile.text();
       const gedcomRecords = parseGedcomRecords(gedcomText);
 
-      return { gedcomFileHandle, gedcomFile, gedcomText, gedcomRecords };
+      return {
+        gedcomFileHandle,
+        gedcomFile,
+        gedcomText,
+        gedcomRecords,
+        directoryHandle,
+      };
     },
   });
 
   readonly ancestryDatabase = computed<AncestryDatabase | undefined>(() => {
     const gedcomResourceValue = this.gedcomResource.value();
-    if (gedcomResourceValue === undefined) {
+    if (
+      gedcomResourceValue === undefined ||
+      gedcomResourceValue.gedcomRecords.length === 0
+    ) {
       return undefined;
     }
 
@@ -326,20 +347,52 @@ export class AncestryService {
     });
     await this.dexieDatabase.transaction(
       "rw",
-      this.dexieDatabase.gedcomFiles,
+      this.dexieDatabase.metadata,
       async () => {
-        await this.dexieDatabase.gedcomFiles.clear();
-        await this.dexieDatabase.gedcomFiles.put(fileHandle);
+        // Upsert logic for singleton
+        const metadata = (await this.dexieDatabase.metadata.get(1)) ?? {
+          id: 1,
+        };
+        metadata.gedcomHandle = fileHandle;
+        await this.dexieDatabase.metadata.put(metadata);
       },
     );
     console.log("Parsing complete");
   }
 
+  async openMultimedia() {
+    const directoryHandle = await window.showDirectoryPicker({
+      id: "multimedia",
+      mode: "read",
+    });
+    await this.dexieDatabase.transaction(
+      "rw",
+      this.dexieDatabase.metadata,
+      async () => {
+        const metadata = (await this.dexieDatabase.metadata.get(1)) ?? {
+          id: 1,
+        };
+        metadata.multimediaHandle = directoryHandle;
+        await this.dexieDatabase.metadata.put(metadata);
+      },
+    );
+  }
+
+  async clearDatabase() {
+    await this.dexieDatabase.transaction(
+      "rw",
+      this.dexieDatabase.metadata,
+      async () => {
+        await this.dexieDatabase.metadata.clear();
+      },
+    );
+  }
+
   async requestPermissions() {
-    const fileHandle = await this.dexieDatabase.gedcomFiles
-      .toCollection()
-      .first();
-    await fileHandle?.requestPermission();
+    const metadata = await this.dexieDatabase.metadata.get(1);
+    await metadata?.gedcomHandle?.requestPermission();
+    await metadata?.multimediaHandle?.requestPermission();
+
     this.gedcomResource.reload();
   }
 

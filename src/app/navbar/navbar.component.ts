@@ -12,17 +12,18 @@ import { RouterLink } from "@angular/router";
 export class NavbarComponent {
   private readonly ancestryService = inject(AncestryService);
 
-  async openFile() {
+  async requestPermissions() {
     try {
-      await this.ancestryService.openGedcom();
+      await this.ancestryService.requestPermissions();
     } catch (err) {
       console.error(err);
     }
   }
 
-  async requestPermissions() {
+  async clearDatabase() {
     try {
-      await this.ancestryService.requestPermissions();
+      await this.ancestryService.clearDatabase();
+      window.location.reload();
     } catch (err) {
       console.error(err);
     }

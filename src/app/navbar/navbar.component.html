@@ -1,7 +1,7 @@
 <div class="navbar navbar-light bg-light navbar-expand-lg">
   <div class="container-fluid">
     <a class="navbar-brand" routerLink="/">
-      <img src="/favicon.ico" style="height: 1em" />
+      <img src="/favicon.ico" style="height: 1em" alt="Ancestry Logo" />
       ancestry.lynch.us
     </a>
     <button
@@ -31,15 +31,20 @@
           <a class="nav-link" routerLink="/validation">Validation</a>
         </li>
       </ul>
-      <span class="mx-3"></span>
-      <form class="d-flex">
-        <input type="button" (click)="openFile()" value="Open File" />
-      </form>
       <form class="d-flex">
         <input
           type="button"
           (click)="requestPermissions()"
           value="Request Permissions"
+        />
+      </form>
+      <span class="mx-3"></span>
+      <form class="d-flex">
+        <input
+          type="button"
+          class="btn btn-outline-danger"
+          (click)="clearDatabase()"
+          value="Clear Database"
         />
       </form>
       <span class="mx-3"></span>

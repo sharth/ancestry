@@ -1,0 +1,66 @@
+<div class="container mt-5">
+  <div class="card">
+    <div class="card-header">
+      <h1>Welcome to Ancestry</h1>
+    </div>
+    <div class="card-body">
+      <p class="lead">
+        To get started, please load a GEDCOM file. You may optionally load a
+        multimedia directory to view photos and documents.
+      </p>
+
+      <div class="d-grid gap-3">
+        <div class="p-3 border rounded bg-light">
+          <h5>GEDCOM File</h5>
+          @if (gedcomResource.value()?.gedcomFileHandle) {
+            <p class="text-success">
+              Loaded: {{ gedcomResource.value()?.gedcomFileHandle?.name }}
+            </p>
+            <button class="btn btn-outline-primary" (click)="openGedcom()">
+              Load Different GEDCOM
+            </button>
+          } @else {
+            <p class="text-danger">No GEDCOM file loaded.</p>
+            <button class="btn btn-primary" (click)="openGedcom()">
+              Load GEDCOM File
+            </button>
+          }
+        </div>
+
+        <div class="p-3 border rounded bg-light">
+          <h5>Multimedia Directory</h5>
+          @if (gedcomResource.value()?.directoryHandle) {
+            <p class="text-success">
+              Loaded: {{ gedcomResource.value()?.directoryHandle?.name }}
+            </p>
+            <button
+              class="btn btn-outline-secondary"
+              (click)="openMultimedia()"
+            >
+              Change Multimedia Directory
+            </button>
+          } @else {
+            <p class="text-muted">No multimedia directory loaded (Optional).</p>
+            <button class="btn btn-secondary" (click)="openMultimedia()">
+              Load Multimedia Directory
+            </button>
+          }
+        </div>
+
+        @if (gedcomResource.value()?.gedcomFileHandle) {
+          <hr />
+          <button class="btn btn-success btn-lg" (click)="enterApp()">
+            Enter Application
+          </button>
+        }
+
+        <hr />
+        <div>
+          <button class="btn btn-danger" (click)="clearDatabase()">
+            Clear Database & Reset
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
