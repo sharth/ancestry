@@ -396,29 +396,39 @@ export class AncestryService {
     this.gedcomResource.reload();
   }
 
-  readonly nextIndividualXref = computed<string>(() => {
-    const individuals = this.ancestryDatabase()?.individuals ?? {};
-    const nextIndex = Object.values(individuals)
-      .map((individual) => /^@I(\d+)@/.exec(individual.xref))
-      .filter((match) => match != undefined)
-      .map((match) => match[1])
-      .filter((id) => id !== undefined)
-      .map((id) => parseInt(id))
-      .reduce((acc, index) => Math.max(acc, index + 1), 0);
-    return `@I${nextIndex}@`;
-  });
+  readonly nextIndividualXref = computed<string>(() =>
+    calculateNextIndividualXref(this.ancestryDatabase()?.individuals ?? {}),
+  );
 
-  readonly nextSourceXref = computed<string>(() => {
-    const sources = this.ancestryDatabase()?.sources ?? [];
-    const nextIndex = Object.values(sources)
-      .map((source) => /^S@(\d+)@/.exec(source.xref))
-      .filter((match) => match != undefined)
-      .map((match) => match[1])
-      .filter((id) => id !== undefined)
-      .map((id) => parseInt(id))
-      .reduce((acc, index) => Math.max(acc, index + 1), 0);
-    return `@S${nextIndex}@`;
-  });
+  readonly nextSourceXref = computed<string>(() =>
+    calculateNextSourceXref(this.ancestryDatabase()?.sources ?? {}),
+  );
+}
+
+export function calculateNextIndividualXref(
+  individuals: Record<string, GedcomIndividual>,
+): string {
+  const nextIndex = Object.values(individuals)
+    .map((individual) => /^@I(\d+)@/.exec(individual.xref))
+    .filter((match) => match != undefined)
+    .map((match) => match[1])
+    .filter((id) => id !== undefined)
+    .map((id) => parseInt(id))
+    .reduce((acc, index) => Math.max(acc, index + 1), 0);
+  return `@I${nextIndex}@`;
+}
+
+export function calculateNextSourceXref(
+  sources: Record<string, GedcomSource>,
+): string {
+  const nextIndex = Object.values(sources)
+    .map((source) => /^@S(\d+)@/.exec(source.xref))
+    .filter((match) => match != undefined)
+    .map((match) => match[1])
+    .filter((id) => id !== undefined)
+    .map((id) => parseInt(id))
+    .reduce((acc, index) => Math.max(acc, index + 1), 0);
+  return `@S${nextIndex}@`;
 }
 
 export interface AncestryDatabase {

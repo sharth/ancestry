@@ -1,7 +1,7 @@
 <form (submit)="submitForm()" class="vstack gap-3">
   <app-input-source
     [(ancestryDatabase)]="computedDatabase"
-    [xref]="xref()!"
+    [xref]="effectiveXref()"
   ></app-input-source>
 
   <h2>Gedcom Delta</h2>

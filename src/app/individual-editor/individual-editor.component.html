@@ -1,7 +1,7 @@
 <form (submit)="submitForm()" class="vstack gap-3">
   <app-input-individual
     [(ancestryDatabase)]="computedDatabase"
-    [xref]="xref()!"
+    [xref]="effectiveXref()"
     [open]="true"
   ></app-input-individual>
 

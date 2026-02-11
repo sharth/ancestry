@@ -40,6 +40,10 @@ export class SourceEditorComponent {
     },
   );
 
+  readonly effectiveXref = computed<string>(
+    () => this.xref() ?? this.ancestryService.nextSourceXref(),
+  );
+
   readonly differences = computed(() =>
     this.ancestryService
       .compareGedcomDatabase(this.computedDatabase())

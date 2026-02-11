@@ -40,6 +40,10 @@ export class IndividualEditorComponent {
     },
   );
 
+  readonly effectiveXref = computed<string>(
+    () => this.xref() ?? this.ancestryService.nextIndividualXref(),
+  );
+
   readonly differences = computed(() =>
     this.ancestryService
       .compareGedcomDatabase(this.computedDatabase())
