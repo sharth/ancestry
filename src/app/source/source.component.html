@@ -32,7 +32,11 @@
 
   <dialog #editDialog>
     @defer (when editDialog.open) {
-      <app-source-editor [xref]="xref()" (finished)="closeSourceEditor()" />
+      <app-gedcom-editor
+        type="SOUR"
+        [xref]="xref()"
+        (finished)="closeSourceEditor()"
+      />
     }
   </dialog>
 }

@@ -20,7 +20,7 @@
 
   <dialog #editDialog>
     @defer (when editDialog.open) {
-      <app-source-editor (finished)="editDialog.close()" />
+      <app-gedcom-editor type="SOUR" (finished)="editDialog.close()" />
     }
   </dialog>
 }

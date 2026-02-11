@@ -4,7 +4,7 @@ import {
   serializeGedcomIndividual,
 } from "../../gedcom/gedcomIndividual";
 import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
-import { IndividualEditorComponent } from "../individual-editor/individual-editor.component";
+import { GedcomEditorComponent } from "../gedcom-editor/gedcom-editor.component";
 import { IndividualAncestorsComponent } from "./individual-ancestors.component";
 import { IndividualEventsComponent } from "./individual-events.component";
 import { IndividualRelativesComponent } from "./individual-relatives.component";
@@ -21,7 +21,7 @@ import {
     IndividualRelativesComponent,
     IndividualAncestorsComponent,
     IndividualEventsComponent,
-    IndividualEditorComponent,
+    GedcomEditorComponent,
   ],
   templateUrl: "./individual.component.html",
   styleUrl: "./individual.component.css",

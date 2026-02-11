@@ -18,7 +18,11 @@
 
   <dialog #editDialog>
     @defer (when editDialog.open) {
-      <app-multimedia-editor [xref]="xref()" (finished)="editDialog.close()" />
+      <app-gedcom-editor
+        type="OBJE"
+        [xref]="xref()"
+        (finished)="editDialog.close()"
+      />
     }
   </dialog>
 }

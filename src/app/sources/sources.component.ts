@@ -1,5 +1,5 @@
 import type { AncestryDatabase } from "../../database/ancestry.service";
-import { SourceEditorComponent } from "../source-editor/source-editor.component";
+import { GedcomEditorComponent } from "../gedcom-editor/gedcom-editor.component";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -10,7 +10,7 @@ import { RouterLink } from "@angular/router";
 
 @Component({
   selector: "app-sources",
-  imports: [RouterLink, SourceEditorComponent],
+  imports: [RouterLink, GedcomEditorComponent],
   templateUrl: "./sources.component.html",
   styleUrl: "./sources.component.css",
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -28,7 +28,11 @@
 
   <dialog #editDialog>
     @defer (when editDialog.open) {
-      <app-individual-editor [xref]="xref()" (finished)="editDialog.close()" />
+      <app-gedcom-editor
+        type="INDI"
+        [xref]="xref()"
+        (finished)="editDialog.close()"
+      />
     }
   </dialog>
 }

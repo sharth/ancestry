@@ -1,7 +1,7 @@
 import type { AncestryDatabase } from "../../database/ancestry.service";
 import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
 import { serializeGedcomSource } from "../../gedcom/gedcomSource";
-import { SourceEditorComponent } from "../source-editor/source-editor.component";
+import { GedcomEditorComponent } from "../gedcom-editor/gedcom-editor.component";
 import { SourceCitationsComponent } from "./source-citations.component";
 import { SourceMultimediaComponent } from "./source-multimedia.component";
 import { SourceRepositoriesComponent } from "./source-repositories.component";
@@ -25,7 +25,7 @@ import { RouterModule } from "@angular/router";
     SourceCitationsComponent,
     SourceRepositoriesComponent,
     SourceMultimediaComponent,
-    SourceEditorComponent,
+    GedcomEditorComponent,
     SourceUnknownsComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,6 +1,8 @@
 import type { AncestryDatabase } from "../../database/ancestry.service";
 import { AncestryService } from "../../database/ancestry.service";
 import { InputIndividualComponent } from "../../forms/input-individual.component";
+import { InputMultimediaComponent } from "../../forms/input-multimedia.component";
+import { InputSourceComponent } from "../../forms/input-source.component";
 import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
 import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
 import {
@@ -15,18 +17,24 @@ import {
 import { ActivatedRoute, Router } from "@angular/router";
 
 @Component({
-  selector: "app-individual-editor",
-  imports: [InputIndividualComponent, GedcomDiffComponent],
-  templateUrl: "./individual-editor.component.html",
-  styleUrl: "./individual-editor.component.css",
+  selector: "app-gedcom-editor",
+  imports: [
+    InputIndividualComponent,
+    InputSourceComponent,
+    InputMultimediaComponent,
+    GedcomDiffComponent,
+  ],
+  templateUrl: "./gedcom-editor.component.html",
+  styleUrl: "./gedcom-editor.component.css",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class IndividualEditorComponent {
+export class GedcomEditorComponent {
   private readonly ancestryService = inject(AncestryService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
   readonly xref = input<string>();
+  readonly type = input.required<"INDI" | "SOUR" | "OBJE">();
   readonly finished = output();
 
   readonly computedDatabase = signal<AncestryDatabase>(
@@ -40,9 +48,19 @@ export class IndividualEditorComponent {
     },
   );
 
-  readonly effectiveXref = computed<string>(
-    () => this.xref() ?? this.ancestryService.nextIndividualXref(),
-  );
+  readonly effectiveXref = computed<string>(() => {
+    const xref = this.xref();
+    if (xref) return xref;
+
+    switch (this.type()) {
+      case "INDI":
+        return this.ancestryService.nextIndividualXref();
+      case "SOUR":
+        return this.ancestryService.nextSourceXref();
+      case "OBJE":
+        return this.ancestryService.nextMultimediaXref();
+    }
+  });
 
   readonly differences = computed(() =>
     this.ancestryService

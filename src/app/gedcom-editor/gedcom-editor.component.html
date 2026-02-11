@@ -1,0 +1,34 @@
+<form (submit)="submitForm()" class="vstack gap-3">
+  @switch (type()) {
+    @case ("INDI") {
+      <app-input-individual
+        [(ancestryDatabase)]="computedDatabase"
+        [xref]="effectiveXref()"
+        [open]="true"
+      ></app-input-individual>
+    }
+    @case ("SOUR") {
+      <app-input-source
+        [(ancestryDatabase)]="computedDatabase"
+        [xref]="effectiveXref()"
+      ></app-input-source>
+    }
+    @case ("OBJE") {
+      <app-input-multimedia
+        [(ancestryDatabase)]="computedDatabase"
+        [xref]="effectiveXref()"
+      ></app-input-multimedia>
+    }
+  }
+
+  <h2>Gedcom Delta</h2>
+  @for (r of differences(); track $index) {
+    <app-gedcom-diff
+      [oldGedcomRecord]="r.canonicalRecord"
+      [newGedcomRecord]="r.currentRecord"
+    ></app-gedcom-diff>
+  }
+
+  <input type="submit" />
+  <input type="button" value="Cancel" (click)="cancelForm()" />
+</form>

@@ -403,6 +403,10 @@ export class AncestryService {
   readonly nextSourceXref = computed<string>(() =>
     calculateNextSourceXref(this.ancestryDatabase()?.sources ?? {}),
   );
+
+  readonly nextMultimediaXref = computed<string>(() =>
+    calculateNextMultimediaXref(this.ancestryDatabase()?.multimedias ?? {}),
+  );
 }
 
 export function calculateNextIndividualXref(
@@ -429,6 +433,19 @@ export function calculateNextSourceXref(
     .map((id) => parseInt(id))
     .reduce((acc, index) => Math.max(acc, index + 1), 0);
   return `@S${nextIndex}@`;
+}
+
+export function calculateNextMultimediaXref(
+  multimedias: Record<string, GedcomMultimedia>,
+): string {
+  const nextIndex = Object.values(multimedias)
+    .map((multimedia) => /^@M(\d+)@/.exec(multimedia.xref))
+    .filter((match) => match != undefined)
+    .map((match) => match[1])
+    .filter((id) => id !== undefined)
+    .map((id) => parseInt(id))
+    .reduce((acc, index) => Math.max(acc, index + 1), 0);
+  return `@M${nextIndex}@`;
 }
 
 export interface AncestryDatabase {

@@ -1,5 +1,5 @@
 import type { AncestryDatabase } from "../../database/ancestry.service";
-import { MultimediaEditorComponent } from "../multimedia-editor/multimedia-editor.component";
+import { GedcomEditorComponent } from "../gedcom-editor/gedcom-editor.component";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -10,7 +10,7 @@ import { RouterLink } from "@angular/router";
 
 @Component({
   selector: "app-multimedias",
-  imports: [RouterLink, MultimediaEditorComponent],
+  imports: [RouterLink, GedcomEditorComponent],
   templateUrl: "./multimedias.component.html",
   styleUrl: "./multimedias.component.css",
   changeDetection: ChangeDetectionStrategy.OnPush,
