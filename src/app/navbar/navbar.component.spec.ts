@@ -3,14 +3,16 @@ import { NavbarComponent } from "./navbar.component";
 import type { ComponentFixture } from "@angular/core/testing";
 import { TestBed } from "@angular/core/testing";
 import { provideRouter } from "@angular/router";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("NavbarComponent", () => {
   let component: NavbarComponent;
   let fixture: ComponentFixture<NavbarComponent>;
-  let formattedAncestryService: AncestryService;
+  let ancestryService: AncestryService;
+  let clearDatabaseButton: HTMLInputElement;
 
   beforeEach(async () => {
+    vi.stubGlobal("location", { reload: vi.fn() });
     const spy = {
       openGedcom: vi.fn(),
       requestPermissions: vi.fn(),
@@ -25,10 +27,21 @@ describe("NavbarComponent", () => {
       ],
     }).compileComponents();
 
-    formattedAncestryService = TestBed.inject(AncestryService);
+    ancestryService = TestBed.inject(AncestryService);
     fixture = TestBed.createComponent(NavbarComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+
+    const clearDatabaseButtonOrNull = (
+      fixture.nativeElement as HTMLElement
+    ).querySelector("#clearDatabaseButton");
+    expect(clearDatabaseButtonOrNull).toBeTruthy();
+    expect(clearDatabaseButtonOrNull).toBeInstanceOf(HTMLInputElement);
+    clearDatabaseButton = clearDatabaseButtonOrNull as HTMLInputElement;
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   it("should create", () => {
@@ -36,36 +49,8 @@ describe("NavbarComponent", () => {
   });
 
   it("should call clearDatabase when Clear Database button is clicked", async () => {
-    // We added the button. Let's find it.
-    // It has class btn-outline-danger and value "Clear Database"
-    const buttons = fixture.nativeElement.querySelectorAll(
-      'input[type="button"]',
-    );
-    let clearButton;
-    for (let i = 0; i < buttons.length; i++) {
-      if (buttons[i].value === "Clear Database") {
-        clearButton = buttons[i];
-        break;
-      }
-    }
-    expect(clearButton).toBeTruthy();
-
-    // Determine if we can mock window.location.reload.
-    // It's hard to mock window.location in JSDom without setup.
-    // But we can check if service method is called.
-    // Since our implementation calls window.location.reload(), it might cause page reload in test env if not mocked?
-    // JSDom usually ignores reload or logs error.
-    // Let's spy on window.location.reload if possible.
-    // vi.spyOn(window.location, 'reload'); // This might fail if location is read-only.
-    // For now just check service call.
-
-    Object.defineProperty(window, "location", {
-      writable: true,
-      value: { reload: vi.fn() },
-    });
-
-    clearButton.click();
-    expect(formattedAncestryService.clearDatabase).toHaveBeenCalled();
+    clearDatabaseButton.click();
+    expect(ancestryService.clearDatabase).toHaveBeenCalled();
     await fixture.whenStable();
     expect(window.location.reload).toHaveBeenCalled();
   });
