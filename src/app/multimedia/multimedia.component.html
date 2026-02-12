@@ -16,13 +16,5 @@
     ></button>
   </div>
 
-  <dialog #editDialog>
-    @defer (when editDialog.open) {
-      <app-gedcom-editor
-        type="OBJE"
-        [xref]="xref()"
-        (finished)="editDialog.close()"
-      />
-    }
-  </dialog>
+  <app-gedcom-editor-dialog #editDialog type="OBJE" [xref]="xref()" />
 }

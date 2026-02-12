@@ -30,13 +30,5 @@
     ></button>
   </div>
 
-  <dialog #editDialog>
-    @defer (when editDialog.open) {
-      <app-gedcom-editor
-        type="SOUR"
-        [xref]="xref()"
-        (finished)="closeSourceEditor()"
-      />
-    }
-  </dialog>
+  <app-gedcom-editor-dialog #editDialog type="SOUR" [xref]="xref()" />
 }

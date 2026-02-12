@@ -18,9 +18,5 @@
     ></button>
   </div>
 
-  <dialog #editDialog>
-    @defer (when editDialog.open) {
-      <app-gedcom-editor type="SOUR" (finished)="editDialog.close()" />
-    }
-  </dialog>
+  <app-gedcom-editor-dialog #editDialog type="SOUR" />
 }

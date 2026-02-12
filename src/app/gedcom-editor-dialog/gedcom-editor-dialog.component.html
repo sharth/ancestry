@@ -1,0 +1,9 @@
+<dialog #editDialog>
+  @defer (when editDialog.open) {
+    <app-gedcom-editor
+      [type]="type()"
+      [xref]="xref()"
+      (finished)="editDialog.close()"
+    />
+  }
+</dialog>

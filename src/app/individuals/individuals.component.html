@@ -21,9 +21,5 @@
     ></button>
   </div>
 
-  <dialog #editDialog>
-    @defer (when editDialog.open) {
-      <app-gedcom-editor type="INDI" (finished)="editDialog.close()" />
-    }
-  </dialog>
+  <app-gedcom-editor-dialog #editDialog type="INDI" />
 }

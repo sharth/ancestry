@@ -1,7 +1,7 @@
 import type { AncestryDatabase } from "../../database/ancestry.service";
 import type { GedcomIndividual } from "../../gedcom/gedcomIndividual";
 import { fullname, surname } from "../../gedcom/gedcomIndividual";
-import { GedcomEditorComponent } from "../gedcom-editor/gedcom-editor.component";
+import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
 import { IndividualLinkComponent } from "../individual-link/individual-link.component";
 import {
   ChangeDetectionStrategy,
@@ -12,7 +12,7 @@ import {
 
 @Component({
   selector: "app-individuals",
-  imports: [IndividualLinkComponent, GedcomEditorComponent],
+  imports: [IndividualLinkComponent, GedcomEditorDialogComponent],
   templateUrl: "./individuals.component.html",
   styleUrl: "./individuals.component.css",
   changeDetection: ChangeDetectionStrategy.OnPush,

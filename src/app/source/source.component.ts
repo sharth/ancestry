@@ -1,12 +1,11 @@
 import type { AncestryDatabase } from "../../database/ancestry.service";
 import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
 import { serializeGedcomSource } from "../../gedcom/gedcomSource";
-import { GedcomEditorComponent } from "../gedcom-editor/gedcom-editor.component";
+import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
 import { SourceCitationsComponent } from "./source-citations.component";
 import { SourceMultimediaComponent } from "./source-multimedia.component";
 import { SourceRepositoriesComponent } from "./source-repositories.component";
 import { SourceUnknownsComponent } from "./source-unknowns.component";
-import type { ElementRef } from "@angular/core";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -25,7 +24,7 @@ import { RouterModule } from "@angular/router";
     SourceCitationsComponent,
     SourceRepositoriesComponent,
     SourceMultimediaComponent,
-    GedcomEditorComponent,
+    GedcomEditorDialogComponent,
     SourceUnknownsComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -49,13 +48,13 @@ export class SourceComponent {
   });
 
   readonly editDialog =
-    viewChild.required<ElementRef<HTMLDialogElement>>("editDialog");
+    viewChild.required<GedcomEditorDialogComponent>("editDialog");
 
   openSourceEditor() {
-    this.editDialog().nativeElement.showModal();
+    this.editDialog().showModal();
   }
 
   closeSourceEditor() {
-    this.editDialog().nativeElement.close();
+    // No longer needed as dialog closes itself on finished
   }
 }
