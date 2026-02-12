@@ -8,6 +8,7 @@
           <button
             class="btn btn-sm btn-outline-danger bi-trash"
             type="button"
+            aria-label="Remove repository link"
             (click)="removeCitation($index)"
           ></button>
           {{
@@ -26,9 +27,15 @@
         ></app-input-repository-call-number>
       </details>
     }
-    <div class="details-lookalike" (click)="appendCitation()">
+    <div
+      class="details-lookalike"
+      tabindex="0"
+      (click)="appendCitation()"
+      (keydown.enter)="appendCitation()"
+    >
       <button
         class="btn btn-sm btn-outline-primary bi-plus"
+        aria-label="Add repository link"
         (click)="$event.preventDefault()"
       ></button>
       Associate with another repository

@@ -1,5 +1,5 @@
 <div class="form-floating">
-  <select #focusTarget class="form-select" [formField]="form">
+  <select id="xref" #focusTarget class="form-select" [formField]="form">
     <option selected value="">Sources...</option>
     @for (source of sources(); track source.xref) {
       <option value="{{ source.xref }}">
@@ -11,5 +11,5 @@
       </option>
     }
   </select>
-  <label>Source</label>
+  <label for="xref">Source</label>
 </div>

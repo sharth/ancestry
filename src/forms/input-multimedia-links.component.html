@@ -7,6 +7,7 @@
           <button
             class="btn btn-sm btn-outline-danger bi-trash"
             type="button"
+            aria-label="Remove multimedia link"
             (click)="removeMultimediaLink($index)"
           ></button>
           {{
@@ -33,16 +34,23 @@
           <input
             class="form-control"
             type="text"
+            id="title_{{ $index }}"
             [formField]="multimediaLink.title"
           />
-          <label>Custom Title</label>
+          <label for="title_{{ $index }}">Custom Title</label>
         </div>
       </details>
     }
-    <div class="details-lookalike" (click)="appendMultimediaLink()">
+    <div
+      class="details-lookalike"
+      tabindex="0"
+      (click)="appendMultimediaLink()"
+      (keydown.enter)="appendMultimediaLink()"
+    >
       <button
         type="button"
         class="btn btn-sm btn-outline-primary bi-plus"
+        aria-label="Add multimedia"
         (click)="$event.preventDefault()"
       ></button>
       Append multimedia

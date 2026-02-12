@@ -7,6 +7,7 @@
           <button
             type="button"
             class="btn btn-sm btn-outline-danger bi-trash"
+            aria-label="Remove citation"
             (click)="removeCitation($index)"
           ></button>
           @let sourceXref = formGroup.sourceXref().value();
@@ -26,7 +27,7 @@
             id="page_{{ $index }}"
             [formField]="formGroup.page"
           />
-          <label for="`page_{{ $index }}`">Page</label>
+          <label for="page_{{ $index }}">Page</label>
         </div>
         <div class="form-floating">
           <input
@@ -34,7 +35,7 @@
             id="quality_{{ $index }}"
             [formField]="formGroup.quality"
           />
-          <label for="`quality_{{ $index }}`">Quality</label>
+          <label for="quality_{{ $index }}">Quality</label>
         </div>
         <div class="form-floating">
           <textarea
@@ -42,7 +43,7 @@
             id="text_{{ $index }}"
             [formField]="formGroup.text"
           ></textarea>
-          <label for="`text_{{ $index }}`">Text</label>
+          <label for="text_{{ $index }}">Text</label>
         </div>
         <app-input-multimedia-links
           [formField]="formGroup.multimediaLinks"
@@ -54,10 +55,16 @@
         ></app-input-notes>
       </details>
     }
-    <div class="details-lookalike" (click)="appendCitation()">
+    <div
+      class="details-lookalike"
+      tabindex="0"
+      (click)="appendCitation()"
+      (keydown.enter)="appendCitation()"
+    >
       <button
         type="button"
         class="btn btn-sm btn-outline-primary bi-plus"
+        aria-label="Add citation"
         (click)="$event.preventDefault()"
       ></button>
       Append another citation

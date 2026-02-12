@@ -7,6 +7,7 @@
           <button
             type="button"
             class="btn btn-sm btn-outline-danger bi-trash"
+            aria-label="Remove name"
             (click)="removeName($index)"
           ></button>
           {{ name.prefix().value() }}
@@ -70,10 +71,16 @@
         ></app-input-source-citations>
       </details>
     }
-    <div class="details-lookalike" (click)="appendName()">
+    <div
+      class="details-lookalike"
+      tabindex="0"
+      (click)="appendName()"
+      (keydown.enter)="appendName()"
+    >
       <button
         type="button"
         class="btn btn-sm btn-outline-primary bi-plus"
+        aria-label="Add name"
         (click)="$event.preventDefault()"
       ></button>
       Append another name

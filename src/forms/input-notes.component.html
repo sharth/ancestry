@@ -9,16 +9,18 @@
               <button
                 type="button"
                 class="btn btn-danger bi-trash"
+                aria-label="Remove note"
                 (click)="removeNote($index)"
               ></button>
             </td>
             <td class="form-floating">
               <textarea
                 #focusTarget
+                id="note_{{ $index }}"
                 class="form-control"
                 [formField]="note.text"
               ></textarea>
-              <label>Text</label>
+              <label for="note_{{ $index }}">Text</label>
             </td>
           </tr>
         }
@@ -29,6 +31,7 @@
             <button
               type="button"
               class="btn btn-outline-primary bi-plus"
+              aria-label="Add note"
               (click)="appendNote()"
             ></button>
           </th>

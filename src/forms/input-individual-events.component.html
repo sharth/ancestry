@@ -6,6 +6,7 @@
         <button
           type="button"
           class="btn btn-sm btn-outline-danger bi-trash"
+          aria-label="Remove event"
           (click)="removeEvent($index)"
         ></button>
         {{ event.tag().value() }}
@@ -88,10 +89,16 @@
     </details>
   }
 
-  <div class="details-lookalike" (click)="appendEvent()">
+  <div
+    class="details-lookalike"
+    tabindex="0"
+    (click)="appendEvent()"
+    (keydown.enter)="appendEvent()"
+  >
     <button
       type="button"
       class="btn btn-sm btn-outline-primary bi-plus"
+      aria-label="Add event"
       (click)="$event.preventDefault()"
     ></button>
     Append another event

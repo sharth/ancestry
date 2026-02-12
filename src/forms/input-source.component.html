@@ -1,16 +1,28 @@
 <div class="form-floating">
-  <textarea class="form-control h-auto" [formField]="form.abbr"></textarea>
-  <label>Short Title</label>
+  <textarea
+    id="abbr"
+    class="form-control h-auto"
+    [formField]="form.abbr"
+  ></textarea>
+  <label for="abbr">Short Title</label>
 </div>
 
 <div class="form-floating">
-  <textarea class="form-control h-auto" [formField]="form.title"></textarea>
-  <label>Title</label>
+  <textarea
+    id="title"
+    class="form-control h-auto"
+    [formField]="form.title"
+  ></textarea>
+  <label for="title">Title</label>
 </div>
 
 <div class="form-floating">
-  <textarea class="form-control h-auto" [formField]="form.text"></textarea>
-  <label>Text</label>
+  <textarea
+    id="text"
+    class="form-control h-auto"
+    [formField]="form.text"
+  ></textarea>
+  <label for="text">Text</label>
 </div>
 
 <app-input-repository-links

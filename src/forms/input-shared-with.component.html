@@ -8,6 +8,7 @@
           <button
             type="button"
             class="btn btn-sm btn-outline-danger bi-trash"
+            aria-label="Remove shared citation"
             (click)="removeSharedEvent($index)"
           ></button>
         </summary>
@@ -26,10 +27,16 @@
         </div>
       </details>
     }
-    <div class="details-lookalike" (click)="appendSharedEvent()">
+    <div
+      class="details-lookalike"
+      tabindex="0"
+      (click)="appendSharedEvent()"
+      (keydown.enter)="appendSharedEvent()"
+    >
       <button
         type="button"
         class="btn btn-sm btn-outline-primary bi-plus"
+        aria-label="Add shared citation"
         (click)="$event.preventDefault()"
       ></button>
       Share event with another individual
