@@ -8,6 +8,30 @@
   <h2>Media Type</h2>
   <pre>{{ vm.multimedia.mediaType }}</pre>
 
+  @if (fileResource.value(); as fileData) {
+    @if (fileData.fileUrl) {
+      <h2>Preview</h2>
+      @if (fileData.mediaType.startsWith("image/")) {
+        <img
+          [src]="fileData.fileUrl"
+          [alt]="vm.multimedia.filePath"
+          class="img-fluid"
+        />
+      } @else if (fileData.mediaType === "application/pdf") {
+        <iframe
+          [src]="fileData.fileUrl"
+          class="w-100"
+          style="height: 600px"
+        ></iframe>
+      } @else {
+        <p>
+          Preview not available for this file type.
+          <a [href]="fileData.fileUrl" download>Download file</a>
+        </p>
+      }
+    }
+  }
+
   <div class="position-fixed bottom-0 end-0 rounded-circle m-5">
     <button
       type="button"
