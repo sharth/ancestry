@@ -395,57 +395,6 @@ export class AncestryService {
 
     this.gedcomResource.reload();
   }
-
-  readonly nextIndividualXref = computed<string>(() =>
-    calculateNextIndividualXref(this.ancestryDatabase()?.individuals ?? {}),
-  );
-
-  readonly nextSourceXref = computed<string>(() =>
-    calculateNextSourceXref(this.ancestryDatabase()?.sources ?? {}),
-  );
-
-  readonly nextMultimediaXref = computed<string>(() =>
-    calculateNextMultimediaXref(this.ancestryDatabase()?.multimedias ?? {}),
-  );
-}
-
-export function calculateNextIndividualXref(
-  individuals: Record<string, GedcomIndividual>,
-): string {
-  const nextIndex = Object.values(individuals)
-    .map((individual) => /^@I(\d+)@/.exec(individual.xref))
-    .filter((match) => match != undefined)
-    .map((match) => match[1])
-    .filter((id) => id !== undefined)
-    .map((id) => parseInt(id))
-    .reduce((acc, index) => Math.max(acc, index + 1), 0);
-  return `@I${nextIndex}@`;
-}
-
-export function calculateNextSourceXref(
-  sources: Record<string, GedcomSource>,
-): string {
-  const nextIndex = Object.values(sources)
-    .map((source) => /^@S(\d+)@/.exec(source.xref))
-    .filter((match) => match != undefined)
-    .map((match) => match[1])
-    .filter((id) => id !== undefined)
-    .map((id) => parseInt(id))
-    .reduce((acc, index) => Math.max(acc, index + 1), 0);
-  return `@S${nextIndex}@`;
-}
-
-export function calculateNextMultimediaXref(
-  multimedias: Record<string, GedcomMultimedia>,
-): string {
-  const nextIndex = Object.values(multimedias)
-    .map((multimedia) => /^@M(\d+)@/.exec(multimedia.xref))
-    .filter((match) => match != undefined)
-    .map((match) => match[1])
-    .filter((id) => id !== undefined)
-    .map((id) => parseInt(id))
-    .reduce((acc, index) => Math.max(acc, index + 1), 0);
-  return `@M${nextIndex}@`;
 }
 
 export interface AncestryDatabase {

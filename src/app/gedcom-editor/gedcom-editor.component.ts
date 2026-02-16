@@ -3,7 +3,10 @@ import { AncestryService } from "../../database/ancestry.service";
 import { InputIndividualComponent } from "../../forms/input-individual.component";
 import { InputMultimediaComponent } from "../../forms/input-multimedia.component";
 import { InputSourceComponent } from "../../forms/input-source.component";
+import type { GedcomIndividual } from "../../gedcom/gedcomIndividual";
+import type { GedcomMultimedia } from "../../gedcom/gedcomMultimedia";
 import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
+import type { GedcomSource } from "../../gedcom/gedcomSource";
 import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
 import {
   ChangeDetectionStrategy,
@@ -52,13 +55,14 @@ export class GedcomEditorComponent {
     const xref = this.xref();
     if (xref) return xref;
 
+    const database = this.computedDatabase();
     switch (this.type()) {
       case "INDI":
-        return this.ancestryService.nextIndividualXref();
+        return calculateNextIndividualXref(database.individuals);
       case "SOUR":
-        return this.ancestryService.nextSourceXref();
+        return calculateNextSourceXref(database.sources);
       case "OBJE":
-        return this.ancestryService.nextMultimediaXref();
+        return calculateNextMultimediaXref(database.multimedias);
     }
   });
 
@@ -88,4 +92,43 @@ export class GedcomEditorComponent {
   cancelForm() {
     this.finished.emit();
   }
+}
+
+export function calculateNextIndividualXref(
+  individuals: Record<string, GedcomIndividual>,
+): string {
+  const nextIndex = Object.values(individuals)
+    .map((individual) => /^@I(\d+)@/.exec(individual.xref))
+    .filter((match) => match != undefined)
+    .map((match) => match[1])
+    .filter((id) => id !== undefined)
+    .map((id) => parseInt(id))
+    .reduce((acc, index) => Math.max(acc, index + 1), 0);
+  return `@I${nextIndex}@`;
+}
+
+export function calculateNextSourceXref(
+  sources: Record<string, GedcomSource>,
+): string {
+  const nextIndex = Object.values(sources)
+    .map((source) => /^@S(\d+)@/.exec(source.xref))
+    .filter((match) => match != undefined)
+    .map((match) => match[1])
+    .filter((id) => id !== undefined)
+    .map((id) => parseInt(id))
+    .reduce((acc, index) => Math.max(acc, index + 1), 0);
+  return `@S${nextIndex}@`;
+}
+
+export function calculateNextMultimediaXref(
+  multimedias: Record<string, GedcomMultimedia>,
+): string {
+  const nextIndex = Object.values(multimedias)
+    .map((multimedia) => /^@M(\d+)@/.exec(multimedia.xref))
+    .filter((match) => match != undefined)
+    .map((match) => match[1])
+    .filter((id) => id !== undefined)
+    .map((id) => parseInt(id))
+    .reduce((acc, index) => Math.max(acc, index + 1), 0);
+  return `@M${nextIndex}@`;
 }

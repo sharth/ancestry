@@ -1,10 +1,11 @@
 import {
   calculateNextIndividualXref,
+  calculateNextMultimediaXref,
   calculateNextSourceXref,
-} from "./ancestry.service";
+} from "./gedcom-editor.component";
 import { describe, expect, it } from "vitest";
 
-describe("AncestryService helpers", () => {
+describe("GedcomEditorComponent helpers", () => {
   describe("calculateNextIndividualXref", () => {
     it("should return @I0@ for an empty database", () => {
       expect(calculateNextIndividualXref({})).toBe("@I0@");
@@ -41,6 +42,30 @@ describe("AncestryService helpers", () => {
       };
       // @ts-expect-error - Partial mock
       expect(calculateNextSourceXref(sources)).toBe("@S11@");
+    });
+  });
+
+  describe("calculateNextMultimediaXref", () => {
+    it("should return @M0@ for an empty database", () => {
+      expect(calculateNextMultimediaXref({})).toBe("@M0@");
+    });
+
+    it("should return the next available index", () => {
+      const multimedias = {
+        "@M1@": { xref: "@M1@" },
+        "@M3@": { xref: "@M3@" },
+      };
+      // @ts-expect-error - Partial mock
+      expect(calculateNextMultimediaXref(multimedias)).toBe("@M4@");
+    });
+
+    it("should handle non-conforming xrefs by ignoring them", () => {
+      const multimedias = {
+        "@M1@": { xref: "@M1@" },
+        OTHER: { xref: "OTHER" },
+      };
+      // @ts-expect-error - Partial mock
+      expect(calculateNextMultimediaXref(multimedias)).toBe("@M2@");
     });
   });
 });
