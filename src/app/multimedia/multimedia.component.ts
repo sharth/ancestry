@@ -34,10 +34,7 @@ export class MultimediaComponent {
     return { multimedia };
   });
 
-  readonly fileResource: ResourceRef<{
-    fileUrl: string | undefined;
-    mediaType: string | undefined;
-  }> = resource({
+  readonly fileResource = resource({
     params: () => {
       const vm = this.vm();
       if (!vm?.multimedia.filePath) {
