@@ -1,10 +1,16 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
+import type { GedcomChangeDate } from "./gedcomChangeDate";
+import {
+  parseGedcomChangeDate,
+  serializeGedcomChangeDate,
+} from "./gedcomChangeDate";
 import type { GedcomRecord } from "./gedcomRecord";
 
 export interface GedcomMultimedia {
   xref: string;
   filePath: string;
   mediaType: string;
+  changeDate?: GedcomChangeDate;
 }
 
 export function parseGedcomMultimedia(record: GedcomRecord): GedcomMultimedia {
@@ -42,6 +48,11 @@ export function parseGedcomMultimedia(record: GedcomRecord): GedcomMultimedia {
           }
         }
         break;
+      case "CHAN":
+        if (gedcomMultimedia.changeDate)
+          throw new Error("Multiple change dates are not allowed");
+        gedcomMultimedia.changeDate = parseGedcomChangeDate(childRecord);
+        break;
       default:
         reportUnparsedRecord(childRecord);
         break;
@@ -75,6 +86,11 @@ export function serializeGedcomMultimedia(
           },
         ].filter((record) => record.value || record.children.length),
       },
-    ].filter((record) => record.value || record.children.length),
+      gedcomMultimedia.changeDate
+        ? serializeGedcomChangeDate(gedcomMultimedia.changeDate)
+        : undefined,
+    ]
+      .filter((record) => record != undefined)
+      .filter((record) => record.value || record.children.length),
   };
 }

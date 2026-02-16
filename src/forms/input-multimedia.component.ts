@@ -1,5 +1,6 @@
 import type { AncestryDatabase } from "../database/ancestry.service";
 import { AncestryService } from "../database/ancestry.service";
+import type { GedcomDate } from "../gedcom/gedcomDate";
 import type { GedcomMultimedia } from "../gedcom/gedcomMultimedia";
 import type { OnInit } from "@angular/core";
 import {
@@ -33,7 +34,15 @@ export class InputMultimediaComponent implements OnInit {
   readonly form = form(this.multimedia);
 
   readonly updateAngularDatabase = effect(() => {
-    const multimedia = this.multimedia();
+    const now: GedcomDate = {
+      value: new Date()
+        .toLocaleString("en-gb", { dateStyle: "medium" })
+        .toLocaleUpperCase(),
+    };
+    const multimedia = {
+      ...this.multimedia(),
+      changeDate: { date: now },
+    };
     if (multimedia.xref !== "") {
       this.ancestryDatabase.update((ancestryDatabase) => ({
         ...ancestryDatabase,

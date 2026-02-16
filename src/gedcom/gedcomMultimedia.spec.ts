@@ -11,13 +11,30 @@ describe("gedcomMultimedia", () => {
     abstag: "OBJE",
     xref: "@M1@",
     value: "",
-    children: [],
+    children: [
+      {
+        tag: "CHAN",
+        abstag: "",
+        xref: "",
+        value: "",
+        children: [
+          {
+            tag: "DATE",
+            abstag: "",
+            xref: "",
+            value: "1 JAN 2020",
+            children: [],
+          },
+        ],
+      },
+    ],
   };
   it("parser", () => {
     expect(parseGedcomMultimedia(gedcomRecord)).toEqual({
       xref: "@M1@",
       filePath: "",
       mediaType: "",
+      changeDate: { date: { value: "1 JAN 2020" } },
     });
   });
   it("serializer", () => {
