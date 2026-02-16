@@ -1,10 +1,12 @@
 import type { AncestryDatabase } from "../database/ancestry.service";
+import { AncestryService } from "../database/ancestry.service";
 import type { GedcomMultimedia } from "../gedcom/gedcomMultimedia";
 import type { OnInit } from "@angular/core";
 import {
   ChangeDetectionStrategy,
   Component,
   effect,
+  inject,
   input,
   model,
   signal,
@@ -19,6 +21,7 @@ import { FormField, form } from "@angular/forms/signals";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputMultimediaComponent implements OnInit {
+  readonly ancestryService = inject(AncestryService);
   readonly ancestryDatabase = model.required<AncestryDatabase>();
   readonly xref = input.required<string>();
 
@@ -50,5 +53,34 @@ export class InputMultimediaComponent implements OnInit {
         mediaType: "",
       },
     );
+  }
+
+  async browseFile() {
+    try {
+      const [fileHandle] = await window.showOpenFilePicker({
+        id: "multimedia",
+        startIn: this.ancestryService.gedcomResource.value()?.directoryHandle,
+      });
+      const file = await fileHandle.getFile();
+      const relativePath = await this.ancestryService.gedcomResource
+        .value()
+        ?.directoryHandle?.resolve(fileHandle);
+
+      if (!relativePath) {
+        alert("File must be inside the multimedia directory");
+        return;
+      }
+
+      this.multimedia.update((m) => ({
+        ...m,
+        filePath: relativePath.join("/"),
+        mediaType: file.type,
+      }));
+    } catch (e) {
+      // User cancelled or error
+      if ((e as Error).name !== "AbortError") {
+        console.error(e);
+      }
+    }
   }
 }
