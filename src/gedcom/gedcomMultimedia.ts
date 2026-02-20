@@ -10,6 +10,7 @@ export interface GedcomMultimedia {
   xref: string;
   filePath: string;
   mediaType: string;
+  title: string;
   changeDate?: GedcomChangeDate;
 }
 
@@ -22,6 +23,7 @@ export function parseGedcomMultimedia(record: GedcomRecord): GedcomMultimedia {
     xref: record.xref,
     filePath: "",
     mediaType: "",
+    title: "",
   };
 
   for (const childRecord of record.children) {
@@ -40,6 +42,14 @@ export function parseGedcomMultimedia(record: GedcomRecord): GedcomMultimedia {
               if (gedcomMultimedia.mediaType != "")
                 throw new Error("Multiple mediaTypes are not allowed");
               gedcomMultimedia.mediaType = grandchildRecord.value;
+              grandchildRecord.children.forEach(reportUnparsedRecord);
+              break;
+            case "TITL":
+              if (grandchildRecord.xref != "") throw new Error();
+              if (grandchildRecord.value == "") throw new Error();
+              if (gedcomMultimedia.title)
+                throw new Error("Multiple titles are not allowed");
+              gedcomMultimedia.title = grandchildRecord.value;
               grandchildRecord.children.forEach(reportUnparsedRecord);
               break;
             default:
@@ -82,6 +92,13 @@ export function serializeGedcomMultimedia(
             abstag: "OBJE.FILE.FORM",
             xref: "",
             value: gedcomMultimedia.mediaType,
+            children: [],
+          },
+          {
+            tag: "TITL",
+            abstag: "OBJE.FILE.TITL",
+            xref: "",
+            value: gedcomMultimedia.title,
             children: [],
           },
         ].filter((record) => record.value || record.children.length),

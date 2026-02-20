@@ -30,6 +30,7 @@ export class InputMultimediaComponent implements OnInit {
     xref: "",
     filePath: "",
     mediaType: "",
+    title: "",
   });
   readonly form = form(this.multimedia);
 
@@ -60,6 +61,7 @@ export class InputMultimediaComponent implements OnInit {
         xref: this.xref(),
         filePath: "",
         mediaType: "",
+        title: "",
       },
     );
   }

@@ -4,7 +4,7 @@
     @for (multimedia of vm.multimedias; track multimedia.xref) {
       <li>
         <a routerLink="/multimedia/{{ multimedia.xref }}">
-          {{ multimedia.filePath || multimedia.xref }}
+          {{ multimedia.title || multimedia.filePath || multimedia.xref }}
         </a>
       </li>
     }
