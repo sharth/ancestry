@@ -31,8 +31,8 @@ export class SourceMultimediaComponent {
 
     return {
       multimediaLinks: source.multimediaLinks.map((multimediaLink) => ({
-        ...ancestry.multimedias[multimediaLink.xref],
-        xref: this.xref(),
+        multimedia: ancestry.multimedias[multimediaLink.xref],
+        xref: multimediaLink.xref,
         title: multimediaLink.title,
       })),
     };
