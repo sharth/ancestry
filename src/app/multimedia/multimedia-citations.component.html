@@ -1,0 +1,37 @@
+@if (vm(); as vm) {
+  @let displayedColumns = ["context", "event", "citation"];
+  <mat-table [dataSource]="vm.citations">
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+
+    <ng-container matColumnDef="context">
+      <mat-header-cell *matHeaderCellDef>Context</mat-header-cell>
+      <mat-cell *matCellDef="let citation">
+        @if (citation.type === "Individual") {
+          Individual: <app-individual-link [xref]="citation.individual.xref" />
+        } @else if (citation.type === "Family") {
+          Family:
+          <a [routerLink]="['/family', citation.family.xref]">{{
+            citation.family.xref
+          }}</a>
+        }
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="event">
+      <mat-header-cell *matHeaderCellDef>Event</mat-header-cell>
+      <mat-cell *matCellDef="let citation">
+        {{ citation.event }}
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="citation">
+      <mat-header-cell *matHeaderCellDef>Citation</mat-header-cell>
+      <mat-cell *matCellDef="let citation">
+        <a [routerLink]="['/source', citation.citation.sourceXref]">{{
+          citation.citation.text || citation.citation.sourceXref
+        }}</a>
+      </mat-cell>
+    </ng-container>
+  </mat-table>
+}

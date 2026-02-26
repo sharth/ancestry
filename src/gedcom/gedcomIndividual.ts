@@ -16,6 +16,7 @@ import {
 import type { GedcomRecord } from "./gedcomRecord";
 import type { GedcomSex } from "./gedcomSex";
 import { parseGedcomSex, serializeGedcomSex } from "./gedcomSex";
+import type { GedcomSourceCitation } from "./gedcomSourceCitation";
 
 export interface GedcomIndividual {
   xref: string;
@@ -177,4 +178,39 @@ export function serializeGedcomIndividual(
       ),
     ].filter((record) => record != null),
   };
+}
+
+export function getIndividualMultimediaCitations(
+  individual: GedcomIndividual,
+  multimediaXref: string,
+): { event: string; citation: GedcomSourceCitation }[] {
+  const references: { event: string; citation: GedcomSourceCitation }[] = [];
+
+  for (const event of individual.events) {
+    for (const citation of event.citations) {
+      if (
+        citation.multimediaLinks.some((link) => link.xref === multimediaXref)
+      ) {
+        references.push({ event: event.tag, citation });
+      }
+    }
+  }
+
+  for (const citation of individual.sex.citations) {
+    if (citation.multimediaLinks.some((link) => link.xref === multimediaXref)) {
+      references.push({ event: "SEX", citation });
+    }
+  }
+
+  for (const name of individual.names) {
+    for (const citation of name.citations) {
+      if (
+        citation.multimediaLinks.some((link) => link.xref === multimediaXref)
+      ) {
+        references.push({ event: "NAME", citation });
+      }
+    }
+  }
+
+  return references;
 }

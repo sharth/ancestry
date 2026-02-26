@@ -1,6 +1,7 @@
 import type { AncestryDatabase } from "../../database/ancestry.service";
 import { AncestryService } from "../../database/ancestry.service";
 import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
+import { MultimediaCitationsComponent } from "./multimedia-citations.component";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -9,12 +10,15 @@ import {
   input,
   resource,
 } from "@angular/core";
-import type { ResourceRef } from "@angular/core";
 import { RouterModule } from "@angular/router";
 
 @Component({
   selector: "app-multimedia",
-  imports: [RouterModule, GedcomEditorDialogComponent],
+  imports: [
+    RouterModule,
+    GedcomEditorDialogComponent,
+    MultimediaCitationsComponent,
+  ],
   templateUrl: "./multimedia.component.html",
   styleUrl: "./multimedia.component.css",
   changeDetection: ChangeDetectionStrategy.OnPush,

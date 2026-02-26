@@ -107,3 +107,28 @@ export function serializeGedcomFamily(
     ].filter((record) => record.children.length || record.value),
   };
 }
+
+export function getFamilyMultimediaCitations(
+  family: GedcomFamily,
+  multimediaXref: string,
+): { event: string; citation: GedcomSourceCitation }[] {
+  const references: { event: string; citation: GedcomSourceCitation }[] = [];
+
+  for (const event of family.events) {
+    for (const citation of event.citations) {
+      if (
+        citation.multimediaLinks.some((link) => link.xref === multimediaXref)
+      ) {
+        references.push({ event: event.tag, citation });
+      }
+    }
+  }
+
+  for (const citation of family.citations) {
+    if (citation.multimediaLinks.some((link) => link.xref === multimediaXref)) {
+      references.push({ event: "FAM", citation });
+    }
+  }
+
+  return references;
+}
