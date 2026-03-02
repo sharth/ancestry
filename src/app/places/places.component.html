@@ -1,0 +1,53 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <h2>Places</h2>
+
+      @for (place of places(); track place.name) {
+        <div class="card my-3">
+          <div class="card-header bg-light">
+            <h4 class="mb-0">{{ place.name }}</h4>
+          </div>
+          <ul class="list-group list-group-flush">
+            @for (address of place.addresses; track address.name) {
+              <li class="list-group-item">
+                <h5 class="mt-2">{{ address.name }}</h5>
+                <div class="table-responsive">
+                  <table class="table table-sm table-striped ml-3">
+                    <thead>
+                      <tr>
+                        <th>Event</th>
+                        <th>Date</th>
+                        <th>Person / Family</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (event of address.events; track $index) {
+                        <tr>
+                          <td>{{ event.eventType }}</td>
+                          <td>{{ event.date }}</td>
+                          <td>
+                            @if (event.isFamily) {
+                              <span>{{ event.linkName }}</span>
+                            } @else {
+                              <a
+                                [routerLink]="['/individual', event.linkXref]"
+                                >{{ event.linkName }}</a
+                              >
+                            }
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </li>
+            }
+          </ul>
+        </div>
+      } @empty {
+        <p>No places found.</p>
+      }
+    </div>
+  </div>
+</div>

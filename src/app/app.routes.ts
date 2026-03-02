@@ -6,6 +6,7 @@ import { IndividualsComponent } from "./individuals/individuals.component";
 import { MultimediaComponent } from "./multimedia/multimedia.component";
 import { MultimediasComponent } from "./multimedias/multimedias.component";
 import { PageNotFoundComponent } from "./page-not-found/page-not-found.component";
+import { PlacesComponent } from "./places/places.component";
 import { RepositoriesComponent } from "./repositories/repositories.component";
 import { RepositoryComponent } from "./repository/repository.component";
 import { SourceComponent } from "./source/source.component";
@@ -51,6 +52,11 @@ export const routes: Routes = [
   {
     path: "source/:xref",
     component: SourceComponent,
+    resolve: { ancestryDatabase: ancestryDatabaseResolver },
+  },
+  {
+    path: "places",
+    component: PlacesComponent,
     resolve: { ancestryDatabase: ancestryDatabaseResolver },
   },
   {
