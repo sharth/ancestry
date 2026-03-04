@@ -6,10 +6,11 @@ import {
   input,
 } from "@angular/core";
 import { RouterLink } from "@angular/router";
+import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
 
 @Component({
   selector: "app-repositories",
-  imports: [RouterLink],
+  imports: [RouterLink, GedcomEditorDialogComponent],
   templateUrl: "./repositories.component.html",
   styleUrl: "./repositories.component.css",
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -19,7 +19,7 @@ import type { ElementRef } from "@angular/core";
 export class GedcomEditorDialogComponent {
   private readonly cdr = inject(ChangeDetectorRef);
   readonly xref = input<string>();
-  readonly type = input.required<"INDI" | "SOUR" | "OBJE">();
+  readonly type = input.required<"INDI" | "SOUR" | "OBJE" | "REPO">();
 
   readonly editDialog =
     viewChild.required<ElementRef<HTMLDialogElement>>("editDialog");

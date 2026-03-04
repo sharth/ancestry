@@ -2,10 +2,12 @@ import type { AncestryDatabase } from "../../database/ancestry.service";
 import { AncestryService } from "../../database/ancestry.service";
 import { InputIndividualComponent } from "../../forms/input-individual.component";
 import { InputMultimediaComponent } from "../../forms/input-multimedia.component";
+import { InputRepositoryComponent } from "../../forms/input-repository.component";
 import { InputSourceComponent } from "../../forms/input-source.component";
 import type { GedcomIndividual } from "../../gedcom/gedcomIndividual";
 import type { GedcomMultimedia } from "../../gedcom/gedcomMultimedia";
 import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
+import type { GedcomRepository } from "../../gedcom/gedcomRepository";
 import type { GedcomSource } from "../../gedcom/gedcomSource";
 import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
 import {
@@ -25,6 +27,7 @@ import { ActivatedRoute, Router } from "@angular/router";
     InputIndividualComponent,
     InputSourceComponent,
     InputMultimediaComponent,
+    InputRepositoryComponent,
     GedcomDiffComponent,
   ],
   templateUrl: "./gedcom-editor.component.html",
@@ -37,7 +40,7 @@ export class GedcomEditorComponent {
   private readonly route = inject(ActivatedRoute);
 
   readonly xref = input<string>();
-  readonly type = input.required<"INDI" | "SOUR" | "OBJE">();
+  readonly type = input.required<"INDI" | "SOUR" | "OBJE" | "REPO">();
   readonly finished = output();
 
   readonly computedDatabase = signal<AncestryDatabase>(
@@ -63,6 +66,8 @@ export class GedcomEditorComponent {
         return calculateNextSourceXref(database.sources);
       case "OBJE":
         return calculateNextMultimediaXref(database.multimedias);
+      case "REPO":
+        return calculateNextRepositoryXref(database.repositories);
     }
   });
 
@@ -131,4 +136,17 @@ export function calculateNextMultimediaXref(
     .map((id) => parseInt(id))
     .reduce((acc, index) => Math.max(acc, index + 1), 0);
   return `@M${nextIndex}@`;
+}
+
+export function calculateNextRepositoryXref(
+  repositories: Record<string, GedcomRepository>,
+): string {
+  const nextIndex = Object.values(repositories)
+    .map((repository) => /^@R(\d+)@/.exec(repository.xref))
+    .filter((match) => match != undefined)
+    .map((match) => match[1])
+    .filter((id) => id !== undefined)
+    .map((id) => parseInt(id))
+    .reduce((acc, index) => Math.max(acc, index + 1), 0);
+  return `@R${nextIndex}@`;
 }

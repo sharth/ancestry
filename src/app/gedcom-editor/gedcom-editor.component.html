@@ -19,6 +19,12 @@
         [xref]="effectiveXref()"
       ></app-input-multimedia>
     }
+    @case ("REPO") {
+      <app-input-repository
+        [(ancestryDatabase)]="computedDatabase"
+        [xref]="effectiveXref()"
+      ></app-input-repository>
+    }
   }
 
   <h2>Gedcom Delta</h2>
