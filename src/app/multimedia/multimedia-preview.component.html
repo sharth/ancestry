@@ -1,0 +1,18 @@
+@if (fileResource.value(); as fileData) {
+  @if (fileData.fileUrl) {
+    @if (fileData.mediaType.startsWith("image/")) {
+      <img [src]="fileData.fileUrl" [alt]="filePath()" class="img-fluid" />
+    } @else if (fileData.mediaType === "application/pdf") {
+      <iframe
+        [src]="fileData.fileUrl"
+        class="w-100"
+        style="height: 600px"
+      ></iframe>
+    } @else {
+      <p>
+        Preview not available for this file type.
+        <a [href]="fileData.fileUrl" download>Download file</a>
+      </p>
+    }
+  }
+}
