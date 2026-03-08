@@ -8,7 +8,10 @@ import type { ElementRef, QueryList } from "@angular/core";
 import {
   ChangeDetectionStrategy,
   Component,
+  Injector,
   ViewChildren,
+  afterNextRender,
+  inject,
   input,
   model,
 } from "@angular/core";
@@ -30,6 +33,8 @@ import { FormField, form } from "@angular/forms/signals";
 export class InputIndividualEventsComponent implements FormValueControl<
   GedcomEvent[]
 > {
+  private readonly _injector = inject(Injector);
+
   readonly ancestryDatabase = model.required<AncestryDatabase>();
 
   readonly open = input<boolean>(false);
@@ -58,9 +63,14 @@ export class InputIndividualEventsComponent implements FormValueControl<
         notes: [],
       },
     ]);
-    setTimeout(() => {
-      this.focusTargets.last.nativeElement.focus();
-    });
+    afterNextRender(
+      {
+        read: () => {
+          this.focusTargets.last.nativeElement.focus();
+        },
+      },
+      { injector: this._injector },
+    );
   }
 
   removeEvent(index: number) {
