@@ -167,6 +167,7 @@ describe("GedcomEditorComponent Integration", () => {
 
     fixture = TestBed.createComponent(GedcomEditorComponent);
     fixture.componentRef.setInput("type", "INDI");
+    fixture.componentRef.setInput("ancestryDatabase", initialDatabase);
     fixture.detectChanges();
   });
 

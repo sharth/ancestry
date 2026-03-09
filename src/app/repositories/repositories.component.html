@@ -19,5 +19,9 @@
     ></button>
   </div>
 
-  <app-gedcom-editor-dialog #editDialog type="REPO" />
+  <app-gedcom-editor-dialog
+    #editDialog
+    type="REPO"
+    [ancestryDatabase]="ancestryDatabase()"
+  />
 }

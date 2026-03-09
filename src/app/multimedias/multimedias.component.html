@@ -19,5 +19,9 @@
     ></button>
   </div>
 
-  <app-gedcom-editor-dialog #editDialog type="OBJE" />
+  <app-gedcom-editor-dialog
+    #editDialog
+    type="OBJE"
+    [ancestryDatabase]="ancestryDatabase()"
+  />
 }

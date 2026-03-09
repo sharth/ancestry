@@ -27,5 +27,10 @@
     ></button>
   </div>
 
-  <app-gedcom-editor-dialog #editDialog type="INDI" [xref]="xref()" />
+  <app-gedcom-editor-dialog
+    #editDialog
+    type="INDI"
+    [xref]="xref()"
+    [ancestryDatabase]="ancestryDatabase()"
+  />
 }

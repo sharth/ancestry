@@ -16,8 +16,8 @@ import {
   computed,
   inject,
   input,
+  linkedSignal,
   output,
-  signal,
 } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 
@@ -41,24 +41,18 @@ export class GedcomEditorComponent {
 
   readonly xref = input<string>();
   readonly type = input.required<"INDI" | "SOUR" | "OBJE" | "REPO">();
+  readonly ancestryDatabase = input.required<AncestryDatabase>();
   readonly finished = output();
 
-  readonly computedDatabase = signal<AncestryDatabase>(
-    this.ancestryService.ancestryDatabase() ?? {
-      individuals: {},
-      families: {},
-      sources: {},
-      multimedias: {},
-      submitters: {},
-      repositories: {},
-    },
+  readonly computedDatabase = linkedSignal<AncestryDatabase>(() =>
+    this.ancestryDatabase(),
   );
 
   readonly effectiveXref = computed<string>(() => {
     const xref = this.xref();
     if (xref) return xref;
 
-    const database = this.computedDatabase();
+    const database = this.ancestryDatabase();
     switch (this.type()) {
       case "INDI":
         return calculateNextIndividualXref(database.individuals);

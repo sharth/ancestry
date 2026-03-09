@@ -31,5 +31,10 @@
     ></button>
   </div>
 
-  <app-gedcom-editor-dialog #editDialog type="SOUR" [xref]="xref()" />
+  <app-gedcom-editor-dialog
+    #editDialog
+    type="SOUR"
+    [xref]="xref()"
+    [ancestryDatabase]="ancestryDatabase()"
+  />
 }

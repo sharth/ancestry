@@ -19,5 +19,9 @@
     ></button>
   </div>
 
-  <app-gedcom-editor-dialog #editDialog type="SOUR" />
+  <app-gedcom-editor-dialog
+    #editDialog
+    type="SOUR"
+    [ancestryDatabase]="ancestryDatabase()"
+  />
 }
