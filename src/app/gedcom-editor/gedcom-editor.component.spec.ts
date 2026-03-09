@@ -11,6 +11,7 @@ import { signal } from "@angular/core";
 import { TestBed } from "@angular/core/testing";
 import type { ComponentFixture } from "@angular/core/testing";
 import { provideRouter } from "@angular/router";
+import { userEvent } from "@testing-library/user-event";
 import { assert, beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("GedcomEditorComponent helpers", () => {
@@ -172,6 +173,7 @@ describe("GedcomEditorComponent Integration", () => {
   });
 
   it("should create a new individual John Doe with birth and death events", async () => {
+    const user = userEvent.setup();
     const editorComponent = fixture.nativeElement as HTMLElement;
 
     const namesContainer = editorComponent.querySelector<HTMLDetailsElement>(
@@ -180,27 +182,21 @@ describe("GedcomEditorComponent Integration", () => {
     assert.isOk(namesContainer);
     await openDetails(namesContainer);
 
-    const addNameButton = namesContainer.querySelector<HTMLElement>(
+    const addNameButton = namesContainer.querySelector(
       'button[aria-label="Add name"]',
     );
     assert.isOk(addNameButton);
-    addNameButton.click();
+    await user.click(addNameButton);
     await fixture.whenStable();
 
-    const givenNameInput = namesContainer.querySelector<HTMLInputElement>(
-      'input[id^="given_0"]',
-    );
+    const givenNameInput = namesContainer.querySelector('input[id^="given_0"]');
     assert.isOk(givenNameInput);
-    givenNameInput.value = "John";
-    givenNameInput.dispatchEvent(new Event("input", { bubbles: true }));
+    await user.type(givenNameInput, "John");
     await fixture.whenStable();
 
-    const surnameInput = namesContainer.querySelector<HTMLInputElement>(
-      'input[id^="surname_0"]',
-    );
+    const surnameInput = namesContainer.querySelector('input[id^="surname_0"]');
     assert.isOk(surnameInput);
-    surnameInput.value = "Doe";
-    surnameInput.dispatchEvent(new Event("input", { bubbles: true }));
+    await user.type(surnameInput, "Doe");
     await fixture.whenStable();
 
     const eventsContainer = editorComponent.querySelector<HTMLDetailsElement>(
@@ -209,11 +205,11 @@ describe("GedcomEditorComponent Integration", () => {
     assert.isOk(eventsContainer);
     await openDetails(eventsContainer);
 
-    const addEventButton = eventsContainer.querySelector<HTMLButtonElement>(
+    const addEventButton = eventsContainer.querySelector(
       'button[aria-label="Add event"]',
     );
     assert.isOk(addEventButton);
-    addEventButton.click();
+    await user.click(addEventButton);
     await fixture.whenStable();
 
     const birthDetails = eventsContainer.querySelector<HTMLDetailsElement>(
@@ -222,30 +218,22 @@ describe("GedcomEditorComponent Integration", () => {
     assert.isOk(birthDetails);
     await openDetails(birthDetails);
 
-    const birthTag =
-      birthDetails.querySelector<HTMLSelectElement>('select[id^="tag_"]');
+    const birthTag = birthDetails.querySelector('select[id^="tag_"]');
     assert.isOk(birthTag);
-    birthTag.value = "BIRT";
-    birthTag.dispatchEvent(new Event("change", { bubbles: true }));
-    birthTag.dispatchEvent(new Event("input", { bubbles: true }));
+    await user.selectOptions(birthTag, "BIRT");
     await fixture.whenStable();
 
-    const birthDate =
-      birthDetails.querySelector<HTMLInputElement>('input[id^="date_"]');
+    const birthDate = birthDetails.querySelector('input[id^="date_"]');
     assert.isOk(birthDate);
-    birthDate.value = "1 Jan 1900";
-    birthDate.dispatchEvent(new Event("input", { bubbles: true }));
+    await user.type(birthDate, "1 Jan 1900");
     await fixture.whenStable();
 
-    const birthPlace = birthDetails.querySelector<HTMLInputElement>(
-      'input[id^="place_"]',
-    );
+    const birthPlace = birthDetails.querySelector('input[id^="place_"]');
     assert.isOk(birthPlace);
-    birthPlace.value = "Boston";
-    birthPlace.dispatchEvent(new Event("input", { bubbles: true }));
+    await user.type(birthPlace, "Boston");
     await fixture.whenStable();
 
-    addEventButton.click();
+    await user.click(addEventButton);
     await fixture.whenStable();
 
     const deathDetails = eventsContainer.querySelector<HTMLDetailsElement>(
@@ -254,35 +242,25 @@ describe("GedcomEditorComponent Integration", () => {
     assert.isOk(deathDetails);
     await openDetails(deathDetails);
 
-    const deathTag =
-      deathDetails.querySelector<HTMLSelectElement>('select[id^="tag_"]');
+    const deathTag = deathDetails.querySelector('select[id^="tag_"]');
     assert.isOk(deathTag);
-    deathTag.value = "DEAT";
-    deathTag.dispatchEvent(new Event("change", { bubbles: true }));
-    deathTag.dispatchEvent(new Event("input", { bubbles: true }));
+    await user.selectOptions(deathTag, "DEAT");
     await fixture.whenStable();
 
-    const deathDate =
-      deathDetails.querySelector<HTMLInputElement>('input[id^="date_"]');
+    const deathDate = deathDetails.querySelector('input[id^="date_"]');
     assert.isOk(deathDate);
-    deathDate.value = "10 Dec 1980";
-    deathDate.dispatchEvent(new Event("input", { bubbles: true }));
+    await user.type(deathDate, "10 Dec 1980");
     await fixture.whenStable();
 
-    const deathPlace = deathDetails.querySelector<HTMLInputElement>(
-      'input[id^="place_"]',
-    );
+    const deathPlace = deathDetails.querySelector('input[id^="place_"]');
     assert.isOk(deathPlace);
-    deathPlace.value = "Philadelphia";
-    deathPlace.dispatchEvent(new Event("input", { bubbles: true }));
+    await user.type(deathPlace, "Philadelphia");
     await fixture.whenStable();
 
     // Click Submit (Commit)
-    const submitButton = editorComponent.querySelector<HTMLInputElement>(
-      'input[type="submit"]',
-    );
+    const submitButton = editorComponent.querySelector('input[type="submit"]');
     assert.isOk(submitButton);
-    submitButton.click();
+    await user.click(submitButton);
     await fixture.whenStable();
 
     // Verify updateGedcomDatabase was called
