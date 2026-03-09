@@ -16,6 +16,7 @@ updates:
           - "@eslint/*"
           - "eslint"
           - "typescript-eslint"
+          - "angular-eslint"
       fonts:
         patterns:
           - "@fontsource/*"
