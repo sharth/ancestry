@@ -292,7 +292,5 @@ describe("GedcomEditorComponent Integration", () => {
     // Check that stock data is maintained
     assert.isOk(updatedDatabase.individuals["@I0@"]);
     assert.isOk(updatedDatabase.families["@F0@"]);
-
-    vi.unstubAllGlobals();
   });
 });
