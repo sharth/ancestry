@@ -14,17 +14,21 @@ export interface GedcomMultimedia {
   changeDate?: GedcomChangeDate;
 }
 
+export function newGedcomMultimedia(xref: string): GedcomMultimedia {
+  return {
+    xref,
+    filePath: "",
+    mediaType: "",
+    title: "",
+  };
+}
+
 export function parseGedcomMultimedia(record: GedcomRecord): GedcomMultimedia {
   if (record.abstag !== "OBJE") throw new Error();
   if (record.xref == "") throw new Error();
   if (record.value != "") throw new Error();
 
-  const gedcomMultimedia: GedcomMultimedia = {
-    xref: record.xref,
-    filePath: "",
-    mediaType: "",
-    title: "",
-  };
+  const gedcomMultimedia = newGedcomMultimedia(record.xref);
 
   for (const childRecord of record.children) {
     switch (childRecord.tag) {

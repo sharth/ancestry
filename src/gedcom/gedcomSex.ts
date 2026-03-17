@@ -9,15 +9,20 @@ export interface GedcomSex {
   citations: GedcomSourceCitation[];
 }
 
+export function newGedcomSex(): GedcomSex {
+  return {
+    sex: "",
+    citations: [],
+  };
+}
+
 export function parseGedcomSex(gedcomRecord: GedcomRecord): GedcomSex {
   if (gedcomRecord.abstag !== "INDI.SEX") throw new Error();
   if (gedcomRecord.xref != "") throw new Error();
   if (gedcomRecord.value == "") throw new Error();
 
-  const gedcomSex: GedcomSex = {
-    sex: gedcomRecord.value,
-    citations: [],
-  };
+  const gedcomSex = newGedcomSex();
+  gedcomSex.sex = gedcomRecord.value;
 
   for (const childRecord of gedcomRecord.children) {
     switch (childRecord.tag) {

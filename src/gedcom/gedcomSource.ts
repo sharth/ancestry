@@ -27,13 +27,9 @@ export interface GedcomSource {
   changeDate: GedcomChangeDate;
 }
 
-export function parseGedcomSource(record: GedcomRecord): GedcomSource {
-  if (record.abstag !== "SOUR") throw new Error();
-  if (record.xref == "") throw new Error();
-  if (record.value != "") throw new Error();
-
-  const gedcomSource: GedcomSource = {
-    xref: record.xref,
+export function newGedcomSource(xref: string): GedcomSource {
+  return {
+    xref: xref,
     abbr: "",
     title: "",
     text: "",
@@ -42,6 +38,14 @@ export function parseGedcomSource(record: GedcomRecord): GedcomSource {
     multimediaLinks: [],
     changeDate: { date: { value: "" } },
   };
+}
+
+export function parseGedcomSource(record: GedcomRecord): GedcomSource {
+  if (record.abstag !== "SOUR") throw new Error();
+  if (record.xref == "") throw new Error();
+  if (record.value != "") throw new Error();
+
+  const gedcomSource = newGedcomSource(record.xref);
 
   for (const childRecord of record.children) {
     switch (childRecord.tag) {

@@ -15,7 +15,7 @@ import {
 } from "./gedcomNote";
 import type { GedcomRecord } from "./gedcomRecord";
 import type { GedcomSex } from "./gedcomSex";
-import { parseGedcomSex, serializeGedcomSex } from "./gedcomSex";
+import { newGedcomSex, parseGedcomSex, serializeGedcomSex } from "./gedcomSex";
 import type { GedcomSourceCitation } from "./gedcomSourceCitation";
 
 export interface GedcomIndividual {
@@ -55,16 +55,7 @@ export function parseGedcomIndividual(record: GedcomRecord): GedcomIndividual {
   if (record.xref == "") throw new Error();
   if (record.value != "") throw new Error();
 
-  const gedcomIndividual: GedcomIndividual = {
-    xref: record.xref,
-    names: [],
-    events: [],
-    parentOfFamilyXrefs: [],
-    childOfFamilyXrefs: [],
-    unknownRecords: [],
-    notes: [],
-    sex: { sex: "", citations: [] },
-  };
+  const gedcomIndividual = newGedcomIndividual(record.xref);
 
   for (const childRecord of record.children) {
     switch (childRecord.tag) {
@@ -213,4 +204,17 @@ export function getIndividualMultimediaCitations(
   }
 
   return references;
+}
+
+export function newGedcomIndividual(xref: string): GedcomIndividual {
+  return {
+    xref,
+    names: [],
+    sex: newGedcomSex(),
+    events: [],
+    parentOfFamilyXrefs: [],
+    childOfFamilyXrefs: [],
+    unknownRecords: [],
+    notes: [],
+  };
 }

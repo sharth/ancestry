@@ -6,6 +6,13 @@ export interface GedcomRepository {
   name: string;
 }
 
+export function newGedcomRepository(xref: string): GedcomRepository {
+  return {
+    xref,
+    name: "",
+  };
+}
+
 export function parseGedcomRepository(
   gedcomRecord: GedcomRecord,
 ): GedcomRepository {
@@ -13,10 +20,7 @@ export function parseGedcomRepository(
   if (gedcomRecord.xref == "") throw new Error();
   if (gedcomRecord.value != "") throw new Error();
 
-  const gedcomRepository: GedcomRepository = {
-    xref: gedcomRecord.xref,
-    name: "",
-  };
+  const gedcomRepository = newGedcomRepository(gedcomRecord.xref);
 
   for (const childRecord of gedcomRecord.children) {
     switch (childRecord.tag) {
