@@ -31,4 +31,9 @@ export class GedcomEditorDialogComponent {
     this.editDialog().nativeElement.showModal();
     this.cdr.detectChanges();
   }
+
+  close() {
+    this.editDialog().nativeElement.close();
+    this.cdr.detectChanges();
+  }
 }
