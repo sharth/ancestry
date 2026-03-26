@@ -33,6 +33,7 @@ export default defineConfig([
         "error",
         { allowConstantLoopConditions: "only-allowed-literals" },
       ],
+      "@typescript-eslint/no-unnecessary-type-arguments": "off",
       "@angular-eslint/directive-selector": [
         "error",
         { type: "attribute", prefix: "app", style: "camelCase" },
