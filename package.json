@@ -26,7 +26,7 @@
     "@angular/router": "^21.2.6",
     "@babel/plugin-proposal-decorators": "^7.29.0",
     "@eslint/js": "^10.0.1",
-    "@eslint/markdown": "^7.5.1",
+    "@eslint/markdown": "^8.0.0",
     "@fontsource/material-icons": "^5.2.7",
     "@fontsource/material-symbols-rounded": "^5.2.38",
     "@fontsource/roboto": "^5.2.10",
