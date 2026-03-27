@@ -36,14 +36,13 @@ export class InputIndividualEventsComponent implements FormValueControl<
   private readonly _injector = inject(Injector);
 
   readonly ancestryDatabase = model.required<AncestryDatabase>();
-
   readonly open = input<boolean>(false);
 
   readonly value = model<GedcomEvent[]>([]);
   readonly form = form(this.value);
 
-  @ViewChildren("focusTarget") private focusTargets!: QueryList<
-    ElementRef<HTMLElement>
+  @ViewChildren("container") private eventContainers!: QueryList<
+    ElementRef<HTMLDetailsElement>
   >;
 
   appendEvent() {
@@ -66,7 +65,7 @@ export class InputIndividualEventsComponent implements FormValueControl<
     afterNextRender(
       {
         read: () => {
-          this.focusTargets.last.nativeElement.focus();
+          this.eventContainers.last.nativeElement.open = true;
         },
       },
       { injector: this._injector },
