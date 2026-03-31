@@ -28,7 +28,7 @@
     "@eslint/js": "^10.0.1",
     "@eslint/markdown": "^8.0.0",
     "@fontsource/material-icons": "^5.2.7",
-    "@fontsource/material-symbols-rounded": "^5.2.38",
+    "@fontsource/material-symbols-rounded": "^5.2.39",
     "@fontsource/roboto": "^5.2.10",
     "@popperjs/core": "^2.11.8",
     "@testing-library/angular": "^19.2.1",
