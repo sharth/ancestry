@@ -42,7 +42,7 @@
     "bootstrap-icons": "^1.13.1",
     "dexie": "^4.4.2",
     "diff": "^8.0.4",
-    "eslint": "^10.1.0",
+    "eslint": "^10.2.0",
     "idb": "^8.0.3",
     "jsdom": "^29.0.2",
     "prettier": "^3.8.1",
