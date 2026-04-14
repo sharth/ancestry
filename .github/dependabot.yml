@@ -26,5 +26,7 @@ updates:
           - "@vitest/*"
   - package-ecosystem: "github-actions"
     directory: "/"
+    assignees:
+      - sharth
     schedule:
       interval: "weekly"
