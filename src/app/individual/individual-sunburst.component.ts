@@ -1,177 +1,154 @@
-import { AncestryService } from "../../database/ancestry.service";
-import { IndividualLinkComponent } from "../individual-link/individual-link.component";
+import type { AncestryDatabase } from "../../database/ancestry.service";
+import type { GedcomIndividual } from "../../gedcom/gedcomIndividual";
+import { fullname } from "../../gedcom/gedcomIndividual";
+import type { ElementRef } from "@angular/core";
 import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  inject,
+  effect,
   input,
+  viewChild,
 } from "@angular/core";
+import { RouterLink } from "@angular/router";
+import * as d3 from "d3";
+
+interface SunburstNode {
+  individual: GedcomIndividual;
+  generation: number;
+  x: number;
+  y: number;
+  rotation: number;
+  width: number;
+  height: number;
+  color: string;
+  arc: string;
+}
 
 @Component({
-  selector: "app-individual-relatives",
-  imports: [IndividualLinkComponent],
+  selector: "app-individual-sunburst",
+  imports: [RouterLink],
   templateUrl: "./individual-sunburst.component.html",
   styleUrl: "./individual.component.css",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IndividualSunburstComponent {
-  readonly xref = input.required<string>();
-  private ancestryService = inject(AncestryService);
+  readonly individual = input.required<GedcomIndividual>();
+  readonly ancestryDatabase = input.required<AncestryDatabase>();
 
-  readonly vm = computed(() => {
-    // const ancestry = this.ancestryService.contents();
-    // if (ancestry === undefined) {
-    //   return undefined;
-    // }
+  private readonly svgElement =
+    viewChild.required<ElementRef<SVGSVGElement>>("svgElement");
+  private readonly zoomGroup =
+    viewChild.required<ElementRef<SVGGElement>>("zoomGroup");
 
-    // const xref = this.xref();
-    // const individual = ancestry.individuals.get(xref);
-    // if (individual === undefined) {
-    //   return undefined;
-    // }
+  protected readonly centerRadius = 80;
+  protected readonly ringWidth = 120;
+  protected readonly s = this.centerRadius * Math.sqrt(2) - 10;
 
-    // type SunburstData = {
-    //   name: string;
-    //   children: SunburstData[];
-    // };
-    // const ancestors: { individual: GedcomIndividual; sunburst: SunburstData } =
-    //   [{ individual: individual, sunburst: {} }];
+  color(individual: GedcomIndividual) {
+    if (individual.sex.sex === "M") return "#add8e6"; // Light blue
+    if (individual.sex.sex === "F") return "#ffb6c1"; // Light pink
+    return "#eeeeee";
+  }
 
-    // for (let i = 0; i < ancestors.length; i++) {
-    //   const familyXref = ancestors[i].individual.childOfFamilyXrefs[0];
-    //   if (familyXref == undefined) continue;
-    // }
+  readonly fullname = fullname;
 
-    // type ChartDataType = {
-    //   individual: GedcomIndividual;
-    //   name: string;
-    //   children?: ChartDataType[];
-    // };
-    // const Q: ChartDataType[] = [
-    //   { individual: individual, name: fullname(individual), children: [] },
-    // ];
-    // const chartData = [Q[0]];
+  readonly sunburstNodes = computed(() => {
+    const ancestryDatabase = this.ancestryDatabase();
+    const nodes: SunburstNode[] = [];
+    const maxGenerations = 5;
 
-    // let chartDataEntry;
-    // while ((chartDataEntry = Q.pop())) {
-    //   const individual = chartDataEntry.individual;
-    //   const family = childOfFamily.get(individual.xref);
-    //   if (family?.husbandXref) {
-    //     const father = ancestry.individuals.get(family.husbandXref);
-    //     if (father != undefined) {
-    //       const entry = {
-    //         individual: father,
-    //         name: fullname(father),
-    //         children: [],
-    //       };
-    //       Q.push(entry);
-    //       chartDataEntry.children?.push(entry);
-    //     }
-    //     const mother = ancestry.individuals.get(family.husbandXref);
-    //     if (mother != undefined) {
-    //       const entry = {
-    //         individual: mother,
-    //         name: fullname(mother),
-    //         children: [],
-    //       };
-    //       Q.push(entry);
-    //       chartDataEntry.children?.push(entry);
-    //     }
-    //   }
-    // }
+    const traverse = (
+      xref: string,
+      generation: number,
+      startAngle: number,
+      endAngle: number,
+    ) => {
+      if (generation > maxGenerations) return;
+      const individual = ancestryDatabase.individuals[xref];
+      if (!individual) return;
 
-    return {
-      // chartData: chartData,
+      const inner = this.centerRadius + (generation - 1) * this.ringWidth;
+      const outer = this.centerRadius + generation * this.ringWidth;
+      const midR = (inner + outer) / 2;
+      const midAngle = (startAngle + endAngle) / 2;
+
+      const x = midR * Math.cos(midAngle - Math.PI / 2);
+      const y = midR * Math.sin(midAngle - Math.PI / 2);
+
+      let rotation = (midAngle * 180) / Math.PI - 90;
+      if (rotation > 90 && rotation < 270) {
+        rotation += 180;
+      }
+      if (rotation < -90) {
+        rotation += 180;
+      }
+
+      const arcLength = midR * (endAngle - startAngle);
+      const boxHeight = arcLength;
+      const boxWidth = this.ringWidth - 4;
+
+      nodes.push({
+        individual: individual,
+        generation: generation,
+        x,
+        y,
+        rotation,
+        width: boxWidth,
+        height: boxHeight,
+        color: this.color(individual),
+        arc:
+          d3.arc()({
+            startAngle: startAngle,
+            endAngle: endAngle,
+            innerRadius: this.centerRadius + (generation - 1) * this.ringWidth,
+            outerRadius: this.centerRadius + generation * this.ringWidth,
+          }) ?? "",
+      });
+
+      const familyXref = individual.childOfFamilyXrefs[0];
+      if (familyXref === undefined) return;
+      const family = ancestryDatabase.families[familyXref];
+
+      const mid = (startAngle + endAngle) / 2;
+      if (family?.husbandXref) {
+        traverse(family.husbandXref, generation + 1, startAngle, mid);
+      }
+      if (family?.wifeXref) {
+        traverse(family.wifeXref, generation + 1, mid, endAngle);
+      }
     };
+
+    const individual = this.individual();
+    const familyXref = individual.childOfFamilyXrefs[0];
+    if (familyXref) {
+      const family = ancestryDatabase.families[familyXref];
+      if (family?.husbandXref) {
+        traverse(family.husbandXref, 1, Math.PI / 4, Math.PI / 2);
+      }
+      if (family?.wifeXref) {
+        traverse(family.wifeXref, 1, Math.PI / 2, (3 * Math.PI) / 4);
+      }
+    }
+
+    return nodes;
+  });
+
+  private readonly zoomEffect = effect((onCleanup) => {
+    const svgEl = this.svgElement().nativeElement;
+    const gEl = this.zoomGroup().nativeElement;
+
+    const zoom = d3
+      .zoom<SVGSVGElement, unknown>()
+      .scaleExtent([0.1, 10])
+      .on("zoom", (event) => {
+        d3.select(gEl).attr("transform", event.transform);
+      });
+
+    d3.select(svgEl).call(zoom as any);
+
+    onCleanup(() => {
+      d3.select(svgEl).on(".zoom", null);
+    });
   });
 }
-
-// import * as echarts from 'echarts/core';
-// import { SunburstChart } from 'echarts/charts';
-// import { CanvasRenderer } from 'echarts/renderers';
-
-// echarts.use([SunburstChart, CanvasRenderer]);
-
-// var chartDom = document.getElementById('main');
-// var myChart = echarts.init(chartDom);
-// var option;
-
-// var data = [
-//   {
-//     name: 'Grandpa',
-//     children: [
-//       {
-//         name: 'Uncle Leo',
-//         value: 15,
-//         children: [
-//           {
-//             name: 'Cousin Jack',
-//             value: 2
-//           },
-//           {
-//             name: 'Cousin Mary',
-//             value: 5,
-//             children: [
-//               {
-//                 name: 'Jackson',
-//                 value: 2
-//               }
-//             ]
-//           },
-//           {
-//             name: 'Cousin Ben',
-//             value: 4
-//           }
-//         ]
-//       },
-//       {
-//         name: 'Father',
-//         value: 10,
-//         children: [
-//           {
-//             name: 'Me',
-//             value: 5
-//           },
-//           {
-//             name: 'Brother Peter',
-//             value: 1
-//           }
-//         ]
-//       }
-//     ]
-//   },
-//   {
-//     name: 'Nancy',
-//     children: [
-//       {
-//         name: 'Uncle Nike',
-//         children: [
-//           {
-//             name: 'Cousin Betty',
-//             value: 1
-//           },
-//           {
-//             name: 'Cousin Jenny',
-//             value: 2
-//           }
-//         ]
-//       }
-//     ]
-//   }
-// ];
-// option = {
-//   series: {
-//     type: 'sunburst',
-//     // emphasis: {
-//     //     focus: 'ancestor'
-//     // },
-//     data: data,
-//     radius: [0, '90%'],
-//     label: {
-//       rotate: 'radial'
-//     }
-//   }
-// };
-
-// option && myChart.setOption(option);

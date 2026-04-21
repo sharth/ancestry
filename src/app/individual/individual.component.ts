@@ -8,6 +8,7 @@ import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-edit
 import { IndividualAncestorsComponent } from "./individual-ancestors.component";
 import { IndividualEventsComponent } from "./individual-events.component";
 import { IndividualRelativesComponent } from "./individual-relatives.component";
+import { IndividualSunburstComponent } from "./individual-sunburst.component";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -22,6 +23,7 @@ import {
     IndividualAncestorsComponent,
     IndividualEventsComponent,
     GedcomEditorDialogComponent,
+    IndividualSunburstComponent,
   ],
   templateUrl: "./individual.component.html",
   styleUrl: "./individual.component.css",
@@ -38,6 +40,7 @@ export class IndividualComponent {
       return undefined;
     }
     return {
+      individual,
       name: fullname(individual),
       sex: individual.sex.sex || "Unknown",
       gedcom: serializeGedcomRecordToText(
