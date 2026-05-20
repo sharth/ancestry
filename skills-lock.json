@@ -7,6 +7,12 @@
       "skillPath": "angular-developer/SKILL.md",
       "computedHash": "36f7f57e1485c994de62eae5b00f54c12f81d1d16661afa6d3c214dd9bcf7269"
     },
+    "chrome-devtools": {
+      "source": "chromedevtools/chrome-devtools-mcp",
+      "sourceType": "github",
+      "skillPath": "skills/chrome-devtools/SKILL.md",
+      "computedHash": "5260f8bf2b080592eec1a381cbe381e6a5ba52cbc7d374ed97df588872afb2ad"
+    },
     "find-skills": {
       "source": "vercel-labs/skills",
       "sourceType": "github",
