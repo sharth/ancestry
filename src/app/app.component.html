@@ -1,7 +1,35 @@
-<nav class="sticky-top">
-  <app-navbar />
+<header>
+  <a class="navbar-brand" routerLink="/">
+    <img src="/favicon.ico" style="height: 1em" alt="Ancestry Logo" />
+    ancestry.lynch.us
+  </a>
+  <input
+    type="button"
+    (click)="requestPermissions()"
+    class="btn btn-outline-success"
+    value="Request Permissions"
+  />
+  <input
+    id="clearDatabaseButton"
+    type="button"
+    class="btn btn-outline-danger"
+    (click)="clearDatabase()"
+    value="Clear Database"
+  />
+  <input class="form-control me-2" type="search" placeholder="Search" />
+  <button class="btn btn-outline-success" type="submit">Search</button>
+</header>
+
+<nav>
+  <a routerLink="/">Home</a>
+  <a routerLink="/individuals">Individuals</a>
+  <a routerLink="/sources">Sources</a>
+  <a routerLink="/repositories">Repositories</a>
+  <a routerLink="/multimedias">Multimedia</a>
+  <a routerLink="/places">Places</a>
+  <a routerLink="/validation">Validation</a>
 </nav>
 
-<main class="container">
+<main>
   <router-outlet />
 </main>
