@@ -3,6 +3,7 @@
     <img src="favicon.ico" style="height: 1em" alt="Ancestry Logo" />
     ancestry.lynch.us
   </a>
+  <div style="flex: 1"></div>
   <input
     type="button"
     (click)="requestPermissions()"
@@ -16,8 +17,10 @@
     (click)="clearDatabase()"
     value="Clear Database"
   />
-  <input class="form-control me-2" type="search" placeholder="Search" />
-  <button class="btn btn-outline-success" type="submit">Search</button>
+  <div class="input-group w-auto">
+    <input class="form-control" type="search" placeholder="Search" />
+    <button class="btn btn-outline-success" type="submit">Search</button>
+  </div>
 </header>
 
 <nav>

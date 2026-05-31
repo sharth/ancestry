@@ -18,18 +18,12 @@ header {
 }
 
 header .navbar-brand {
-  flex: auto;
   font-weight: 600;
   display: flex;
   align-items: center;
   gap: 0.5rem;
   text-decoration: none;
   color: #212529;
-}
-
-header .form-control {
-  max-width: 300px;
-  margin-left: auto;
 }
 
 nav {
