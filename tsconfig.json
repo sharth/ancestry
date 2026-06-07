@@ -23,7 +23,8 @@
     "importHelpers": true,
     "target": "es2023",
     "module": "esnext",
-    "lib": ["es2023", "ESNext.Collection", "ESNext.Iterator", "dom"]
+    "lib": ["es2023", "ESNext.Collection", "ESNext.Iterator", "dom"],
+    "types": ["@types/d3", "@types/wicg-file-system-access"]
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
