@@ -39,7 +39,7 @@ import {
 import type { GedcomTrailer } from "../gedcom/gedcomTrailer";
 import { parseGedcomTrailer } from "../gedcom/gedcomTrailer";
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
-import { Injectable, computed, inject, resource, signal } from "@angular/core";
+import { Service, computed, inject, resource, signal } from "@angular/core";
 import { toObservable } from "@angular/core/rxjs-interop";
 import type { ResolveFn } from "@angular/router";
 import { RedirectCommand, Router } from "@angular/router";
@@ -63,7 +63,7 @@ class DexieDatabase extends Dexie {
   }
 }
 
-@Injectable({ providedIn: "root" })
+@Service()
 export class AncestryService {
   readonly dexieDatabase = new DexieDatabase();
 
