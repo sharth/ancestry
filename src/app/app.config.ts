@@ -26,3 +26,5 @@ export const appConfig: ApplicationConfig = {
     provideZonelessChangeDetection(),
   ],
 };
+
+console.log(USE_HASH_LOCATION);
