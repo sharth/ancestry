@@ -10,12 +10,14 @@ import {
   withInMemoryScrolling,
 } from "@angular/router";
 
+declare const USE_HASH_LOCATION: boolean;
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(
       routes,
       withComponentInputBinding(),
-      withHashLocation(),
+      ...(USE_HASH_LOCATION ? [withHashLocation()] : []),
       withInMemoryScrolling({
         scrollPositionRestoration: "enabled",
       }),
