@@ -22,7 +22,7 @@ jobs:
           node-version: "22.x"
           cache: "npm"
       - run: npm clean-install
-      - run: npx @angular/cli build --base-href=/ancestry/
+      - run: npx @angular/cli build
       - uses: actions/upload-artifact@v7
         with:
           name: build-output
@@ -41,4 +41,4 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy build-output --project-name=ancestry-app
+          command: pages deploy build-output --project-name=ancestry-app --branch=main
