@@ -1,7 +1,6 @@
 import { routes } from "./app.routes";
 import { NoRouteReuseStrategy } from "./no-reuse-route-strategy";
 import type { ApplicationConfig } from "@angular/core";
-import { provideZonelessChangeDetection } from "@angular/core";
 import {
   RouteReuseStrategy,
   provideRouter,
@@ -23,7 +22,6 @@ export const appConfig: ApplicationConfig = {
       }),
     ),
     { provide: RouteReuseStrategy, useClass: NoRouteReuseStrategy },
-    provideZonelessChangeDetection(),
   ],
 };
 
