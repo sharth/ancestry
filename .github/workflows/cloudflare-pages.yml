@@ -12,7 +12,6 @@ concurrency:
 
 jobs:
   build:
-    name: Deploy to Cloudflare Pages
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -24,13 +23,12 @@ jobs:
           cache: "npm"
       - run: npm clean-install
       - run: npx @angular/cli build --base-href=/ancestry/
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: build-output
           path: dist/angular/browser
 
-  deploy-to-cloudflare-pages:
-    name: Deploy to Cloudflare Pages
+  deploy:
     needs: build
     runs-on: ubuntu-latest
 
@@ -38,10 +36,9 @@ jobs:
       - uses: actions/download-artifact@v8
         with:
           name: build-output
-      - name: Display structure of downloaded files
-        run: ls -R
+          path: build-output
       - uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist/angular/browser --project-name=ancestry-app --branch=main
+          command: pages deploy build-output --project-name=ancestry-app
