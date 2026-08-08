@@ -111,6 +111,7 @@ describe("GedcomEditorComponent Integration", () => {
         parentOfFamilyXrefs: ["@F0@"],
         notes: [],
         unknownRecords: [],
+        changeDate: { date: { value: "" } },
       },
     },
     families: {

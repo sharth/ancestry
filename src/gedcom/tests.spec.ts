@@ -1,3 +1,4 @@
+import { newGedcomChangeDate } from "./gedcomChangeDate";
 import type { GedcomFamily } from "./gedcomFamily";
 import { parseGedcomFamily, serializeGedcomFamily } from "./gedcomFamily";
 import type { GedcomHeader } from "./gedcomHeader";
@@ -137,6 +138,7 @@ const testCases: {
           unknownRecords: [],
           notes: [],
           sex: { sex: "", citations: [] },
+          changeDate: newGedcomChangeDate(),
         },
         {
           xref: "@I2@",
@@ -147,6 +149,7 @@ const testCases: {
           childOfFamilyXrefs: [],
           unknownRecords: [],
           notes: [],
+          changeDate: newGedcomChangeDate(),
         },
         {
           xref: "@I3@",
@@ -169,6 +172,7 @@ const testCases: {
           childOfFamilyXrefs: [],
           unknownRecords: [],
           notes: [],
+          changeDate: newGedcomChangeDate(),
         },
         {
           xref: "@I4@",
@@ -179,6 +183,7 @@ const testCases: {
           unknownRecords: [],
           notes: [],
           sex: { sex: "", citations: [] },
+          changeDate: newGedcomChangeDate(),
         },
         {
           xref: "@I5@",
@@ -238,6 +243,7 @@ const testCases: {
           unknownRecords: [],
           notes: [],
           sex: { sex: "", citations: [] },
+          changeDate: newGedcomChangeDate(),
         },
         {
           xref: "@I6@",
@@ -260,6 +266,7 @@ const testCases: {
           unknownRecords: [],
           notes: [],
           sex: { sex: "", citations: [] },
+          changeDate: newGedcomChangeDate(),
         },
         {
           xref: "@I7@",
@@ -281,6 +288,7 @@ const testCases: {
           unknownRecords: [],
           notes: [],
           sex: { sex: "", citations: [] },
+          changeDate: newGedcomChangeDate(),
         },
         {
           xref: "@I9@",
@@ -308,6 +316,7 @@ const testCases: {
           unknownRecords: [],
           notes: [],
           sex: { sex: "", citations: [] },
+          changeDate: newGedcomChangeDate(),
         },
       ],
     },

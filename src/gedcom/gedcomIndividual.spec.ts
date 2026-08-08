@@ -1,3 +1,4 @@
+import type { GedcomIndividual } from "./gedcomIndividual";
 import {
   parseGedcomIndividual,
   serializeGedcomIndividual,
@@ -29,7 +30,7 @@ describe("gedcomIndividual", () => {
       gedcomText.join("\n"),
     );
     expectToBeDefined(gedcomRecord);
-    expect(parseGedcomIndividual(gedcomRecord)).toEqual({
+    expect(parseGedcomIndividual(gedcomRecord)).toEqual<GedcomIndividual>({
       xref: "@I1@",
       names: [],
       sex: { sex: "", citations: [] },
@@ -38,6 +39,7 @@ describe("gedcomIndividual", () => {
       childOfFamilyXrefs: [],
       unknownRecords: [],
       notes: [],
+      changeDate: { date: { value: "" } },
     });
     expect(
       normalize(serializeGedcomIndividual(parseGedcomIndividual(gedcomRecord))),
@@ -56,7 +58,7 @@ describe("gedcomIndividual", () => {
     ];
     const [gedcomRecord] = parseGedcomRecords(gedcomText.join("\n"));
     expectToBeDefined(gedcomRecord);
-    expect(parseGedcomIndividual(gedcomRecord)).toEqual({
+    expect(parseGedcomIndividual(gedcomRecord)).toEqual<GedcomIndividual>({
       xref: "@I1@",
       sex: { sex: "", citations: [] },
       changeDate: {

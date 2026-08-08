@@ -1,6 +1,9 @@
 import type { AncestryDatabase } from "../database/ancestry.service";
 import type { GedcomDate } from "../gedcom/gedcomDate";
-import type { GedcomIndividual } from "../gedcom/gedcomIndividual";
+import {
+  type GedcomIndividual,
+  newGedcomIndividual,
+} from "../gedcom/gedcomIndividual";
 import { InputIndividualEventsComponent } from "./input-individual-events.component";
 import { InputIndividualNamesComponent } from "./input-individual-names.component";
 import { InputIndividualSexComponent } from "./input-individual-sex.component";
@@ -36,19 +39,7 @@ export class InputIndividualComponent implements OnInit {
   readonly xref = input.required<string>();
   readonly open = input<boolean>(false);
 
-  readonly individual = signal<GedcomIndividual>({
-    xref: "",
-    names: [],
-    events: [],
-    sex: {
-      sex: "",
-      citations: [],
-    },
-    childOfFamilyXrefs: [],
-    parentOfFamilyXrefs: [],
-    notes: [],
-    unknownRecords: [],
-  });
+  readonly individual = signal<GedcomIndividual>(newGedcomIndividual(""));
   readonly form = form<GedcomIndividual>(this.individual);
 
   readonly updateAngularDatabase = effect(() => {
@@ -74,16 +65,8 @@ export class InputIndividualComponent implements OnInit {
 
   ngOnInit(): void {
     this.individual.set(
-      this.ancestryDatabase().individuals[this.xref()] ?? {
-        xref: this.xref(),
-        names: [],
-        events: [],
-        sex: { sex: "", citations: [] },
-        childOfFamilyXrefs: [],
-        parentOfFamilyXrefs: [],
-        notes: [],
-        unknownRecords: [],
-      },
+      this.ancestryDatabase().individuals[this.xref()] ??
+        newGedcomIndividual(this.xref()),
     );
   }
 }

@@ -49,3 +49,9 @@ export function serializeGedcomChangeDate(
     return null;
   }
 }
+
+export function newGedcomChangeDate(value = ""): GedcomChangeDate {
+  return {
+    date: { value: value },
+  };
+}

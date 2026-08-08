@@ -1,6 +1,7 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import type { GedcomChangeDate } from "./gedcomChangeDate";
 import {
+  newGedcomChangeDate,
   parseGedcomChangeDate,
   serializeGedcomChangeDate,
 } from "./gedcomChangeDate";
@@ -23,7 +24,7 @@ export interface GedcomIndividual {
   names: GedcomName[];
   events: GedcomEvent[];
   sex: GedcomSex;
-  changeDate?: GedcomChangeDate;
+  changeDate: GedcomChangeDate;
   childOfFamilyXrefs: string[];
   parentOfFamilyXrefs: string[];
   notes: GedcomNote[];
@@ -101,7 +102,6 @@ export function parseGedcomIndividual(record: GedcomRecord): GedcomIndividual {
         gedcomIndividual.childOfFamilyXrefs.push(childRecord.value);
         break;
       case "CHAN":
-        if (gedcomIndividual.changeDate) throw new Error();
         gedcomIndividual.changeDate = parseGedcomChangeDate(childRecord);
         break;
       case "NOTE":
@@ -136,9 +136,7 @@ export function serializeGedcomIndividual(
       ...gedcomIndividual.unknownRecords.filter(
         (record) => record.tag == "_AMTID",
       ),
-      gedcomIndividual.changeDate
-        ? serializeGedcomChangeDate(gedcomIndividual.changeDate)
-        : null,
+      serializeGedcomChangeDate(gedcomIndividual.changeDate),
       ...gedcomIndividual.unknownRecords.filter(
         (record) => record.tag == "SOUR",
       ),
@@ -216,5 +214,6 @@ export function newGedcomIndividual(xref: string): GedcomIndividual {
     childOfFamilyXrefs: [],
     unknownRecords: [],
     notes: [],
+    changeDate: newGedcomChangeDate(),
   };
 }
