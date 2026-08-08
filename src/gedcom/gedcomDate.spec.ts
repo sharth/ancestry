@@ -1,7 +1,10 @@
-import type { GedcomDate } from "./gedcomDate";
-import { parseGedcomDate, serializeGedcomDate } from "./gedcomDate";
-import type { GedcomRecord } from "./gedcomRecord";
 import { describe, expect, it } from "vitest";
+import {
+  parseGedcomDate,
+  serializeGedcomDate,
+  type GedcomDate,
+} from "./gedcomDate";
+import type { GedcomRecord } from "./gedcomRecord";
 
 describe("gedcomDate", () => {
   it("Exact Date", () => {

@@ -1,6 +1,3 @@
-import type { AncestryDatabase } from "../database/ancestry.service";
-import { displayGedcomName } from "../gedcom/gedcomName";
-import type { ElementRef } from "@angular/core";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -8,9 +5,11 @@ import {
   computed,
   input,
   model,
+  type ElementRef,
 } from "@angular/core";
-import type { FormValueControl } from "@angular/forms/signals";
-import { FormField, form } from "@angular/forms/signals";
+import { FormField, form, type FormValueControl } from "@angular/forms/signals";
+import type { AncestryDatabase } from "../database/ancestry.service";
+import { displayGedcomName } from "../gedcom/gedcomName";
 
 @Component({
   selector: "app-input-source-xref",

@@ -1,5 +1,3 @@
-import { AncestryService } from "../../database/ancestry.service";
-import { IndividualLinkComponent } from "../individual-link/individual-link.component";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -7,6 +5,8 @@ import {
   inject,
   input,
 } from "@angular/core";
+import { AncestryService } from "../../database/ancestry.service";
+import { IndividualLinkComponent } from "../individual-link/individual-link.component";
 
 @Component({
   selector: "app-individual-relatives",

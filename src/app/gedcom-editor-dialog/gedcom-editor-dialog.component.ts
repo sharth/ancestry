@@ -1,5 +1,3 @@
-import type { AncestryDatabase } from "../../database/ancestry.service";
-import { GedcomEditorComponent } from "../gedcom-editor/gedcom-editor.component";
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -7,8 +5,10 @@ import {
   inject,
   input,
   viewChild,
+  type ElementRef,
 } from "@angular/core";
-import type { ElementRef } from "@angular/core";
+import type { AncestryDatabase } from "../../database/ancestry.service";
+import { GedcomEditorComponent } from "../gedcom-editor/gedcom-editor.component";
 
 @Component({
   selector: "app-gedcom-editor-dialog",

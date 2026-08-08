@@ -1,14 +1,20 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
-import type { GedcomDate } from "./gedcomDate";
-import { parseGedcomDate } from "./gedcomDate";
-import { serializeGedcomDate, serializeGedcomSortDate } from "./gedcomDate";
-import type { GedcomNote } from "./gedcomNote";
-import { parseGedcomNote, serializeGedcomNote } from "./gedcomNote";
+import {
+  parseGedcomDate,
+  serializeGedcomDate,
+  serializeGedcomSortDate,
+  type GedcomDate,
+} from "./gedcomDate";
+import {
+  parseGedcomNote,
+  serializeGedcomNote,
+  type GedcomNote,
+} from "./gedcomNote";
 import type { GedcomRecord } from "./gedcomRecord";
-import type { GedcomSourceCitation } from "./gedcomSourceCitation";
 import {
   parseGedcomSourceCitation,
   serializeGedcomSourceCitation,
+  type GedcomSourceCitation,
 } from "./gedcomSourceCitation";
 
 export interface GedcomEventSharedWith {

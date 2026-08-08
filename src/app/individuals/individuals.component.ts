@@ -1,14 +1,17 @@
-import type { AncestryDatabase } from "../../database/ancestry.service";
-import type { GedcomIndividual } from "../../gedcom/gedcomIndividual";
-import { fullname, surname } from "../../gedcom/gedcomIndividual";
-import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
-import { IndividualLinkComponent } from "../individual-link/individual-link.component";
 import {
   ChangeDetectionStrategy,
   Component,
   computed,
   input,
 } from "@angular/core";
+import type { AncestryDatabase } from "../../database/ancestry.service";
+import {
+  fullname,
+  surname,
+  type GedcomIndividual,
+} from "../../gedcom/gedcomIndividual";
+import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
+import { IndividualLinkComponent } from "../individual-link/individual-link.component";
 
 @Component({
   selector: "app-individuals",

@@ -32,7 +32,7 @@
     "@testing-library/angular": "^19.4.1",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/user-event": "^14.6.1",
-    "@trivago/prettier-plugin-sort-imports": "^6.0.2",
+    "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
     "@types/d3": "^7.4.3",
     "@types/wicg-file-system-access": "^2023.10.7",
     "@vitest/browser-playwright": "^4.1.10",
@@ -56,13 +56,14 @@
     "vitest": "^4.0.13"
   },
   "prettier": {
-    "importOrderSortSpecifiers": true,
-    "plugins": [
-      "@trivago/prettier-plugin-sort-imports"
-    ],
+    "importOrderCaseSensitive": true,
+    "importOrderTypeScriptVersion": "6.0.3",
     "importOrderParserPlugins": [
       "typescript",
       "decorators"
+    ],
+    "plugins": [
+      "@ianvs/prettier-plugin-sort-imports"
     ]
   }
 }

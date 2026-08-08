@@ -1,6 +1,6 @@
-import { AncestryService } from "../../database/ancestry.service";
 import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 import { Router } from "@angular/router";
+import { AncestryService } from "../../database/ancestry.service";
 
 @Component({
   selector: "app-hello",

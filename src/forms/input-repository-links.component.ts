@@ -1,8 +1,3 @@
-import type { AncestryDatabase } from "../database/ancestry.service";
-import type { GedcomRepositoryLink } from "../gedcom/gedcomRepositoryLink";
-import { InputRepositoryCallNumberComponent } from "./input-repository-call-number.component";
-import { InputRepositoryXrefComponent } from "./input-repository-xref.component";
-import type { QueryList } from "@angular/core";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -12,10 +7,19 @@ import {
   inject,
   input,
   model,
+  type QueryList,
 } from "@angular/core";
-import type { FieldTree, FormValueControl } from "@angular/forms/signals";
-import { FormField, form } from "@angular/forms/signals";
+import {
+  FormField,
+  form,
+  type FieldTree,
+  type FormValueControl,
+} from "@angular/forms/signals";
 import { RouterModule } from "@angular/router";
+import type { AncestryDatabase } from "../database/ancestry.service";
+import type { GedcomRepositoryLink } from "../gedcom/gedcomRepositoryLink";
+import { InputRepositoryCallNumberComponent } from "./input-repository-call-number.component";
+import { InputRepositoryXrefComponent } from "./input-repository-xref.component";
 
 @Component({
   selector: "app-input-repository-links",

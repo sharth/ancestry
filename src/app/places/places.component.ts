@@ -1,6 +1,3 @@
-import { AncestryService } from "../../database/ancestry.service";
-import { gedcomEventTags } from "../../gedcom/gedcomEvent";
-import { fullname } from "../../gedcom/gedcomIndividual";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -8,6 +5,9 @@ import {
   inject,
 } from "@angular/core";
 import { RouterLink } from "@angular/router";
+import { AncestryService } from "../../database/ancestry.service";
+import { gedcomEventTags } from "../../gedcom/gedcomEvent";
+import { fullname } from "../../gedcom/gedcomIndividual";
 
 interface EventItem {
   eventType: string;

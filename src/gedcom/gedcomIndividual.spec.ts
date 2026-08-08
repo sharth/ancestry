@@ -1,11 +1,10 @@
-import type { GedcomIndividual } from "./gedcomIndividual";
+import { describe, expect, it } from "vitest";
 import {
   parseGedcomIndividual,
   serializeGedcomIndividual,
+  type GedcomIndividual,
 } from "./gedcomIndividual";
-import type { GedcomRecord } from "./gedcomRecord";
-import { parseGedcomRecords } from "./gedcomRecord";
-import { describe, expect, it } from "vitest";
+import { parseGedcomRecords, type GedcomRecord } from "./gedcomRecord";
 
 function normalize(record: GedcomRecord): GedcomRecord {
   return {

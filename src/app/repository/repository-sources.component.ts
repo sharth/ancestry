@@ -1,4 +1,3 @@
-import { AncestryService } from "../../database/ancestry.service";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -7,6 +6,7 @@ import {
   input,
 } from "@angular/core";
 import { RouterModule } from "@angular/router";
+import { AncestryService } from "../../database/ancestry.service";
 
 @Component({
   selector: "app-repository-sources",

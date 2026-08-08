@@ -1,4 +1,3 @@
-import { AncestryService } from "../../database/ancestry.service";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -7,6 +6,7 @@ import {
   resource,
 } from "@angular/core";
 import { DomSanitizer } from "@angular/platform-browser";
+import { AncestryService } from "../../database/ancestry.service";
 
 @Component({
   selector: "app-multimedia-preview",

@@ -1,11 +1,13 @@
-import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
-import type { GedcomRecord } from "../../gedcom/gedcomRecord";
 import {
   ChangeDetectionStrategy,
   Component,
   computed,
   input,
 } from "@angular/core";
+import {
+  serializeGedcomRecordToText,
+  type GedcomRecord,
+} from "../../gedcom/gedcomRecord";
 
 @Component({
   selector: "app-gedcom-diff",

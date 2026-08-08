@@ -1,5 +1,3 @@
-import { routes } from "./app.routes";
-import { NoRouteReuseStrategy } from "./no-reuse-route-strategy";
 import type { ApplicationConfig } from "@angular/core";
 import {
   RouteReuseStrategy,
@@ -8,6 +6,8 @@ import {
   withHashLocation,
   withInMemoryScrolling,
 } from "@angular/router";
+import { routes } from "./app.routes";
+import { NoRouteReuseStrategy } from "./no-reuse-route-strategy";
 
 declare const USE_HASH_LOCATION: boolean;
 

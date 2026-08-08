@@ -1,15 +1,15 @@
-import type { AncestryDatabase } from "../database/ancestry.service";
-import type { GedcomNote } from "../gedcom/gedcomNote";
-import type { ElementRef, QueryList } from "@angular/core";
 import {
   ChangeDetectionStrategy,
   Component,
   ViewChildren,
   input,
   model,
+  type ElementRef,
+  type QueryList,
 } from "@angular/core";
-import type { FormValueControl } from "@angular/forms/signals";
-import { FormField, form } from "@angular/forms/signals";
+import { FormField, form, type FormValueControl } from "@angular/forms/signals";
+import type { AncestryDatabase } from "../database/ancestry.service";
+import type { GedcomNote } from "../gedcom/gedcomNote";
 
 @Component({
   selector: "app-input-notes",

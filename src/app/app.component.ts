@@ -1,7 +1,7 @@
-import { AncestryService } from "../database/ancestry.service";
 import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 import { MatSidenavModule } from "@angular/material/sidenav";
 import { RouterLink, RouterOutlet } from "@angular/router";
+import { AncestryService } from "../database/ancestry.service";
 
 @Component({
   selector: "app-root",

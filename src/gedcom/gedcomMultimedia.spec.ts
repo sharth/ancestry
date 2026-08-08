@@ -1,9 +1,9 @@
+import { describe, expect, it } from "vitest";
 import {
   parseGedcomMultimedia,
   serializeGedcomMultimedia,
 } from "./gedcomMultimedia";
 import type { GedcomRecord } from "./gedcomRecord";
-import { describe, expect, it } from "vitest";
 
 describe("gedcomMultimedia", () => {
   const fullMultimediaRecord: GedcomRecord = {

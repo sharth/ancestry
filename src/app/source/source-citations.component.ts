@@ -1,5 +1,3 @@
-import { AncestryService } from "../../database/ancestry.service";
-import { IndividualLinkComponent } from "../individual-link/individual-link.component";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -9,6 +7,8 @@ import {
 } from "@angular/core";
 import { MatTableModule } from "@angular/material/table";
 import { RouterModule } from "@angular/router";
+import { AncestryService } from "../../database/ancestry.service";
+import { IndividualLinkComponent } from "../individual-link/individual-link.component";
 
 @Component({
   selector: "app-source-citations",

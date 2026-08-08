@@ -1,24 +1,3 @@
-import type { AncestryDatabase } from "../../database/ancestry.service";
-import { AncestryService } from "../../database/ancestry.service";
-import { InputIndividualComponent } from "../../forms/input-individual.component";
-import { InputMultimediaComponent } from "../../forms/input-multimedia.component";
-import { InputRepositoryComponent } from "../../forms/input-repository.component";
-import { InputSourceComponent } from "../../forms/input-source.component";
-import {
-  type GedcomIndividual,
-  newGedcomIndividual,
-} from "../../gedcom/gedcomIndividual";
-import {
-  type GedcomMultimedia,
-  newGedcomMultimedia,
-} from "../../gedcom/gedcomMultimedia";
-import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
-import {
-  type GedcomRepository,
-  newGedcomRepository,
-} from "../../gedcom/gedcomRepository";
-import { type GedcomSource, newGedcomSource } from "../../gedcom/gedcomSource";
-import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -31,6 +10,29 @@ import {
 } from "@angular/core";
 import { FormField, form } from "@angular/forms/signals";
 import { ActivatedRoute, Router } from "@angular/router";
+import {
+  AncestryService,
+  type AncestryDatabase,
+} from "../../database/ancestry.service";
+import { InputIndividualComponent } from "../../forms/input-individual.component";
+import { InputMultimediaComponent } from "../../forms/input-multimedia.component";
+import { InputRepositoryComponent } from "../../forms/input-repository.component";
+import { InputSourceComponent } from "../../forms/input-source.component";
+import {
+  newGedcomIndividual,
+  type GedcomIndividual,
+} from "../../gedcom/gedcomIndividual";
+import {
+  newGedcomMultimedia,
+  type GedcomMultimedia,
+} from "../../gedcom/gedcomMultimedia";
+import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
+import {
+  newGedcomRepository,
+  type GedcomRepository,
+} from "../../gedcom/gedcomRepository";
+import { newGedcomSource, type GedcomSource } from "../../gedcom/gedcomSource";
+import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
 
 @Component({
   selector: "app-gedcom-editor-individual",

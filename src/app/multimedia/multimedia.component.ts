@@ -1,8 +1,3 @@
-import type { AncestryDatabase } from "../../database/ancestry.service";
-import { AncestryService } from "../../database/ancestry.service";
-import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
-import { MultimediaCitationsComponent } from "./multimedia-citations.component";
-import { MultimediaPreviewComponent } from "./multimedia-preview.component";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -11,6 +6,13 @@ import {
   input,
 } from "@angular/core";
 import { RouterModule } from "@angular/router";
+import {
+  AncestryService,
+  type AncestryDatabase,
+} from "../../database/ancestry.service";
+import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
+import { MultimediaCitationsComponent } from "./multimedia-citations.component";
+import { MultimediaPreviewComponent } from "./multimedia-preview.component";
 
 @Component({
   selector: "app-multimedia",

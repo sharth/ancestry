@@ -1,9 +1,9 @@
-import { type GedcomRecord, parseGedcomRecords } from "./gedcomRecord";
+import { describe, expect, it } from "vitest";
+import { parseGedcomRecords, type GedcomRecord } from "./gedcomRecord";
 import {
   parseGedcomSubmitter,
   serializeGedcomSubmitter,
 } from "./gedcomSubmitter";
-import { describe, expect, it } from "vitest";
 
 function parseGedcomRecordsFromArray(lines: string[]): GedcomRecord[] {
   return parseGedcomRecords(lines.join("\n"));

@@ -1,3 +1,9 @@
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+} from "@angular/core";
 import type { AncestryDatabase } from "../../database/ancestry.service";
 import {
   fullname,
@@ -9,12 +15,6 @@ import { IndividualAncestorsComponent } from "./individual-ancestors.component";
 import { IndividualEventsComponent } from "./individual-events.component";
 import { IndividualRelativesComponent } from "./individual-relatives.component";
 import { IndividualSunburstComponent } from "./individual-sunburst.component";
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  input,
-} from "@angular/core";
 
 @Component({
   selector: "app-individual",

@@ -1,7 +1,3 @@
-import { AncestryService } from "../../database/ancestry.service";
-import type { GedcomIndividual } from "../../gedcom/gedcomIndividual";
-import { fullname } from "../../gedcom/gedcomIndividual";
-import { IndividualLinkComponent } from "../individual-link/individual-link.component";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -9,6 +5,9 @@ import {
   inject,
   input,
 } from "@angular/core";
+import { AncestryService } from "../../database/ancestry.service";
+import { fullname, type GedcomIndividual } from "../../gedcom/gedcomIndividual";
+import { IndividualLinkComponent } from "../individual-link/individual-link.component";
 
 @Component({
   selector: "app-individual-ancestors",

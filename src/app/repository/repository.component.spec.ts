@@ -1,9 +1,8 @@
-import { RepositoryComponent } from "./repository.component";
-import type { ComponentFixture } from "@angular/core/testing";
-import { TestBed } from "@angular/core/testing";
+import { TestBed, type ComponentFixture } from "@angular/core/testing";
 import { provideRouter } from "@angular/router";
-import { describe, expect, it, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import type { AncestryDatabase } from "../../database/ancestry.service";
+import { RepositoryComponent } from "./repository.component";
 
 describe("RepositoryComponent", () => {
   let component: RepositoryComponent;

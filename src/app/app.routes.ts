@@ -1,3 +1,4 @@
+import type { Routes } from "@angular/router";
 import { ancestryDatabaseResolver } from "../database/ancestry.service";
 import { HelloComponent } from "./hello/hello.component";
 import { IndexComponent } from "./index/index.component";
@@ -12,7 +13,6 @@ import { RepositoryComponent } from "./repository/repository.component";
 import { SourceComponent } from "./source/source.component";
 import { SourcesComponent } from "./sources/sources.component";
 import { ValidationComponent } from "./validation/validation.component";
-import type { Routes } from "@angular/router";
 
 export const routes: Routes = [
   {

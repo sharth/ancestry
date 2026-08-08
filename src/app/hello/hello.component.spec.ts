@@ -1,9 +1,8 @@
+import { signal } from "@angular/core";
+import { TestBed, type ComponentFixture } from "@angular/core/testing";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AncestryService } from "../../database/ancestry.service";
 import { HelloComponent } from "./hello.component";
-import { signal } from "@angular/core";
-import type { ComponentFixture } from "@angular/core/testing";
-import { TestBed } from "@angular/core/testing";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("HelloComponent", () => {
   let component: HelloComponent;

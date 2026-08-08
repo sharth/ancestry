@@ -1,10 +1,15 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
-import type { GedcomNote } from "./gedcomNote";
-import { parseGedcomNote, serializeGedcomNote } from "./gedcomNote";
+import {
+  parseGedcomNote,
+  serializeGedcomNote,
+  type GedcomNote,
+} from "./gedcomNote";
 import type { GedcomRecord } from "./gedcomRecord";
-import type { GedcomSourceCitation } from "./gedcomSourceCitation";
-import { parseGedcomSourceCitation } from "./gedcomSourceCitation";
-import { serializeGedcomSourceCitation } from "./gedcomSourceCitation";
+import {
+  parseGedcomSourceCitation,
+  serializeGedcomSourceCitation,
+  type GedcomSourceCitation,
+} from "./gedcomSourceCitation";
 
 export interface GedcomName {
   prefix: string;

@@ -1,8 +1,3 @@
-import type { AncestryDatabase } from "../../database/ancestry.service";
-import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
-import { serializeGedcomRepository } from "../../gedcom/gedcomRepository";
-import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
-import { RepositorySourcesComponent } from "./repository-sources.component";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -11,6 +6,11 @@ import {
   viewChild,
 } from "@angular/core";
 import { RouterModule } from "@angular/router";
+import type { AncestryDatabase } from "../../database/ancestry.service";
+import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
+import { serializeGedcomRepository } from "../../gedcom/gedcomRepository";
+import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
+import { RepositorySourcesComponent } from "./repository-sources.component";
 
 @Component({
   selector: "app-repository",

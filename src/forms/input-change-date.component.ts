@@ -1,7 +1,7 @@
-import type { AncestryDatabase } from "../database/ancestry.service";
-import type { GedcomChangeDate } from "../gedcom/gedcomChangeDate";
 import { Component, effect, input, model } from "@angular/core";
 import type { FormValueControl } from "@angular/forms/signals";
+import type { AncestryDatabase } from "../database/ancestry.service";
+import type { GedcomChangeDate } from "../gedcom/gedcomChangeDate";
 
 @Component({
   selector: "app-input-change-date",

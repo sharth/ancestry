@@ -1,16 +1,20 @@
-import type { AncestryDatabase } from "../database/ancestry.service";
-import type { GedcomEventSharedWith } from "../gedcom/gedcomEvent";
-import { InputIndividualXrefComponent } from "./input-individual-xref.component";
-import type { QueryList } from "@angular/core";
 import {
   ChangeDetectionStrategy,
   Component,
   ViewChildren,
   input,
   model,
+  type QueryList,
 } from "@angular/core";
-import type { FieldTree, FormValueControl } from "@angular/forms/signals";
-import { FormField, form } from "@angular/forms/signals";
+import {
+  FormField,
+  form,
+  type FieldTree,
+  type FormValueControl,
+} from "@angular/forms/signals";
+import type { AncestryDatabase } from "../database/ancestry.service";
+import type { GedcomEventSharedWith } from "../gedcom/gedcomEvent";
+import { InputIndividualXrefComponent } from "./input-individual-xref.component";
 
 @Component({
   selector: "app-input-shared-with",

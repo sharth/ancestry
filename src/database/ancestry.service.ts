@@ -1,50 +1,50 @@
+import { computed, inject, resource, Service, signal } from "@angular/core";
+import { toObservable } from "@angular/core/rxjs-interop";
+import { RedirectCommand, Router, type ResolveFn } from "@angular/router";
+import Dexie from "dexie";
+import { filter, firstValueFrom } from "rxjs";
 import { monthNames } from "../gedcom/gedcomDate";
-import type { GedcomFamily } from "../gedcom/gedcomFamily";
 import {
   parseGedcomFamily,
   serializeGedcomFamily,
+  type GedcomFamily,
 } from "../gedcom/gedcomFamily";
-import type { GedcomHeader } from "../gedcom/gedcomHeader";
-import { parseGedcomHeader } from "../gedcom/gedcomHeader";
-import type { GedcomIndividual } from "../gedcom/gedcomIndividual";
+import { parseGedcomHeader, type GedcomHeader } from "../gedcom/gedcomHeader";
 import {
   parseGedcomIndividual,
   serializeGedcomIndividual,
+  type GedcomIndividual,
 } from "../gedcom/gedcomIndividual";
-import type { GedcomMultimedia } from "../gedcom/gedcomMultimedia";
 import {
   parseGedcomMultimedia,
   serializeGedcomMultimedia,
+  type GedcomMultimedia,
 } from "../gedcom/gedcomMultimedia";
-import type { GedcomRecord } from "../gedcom/gedcomRecord";
 import {
   parseGedcomRecords,
   serializeGedcomRecordToText,
+  type GedcomRecord,
 } from "../gedcom/gedcomRecord";
-import type { GedcomRepository } from "../gedcom/gedcomRepository";
 import {
   parseGedcomRepository,
   serializeGedcomRepository,
+  type GedcomRepository,
 } from "../gedcom/gedcomRepository";
-import type { GedcomSource } from "../gedcom/gedcomSource";
 import {
   parseGedcomSource,
   serializeGedcomSource,
+  type GedcomSource,
 } from "../gedcom/gedcomSource";
-import type { GedcomSubmitter } from "../gedcom/gedcomSubmitter";
 import {
   parseGedcomSubmitter,
   serializeGedcomSubmitter,
+  type GedcomSubmitter,
 } from "../gedcom/gedcomSubmitter";
-import type { GedcomTrailer } from "../gedcom/gedcomTrailer";
-import { parseGedcomTrailer } from "../gedcom/gedcomTrailer";
+import {
+  parseGedcomTrailer,
+  type GedcomTrailer,
+} from "../gedcom/gedcomTrailer";
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
-import { Service, computed, inject, resource, signal } from "@angular/core";
-import { toObservable } from "@angular/core/rxjs-interop";
-import type { ResolveFn } from "@angular/router";
-import { RedirectCommand, Router } from "@angular/router";
-import Dexie from "dexie";
-import { filter, firstValueFrom } from "rxjs";
 
 interface DatabaseState {
   id?: number;

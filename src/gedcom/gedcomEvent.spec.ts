@@ -1,7 +1,10 @@
-import type { GedcomEvent } from "./gedcomEvent";
-import { parseGedcomEvent, serializeGedcomEvent } from "./gedcomEvent";
-import type { GedcomRecord } from "./gedcomRecord";
 import { describe, expect, it } from "vitest";
+import {
+  parseGedcomEvent,
+  serializeGedcomEvent,
+  type GedcomEvent,
+} from "./gedcomEvent";
+import type { GedcomRecord } from "./gedcomRecord";
 
 describe("gedcomEvent", () => {
   const gedcomRecord: GedcomRecord = {

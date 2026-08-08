@@ -1,6 +1,3 @@
-import type { AncestryDatabase } from "../database/ancestry.service";
-import type { GedcomMultimediaLink } from "../gedcom/gedcomMultimediaLink";
-import type { ElementRef, QueryList } from "@angular/core";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -11,10 +8,18 @@ import {
   inject,
   input,
   model,
+  type ElementRef,
+  type QueryList,
 } from "@angular/core";
-import type { FieldTree } from "@angular/forms/signals";
-import { FormField, type FormValueControl, form } from "@angular/forms/signals";
+import {
+  FormField,
+  form,
+  type FieldTree,
+  type FormValueControl,
+} from "@angular/forms/signals";
 import { RouterModule } from "@angular/router";
+import type { AncestryDatabase } from "../database/ancestry.service";
+import type { GedcomMultimediaLink } from "../gedcom/gedcomMultimediaLink";
 
 @Component({
   selector: "app-input-multimedia-links",

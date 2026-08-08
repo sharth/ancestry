@@ -1,9 +1,9 @@
 import { Injectable } from "@angular/core";
-import type {
-  ActivatedRouteSnapshot,
-  DetachedRouteHandle,
+import {
+  RouteReuseStrategy,
+  type ActivatedRouteSnapshot,
+  type DetachedRouteHandle,
 } from "@angular/router";
-import { RouteReuseStrategy } from "@angular/router";
 
 @Injectable()
 export class NoRouteReuseStrategy extends RouteReuseStrategy {

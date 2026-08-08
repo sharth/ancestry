@@ -1,6 +1,6 @@
+import { describe, expect, it } from "vitest";
 import { parseGedcomFamily, serializeGedcomFamily } from "./gedcomFamily";
 import type { GedcomRecord } from "./gedcomRecord";
-import { describe, expect, it } from "vitest";
 
 describe("gedcomFamily", () => {
   const gedcomRecord: GedcomRecord = {

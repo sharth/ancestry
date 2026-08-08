@@ -1,9 +1,3 @@
-import type { AncestryDatabase } from "../database/ancestry.service";
-import { AncestryService } from "../database/ancestry.service";
-import {
-  type GedcomMultimedia,
-  newGedcomMultimedia,
-} from "../gedcom/gedcomMultimedia";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -11,8 +5,15 @@ import {
   input,
   model,
 } from "@angular/core";
-import type { FormValueControl } from "@angular/forms/signals";
-import { FormField, form } from "@angular/forms/signals";
+import { FormField, form, type FormValueControl } from "@angular/forms/signals";
+import {
+  AncestryService,
+  type AncestryDatabase,
+} from "../database/ancestry.service";
+import {
+  newGedcomMultimedia,
+  type GedcomMultimedia,
+} from "../gedcom/gedcomMultimedia";
 
 @Component({
   selector: "app-input-multimedia",

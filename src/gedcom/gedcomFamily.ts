@@ -1,12 +1,14 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
-import type { GedcomEvent } from "./gedcomEvent";
-import { parseGedcomEvent } from "./gedcomEvent";
-import { serializeGedcomEvent } from "./gedcomEvent";
+import {
+  parseGedcomEvent,
+  serializeGedcomEvent,
+  type GedcomEvent,
+} from "./gedcomEvent";
 import type { GedcomRecord } from "./gedcomRecord";
-import type { GedcomSourceCitation } from "./gedcomSourceCitation";
 import {
   parseGedcomSourceCitation,
   serializeGedcomSourceCitation,
+  type GedcomSourceCitation,
 } from "./gedcomSourceCitation";
 
 export interface GedcomFamily {

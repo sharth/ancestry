@@ -1,5 +1,3 @@
-import type { AncestryDatabase } from "../../database/ancestry.service";
-import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -7,6 +5,8 @@ import {
   input,
 } from "@angular/core";
 import { RouterLink } from "@angular/router";
+import type { AncestryDatabase } from "../../database/ancestry.service";
+import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
 
 @Component({
   selector: "app-multimedias",

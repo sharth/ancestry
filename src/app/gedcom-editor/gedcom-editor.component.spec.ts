@@ -1,5 +1,12 @@
-import { AncestryService } from "../../database/ancestry.service";
-import type { AncestryDatabase } from "../../database/ancestry.service";
+import { signal } from "@angular/core";
+import { TestBed, type ComponentFixture } from "@angular/core/testing";
+import { provideRouter } from "@angular/router";
+import { userEvent } from "@testing-library/user-event";
+import { assert, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  AncestryService,
+  type AncestryDatabase,
+} from "../../database/ancestry.service";
 import type { GedcomIndividual } from "../../gedcom/gedcomIndividual";
 import {
   GedcomEditorComponent,
@@ -7,12 +14,6 @@ import {
   calculateNextMultimediaXref,
   calculateNextSourceXref,
 } from "./gedcom-editor.component";
-import { signal } from "@angular/core";
-import { TestBed } from "@angular/core/testing";
-import type { ComponentFixture } from "@angular/core/testing";
-import { provideRouter } from "@angular/router";
-import { userEvent } from "@testing-library/user-event";
-import { assert, beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("GedcomEditorComponent helpers", () => {
   describe("calculateNextIndividualXref", () => {

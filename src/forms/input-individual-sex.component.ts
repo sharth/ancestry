@@ -1,14 +1,13 @@
-import type { AncestryDatabase } from "../database/ancestry.service";
-import type { GedcomSex } from "../gedcom/gedcomSex";
-import { InputSourceCitationsComponent } from "./input-source-citations.component";
 import {
   ChangeDetectionStrategy,
   Component,
   input,
   model,
 } from "@angular/core";
-import type { FormValueControl } from "@angular/forms/signals";
-import { FormField, form } from "@angular/forms/signals";
+import { form, FormField, type FormValueControl } from "@angular/forms/signals";
+import type { AncestryDatabase } from "../database/ancestry.service";
+import type { GedcomSex } from "../gedcom/gedcomSex";
+import { InputSourceCitationsComponent } from "./input-source-citations.component";
 
 @Component({
   selector: "app-input-individual-sex",

@@ -1,7 +1,3 @@
-import type { AncestryDatabase } from "../../database/ancestry.service";
-import type { GedcomIndividual } from "../../gedcom/gedcomIndividual";
-import { fullname } from "../../gedcom/gedcomIndividual";
-import type { ElementRef } from "@angular/core";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -9,9 +5,12 @@ import {
   effect,
   input,
   viewChild,
+  type ElementRef,
 } from "@angular/core";
 import { RouterLink } from "@angular/router";
 import * as d3 from "d3";
+import type { AncestryDatabase } from "../../database/ancestry.service";
+import { fullname, type GedcomIndividual } from "../../gedcom/gedcomIndividual";
 
 interface SunburstNode {
   individual: GedcomIndividual;

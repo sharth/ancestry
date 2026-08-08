@@ -1,8 +1,8 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
-import type { GedcomChangeDate } from "./gedcomChangeDate";
 import {
   parseGedcomChangeDate,
   serializeGedcomChangeDate,
+  type GedcomChangeDate,
 } from "./gedcomChangeDate";
 import type { GedcomRecord } from "./gedcomRecord";
 

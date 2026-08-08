@@ -1,8 +1,8 @@
+import { describe, expect, it } from "vitest";
 import {
   parseGedcomRecords,
   serializeGedcomRecordToText,
 } from "./gedcomRecord";
-import { describe, expect, it } from "vitest";
 
 describe("GedcomRecord", () => {
   // CONC and CONT will be discarded during parsing, and will not be preserved by the parser.

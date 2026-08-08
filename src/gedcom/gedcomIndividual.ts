@@ -1,22 +1,32 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
-import type { GedcomChangeDate } from "./gedcomChangeDate";
 import {
   newGedcomChangeDate,
   parseGedcomChangeDate,
   serializeGedcomChangeDate,
+  type GedcomChangeDate,
 } from "./gedcomChangeDate";
-import type { GedcomEvent } from "./gedcomEvent";
-import { parseGedcomEvent, serializeGedcomEvent } from "./gedcomEvent";
-import type { GedcomName } from "./gedcomName";
-import { parseGedcomName, serializeGedcomName } from "./gedcomName";
 import {
-  type GedcomNote,
+  parseGedcomEvent,
+  serializeGedcomEvent,
+  type GedcomEvent,
+} from "./gedcomEvent";
+import {
+  parseGedcomName,
+  serializeGedcomName,
+  type GedcomName,
+} from "./gedcomName";
+import {
   parseGedcomNote,
   serializeGedcomNote,
+  type GedcomNote,
 } from "./gedcomNote";
 import type { GedcomRecord } from "./gedcomRecord";
-import type { GedcomSex } from "./gedcomSex";
-import { newGedcomSex, parseGedcomSex, serializeGedcomSex } from "./gedcomSex";
+import {
+  newGedcomSex,
+  parseGedcomSex,
+  serializeGedcomSex,
+  type GedcomSex,
+} from "./gedcomSex";
 import type { GedcomSourceCitation } from "./gedcomSourceCitation";
 
 export interface GedcomIndividual {

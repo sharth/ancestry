@@ -1,7 +1,14 @@
+import {
+  ChangeDetectionStrategy,
+  Component,
+  input,
+  model,
+} from "@angular/core";
+import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 import type { AncestryDatabase } from "../database/ancestry.service";
 import {
-  type GedcomIndividual,
   newGedcomIndividual,
+  type GedcomIndividual,
 } from "../gedcom/gedcomIndividual";
 import { InputChangeDateComponent } from "./input-change-date.component";
 import { InputIndividualEventsComponent } from "./input-individual-events.component";
@@ -9,14 +16,6 @@ import { InputIndividualNamesComponent } from "./input-individual-names.componen
 import { InputIndividualSexComponent } from "./input-individual-sex.component";
 import { InputNotesComponent } from "./input-notes.component";
 import { InputUnknownRecordsComponent } from "./input-unknown-records.component";
-import {
-  ChangeDetectionStrategy,
-  Component,
-  input,
-  model,
-} from "@angular/core";
-import type { FormValueControl } from "@angular/forms/signals";
-import { FormField, form } from "@angular/forms/signals";
 
 @Component({
   selector: "app-input-individual",

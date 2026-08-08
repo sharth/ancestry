@@ -1,10 +1,10 @@
-import type { AncestryDatabase } from "../../database/ancestry.service";
 import {
   ChangeDetectionStrategy,
   Component,
   computed,
   input,
 } from "@angular/core";
+import type { AncestryDatabase } from "../../database/ancestry.service";
 
 @Component({
   selector: "app-index",

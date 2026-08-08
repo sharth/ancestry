@@ -1,16 +1,15 @@
-import type { AncestryDatabase } from "../database/ancestry.service";
-import {
-  type GedcomRepository,
-  newGedcomRepository,
-} from "../gedcom/gedcomRepository";
 import {
   ChangeDetectionStrategy,
   Component,
   input,
   model,
 } from "@angular/core";
-import type { FormValueControl } from "@angular/forms/signals";
-import { FormField, form } from "@angular/forms/signals";
+import { FormField, form, type FormValueControl } from "@angular/forms/signals";
+import type { AncestryDatabase } from "../database/ancestry.service";
+import {
+  newGedcomRepository,
+  type GedcomRepository,
+} from "../gedcom/gedcomRepository";
 
 @Component({
   selector: "app-input-repository",

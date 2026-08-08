@@ -1,10 +1,9 @@
+import { describe, expect, it } from "vitest";
 import {
   parseGedcomChangeDate,
   serializeGedcomChangeDate,
 } from "./gedcomChangeDate";
-import type { GedcomRecord } from "./gedcomRecord";
-import { parseGedcomRecords } from "./gedcomRecord";
-import { describe, expect, it } from "vitest";
+import { parseGedcomRecords, type GedcomRecord } from "./gedcomRecord";
 
 function normalize(record: GedcomRecord | null): GedcomRecord | null {
   if (record === null) {

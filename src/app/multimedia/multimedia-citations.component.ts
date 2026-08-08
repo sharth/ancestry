@@ -1,7 +1,3 @@
-import type { AncestryDatabase } from "../../database/ancestry.service";
-import { getFamilyMultimediaCitations } from "../../gedcom/gedcomFamily";
-import { getIndividualMultimediaCitations } from "../../gedcom/gedcomIndividual";
-import { IndividualLinkComponent } from "../individual-link/individual-link.component";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -10,6 +6,10 @@ import {
 } from "@angular/core";
 import { MatTableModule } from "@angular/material/table";
 import { RouterModule } from "@angular/router";
+import type { AncestryDatabase } from "../../database/ancestry.service";
+import { getFamilyMultimediaCitations } from "../../gedcom/gedcomFamily";
+import { getIndividualMultimediaCitations } from "../../gedcom/gedcomIndividual";
+import { IndividualLinkComponent } from "../individual-link/individual-link.component";
 
 @Component({
   selector: "app-multimedia-citations",

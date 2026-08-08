@@ -1,7 +1,3 @@
-import type { AncestryDatabase } from "../database/ancestry.service";
-import type { GedcomName } from "../gedcom/gedcomName";
-import { InputSourceCitationsComponent } from "./input-source-citations.component";
-import type { ElementRef, QueryList } from "@angular/core";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -11,9 +7,18 @@ import {
   inject,
   input,
   model,
+  type ElementRef,
+  type QueryList,
 } from "@angular/core";
-import type { FieldTree, FormValueControl } from "@angular/forms/signals";
-import { FormField, form } from "@angular/forms/signals";
+import {
+  FormField,
+  form,
+  type FieldTree,
+  type FormValueControl,
+} from "@angular/forms/signals";
+import type { AncestryDatabase } from "../database/ancestry.service";
+import type { GedcomName } from "../gedcom/gedcomName";
+import { InputSourceCitationsComponent } from "./input-source-citations.component";
 
 @Component({
   selector: "app-input-individual-names",

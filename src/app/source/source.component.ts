@@ -1,11 +1,3 @@
-import type { AncestryDatabase } from "../../database/ancestry.service";
-import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
-import { serializeGedcomSource } from "../../gedcom/gedcomSource";
-import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
-import { SourceCitationsComponent } from "./source-citations.component";
-import { SourceMultimediaComponent } from "./source-multimedia.component";
-import { SourceRepositoriesComponent } from "./source-repositories.component";
-import { SourceUnknownsComponent } from "./source-unknowns.component";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -14,6 +6,14 @@ import {
   viewChild,
 } from "@angular/core";
 import { RouterModule } from "@angular/router";
+import type { AncestryDatabase } from "../../database/ancestry.service";
+import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
+import { serializeGedcomSource } from "../../gedcom/gedcomSource";
+import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
+import { SourceCitationsComponent } from "./source-citations.component";
+import { SourceMultimediaComponent } from "./source-multimedia.component";
+import { SourceRepositoriesComponent } from "./source-repositories.component";
+import { SourceUnknownsComponent } from "./source-unknowns.component";
 
 @Component({
   selector: "app-source",

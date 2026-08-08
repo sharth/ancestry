@@ -1,7 +1,10 @@
-import { type GedcomRecord, parseGedcomRecords } from "./gedcomRecord";
-import type { GedcomSource } from "./gedcomSource";
-import { parseGedcomSource, serializeGedcomSource } from "./gedcomSource";
 import { describe, expect, it } from "vitest";
+import { parseGedcomRecords, type GedcomRecord } from "./gedcomRecord";
+import {
+  parseGedcomSource,
+  serializeGedcomSource,
+  type GedcomSource,
+} from "./gedcomSource";
 
 function expectToBeDefined<T>(value: T | undefined): asserts value is T {
   expect(value).toBeDefined();

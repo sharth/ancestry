@@ -1,6 +1,3 @@
-import type { AncestryDatabase } from "../database/ancestry.service";
-import { serializeGedcomRecordToText } from "../gedcom/gedcomRecord";
-import type { GedcomRecord } from "../gedcom/gedcomRecord";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -8,6 +5,11 @@ import {
   model,
 } from "@angular/core";
 import type { FormValueControl } from "@angular/forms/signals";
+import type { AncestryDatabase } from "../database/ancestry.service";
+import {
+  serializeGedcomRecordToText,
+  type GedcomRecord,
+} from "../gedcom/gedcomRecord";
 
 @Component({
   selector: "app-input-unknown-records",

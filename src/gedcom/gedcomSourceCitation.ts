@@ -1,11 +1,14 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
-import type { GedcomMultimediaLink } from "./gedcomMultimediaLink";
 import {
   parseGedcomMultimediaLink,
   serializeGedcomMultimediaLink,
+  type GedcomMultimediaLink,
 } from "./gedcomMultimediaLink";
-import type { GedcomNote } from "./gedcomNote";
-import { parseGedcomNote, serializeGedcomNote } from "./gedcomNote";
+import {
+  parseGedcomNote,
+  serializeGedcomNote,
+  type GedcomNote,
+} from "./gedcomNote";
 import type { GedcomRecord } from "./gedcomRecord";
 
 export interface GedcomSourceCitation {

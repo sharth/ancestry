@@ -1,19 +1,19 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
-import type { GedcomChangeDate } from "./gedcomChangeDate";
 import {
   parseGedcomChangeDate,
   serializeGedcomChangeDate,
+  type GedcomChangeDate,
 } from "./gedcomChangeDate";
-import type { GedcomMultimediaLink } from "./gedcomMultimediaLink";
 import {
   parseGedcomMultimediaLink,
   serializeGedcomMultimediaLink,
+  type GedcomMultimediaLink,
 } from "./gedcomMultimediaLink";
 import type { GedcomRecord } from "./gedcomRecord";
-import type { GedcomRepositoryLink } from "./gedcomRepositoryLink";
 import {
   parseGedcomRepositoryLink,
   serializeGedcomRepositoryLink,
+  type GedcomRepositoryLink,
 } from "./gedcomRepositoryLink";
 
 export interface GedcomSource {
