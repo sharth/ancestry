@@ -1,18 +1,11 @@
 import type { AncestryDatabase } from "../database/ancestry.service";
-import type { GedcomDate } from "../gedcom/gedcomDate";
-import type { GedcomSource } from "../gedcom/gedcomSource";
+import { type GedcomSource, newGedcomSource } from "../gedcom/gedcomSource";
+import { InputChangeDateComponent } from "./input-change-date.component";
 import { InputMultimediaLinksComponent } from "./input-multimedia-links.component";
 import { InputRepositoryLinksComponent } from "./input-repository-links.component";
 import { InputUnknownRecordsComponent } from "./input-unknown-records.component";
-import type { OnInit } from "@angular/core";
-import {
-  ChangeDetectionStrategy,
-  Component,
-  effect,
-  input,
-  model,
-  signal,
-} from "@angular/core";
+import { ChangeDetectionStrategy, Component, model } from "@angular/core";
+import type { FormValueControl } from "@angular/forms/signals";
 import { FormField, form } from "@angular/forms/signals";
 
 @Component({
@@ -22,57 +15,14 @@ import { FormField, form } from "@angular/forms/signals";
     InputMultimediaLinksComponent,
     InputRepositoryLinksComponent,
     InputUnknownRecordsComponent,
+    InputChangeDateComponent,
   ],
   templateUrl: "./input-source.component.html",
   styleUrl: "./input.component.css",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class InputSourceComponent implements OnInit {
+export class InputSourceComponent implements FormValueControl<GedcomSource> {
   readonly ancestryDatabase = model.required<AncestryDatabase>();
-  readonly xref = input.required<string>();
-
-  readonly source = signal<GedcomSource>({
-    xref: "",
-    abbr: "",
-    title: "",
-    text: "",
-    repositoryLinks: [],
-    multimediaLinks: [],
-    unknownRecords: [],
-    changeDate: { date: { value: "" } },
-  });
-  readonly form = form(this.source);
-
-  readonly updateAngularDatabase = effect(() => {
-    const now: GedcomDate = {
-      value: new Date()
-        .toLocaleString("en-gb", { dateStyle: "medium" })
-        .toLocaleUpperCase(),
-    };
-    const source: GedcomSource = {
-      ...this.source(),
-      changeDate: { date: now },
-    };
-    if (source.xref !== "") {
-      this.ancestryDatabase.update((ancestryDatabase) => ({
-        ...ancestryDatabase,
-        sources: { ...ancestryDatabase.sources, [source.xref]: source },
-      }));
-    }
-  });
-
-  ngOnInit(): void {
-    this.source.set(
-      this.ancestryDatabase().sources[this.xref()] ?? {
-        xref: this.xref(),
-        abbr: "",
-        title: "",
-        text: "",
-        repositoryLinks: [],
-        multimediaLinks: [],
-        unknownRecords: [],
-        changeDate: { date: { value: "" } },
-      },
-    );
-  }
+  readonly value = model<GedcomSource>(newGedcomSource(""));
+  readonly form = form(this.value);
 }

@@ -1,14 +1,10 @@
 import type { AncestryDatabase } from "../database/ancestry.service";
-import type { GedcomRepository } from "../gedcom/gedcomRepository";
-import type { OnInit } from "@angular/core";
 import {
-  ChangeDetectionStrategy,
-  Component,
-  effect,
-  input,
-  model,
-  signal,
-} from "@angular/core";
+  type GedcomRepository,
+  newGedcomRepository,
+} from "../gedcom/gedcomRepository";
+import { ChangeDetectionStrategy, Component, model } from "@angular/core";
+import type { FormValueControl } from "@angular/forms/signals";
 import { FormField, form } from "@angular/forms/signals";
 
 @Component({
@@ -18,37 +14,8 @@ import { FormField, form } from "@angular/forms/signals";
   styleUrl: "./input.component.css",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class InputRepositoryComponent implements OnInit {
+export class InputRepositoryComponent implements FormValueControl<GedcomRepository> {
   readonly ancestryDatabase = model.required<AncestryDatabase>();
-  readonly xref = input.required<string>();
-
-  readonly repository = signal<GedcomRepository>({
-    xref: "",
-    name: "",
-  });
-  readonly form = form(this.repository);
-
-  readonly updateAngularDatabase = effect(() => {
-    const repository: GedcomRepository = {
-      ...this.repository(),
-    };
-    if (repository.xref !== "") {
-      this.ancestryDatabase.update((ancestryDatabase) => ({
-        ...ancestryDatabase,
-        repositories: {
-          ...ancestryDatabase.repositories,
-          [repository.xref]: repository,
-        },
-      }));
-    }
-  });
-
-  ngOnInit(): void {
-    this.repository.set(
-      this.ancestryDatabase().repositories[this.xref()] ?? {
-        xref: this.xref(),
-        name: "",
-      },
-    );
-  }
+  readonly value = model<GedcomRepository>(newGedcomRepository(""));
+  readonly form = form(this.value);
 }

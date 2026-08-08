@@ -1,17 +1,16 @@
 import type { AncestryDatabase } from "../database/ancestry.service";
 import { AncestryService } from "../database/ancestry.service";
-import type { GedcomDate } from "../gedcom/gedcomDate";
-import type { GedcomMultimedia } from "../gedcom/gedcomMultimedia";
-import type { OnInit } from "@angular/core";
+import {
+  type GedcomMultimedia,
+  newGedcomMultimedia,
+} from "../gedcom/gedcomMultimedia";
 import {
   ChangeDetectionStrategy,
   Component,
-  effect,
   inject,
-  input,
   model,
-  signal,
 } from "@angular/core";
+import type { FormValueControl } from "@angular/forms/signals";
 import { FormField, form } from "@angular/forms/signals";
 
 @Component({
@@ -21,51 +20,11 @@ import { FormField, form } from "@angular/forms/signals";
   styleUrl: "./input.component.css",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class InputMultimediaComponent implements OnInit {
+export class InputMultimediaComponent implements FormValueControl<GedcomMultimedia> {
   readonly ancestryService = inject(AncestryService);
   readonly ancestryDatabase = model.required<AncestryDatabase>();
-  readonly xref = input.required<string>();
-
-  readonly multimedia = signal<GedcomMultimedia>({
-    xref: "",
-    filePath: "",
-    mediaType: "",
-    title: "",
-  });
-  readonly form = form(this.multimedia);
-
-  readonly updateAngularDatabase = effect(() => {
-    const now: GedcomDate = {
-      value: new Date()
-        .toLocaleString("en-gb", { dateStyle: "medium" })
-        .toLocaleUpperCase(),
-    };
-    const multimedia = {
-      ...this.multimedia(),
-      changeDate: { date: now },
-    };
-    if (multimedia.xref !== "") {
-      this.ancestryDatabase.update((ancestryDatabase) => ({
-        ...ancestryDatabase,
-        multimedias: {
-          ...ancestryDatabase.multimedias,
-          [multimedia.xref]: multimedia,
-        },
-      }));
-    }
-  });
-
-  ngOnInit(): void {
-    this.multimedia.set(
-      this.ancestryDatabase().multimedias[this.xref()] ?? {
-        xref: this.xref(),
-        filePath: "",
-        mediaType: "",
-        title: "",
-      },
-    );
-  }
-
+  readonly value = model<GedcomMultimedia>(newGedcomMultimedia(""));
+  readonly form = form(this.value);
   async browseFile() {
     try {
       const [fileHandle] = await window.showOpenFilePicker({
@@ -82,7 +41,7 @@ export class InputMultimediaComponent implements OnInit {
         return;
       }
 
-      this.multimedia.update((m) => ({
+      this.value.update((m) => ({
         ...m,
         filePath: relativePath.join("/"),
         mediaType: file.type,

@@ -1,23 +1,16 @@
 import type { AncestryDatabase } from "../database/ancestry.service";
-import type { GedcomDate } from "../gedcom/gedcomDate";
 import {
   type GedcomIndividual,
   newGedcomIndividual,
 } from "../gedcom/gedcomIndividual";
+import { InputChangeDateComponent } from "./input-change-date.component";
 import { InputIndividualEventsComponent } from "./input-individual-events.component";
 import { InputIndividualNamesComponent } from "./input-individual-names.component";
 import { InputIndividualSexComponent } from "./input-individual-sex.component";
 import { InputNotesComponent } from "./input-notes.component";
 import { InputUnknownRecordsComponent } from "./input-unknown-records.component";
-import type { OnInit } from "@angular/core";
-import {
-  ChangeDetectionStrategy,
-  Component,
-  effect,
-  input,
-  model,
-  signal,
-} from "@angular/core";
+import { ChangeDetectionStrategy, Component, model } from "@angular/core";
+import type { FormValueControl } from "@angular/forms/signals";
 import { FormField, form } from "@angular/forms/signals";
 
 @Component({
@@ -29,44 +22,14 @@ import { FormField, form } from "@angular/forms/signals";
     InputIndividualNamesComponent,
     InputUnknownRecordsComponent,
     InputNotesComponent,
+    InputChangeDateComponent,
   ],
   templateUrl: "./input-individual.component.html",
   styleUrl: "./input.component.css",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class InputIndividualComponent implements OnInit {
+export class InputIndividualComponent implements FormValueControl<GedcomIndividual> {
   readonly ancestryDatabase = model.required<AncestryDatabase>();
-  readonly xref = input.required<string>();
-  readonly open = input<boolean>(false);
-
-  readonly individual = signal<GedcomIndividual>(newGedcomIndividual(""));
-  readonly form = form<GedcomIndividual>(this.individual);
-
-  readonly updateAngularDatabase = effect(() => {
-    const now: GedcomDate = {
-      value: new Date()
-        .toLocaleString("en-gb", { dateStyle: "medium" })
-        .toLocaleUpperCase(),
-    };
-    const individual = {
-      ...this.individual(),
-      changeDate: { date: now },
-    };
-    if (individual.xref !== "") {
-      this.ancestryDatabase.update((ancestryDatabase) => ({
-        ...ancestryDatabase,
-        individuals: {
-          ...ancestryDatabase.individuals,
-          [individual.xref]: individual,
-        },
-      }));
-    }
-  });
-
-  ngOnInit(): void {
-    this.individual.set(
-      this.ancestryDatabase().individuals[this.xref()] ??
-        newGedcomIndividual(this.xref()),
-    );
-  }
+  readonly value = model<GedcomIndividual>(newGedcomIndividual(""));
+  readonly form = form(this.value);
 }

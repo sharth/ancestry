@@ -1,29 +1,28 @@
 <form (submit)="submitForm()" class="vstack gap-3">
   @switch (type()) {
     @case ("INDI") {
-      <app-input-individual
+      <app-gedcom-editor-individual
         [(ancestryDatabase)]="computedDatabase"
         [xref]="effectiveXref()"
-        [open]="true"
-      ></app-input-individual>
+      ></app-gedcom-editor-individual>
     }
     @case ("SOUR") {
-      <app-input-source
+      <app-gedcom-editor-source
         [(ancestryDatabase)]="computedDatabase"
         [xref]="effectiveXref()"
-      ></app-input-source>
+      ></app-gedcom-editor-source>
     }
     @case ("OBJE") {
-      <app-input-multimedia
+      <app-gedcom-editor-multimedia
         [(ancestryDatabase)]="computedDatabase"
         [xref]="effectiveXref()"
-      ></app-input-multimedia>
+      ></app-gedcom-editor-multimedia>
     }
     @case ("REPO") {
-      <app-input-repository
+      <app-gedcom-editor-repository
         [(ancestryDatabase)]="computedDatabase"
         [xref]="effectiveXref()"
-      ></app-input-repository>
+      ></app-gedcom-editor-repository>
     }
   }
 
