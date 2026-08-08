@@ -10,6 +10,7 @@ import {
   ViewChildren,
   afterNextRender,
   inject,
+  input,
   model,
 } from "@angular/core";
 import type { FieldTree, FormValueControl } from "@angular/forms/signals";
@@ -33,7 +34,7 @@ export class InputRepositoryLinksComponent implements FormValueControl<
 > {
   private readonly _injector = inject(Injector);
 
-  readonly ancestryDatabase = model.required<AncestryDatabase>();
+  readonly ancestryDatabase = input.required<AncestryDatabase>();
   readonly value = model<GedcomRepositoryLink[]>([]);
   readonly form = form(this.value);
 

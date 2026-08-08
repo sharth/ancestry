@@ -36,7 +36,7 @@ import { ActivatedRoute, Router } from "@angular/router";
   selector: "app-gedcom-editor-individual",
   imports: [FormField, InputIndividualComponent],
   template: `<app-input-individual
-    [(ancestryDatabase)]="ancestryDatabase"
+    [ancestryDatabase]="ancestryDatabase()"
     [formField]="form"
   ></app-input-individual>`,
 })
@@ -71,7 +71,7 @@ export class GedcomEditorIndividualComponent {
   selector: "app-gedcom-editor-source",
   imports: [FormField, InputSourceComponent],
   template: `<app-input-source
-    [(ancestryDatabase)]="ancestryDatabase"
+    [ancestryDatabase]="ancestryDatabase()"
     [formField]="form"
   ></app-input-source>`,
 })
@@ -106,7 +106,7 @@ export class GedcomEditorSourceComponent {
   selector: "app-gedcom-editor-repository",
   imports: [FormField, InputRepositoryComponent],
   template: `<app-input-repository
-    [(ancestryDatabase)]="ancestryDatabase"
+    [ancestryDatabase]="ancestryDatabase()"
     [formField]="form"
   ></app-input-repository>`,
 })
@@ -141,7 +141,7 @@ export class GedcomEditorRepositoryComponent {
   selector: "app-gedcom-editor-multimedia",
   imports: [FormField, InputMultimediaComponent],
   template: `<app-input-multimedia
-    [(ancestryDatabase)]="ancestryDatabase"
+    [ancestryDatabase]="ancestryDatabase()"
     [formField]="form"
   ></app-input-multimedia>`,
 })

@@ -8,6 +8,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   inject,
+  input,
   model,
 } from "@angular/core";
 import type { FormValueControl } from "@angular/forms/signals";
@@ -22,9 +23,10 @@ import { FormField, form } from "@angular/forms/signals";
 })
 export class InputMultimediaComponent implements FormValueControl<GedcomMultimedia> {
   readonly ancestryService = inject(AncestryService);
-  readonly ancestryDatabase = model.required<AncestryDatabase>();
+  readonly ancestryDatabase = input.required<AncestryDatabase>();
   readonly value = model<GedcomMultimedia>(newGedcomMultimedia(""));
   readonly form = form(this.value);
+
   async browseFile() {
     try {
       const [fileHandle] = await window.showOpenFilePicker({

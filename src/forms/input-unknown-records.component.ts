@@ -19,7 +19,7 @@ import type { FormValueControl } from "@angular/forms/signals";
 export class InputUnknownRecordsComponent implements FormValueControl<
   GedcomRecord[]
 > {
-  readonly ancestryDatabase = model.required<AncestryDatabase>();
+  readonly ancestryDatabase = input.required<AncestryDatabase>();
   readonly open = input<boolean>(false);
   readonly value = model<GedcomRecord[]>([]);
 

@@ -74,15 +74,15 @@
         </div>
         <app-input-source-citations
           [formField]="event.citations"
-          [(ancestryDatabase)]="ancestryDatabase"
+          [ancestryDatabase]="ancestryDatabase()"
         ></app-input-source-citations>
         <app-input-shared-with
           [formField]="event.sharedWith"
-          [(ancestryDatabase)]="ancestryDatabase"
+          [ancestryDatabase]="ancestryDatabase()"
         ></app-input-shared-with>
         <app-input-notes
           [formField]="event.notes"
-          [(ancestryDatabase)]="ancestryDatabase"
+          [ancestryDatabase]="ancestryDatabase()"
         ></app-input-notes>
       }
     </details>

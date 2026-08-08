@@ -9,6 +9,7 @@ import {
   afterNextRender,
   computed,
   inject,
+  input,
   model,
 } from "@angular/core";
 import type { FieldTree } from "@angular/forms/signals";
@@ -26,8 +27,7 @@ export class InputMultimediaLinksComponent implements FormValueControl<
   GedcomMultimediaLink[]
 > {
   private readonly _injector = inject(Injector);
-
-  readonly ancestryDatabase = model.required<AncestryDatabase>();
+  readonly ancestryDatabase = input.required<AncestryDatabase>();
   readonly value = model<GedcomMultimediaLink[]>([]);
   readonly form = form(this.value);
 
@@ -47,6 +47,7 @@ export class InputMultimediaLinksComponent implements FormValueControl<
       ...multimediaLinks,
       { xref: "", title: "" },
     ]);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.newControls.add(this.form[this.form.length - 1]!);
     afterNextRender(
       {

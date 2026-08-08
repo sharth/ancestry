@@ -1,34 +1,34 @@
 <app-input-individual-names
   [open]="true"
   [formField]="form.names"
-  [(ancestryDatabase)]="ancestryDatabase"
+  [ancestryDatabase]="ancestryDatabase()"
 ></app-input-individual-names>
 
 <app-input-individual-sex
   [open]="true"
   [formField]="form.sex"
-  [(ancestryDatabase)]="ancestryDatabase"
+  [ancestryDatabase]="ancestryDatabase()"
 ></app-input-individual-sex>
 
 <app-input-individual-events
   [open]="true"
   [formField]="form.events"
-  [(ancestryDatabase)]="ancestryDatabase"
+  [ancestryDatabase]="ancestryDatabase()"
 ></app-input-individual-events>
 
 <app-input-notes
   [open]="true"
   [formField]="form.notes"
-  [(ancestryDatabase)]="ancestryDatabase"
+  [ancestryDatabase]="ancestryDatabase()"
 ></app-input-notes>
 
 <app-input-unknown-records
   [open]="true"
   [formField]="form.unknownRecords"
-  [(ancestryDatabase)]="ancestryDatabase"
+  [ancestryDatabase]="ancestryDatabase()"
 ></app-input-unknown-records>
 
 <app-input-change-date
-  [(ancestryDatabase)]="ancestryDatabase"
+  [ancestryDatabase]="ancestryDatabase()"
   [formField]="form.changeDate"
 ></app-input-change-date>

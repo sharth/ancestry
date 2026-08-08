@@ -5,6 +5,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   ViewChild,
+  input,
   model,
 } from "@angular/core";
 import type { FormValueControl } from "@angular/forms/signals";
@@ -18,7 +19,7 @@ import { FormField, form } from "@angular/forms/signals";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputIndividualXrefComponent implements FormValueControl<string> {
-  readonly ancestryDatabase = model.required<AncestryDatabase>();
+  readonly ancestryDatabase = input.required<AncestryDatabase>();
 
   readonly value = model<string>("");
   readonly form = form(this.value);

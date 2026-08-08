@@ -9,7 +9,12 @@ import { InputIndividualNamesComponent } from "./input-individual-names.componen
 import { InputIndividualSexComponent } from "./input-individual-sex.component";
 import { InputNotesComponent } from "./input-notes.component";
 import { InputUnknownRecordsComponent } from "./input-unknown-records.component";
-import { ChangeDetectionStrategy, Component, model } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  input,
+  model,
+} from "@angular/core";
 import type { FormValueControl } from "@angular/forms/signals";
 import { FormField, form } from "@angular/forms/signals";
 
@@ -29,7 +34,7 @@ import { FormField, form } from "@angular/forms/signals";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputIndividualComponent implements FormValueControl<GedcomIndividual> {
-  readonly ancestryDatabase = model.required<AncestryDatabase>();
+  readonly ancestryDatabase = input.required<AncestryDatabase>();
   readonly value = model<GedcomIndividual>(newGedcomIndividual(""));
   readonly form = form(this.value);
 }

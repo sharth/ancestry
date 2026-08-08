@@ -6,6 +6,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   ViewChildren,
+  input,
   model,
 } from "@angular/core";
 import type { FieldTree, FormValueControl } from "@angular/forms/signals";
@@ -21,7 +22,7 @@ import { FormField, form } from "@angular/forms/signals";
 export class InputSharedWithComponent implements FormValueControl<
   GedcomEventSharedWith[]
 > {
-  readonly ancestryDatabase = model.required<AncestryDatabase>();
+  readonly ancestryDatabase = input.required<AncestryDatabase>();
   readonly value = model<GedcomEventSharedWith[]>([]);
   readonly form = form(this.value);
 

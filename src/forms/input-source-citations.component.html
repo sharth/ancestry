@@ -47,11 +47,11 @@
         </div>
         <app-input-multimedia-links
           [formField]="formGroup.multimediaLinks"
-          [(ancestryDatabase)]="ancestryDatabase"
+          [ancestryDatabase]="ancestryDatabase()"
         ></app-input-multimedia-links>
         <app-input-notes
           [formField]="formGroup.notes"
-          [(ancestryDatabase)]="ancestryDatabase"
+          [ancestryDatabase]="ancestryDatabase()"
         ></app-input-notes>
       </details>
     }

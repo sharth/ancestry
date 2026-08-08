@@ -19,11 +19,11 @@
         <app-input-repository-xref
           #focusTarget
           [formField]="formGroup.repositoryXref"
-          [(ancestryDatabase)]="ancestryDatabase"
+          [ancestryDatabase]="ancestryDatabase()"
         ></app-input-repository-xref>
         <app-input-repository-call-number
           [formField]="formGroup.callNumber"
-          [(ancestryDatabase)]="ancestryDatabase"
+          [ancestryDatabase]="ancestryDatabase()"
         ></app-input-repository-call-number>
       </details>
     }

@@ -8,6 +8,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   ViewChildren,
+  input,
   model,
 } from "@angular/core";
 import type { FormValueControl } from "@angular/forms/signals";
@@ -28,7 +29,7 @@ import { FormField, form } from "@angular/forms/signals";
 export class InputSourceCitationsComponent implements FormValueControl<
   GedcomSourceCitation[]
 > {
-  readonly ancestryDatabase = model.required<AncestryDatabase>();
+  readonly ancestryDatabase = input.required<AncestryDatabase>();
   readonly value = model<GedcomSourceCitation[]>([]);
   readonly form = form(this.value);
 

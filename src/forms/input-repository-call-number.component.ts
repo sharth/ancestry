@@ -1,5 +1,10 @@
 import type { AncestryDatabase } from "../database/ancestry.service";
-import { ChangeDetectionStrategy, Component, model } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  input,
+  model,
+} from "@angular/core";
 import { FormField, type FormValueControl, form } from "@angular/forms/signals";
 
 @Component({
@@ -10,7 +15,7 @@ import { FormField, type FormValueControl, form } from "@angular/forms/signals";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputRepositoryCallNumberComponent implements FormValueControl<string> {
-  readonly ancestryDatabase = model.required<AncestryDatabase>();
+  readonly ancestryDatabase = input.required<AncestryDatabase>();
 
   readonly value = model<string>("");
   readonly form = form(this.value);

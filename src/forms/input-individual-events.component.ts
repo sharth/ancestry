@@ -34,8 +34,7 @@ export class InputIndividualEventsComponent implements FormValueControl<
   GedcomEvent[]
 > {
   private readonly _injector = inject(Injector);
-
-  readonly ancestryDatabase = model.required<AncestryDatabase>();
+  readonly ancestryDatabase = input.required<AncestryDatabase>();
   readonly open = input<boolean>(false);
 
   readonly value = model<GedcomEvent[]>([]);

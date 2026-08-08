@@ -19,8 +19,7 @@ import { FormField, form } from "@angular/forms/signals";
 })
 export class InputIndividualSexComponent implements FormValueControl<GedcomSex> {
   readonly open = input<boolean>(false);
-
-  readonly ancestryDatabase = model.required<AncestryDatabase>();
+  readonly ancestryDatabase = input.required<AncestryDatabase>();
 
   readonly value = model<GedcomSex>({ sex: "", citations: [] });
   readonly form = form(this.value);

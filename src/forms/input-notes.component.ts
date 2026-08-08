@@ -19,12 +19,10 @@ import { FormField, form } from "@angular/forms/signals";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputNotesComponent implements FormValueControl<GedcomNote[]> {
+  readonly ancestryDatabase = input.required<AncestryDatabase>();
   readonly value = model<GedcomNote[]>([]);
   readonly form = form(this.value);
-
   readonly open = input<boolean>(false);
-
-  readonly ancestryDatabase = model.required<AncestryDatabase>();
 
   @ViewChildren("focusTarget")
   private focusTargets!: QueryList<ElementRef<HTMLElement>>;
