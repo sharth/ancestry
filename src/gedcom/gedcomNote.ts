@@ -34,3 +34,9 @@ export function serializeGedcomNote(gedcomNote: GedcomNote): GedcomRecord {
     children: [],
   };
 }
+
+export function newGedcomNote(): GedcomNote {
+  return {
+    text: "",
+  };
+}

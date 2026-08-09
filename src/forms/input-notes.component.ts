@@ -1,15 +1,16 @@
 import {
+  afterNextRender,
   ChangeDetectionStrategy,
   Component,
-  ViewChildren,
   input,
   model,
+  ViewChildren,
   type ElementRef,
   type QueryList,
 } from "@angular/core";
-import { FormField, form, type FormValueControl } from "@angular/forms/signals";
+import { form, FormField, type FormValueControl } from "@angular/forms/signals";
 import type { AncestryDatabase } from "../database/ancestry.service";
-import type { GedcomNote } from "../gedcom/gedcomNote";
+import { newGedcomNote, type GedcomNote } from "../gedcom/gedcomNote";
 
 @Component({
   selector: "app-input-notes",
@@ -24,14 +25,8 @@ export class InputNotesComponent implements FormValueControl<GedcomNote[]> {
   readonly form = form(this.value);
   readonly open = input<boolean>(false);
 
-  @ViewChildren("focusTarget")
-  private focusTargets!: QueryList<ElementRef<HTMLElement>>;
-
   appendNote() {
-    this.value.update((notes) => [...notes, { text: "" }]);
-    setTimeout(() => {
-      this.focusTargets.last.nativeElement.focus();
-    });
+    this.value.update((notes) => [...notes, newGedcomNote()]);
   }
 
   removeNote(index: number) {

@@ -1,43 +1,41 @@
-<details #container (toggle)="(true)" [open]="open()">
+<details #container (toggle)="(true)">
   <summary>Notes ({{ form.length }})</summary>
   @defer (when container.open) {
-    <table>
-      <tbody>
-        @for (note of form; track note) {
-          <tr>
-            <td>
-              <button
-                type="button"
-                class="btn btn-danger bi-trash"
-                aria-label="Remove note"
-                (click)="removeNote($index)"
-              ></button>
-            </td>
-            <td class="form-floating">
-              <textarea
-                #focusTarget
-                id="note_{{ $index }}"
-                class="form-control"
-                [formField]="note.text"
-              ></textarea>
-              <label for="note_{{ $index }}">Text</label>
-            </td>
-          </tr>
-        }
-      </tbody>
-      <tfoot>
-        <tr>
-          <th>
-            <button
-              type="button"
-              class="btn btn-outline-primary bi-plus"
-              aria-label="Add note"
-              (click)="appendNote()"
-            ></button>
-          </th>
-          <th></th>
-        </tr>
-      </tfoot>
-    </table>
+    @for (note of form; track note) {
+      <details [open]="open()">
+        <summary>
+          <button
+            class="btn btn-sm btn-outline-danger bi-trash"
+            type="button"
+            aria-label="Remove note"
+            (click)="removeNote($index)"
+          ></button>
+          {{ note.text().value() }}
+        </summary>
+        <div class="form-floating">
+          <input
+            class="form-control"
+            type="text"
+            id="text_{{ $index }}"
+            [formField]="note.text"
+          />
+          <label for="text_{{ $index }}">Note</label>
+        </div>
+      </details>
+    }
+    <div
+      class="details-lookalike"
+      tabindex="0"
+      (click)="appendNote()"
+      (keydown.enter)="appendNote()"
+    >
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-primary bi-plus"
+        aria-label="Append note"
+        (click)="$event.preventDefault()"
+      ></button>
+      Append note
+    </div>
   }
 </details>
