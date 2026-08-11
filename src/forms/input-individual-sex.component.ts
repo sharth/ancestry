@@ -4,7 +4,7 @@ import {
   input,
   model,
 } from "@angular/core";
-import { form, FormField, type FormValueControl } from "@angular/forms/signals";
+import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 import type { AncestryDatabase } from "../database/ancestry.service";
 import type { GedcomSex } from "../gedcom/gedcomSex";
 import { InputSourceCitationsComponent } from "./input-source-citations.component";

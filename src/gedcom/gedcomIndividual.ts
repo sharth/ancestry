@@ -66,7 +66,9 @@ export function parseGedcomIndividual(record: GedcomRecord): GedcomIndividual {
   if (record.xref == "") throw new Error();
   if (record.value != "") throw new Error();
 
-  const gedcomIndividual = newGedcomIndividual(record.xref);
+  const gedcomIndividual = newGedcomIndividual({
+    xref: record.xref,
+  });
 
   for (const childRecord of record.children) {
     switch (childRecord.tag) {
@@ -214,9 +216,10 @@ export function getIndividualMultimediaCitations(
   return references;
 }
 
-export function newGedcomIndividual(xref: string): GedcomIndividual {
+export function newGedcomIndividual(
+  fieldsToUpdate: Partial<GedcomIndividual> & Pick<GedcomIndividual, "xref">,
+): GedcomIndividual {
   return {
-    xref,
     names: [],
     sex: newGedcomSex(),
     events: [],
@@ -225,5 +228,6 @@ export function newGedcomIndividual(xref: string): GedcomIndividual {
     unknownRecords: [],
     notes: [],
     changeDate: newGedcomChangeDate(),
+    ...fieldsToUpdate,
   };
 }

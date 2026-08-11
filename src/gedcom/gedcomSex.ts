@@ -11,10 +11,13 @@ export interface GedcomSex {
   citations: GedcomSourceCitation[];
 }
 
-export function newGedcomSex(): GedcomSex {
+export function newGedcomSex(
+  fieldsToUpdate: Partial<GedcomSex> = {},
+): GedcomSex {
   return {
     sex: "",
     citations: [],
+    ...fieldsToUpdate,
   };
 }
 

@@ -66,19 +66,10 @@ export function parseGedcomEvent(record: GedcomRecord): GedcomEvent {
   if (!gedcomEventTags.get(record.tag)) throw new Error();
   if (record.xref != "") throw new Error();
 
-  const gedcomEvent: GedcomEvent = {
+  const gedcomEvent = newGedcomEvent({
     tag: record.tag,
-    type: "",
-    address: "",
-    place: "",
     value: record.value,
-    cause: "",
-    date: { value: "" },
-    sortDate: { value: "" },
-    citations: [],
-    sharedWith: [],
-    notes: [],
-  };
+  });
 
   for (const childRecord of record.children) {
     switch (childRecord.tag) {
@@ -226,5 +217,24 @@ function serializeGedcomSharedEvent(
         children: [],
       },
     ].filter((r) => r.children.length || r.value),
+  };
+}
+
+export function newGedcomEvent(
+  fieldsToUpdate: Partial<GedcomEvent> = {},
+): GedcomEvent {
+  return {
+    tag: "",
+    type: "",
+    address: "",
+    place: "",
+    value: "",
+    cause: "",
+    date: { value: "" },
+    sortDate: { value: "" },
+    citations: [],
+    sharedWith: [],
+    notes: [],
+    ...fieldsToUpdate,
   };
 }

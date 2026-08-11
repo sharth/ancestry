@@ -6,7 +6,7 @@ import {
   type GedcomIndividual,
 } from "./gedcomIndividual";
 import { parseGedcomRecords, type GedcomRecord } from "./gedcomRecord";
-import { serializeGedcomSex, type GedcomSex } from "./gedcomSex";
+import { newGedcomSex, serializeGedcomSex, type GedcomSex } from "./gedcomSex";
 
 function expectToBeDefined<T>(value: T | undefined): asserts value is T {
   expect(value).toBeDefined();
@@ -21,13 +21,10 @@ describe("GedcomSex", () => {
     const [gedcomRecord]: GedcomRecord[] = parseGedcomRecords(
       gedcomText.join("\n"),
     );
-    const gedcomIndividual = {
-      ...newGedcomIndividual("@I1@"),
-      sex: {
-        sex: "M",
-        citations: [],
-      },
-    };
+    const gedcomIndividual = newGedcomIndividual({
+      xref: "@I1@",
+      sex: newGedcomSex({ sex: "M" }),
+    });
     expectToBeDefined(gedcomRecord);
     expect(parseGedcomIndividual(gedcomRecord)).toEqual(gedcomIndividual);
     expect(
@@ -43,13 +40,12 @@ describe("GedcomSex", () => {
     const [gedcomRecord]: GedcomRecord[] = parseGedcomRecords(
       gedcomText.join("\n"),
     );
-    const gedcomIndividual: GedcomIndividual = {
-      ...newGedcomIndividual("@I1@"),
-      sex: {
+    const gedcomIndividual: GedcomIndividual = newGedcomIndividual({
+      xref: "@I1@",
+      sex: newGedcomSex({
         sex: "F",
-        citations: [],
-      },
-    };
+      }),
+    });
     expectToBeDefined(gedcomRecord);
     expect(parseGedcomIndividual(gedcomRecord)).toEqual(gedcomIndividual);
     expect(
@@ -64,13 +60,10 @@ describe("GedcomSex", () => {
     const [gedcomRecord]: GedcomRecord[] = parseGedcomRecords(
       gedcomText.join("\n"),
     );
-    const gedcomIndividual: GedcomIndividual = {
-      ...newGedcomIndividual("@I1@"),
-      sex: {
-        sex: "",
-        citations: [],
-      },
-    };
+    const gedcomIndividual: GedcomIndividual = newGedcomIndividual({
+      xref: "@I1@",
+      sex: newGedcomSex(),
+    });
     expectToBeDefined(gedcomRecord);
     expect(parseGedcomIndividual(gedcomRecord)).toEqual(gedcomIndividual);
     expect(
@@ -79,10 +72,7 @@ describe("GedcomSex", () => {
   });
 
   it("no details returns null", () => {
-    const gedcomSex: GedcomSex = {
-      sex: "",
-      citations: [],
-    };
+    const gedcomSex: GedcomSex = newGedcomSex();
     expect(serializeGedcomSex(gedcomSex)).toBeNull();
   });
 });

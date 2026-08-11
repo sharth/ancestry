@@ -1,18 +1,16 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  Injector,
-  ViewChildren,
-  afterNextRender,
-  inject,
   input,
   model,
-  type ElementRef,
-  type QueryList,
 } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 import type { AncestryDatabase } from "../database/ancestry.service";
-import { gedcomEventTags, type GedcomEvent } from "../gedcom/gedcomEvent";
+import {
+  gedcomEventTags,
+  newGedcomEvent,
+  type GedcomEvent,
+} from "../gedcom/gedcomEvent";
 import { InputNotesComponent } from "./input-notes.component";
 import { InputSharedWithComponent } from "./input-shared-with.component";
 import { InputSourceCitationsComponent } from "./input-source-citations.component";
@@ -32,42 +30,14 @@ import { InputSourceCitationsComponent } from "./input-source-citations.componen
 export class InputIndividualEventsComponent implements FormValueControl<
   GedcomEvent[]
 > {
-  private readonly _injector = inject(Injector);
   readonly ancestryDatabase = input.required<AncestryDatabase>();
   readonly open = input<boolean>(false);
-
   readonly value = model<GedcomEvent[]>([]);
   readonly form = form(this.value);
 
-  @ViewChildren("container") private eventContainers!: QueryList<
-    ElementRef<HTMLDetailsElement>
-  >;
-
   appendEvent() {
-    this.value.update((events) => [
-      ...events,
-      {
-        tag: "EVEN",
-        type: "",
-        address: "",
-        place: "",
-        cause: "",
-        date: { value: "" },
-        sortDate: { value: "" },
-        value: "",
-        citations: [],
-        sharedWith: [],
-        notes: [],
-      },
-    ]);
-    afterNextRender(
-      {
-        read: () => {
-          this.eventContainers.last.nativeElement.open = true;
-        },
-      },
-      { injector: this._injector },
-    );
+    const event = newGedcomEvent();
+    this.value.update((events) => [...events, event]);
   }
 
   removeEvent(index: number) {

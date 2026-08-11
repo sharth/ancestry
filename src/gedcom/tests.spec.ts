@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { newGedcomChangeDate } from "./gedcomChangeDate";
+import { newGedcomEvent } from "./gedcomEvent";
 import {
+  newGedcomFamily,
   parseGedcomFamily,
   serializeGedcomFamily,
   type GedcomFamily,
@@ -11,6 +12,7 @@ import {
   type GedcomHeader,
 } from "./gedcomHeader";
 import {
+  newGedcomIndividual,
   parseGedcomIndividual,
   serializeGedcomIndividual,
   type GedcomIndividual,
@@ -20,6 +22,7 @@ import {
   serializeGedcomMultimedia,
   type GedcomMultimedia,
 } from "./gedcomMultimedia";
+import { newGedcomName } from "./gedcomName";
 import {
   parseGedcomRecords,
   serializeGedcomRecordToText,
@@ -34,6 +37,7 @@ import {
   serializeGedcomSource,
   type GedcomSource,
 } from "./gedcomSource";
+import { newGedcomSourceCitation } from "./gedcomSourceCitation";
 import {
   parseGedcomSubmitter,
   serializeGedcomSubmitter,
@@ -104,232 +108,109 @@ const testCases: {
     ],
     database: {
       individuals: [
-        {
+        newGedcomIndividual({
           xref: "@I1@",
           names: [
-            {
-              prefix: "",
+            newGedcomName({
               givenName: "John",
-              nickName: "",
-              surnamePrefix: "",
               surname: "Doe",
-              suffix: "",
-              nameType: "",
               citations: [
-                {
+                newGedcomSourceCitation({
                   sourceXref: "@S1@",
-                  multimediaLinks: [],
-                  notes: [],
-                  text: "",
-                  page: "",
-                  quality: "",
-                },
-                {
+                }),
+                newGedcomSourceCitation({
                   sourceXref: "@S2@",
                   quality: "3",
-                  multimediaLinks: [],
-                  notes: [],
-                  text: "",
-                  page: "",
-                },
-                {
+                }),
+                newGedcomSourceCitation({
                   sourceXref: "@S3@",
                   text: "text",
                   page: "page",
                   quality: "3",
-                  multimediaLinks: [],
-                  notes: [],
-                },
+                }),
               ],
-              notes: [],
-            },
+            }),
           ],
-          events: [],
-          parentOfFamilyXrefs: [],
-          childOfFamilyXrefs: [],
-          unknownRecords: [],
-          notes: [],
-          sex: { sex: "", citations: [] },
-          changeDate: newGedcomChangeDate(),
-        },
-        {
+        }),
+        newGedcomIndividual({
           xref: "@I2@",
           sex: { sex: "M", citations: [] },
-          names: [],
-          events: [],
-          parentOfFamilyXrefs: [],
-          childOfFamilyXrefs: [],
-          unknownRecords: [],
-          notes: [],
-          changeDate: newGedcomChangeDate(),
-        },
-        {
+        }),
+        newGedcomIndividual({
           xref: "@I3@",
           sex: {
             sex: "F",
             citations: [
-              {
+              newGedcomSourceCitation({
                 sourceXref: "@S50@",
-                multimediaLinks: [],
-                notes: [],
-                text: "",
-                page: "",
-                quality: "",
-              },
+              }),
             ],
           },
-          names: [],
-          events: [],
-          parentOfFamilyXrefs: [],
-          childOfFamilyXrefs: [],
-          unknownRecords: [],
-          notes: [],
-          changeDate: newGedcomChangeDate(),
-        },
-        {
+        }),
+        newGedcomIndividual({
           xref: "@I4@",
-          names: [],
-          events: [],
-          parentOfFamilyXrefs: [],
-          childOfFamilyXrefs: [],
-          unknownRecords: [],
-          notes: [],
-          sex: { sex: "", citations: [] },
-          changeDate: newGedcomChangeDate(),
-        },
-        {
+        }),
+        newGedcomIndividual({
           xref: "@I5@",
-          names: [],
           events: [
-            {
+            newGedcomEvent({
               tag: "IDNO",
               value: "abcd",
               type: "familysearch.org",
-              address: "",
-              place: "",
-              cause: "",
-              citations: [],
-              sharedWith: [],
-              notes: [],
-              date: { value: "" },
-              sortDate: { value: "" },
-            },
-            {
+            }),
+            newGedcomEvent({
               tag: "BIRT",
-              type: "",
-              value: "",
               place: "place",
               address: "address",
               cause: "normal",
               date: { value: "ABT 1 Jan 2000" },
               sortDate: { value: "1 Jan 2000" },
               citations: [
-                {
+                newGedcomSourceCitation({
                   sourceXref: "@S1@",
-                  multimediaLinks: [],
-                  notes: [],
-                  text: "",
-                  page: "",
-                  quality: "",
-                },
+                }),
               ],
-              sharedWith: [],
-              notes: [],
-            },
-            {
+            }),
+            newGedcomEvent({
               tag: "OCCU",
               value: "Truck Driver",
-              cause: "",
               type: "Permanent",
-              address: "",
-              place: "",
-              citations: [],
-              sharedWith: [],
-              notes: [],
-              date: { value: "" },
-              sortDate: { value: "" },
-            },
+            }),
           ],
-          parentOfFamilyXrefs: [],
-          childOfFamilyXrefs: [],
-          unknownRecords: [],
-          notes: [],
-          sex: { sex: "", citations: [] },
-          changeDate: newGedcomChangeDate(),
-        },
-        {
+        }),
+        newGedcomIndividual({
           xref: "@I6@",
           names: [
-            {
-              prefix: "",
+            newGedcomName({
               givenName: "John",
-              nickName: "",
-              surnamePrefix: "",
               surname: "Doe",
               suffix: "Jr",
               nameType: "Traditional",
-              citations: [],
-              notes: [],
-            },
+            }),
           ],
-          events: [],
-          parentOfFamilyXrefs: [],
-          childOfFamilyXrefs: [],
-          unknownRecords: [],
-          notes: [],
-          sex: { sex: "", citations: [] },
-          changeDate: newGedcomChangeDate(),
-        },
-        {
+        }),
+
+        newGedcomIndividual({
           xref: "@I7@",
           changeDate: { date: { value: "1 Jan 2000" } },
-          names: [],
-          events: [],
-          parentOfFamilyXrefs: [],
-          childOfFamilyXrefs: [],
-          unknownRecords: [],
-          notes: [],
-          sex: { sex: "", citations: [] },
-        },
-        {
+        }),
+        newGedcomIndividual({
           xref: "@I8@",
-          names: [],
-          events: [],
           parentOfFamilyXrefs: ["@F1@"],
           childOfFamilyXrefs: ["@F2@"],
-          unknownRecords: [],
-          notes: [],
-          sex: { sex: "", citations: [] },
-          changeDate: newGedcomChangeDate(),
-        },
-        {
+        }),
+        newGedcomIndividual({
           xref: "@I9@",
-          names: [],
           events: [
-            {
+            newGedcomEvent({
               tag: "CENS",
-              type: "",
-              cause: "",
-              value: "",
-              address: "",
-              place: "",
-              citations: [],
               sharedWith: [
                 { xref: "@I7@", role: "" },
                 { xref: "@I8@", role: "Friend" },
               ],
-              notes: [],
-              date: { value: "" },
-              sortDate: { value: "" },
-            },
+            }),
           ],
-          parentOfFamilyXrefs: [],
-          childOfFamilyXrefs: [],
-          unknownRecords: [],
-          notes: [],
-          sex: { sex: "", citations: [] },
-          changeDate: newGedcomChangeDate(),
-        },
+        }),
       ],
     },
   },
@@ -338,22 +219,15 @@ const testCases: {
     gedcom: ["0 @F1@ FAM", "0 @F3@ FAM", "1 HUSB @I3@", "1 WIFE @I2@"],
     database: {
       families: [
-        {
+        newGedcomFamily({
           xref: "@F1@",
-          husbandXref: "",
-          wifeXref: "",
-          childXrefs: [],
-          events: [],
-          citations: [],
-        },
-        {
+        }),
+
+        newGedcomFamily({
           xref: "@F3@",
           wifeXref: "@I2@",
           husbandXref: "@I3@",
-          childXrefs: [],
-          events: [],
-          citations: [],
-        },
+        }),
       ],
     },
   },

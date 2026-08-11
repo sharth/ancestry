@@ -177,3 +177,20 @@ export function displayGedcomName(gedcomName: GedcomName) {
     .filter((part) => part != "")
     .join(" ");
 }
+
+export function newGedcomName(
+  fieldsToUpdate: Partial<GedcomName> = {},
+): GedcomName {
+  return {
+    prefix: "",
+    givenName: "",
+    nickName: "",
+    surnamePrefix: "",
+    surname: "",
+    suffix: "",
+    nameType: "",
+    citations: [],
+    notes: [],
+    ...fieldsToUpdate,
+  };
+}

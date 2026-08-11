@@ -1,14 +1,14 @@
 import {
-  afterNextRender,
   ChangeDetectionStrategy,
   Component,
+  ViewChildren,
+  afterNextRender,
   input,
   model,
-  ViewChildren,
   type ElementRef,
   type QueryList,
 } from "@angular/core";
-import { form, FormField, type FormValueControl } from "@angular/forms/signals";
+import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 import type { AncestryDatabase } from "../database/ancestry.service";
 import { newGedcomNote, type GedcomNote } from "../gedcom/gedcomNote";
 

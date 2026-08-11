@@ -1,4 +1,4 @@
-import { computed, inject, resource, Service, signal } from "@angular/core";
+import { Service, computed, inject, resource, signal } from "@angular/core";
 import { toObservable } from "@angular/core/rxjs-interop";
 import { RedirectCommand, Router, type ResolveFn } from "@angular/router";
 import Dexie from "dexie";

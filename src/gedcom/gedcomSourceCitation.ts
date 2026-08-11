@@ -136,3 +136,17 @@ export function serializeGedcomSourceCitation(
     ].filter((record) => record.children.length || record.value),
   };
 }
+
+export function newGedcomSourceCitation(
+  fieldsToUpdate: Partial<GedcomSourceCitation> = {},
+): GedcomSourceCitation {
+  return {
+    sourceXref: "",
+    text: "",
+    page: "",
+    quality: "",
+    notes: [],
+    multimediaLinks: [],
+    ...fieldsToUpdate,
+  };
+}

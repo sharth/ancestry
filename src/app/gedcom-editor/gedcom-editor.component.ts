@@ -50,7 +50,7 @@ export class GedcomEditorIndividualComponent {
     () => {
       return (
         this.ancestryDatabase().individuals[this.xref()] ??
-        newGedcomIndividual(this.xref())
+        newGedcomIndividual({ xref: this.xref() })
       );
     },
     {
