@@ -7,10 +7,16 @@
   <p>{{ vm.sex }}</p>
 
   <h2>Relatives</h2>
-  <app-individual-relatives [xref]="xref()" />
+  <app-individual-relatives
+    [ancestryDatabase]="ancestryDatabase()"
+    [individual]="vm.individual"
+  />
 
   <h2>Events</h2>
-  <app-individual-events [xref]="xref()" />
+  <app-individual-events
+    [ancestryDatabase]="ancestryDatabase()"
+    [individual]="vm.individual"
+  />
 
   <h2>Ancestors</h2>
   <app-individual-ancestors [xref]="xref()" />

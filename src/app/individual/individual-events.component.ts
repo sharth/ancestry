@@ -2,10 +2,10 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  inject,
   input,
 } from "@angular/core";
-import { AncestryService } from "../../database/ancestry.service";
+import type { AncestryDatabase } from "../../database/ancestry.service";
+import type { GedcomIndividual } from "../../gedcom/gedcomIndividual";
 import { EventsTableComponent } from "../events-table/events-table.component";
 
 @Component({
@@ -16,18 +16,11 @@ import { EventsTableComponent } from "../events-table/events-table.component";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IndividualEventsComponent {
-  readonly xref = input.required<string>();
-  private ancestryService = inject(AncestryService);
+  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly individual = input.required<GedcomIndividual>();
 
   readonly vm = computed(() => {
-    const ancestry = this.ancestryService.ancestryDatabase();
-    if (ancestry === undefined) {
-      return undefined;
-    }
-    const individual = ancestry.individuals[this.xref()];
-    if (individual === undefined) {
-      return undefined;
-    }
+    const individual = this.individual();
     return {
       events: individual.events,
     };

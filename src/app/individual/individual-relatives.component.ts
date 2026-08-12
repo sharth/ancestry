@@ -2,10 +2,10 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  inject,
   input,
 } from "@angular/core";
-import { AncestryService } from "../../database/ancestry.service";
+import type { AncestryDatabase } from "../../database/ancestry.service";
+import type { GedcomIndividual } from "../../gedcom/gedcomIndividual";
 import { IndividualLinkComponent } from "../individual-link/individual-link.component";
 
 @Component({
@@ -16,20 +16,12 @@ import { IndividualLinkComponent } from "../individual-link/individual-link.comp
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IndividualRelativesComponent {
-  readonly xref = input.required<string>();
-  private ancestryService = inject(AncestryService);
+  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly individual = input.required<GedcomIndividual>();
 
   readonly vm = computed(() => {
-    const ancestry = this.ancestryService.ancestryDatabase();
-    if (ancestry === undefined) {
-      return undefined;
-    }
-
-    const xref = this.xref();
-    const individual = ancestry.individuals[xref];
-    if (individual === undefined) {
-      return undefined;
-    }
+    const ancestry = this.ancestryDatabase();
+    const individual = this.individual();
 
     return {
       parentGroups: individual.childOfFamilyXrefs
