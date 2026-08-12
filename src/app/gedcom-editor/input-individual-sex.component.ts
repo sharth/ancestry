@@ -5,8 +5,8 @@ import {
   model,
 } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
-import type { AncestryDatabase } from "../database/ancestry.service";
-import type { GedcomSex } from "../gedcom/gedcomSex";
+import type { AncestryDatabase } from "../../database/ancestry.service";
+import type { GedcomSex } from "../../gedcom/gedcomSex";
 import { InputSourceCitationsComponent } from "./input-source-citations.component";
 
 @Component({

@@ -9,11 +9,11 @@ import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 import {
   AncestryService,
   type AncestryDatabase,
-} from "../database/ancestry.service";
+} from "../../database/ancestry.service";
 import {
   newGedcomMultimedia,
   type GedcomMultimedia,
-} from "../gedcom/gedcomMultimedia";
+} from "../../gedcom/gedcomMultimedia";
 
 @Component({
   selector: "app-input-multimedia",

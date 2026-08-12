@@ -5,11 +5,11 @@ import {
   model,
 } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
-import type { AncestryDatabase } from "../database/ancestry.service";
+import type { AncestryDatabase } from "../../database/ancestry.service";
 import {
   newGedcomRepository,
   type GedcomRepository,
-} from "../gedcom/gedcomRepository";
+} from "../../gedcom/gedcomRepository";
 
 @Component({
   selector: "app-input-repository",

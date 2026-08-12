@@ -5,12 +5,12 @@ import {
   model,
 } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
-import type { AncestryDatabase } from "../database/ancestry.service";
+import type { AncestryDatabase } from "../../database/ancestry.service";
 import {
   gedcomEventTags,
   newGedcomEvent,
   type GedcomEvent,
-} from "../gedcom/gedcomEvent";
+} from "../../gedcom/gedcomEvent";
 import { InputNotesComponent } from "./input-notes.component";
 import { InputSharedWithComponent } from "./input-shared-with.component";
 import { InputSourceCitationsComponent } from "./input-source-citations.component";

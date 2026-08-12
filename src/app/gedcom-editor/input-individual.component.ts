@@ -5,11 +5,11 @@ import {
   model,
 } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
-import type { AncestryDatabase } from "../database/ancestry.service";
+import type { AncestryDatabase } from "../../database/ancestry.service";
 import {
   newGedcomIndividual,
   type GedcomIndividual,
-} from "../gedcom/gedcomIndividual";
+} from "../../gedcom/gedcomIndividual";
 import { InputChangeDateComponent } from "./input-change-date.component";
 import { InputIndividualEventsComponent } from "./input-individual-events.component";
 import { InputIndividualNamesComponent } from "./input-individual-names.component";

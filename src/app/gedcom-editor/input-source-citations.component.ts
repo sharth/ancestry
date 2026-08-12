@@ -7,8 +7,8 @@ import {
   type QueryList,
 } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
-import type { AncestryDatabase } from "../database/ancestry.service";
-import type { GedcomSourceCitation } from "../gedcom/gedcomSourceCitation";
+import type { AncestryDatabase } from "../../database/ancestry.service";
+import type { GedcomSourceCitation } from "../../gedcom/gedcomSourceCitation";
 import { InputMultimediaLinksComponent } from "./input-multimedia-links.component";
 import { InputNotesComponent } from "./input-notes.component";
 import { InputSourceXrefComponent } from "./input-source-xref.component";

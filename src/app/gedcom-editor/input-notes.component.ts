@@ -9,8 +9,8 @@ import {
   type QueryList,
 } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
-import type { AncestryDatabase } from "../database/ancestry.service";
-import { newGedcomNote, type GedcomNote } from "../gedcom/gedcomNote";
+import type { AncestryDatabase } from "../../database/ancestry.service";
+import { newGedcomNote, type GedcomNote } from "../../gedcom/gedcomNote";
 
 @Component({
   selector: "app-input-notes",

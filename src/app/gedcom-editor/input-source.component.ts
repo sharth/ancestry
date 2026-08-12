@@ -5,8 +5,8 @@ import {
   model,
 } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
-import type { AncestryDatabase } from "../database/ancestry.service";
-import { newGedcomSource, type GedcomSource } from "../gedcom/gedcomSource";
+import type { AncestryDatabase } from "../../database/ancestry.service";
+import { newGedcomSource, type GedcomSource } from "../../gedcom/gedcomSource";
 import { InputChangeDateComponent } from "./input-change-date.component";
 import { InputMultimediaLinksComponent } from "./input-multimedia-links.component";
 import { InputRepositoryLinksComponent } from "./input-repository-links.component";

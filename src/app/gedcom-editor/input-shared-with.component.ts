@@ -12,8 +12,8 @@ import {
   type FieldTree,
   type FormValueControl,
 } from "@angular/forms/signals";
-import type { AncestryDatabase } from "../database/ancestry.service";
-import type { GedcomEventSharedWith } from "../gedcom/gedcomEvent";
+import type { AncestryDatabase } from "../../database/ancestry.service";
+import type { GedcomEventSharedWith } from "../../gedcom/gedcomEvent";
 import { InputIndividualXrefComponent } from "./input-individual-xref.component";
 
 @Component({

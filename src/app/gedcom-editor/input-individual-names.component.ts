@@ -16,8 +16,8 @@ import {
   type FieldTree,
   type FormValueControl,
 } from "@angular/forms/signals";
-import type { AncestryDatabase } from "../database/ancestry.service";
-import type { GedcomName } from "../gedcom/gedcomName";
+import type { AncestryDatabase } from "../../database/ancestry.service";
+import type { GedcomName } from "../../gedcom/gedcomName";
 import { InputSourceCitationsComponent } from "./input-source-citations.component";
 
 @Component({

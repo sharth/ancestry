@@ -14,10 +14,6 @@ import {
   AncestryService,
   type AncestryDatabase,
 } from "../../database/ancestry.service";
-import { InputIndividualComponent } from "../../forms/input-individual.component";
-import { InputMultimediaComponent } from "../../forms/input-multimedia.component";
-import { InputRepositoryComponent } from "../../forms/input-repository.component";
-import { InputSourceComponent } from "../../forms/input-source.component";
 import {
   newGedcomIndividual,
   type GedcomIndividual,
@@ -33,6 +29,10 @@ import {
 } from "../../gedcom/gedcomRepository";
 import { newGedcomSource, type GedcomSource } from "../../gedcom/gedcomSource";
 import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
+import { InputIndividualComponent } from "./input-individual.component";
+import { InputMultimediaComponent } from "./input-multimedia.component";
+import { InputRepositoryComponent } from "./input-repository.component";
+import { InputSourceComponent } from "./input-source.component";
 
 @Component({
   selector: "app-gedcom-editor-individual",
