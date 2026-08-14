@@ -13,10 +13,16 @@
   />
 
   <h2>Events</h2>
-  <app-individual-events
-    [ancestryDatabase]="ancestryDatabase()"
-    [individual]="vm.individual"
-  />
+  <app-events-table [events]="vm.individual.events" />
+
+  <h2>Family Events</h2>
+  @let familyXrefs = vm.individual.parentOfFamilyXrefs;
+  @for (familyXref of familyXrefs; track familyXref) {
+    @if (ancestryDatabase().families[familyXref]; as family) {
+      <h3>For family {{ familyXref }}</h3>
+      <app-events-table [events]="family.events" />
+    }
+  }
 
   <h2>Ancestors</h2>
   <app-individual-ancestors [xref]="xref()" />

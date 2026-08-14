@@ -10,9 +10,9 @@ import {
   serializeGedcomIndividual,
 } from "../../gedcom/gedcomIndividual";
 import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
+import { EventsTableComponent } from "../events-table/events-table.component";
 import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
 import { IndividualAncestorsComponent } from "./individual-ancestors.component";
-import { IndividualEventsComponent } from "./individual-events.component";
 import { IndividualRelativesComponent } from "./individual-relatives.component";
 import { IndividualSunburstComponent } from "./individual-sunburst.component";
 
@@ -21,9 +21,9 @@ import { IndividualSunburstComponent } from "./individual-sunburst.component";
   imports: [
     IndividualRelativesComponent,
     IndividualAncestorsComponent,
-    IndividualEventsComponent,
     GedcomEditorDialogComponent,
     IndividualSunburstComponent,
+    EventsTableComponent,
   ],
   templateUrl: "./individual.component.html",
   styleUrl: "./individual.component.css",
