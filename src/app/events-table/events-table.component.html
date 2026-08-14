@@ -3,7 +3,6 @@
     <thead>
       <tr>
         <th scope="col">Event</th>
-        <th scope="col">Type</th>
         <th scope="col">Date</th>
         <th scope="col">Location</th>
         <th scope="col">Detail</th>
@@ -13,8 +12,31 @@
     <tbody>
       @for (event of events; track event) {
         <tr>
-          <td>{{ event.tag }}</td>
-          <td>{{ event.type }}</td>
+          <td>
+            @if (event.tag === "BIRT" && event.type === "") {
+              Birth
+            } @else if (event.tag === "BURI" && event.type === "") {
+              Burial
+            } @else if (event.tag === "CENS" && event.type === "") {
+              Census
+            } @else if (event.tag === "DEAT" && event.type === "") {
+              Death
+            } @else if (event.tag === "EDUC" && event.type === "") {
+              Education
+            } @else if (event.tag === "EMIG" && event.type === "") {
+              Emigration
+            } @else if (event.tag === "EVEN") {
+              {{ event.type }}
+            } @else if (event.tag === "MARR" && event.type === "") {
+              Marriage
+            } @else if (event.tag === "OCCU" && event.type === "") {
+              Occupation
+            } @else if (event.tag === "RESI" && event.type === "") {
+              Residence
+            } @else {
+              {{ event.tag }} ({{ event.type }})
+            }
+          </td>
           <td>{{ event.date.value }}</td>
           <td>
             @if (event.address) {
