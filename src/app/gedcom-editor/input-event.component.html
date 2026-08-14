@@ -1,0 +1,44 @@
+<div class="form-floating">
+  <select class="form-control" id="tag" [formField]="form.tag">
+    @for (event of gedcomEventTags; track event.tag) {
+      <option [value]="event.tag">{{ event.description }}</option>
+    }
+  </select>
+  <label for="tag">Tag</label>
+</div>
+<div class="form-floating">
+  <input class="form-control" id="type" [formField]="form.type" />
+  <label for="type">Type</label>
+</div>
+<div class="form-floating">
+  <input class="form-control" id="address" [formField]="form.address" />
+  <label for="address">Address</label>
+</div>
+<div class="form-floating">
+  <input class="form-control" id="place" [formField]="form.place" />
+  <label for="place">Place</label>
+</div>
+<div class="form-floating">
+  <input class="form-control" id="cause" [formField]="form.cause" />
+  <label for="cause">Cause</label>
+</div>
+<div class="form-floating">
+  <input class="form-control" id="date" [formField]="form.date.value" />
+  <label for="date">Date</label>
+</div>
+<div class="form-floating">
+  <input class="form-control" id="sdate" [formField]="form.sortDate.value" />
+  <label for="sdate">Sort Date</label>
+</div>
+<app-input-source-citations
+  [ancestryDatabase]="ancestryDatabase()"
+  [formField]="form.citations"
+></app-input-source-citations>
+<app-input-shared-with
+  [ancestryDatabase]="ancestryDatabase()"
+  [formField]="form.sharedWith"
+></app-input-shared-with>
+<app-input-notes
+  [ancestryDatabase]="ancestryDatabase()"
+  [formField]="form.notes"
+></app-input-notes>

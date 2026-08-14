@@ -12,82 +12,13 @@
         {{ event.tag().value() }}
       </summary>
       @defer (when container.open) {
-        <div class="form-floating">
-          <select
-            class="form-control"
-            id="tag_{{ $index }}"
-            [formField]="event.tag"
-          >
-            @for (event of gedcomEventTags; track event.tag) {
-              <option [value]="event.tag">{{ event.description }}</option>
-            }
-          </select>
-          <label for="tag_{{ $index }}">Tag</label>
-        </div>
-        <div class="form-floating">
-          <input
-            class="form-control"
-            id="type_{{ $index }}"
-            [formField]="event.type"
-          />
-          <label for="type_{{ $index }}">Type</label>
-        </div>
-        <div class="form-floating">
-          <input
-            class="form-control"
-            id="address_{{ $index }}"
-            [formField]="event.address"
-          />
-          <label for="address_{{ $index }}">Address</label>
-        </div>
-        <div class="form-floating">
-          <input
-            class="form-control"
-            id="place_{{ $index }}"
-            [formField]="event.place"
-          />
-          <label for="place_{{ $index }}">Place</label>
-        </div>
-        <div class="form-floating">
-          <input
-            class="form-control"
-            id="cause_{{ $index }}"
-            [formField]="event.cause"
-          />
-          <label for="cause_{{ $index }}">Cause</label>
-        </div>
-        <div class="form-floating">
-          <input
-            class="form-control"
-            id="date_{{ $index }}"
-            [formField]="event.date.value"
-          />
-          <label for="date_{{ $index }}">Date</label>
-        </div>
-        <div class="form-floating">
-          <input
-            class="form-control"
-            id="sdate_{{ $index }}"
-            [formField]="event.sortDate.value"
-          />
-          <label for="sdate_{{ $index }}">Sort Date</label>
-        </div>
-        <app-input-source-citations
-          [formField]="event.citations"
+        <app-input-event
           [ancestryDatabase]="ancestryDatabase()"
-        ></app-input-source-citations>
-        <app-input-shared-with
-          [formField]="event.sharedWith"
-          [ancestryDatabase]="ancestryDatabase()"
-        ></app-input-shared-with>
-        <app-input-notes
-          [formField]="event.notes"
-          [ancestryDatabase]="ancestryDatabase()"
-        ></app-input-notes>
+          [formField]="event"
+        ></app-input-event>
       }
     </details>
   }
-
   <div
     class="details-lookalike"
     tabindex="0"

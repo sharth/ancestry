@@ -11,31 +11,27 @@ import {
   newGedcomEvent,
   type GedcomEvent,
 } from "../../gedcom/gedcomEvent";
-import { InputEventComponent } from "./input-event.component";
+import { InputNotesComponent } from "./input-notes.component";
+import { InputSharedWithComponent } from "./input-shared-with.component";
+import { InputSourceCitationsComponent } from "./input-source-citations.component";
 
 @Component({
-  selector: "app-input-individual-events",
-  imports: [FormField, InputEventComponent],
-  templateUrl: "./input-individual-events.component.html",
+  selector: "app-input-event",
+  imports: [
+    FormField,
+    InputSourceCitationsComponent,
+    InputNotesComponent,
+    InputSharedWithComponent,
+  ],
+  templateUrl: "./input-event.component.html",
   styleUrl: "./input.component.css",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class InputIndividualEventsComponent implements FormValueControl<
-  GedcomEvent[]
-> {
+export class InputEventComponent implements FormValueControl<GedcomEvent> {
   readonly ancestryDatabase = input.required<AncestryDatabase>();
   readonly open = input<boolean>(false);
-  readonly value = model<GedcomEvent[]>([]);
+  readonly value = model<GedcomEvent>(newGedcomEvent());
   readonly form = form(this.value);
-
-  appendEvent() {
-    const event = newGedcomEvent();
-    this.value.update((events) => [...events, event]);
-  }
-
-  removeEvent(index: number) {
-    this.value.update((events) => events.toSpliced(index, 1));
-  }
 
   readonly gedcomEventTags = gedcomEventTags
     .entries()

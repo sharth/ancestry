@@ -220,17 +220,17 @@ describe("GedcomEditorComponent Integration", () => {
     assert.isOk(birthDetails);
     await openDetails(birthDetails);
 
-    const birthTag = birthDetails.querySelector('select[id^="tag_"]');
+    const birthTag = birthDetails.querySelector('select[id^="tag"]');
     assert.isOk(birthTag);
     await user.selectOptions(birthTag, "BIRT");
     await fixture.whenStable();
 
-    const birthDate = birthDetails.querySelector('input[id^="date_"]');
+    const birthDate = birthDetails.querySelector('input[id^="date"]');
     assert.isOk(birthDate);
     await user.type(birthDate, "1 Jan 1900");
     await fixture.whenStable();
 
-    const birthPlace = birthDetails.querySelector('input[id^="place_"]');
+    const birthPlace = birthDetails.querySelector('input[id^="place"]');
     assert.isOk(birthPlace);
     await user.type(birthPlace, "Boston");
     await fixture.whenStable();
@@ -244,17 +244,17 @@ describe("GedcomEditorComponent Integration", () => {
     assert.isOk(deathDetails);
     await openDetails(deathDetails);
 
-    const deathTag = deathDetails.querySelector('select[id^="tag_"]');
+    const deathTag = deathDetails.querySelector('select[id^="tag"]');
     assert.isOk(deathTag);
     await user.selectOptions(deathTag, "DEAT");
     await fixture.whenStable();
 
-    const deathDate = deathDetails.querySelector('input[id^="date_"]');
+    const deathDate = deathDetails.querySelector('input[id^="date"]');
     assert.isOk(deathDate);
     await user.type(deathDate, "10 Dec 1980");
     await fixture.whenStable();
 
-    const deathPlace = deathDetails.querySelector('input[id^="place_"]');
+    const deathPlace = deathDetails.querySelector('input[id^="place"]');
     assert.isOk(deathPlace);
     await user.type(deathPlace, "Philadelphia");
     await fixture.whenStable();
