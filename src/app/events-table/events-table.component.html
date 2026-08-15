@@ -13,7 +13,9 @@
       @for (event of events; track event) {
         <tr>
           <td>
-            @if (event.tag === "BIRT" && event.type === "") {
+            @if (event.tag === "BAPM" && event.type === "") {
+              Baptism
+            } @else if (event.tag === "BIRT" && event.type === "") {
               Birth
             } @else if (event.tag === "BURI" && event.type === "") {
               Burial
