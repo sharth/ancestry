@@ -1,4 +1,4 @@
-import type { GedcomRecord } from "./gedcomRecord";
+import { newGedcomRecord, type GedcomRecord } from "./gedcomRecord";
 
 export interface GedcomTrailer {
   record?: GedcomRecord;
@@ -19,11 +19,8 @@ export function serializeGedcomTrailer(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   gedcomTrailer: GedcomTrailer,
 ): GedcomRecord {
-  return {
+  return newGedcomRecord({
     tag: "TRLR",
     abstag: "TRLR",
-    xref: "",
-    value: "",
-    children: [],
-  };
+  });
 }

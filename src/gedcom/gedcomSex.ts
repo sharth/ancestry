@@ -1,5 +1,9 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
-import type { GedcomRecord } from "./gedcomRecord";
+import {
+  filterTrivialGedcomRecord,
+  newGedcomRecord,
+  type GedcomRecord,
+} from "./gedcomRecord";
 import {
   parseGedcomSourceCitation,
   serializeGedcomSourceCitation,
@@ -44,16 +48,14 @@ export function parseGedcomSex(gedcomRecord: GedcomRecord): GedcomSex {
 }
 
 export function serializeGedcomSex(gedcomSex: GedcomSex): GedcomRecord | null {
-  if (gedcomSex.sex == "" && gedcomSex.citations.length === 0) {
-    return null;
-  }
-  return {
-    tag: "SEX",
-    abstag: "INDI.SEX",
-    xref: "",
-    value: gedcomSex.sex,
-    children: [
-      ...gedcomSex.citations.map((c) => serializeGedcomSourceCitation(c)),
-    ],
-  };
+  return filterTrivialGedcomRecord(
+    newGedcomRecord({
+      tag: "SEX",
+      abstag: "INDI.SEX",
+      value: gedcomSex.sex,
+      children: [
+        ...gedcomSex.citations.map((c) => serializeGedcomSourceCitation(c)),
+      ],
+    }),
+  );
 }

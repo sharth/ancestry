@@ -10,7 +10,11 @@ import {
   serializeGedcomNote,
   type GedcomNote,
 } from "./gedcomNote";
-import type { GedcomRecord } from "./gedcomRecord";
+import {
+  filterTrivialGedcomRecords,
+  newGedcomRecord,
+  type GedcomRecord,
+} from "./gedcomRecord";
 import {
   parseGedcomSourceCitation,
   serializeGedcomSourceCitation,
@@ -155,69 +159,35 @@ function parseGedcomShareEvent(
 }
 
 export function serializeGedcomEvent(gedcomEvent: GedcomEvent): GedcomRecord {
-  return {
+  return newGedcomRecord({
     tag: gedcomEvent.tag,
-    abstag: "",
-    xref: "",
     value: gedcomEvent.value,
     children: [
-      {
-        tag: "TYPE",
-        abstag: "",
-        xref: "",
-        value: gedcomEvent.type,
-        children: [],
-      },
-      {
-        tag: "CAUS",
-        abstag: "",
-        xref: "",
-        value: gedcomEvent.cause,
-        children: [],
-      },
+      newGedcomRecord({ tag: "TYPE", value: gedcomEvent.type }),
+      newGedcomRecord({ tag: "CAUS", value: gedcomEvent.cause }),
       serializeGedcomDate(gedcomEvent.date),
       serializeGedcomSortDate(gedcomEvent.sortDate),
-      {
-        tag: "PLAC",
-        abstag: "",
-        xref: "",
-        value: gedcomEvent.place,
-        children: [],
-      },
-      {
-        tag: "ADDR",
-        abstag: "",
-        xref: "",
-        value: gedcomEvent.address,
-        children: [],
-      },
+      newGedcomRecord({ tag: "PLAC", value: gedcomEvent.place }),
+      newGedcomRecord({ tag: "ADDR", value: gedcomEvent.address }),
       ...gedcomEvent.sharedWith.map((s) => serializeGedcomSharedEvent(s)),
       ...gedcomEvent.notes.map((n) => serializeGedcomNote(n)),
       ...gedcomEvent.citations.map((c) => serializeGedcomSourceCitation(c)),
     ]
       .filter((r) => r != null)
       .filter((r) => r.children.length || r.value),
-  };
+  });
 }
 
 function serializeGedcomSharedEvent(
   sharedWith: GedcomEventSharedWith,
 ): GedcomRecord {
-  return {
+  return newGedcomRecord({
     tag: "_SHAR",
-    abstag: "",
-    xref: "",
     value: sharedWith.xref,
-    children: [
-      {
-        tag: "ROLE",
-        abstag: "",
-        xref: "",
-        value: sharedWith.role,
-        children: [],
-      },
-    ].filter((r) => r.children.length || r.value),
-  };
+    children: filterTrivialGedcomRecords([
+      newGedcomRecord({ tag: "ROLE", value: sharedWith.role }),
+    ]),
+  });
 }
 
 export function newGedcomEvent(

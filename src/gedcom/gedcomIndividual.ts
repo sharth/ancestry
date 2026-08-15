@@ -20,7 +20,11 @@ import {
   serializeGedcomNote,
   type GedcomNote,
 } from "./gedcomNote";
-import type { GedcomRecord } from "./gedcomRecord";
+import {
+  filterTrivialGedcomRecords,
+  newGedcomRecord,
+  type GedcomRecord,
+} from "./gedcomRecord";
 import {
   newGedcomSex,
   parseGedcomSex,
@@ -131,12 +135,11 @@ export function parseGedcomIndividual(record: GedcomRecord): GedcomIndividual {
 export function serializeGedcomIndividual(
   gedcomIndividual: GedcomIndividual,
 ): GedcomRecord {
-  return {
+  return newGedcomRecord({
     xref: gedcomIndividual.xref,
     tag: "INDI",
     abstag: "INDI",
-    value: "",
-    children: [
+    children: filterTrivialGedcomRecords([
       ...gedcomIndividual.names.map((name) => serializeGedcomName(name)),
       serializeGedcomSex(gedcomIndividual.sex),
       ...gedcomIndividual.unknownRecords.filter(
@@ -153,20 +156,12 @@ export function serializeGedcomIndividual(
         (record) => record.tag == "SOUR",
       ),
       ...gedcomIndividual.events.map((event) => serializeGedcomEvent(event)),
-      ...gedcomIndividual.parentOfFamilyXrefs.map((xref) => ({
-        tag: "FAMS",
-        abstag: "",
-        xref: "",
-        value: xref,
-        children: [],
-      })),
-      ...gedcomIndividual.childOfFamilyXrefs.map((xref) => ({
-        tag: "FAMC",
-        abstag: "",
-        xref: "",
-        value: xref,
-        children: [],
-      })),
+      ...gedcomIndividual.parentOfFamilyXrefs.map((xref) =>
+        newGedcomRecord({ tag: "FAMS", value: xref }),
+      ),
+      ...gedcomIndividual.childOfFamilyXrefs.map((xref) =>
+        newGedcomRecord({ tag: "FAMC", value: xref }),
+      ),
       ...gedcomIndividual.notes.map((gedcomNote) =>
         serializeGedcomNote(gedcomNote),
       ),
@@ -177,8 +172,8 @@ export function serializeGedcomIndividual(
           record.tag != "_AMTID" &&
           record.tag != "SOUR",
       ),
-    ].filter((record) => record != null),
-  };
+    ]),
+  });
 }
 
 export function getIndividualMultimediaCitations(

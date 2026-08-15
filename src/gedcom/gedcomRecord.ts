@@ -6,6 +6,35 @@ export interface GedcomRecord {
   children: GedcomRecord[];
 }
 
+export function newGedcomRecord(fieldsToOverride: Partial<GedcomRecord>) {
+  return {
+    xref: "",
+    tag: "",
+    abstag: "",
+    value: "",
+    children: [],
+    ...fieldsToOverride,
+  };
+}
+
+export function filterTrivialGedcomRecord(
+  record: GedcomRecord,
+): GedcomRecord | null {
+  if (record.xref || record.value || record.children.length) {
+    return record;
+  } else {
+    return null;
+  }
+}
+
+export function filterTrivialGedcomRecords(
+  records: (GedcomRecord | null)[],
+): GedcomRecord[] {
+  return records
+    .filter((record) => record !== null)
+    .filter((record) => filterTrivialGedcomRecord(record) !== null);
+}
+
 export function parseGedcomRecords(text: string): GedcomRecord[] {
   const lines = text.split(/\r?\n/);
   const records: GedcomRecord[] = [];
@@ -25,7 +54,7 @@ export function parseGedcomRecords(text: string): GedcomRecord[] {
       ...ladder.slice(0, level).map((record) => record.tag),
       tag,
     ].join(".");
-    const record: GedcomRecord = { xref, tag, abstag, value, children: [] };
+    const record = newGedcomRecord({ xref, tag, abstag, value });
 
     if (level == 0) {
       ladder = [record];

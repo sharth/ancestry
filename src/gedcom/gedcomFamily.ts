@@ -4,7 +4,11 @@ import {
   serializeGedcomEvent,
   type GedcomEvent,
 } from "./gedcomEvent";
-import type { GedcomRecord } from "./gedcomRecord";
+import {
+  filterTrivialGedcomRecords,
+  newGedcomRecord,
+  type GedcomRecord,
+} from "./gedcomRecord";
 import {
   parseGedcomSourceCitation,
   serializeGedcomSourceCitation,
@@ -70,39 +74,34 @@ export function parseGedcomFamily(record: GedcomRecord): GedcomFamily {
 export function serializeGedcomFamily(
   gedcomFamily: GedcomFamily,
 ): GedcomRecord {
-  return {
+  return newGedcomRecord({
     tag: "FAM",
     abstag: "FAM",
     xref: gedcomFamily.xref,
-    value: "",
-    children: [
-      {
+    children: filterTrivialGedcomRecords([
+      newGedcomRecord({
         tag: "HUSB",
         abstag: "FAM.HUSB",
-        xref: "",
         value: gedcomFamily.husbandXref,
-        children: [],
-      },
-      {
+      }),
+      newGedcomRecord({
         tag: "WIFE",
         abstag: "FAM.WIFE",
-        xref: "",
         value: gedcomFamily.wifeXref,
-        children: [],
-      },
-      ...gedcomFamily.childXrefs.map((childXref) => ({
-        tag: "CHIL",
-        abstag: "FAM.CHIL",
-        xref: "",
-        value: childXref,
-        children: [],
-      })),
+      }),
+      ...gedcomFamily.childXrefs.map((childXref) =>
+        newGedcomRecord({
+          tag: "CHIL",
+          abstag: "FAM.CHIL",
+          value: childXref,
+        }),
+      ),
       ...gedcomFamily.citations.map((citation) =>
         serializeGedcomSourceCitation(citation),
       ),
       ...gedcomFamily.events.map((event) => serializeGedcomEvent(event)),
-    ].filter((record) => record.children.length || record.value),
-  };
+    ]),
+  });
 }
 
 export function getFamilyMultimediaCitations(

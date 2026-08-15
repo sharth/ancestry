@@ -9,7 +9,11 @@ import {
   serializeGedcomMultimediaLink,
   type GedcomMultimediaLink,
 } from "./gedcomMultimediaLink";
-import type { GedcomRecord } from "./gedcomRecord";
+import {
+  filterTrivialGedcomRecords,
+  newGedcomRecord,
+  type GedcomRecord,
+} from "./gedcomRecord";
 import {
   parseGedcomRepositoryLink,
   serializeGedcomRepositoryLink,
@@ -93,35 +97,28 @@ export function parseGedcomSource(record: GedcomRecord): GedcomSource {
 }
 
 export function serializeGedcomSource(source: GedcomSource): GedcomRecord {
-  return {
+  return newGedcomRecord({
     xref: source.xref,
     tag: "SOUR",
     abstag: "SOUR",
-    value: "",
-    children: [
-      {
+    children: filterTrivialGedcomRecords([
+      newGedcomRecord({
         tag: "ABBR",
         abstag: "SOUR.ABBR",
-        xref: "",
         value: source.abbr,
-        children: [],
-      },
-      {
+      }),
+      newGedcomRecord({
         tag: "TITL",
         abstag: "SOUR.TITL",
-        xref: "",
         value: source.title,
-        children: [],
-      },
+      }),
       ...source.unknownRecords.filter((record) => record.tag == "_SUBQ"),
       ...source.unknownRecords.filter((record) => record.tag == "_BIBL"),
-      {
+      newGedcomRecord({
         tag: "TEXT",
         abstag: "SOUR.TEXT",
-        xref: "",
         value: source.text,
-        children: [],
-      },
+      }),
       serializeGedcomChangeDate(source.changeDate),
       ...source.repositoryLinks.map((repositoryLink) =>
         serializeGedcomRepositoryLink(repositoryLink),
@@ -132,8 +129,6 @@ export function serializeGedcomSource(source: GedcomSource): GedcomRecord {
       ...source.unknownRecords.filter(
         (record) => record.tag != "_SUBQ" && record.tag != "_BIBL",
       ),
-    ]
-      .filter((record) => record != null)
-      .filter((record) => record.children.length || record.value),
-  };
+    ]),
+  });
 }

@@ -4,7 +4,11 @@ import {
   serializeGedcomChangeDate,
   type GedcomChangeDate,
 } from "./gedcomChangeDate";
-import type { GedcomRecord } from "./gedcomRecord";
+import {
+  filterTrivialGedcomRecords,
+  newGedcomRecord,
+  type GedcomRecord,
+} from "./gedcomRecord";
 
 export interface GedcomMultimedia {
   xref: string;
@@ -79,39 +83,31 @@ export function parseGedcomMultimedia(record: GedcomRecord): GedcomMultimedia {
 export function serializeGedcomMultimedia(
   gedcomMultimedia: GedcomMultimedia,
 ): GedcomRecord {
-  return {
+  return newGedcomRecord({
     tag: "OBJE",
     abstag: "OBJE",
     xref: gedcomMultimedia.xref,
-    value: "",
-    children: [
-      {
+    children: filterTrivialGedcomRecords([
+      newGedcomRecord({
         tag: "FILE",
         abstag: "OBJE.FILE",
-        xref: "",
         value: gedcomMultimedia.filePath,
-        children: [
-          {
+        children: filterTrivialGedcomRecords([
+          newGedcomRecord({
             tag: "FORM",
             abstag: "OBJE.FILE.FORM",
-            xref: "",
             value: gedcomMultimedia.mediaType,
-            children: [],
-          },
-          {
+          }),
+          newGedcomRecord({
             tag: "TITL",
             abstag: "OBJE.FILE.TITL",
-            xref: "",
             value: gedcomMultimedia.title,
-            children: [],
-          },
-        ].filter((record) => record.value || record.children.length),
-      },
+          }),
+        ]),
+      }),
       gedcomMultimedia.changeDate
         ? serializeGedcomChangeDate(gedcomMultimedia.changeDate)
-        : undefined,
-    ]
-      .filter((record) => record != undefined)
-      .filter((record) => record.value || record.children.length),
-  };
+        : null,
+    ]),
+  });
 }

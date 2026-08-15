@@ -1,4 +1,8 @@
-import type { GedcomRecord } from "./gedcomRecord";
+import {
+  filterTrivialGedcomRecord,
+  newGedcomRecord,
+  type GedcomRecord,
+} from "./gedcomRecord";
 
 export interface GedcomDate {
   value: string;
@@ -32,33 +36,21 @@ export function parseGedcomDate(gedcomRecord: GedcomRecord): GedcomDate {
 export function serializeGedcomDate(
   gedcomDate: GedcomDate,
 ): GedcomRecord | null {
-  const gedcomRecord = {
-    tag: "DATE",
-    abstag: "",
-    xref: "",
-    value: gedcomDate.value,
-    children: [],
-  };
-  if (gedcomRecord.xref || gedcomRecord.value || gedcomRecord.children.length) {
-    return gedcomRecord;
-  } else {
-    return null;
-  }
+  return filterTrivialGedcomRecord(
+    newGedcomRecord({
+      tag: "DATE",
+      value: gedcomDate.value,
+    }),
+  );
 }
 
 export function serializeGedcomSortDate(
   gedcomDate: GedcomDate,
 ): GedcomRecord | null {
-  const gedcomRecord = {
-    tag: "SDATE",
-    abstag: "",
-    xref: "",
-    value: gedcomDate.value,
-    children: [],
-  };
-  if (gedcomRecord.xref || gedcomRecord.value || gedcomRecord.children.length) {
-    return gedcomRecord;
-  } else {
-    return null;
-  }
+  return filterTrivialGedcomRecord(
+    newGedcomRecord({
+      tag: "SDATE",
+      value: gedcomDate.value,
+    }),
+  );
 }

@@ -1,5 +1,9 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
-import type { GedcomRecord } from "./gedcomRecord";
+import {
+  filterTrivialGedcomRecords,
+  newGedcomRecord,
+  type GedcomRecord,
+} from "./gedcomRecord";
 
 export interface GedcomMultimediaLink {
   xref: string;
@@ -41,19 +45,11 @@ export function parseGedcomMultimediaLink(
 export function serializeGedcomMultimediaLink(
   gedcomMultimediaLink: GedcomMultimediaLink,
 ): GedcomRecord {
-  return {
+  return newGedcomRecord({
     tag: "OBJE",
-    abstag: "",
-    xref: "",
     value: gedcomMultimediaLink.xref,
-    children: [
-      {
-        tag: "TITL",
-        abstag: "",
-        xref: "",
-        value: gedcomMultimediaLink.title,
-        children: [],
-      },
-    ].filter((record) => record.value || record.children.length),
-  };
+    children: filterTrivialGedcomRecords([
+      newGedcomRecord({ tag: "TITL", value: gedcomMultimediaLink.title }),
+    ]),
+  });
 }

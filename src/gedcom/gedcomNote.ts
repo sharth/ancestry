@@ -1,5 +1,5 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
-import type { GedcomRecord } from "./gedcomRecord";
+import { newGedcomRecord, type GedcomRecord } from "./gedcomRecord";
 
 export interface GedcomNote {
   text: string;
@@ -26,13 +26,7 @@ export function parseGedcomNote(gedcomRecord: GedcomRecord): GedcomNote {
 }
 
 export function serializeGedcomNote(gedcomNote: GedcomNote): GedcomRecord {
-  return {
-    tag: "NOTE",
-    abstag: "",
-    xref: "",
-    value: gedcomNote.text,
-    children: [],
-  };
+  return newGedcomRecord({ tag: "NOTE", value: gedcomNote.text });
 }
 
 export function newGedcomNote(): GedcomNote {

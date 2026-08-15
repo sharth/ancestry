@@ -9,7 +9,11 @@ import {
   serializeGedcomNote,
   type GedcomNote,
 } from "./gedcomNote";
-import type { GedcomRecord } from "./gedcomRecord";
+import {
+  filterTrivialGedcomRecords,
+  newGedcomRecord,
+  type GedcomRecord,
+} from "./gedcomRecord";
 
 export interface GedcomSourceCitation {
   sourceXref: string;
@@ -92,49 +96,26 @@ function parseGedcomSourceCitationData(gedcomRecord: GedcomRecord): string {
 export function serializeGedcomSourceCitation(
   gedcomCitation: GedcomSourceCitation,
 ): GedcomRecord {
-  return {
+  return newGedcomRecord({
     tag: "SOUR",
-    abstag: "",
-    xref: "",
     value: gedcomCitation.sourceXref,
-    children: [
+    children: filterTrivialGedcomRecords([
       ...gedcomCitation.multimediaLinks.map((gedcomMultimediaLink) =>
         serializeGedcomMultimediaLink(gedcomMultimediaLink),
       ),
-      {
-        tag: "PAGE",
-        abstag: "",
-        xref: "",
-        value: gedcomCitation.page,
-        children: [],
-      },
+      newGedcomRecord({ tag: "PAGE", value: gedcomCitation.page }),
       ...gedcomCitation.notes.map((gedcomNote) =>
         serializeGedcomNote(gedcomNote),
       ),
-      {
-        tag: "QUAY",
-        abstag: "",
-        xref: "",
-        value: gedcomCitation.quality,
-        children: [],
-      },
-      {
+      newGedcomRecord({ tag: "QUAY", value: gedcomCitation.quality }),
+      newGedcomRecord({
         tag: "DATA",
-        abstag: "",
-        xref: "",
-        value: "",
-        children: [
-          {
-            tag: "TEXT",
-            abstag: "",
-            xref: "",
-            value: gedcomCitation.text,
-            children: [],
-          },
-        ].filter((record) => record.children.length || record.value),
-      },
-    ].filter((record) => record.children.length || record.value),
-  };
+        children: filterTrivialGedcomRecords([
+          newGedcomRecord({ tag: "TEXT", value: gedcomCitation.text }),
+        ]),
+      }),
+    ]),
+  });
 }
 
 export function newGedcomSourceCitation(

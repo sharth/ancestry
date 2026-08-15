@@ -1,5 +1,9 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
-import type { GedcomRecord } from "./gedcomRecord";
+import {
+  filterTrivialGedcomRecords,
+  newGedcomRecord,
+  type GedcomRecord,
+} from "./gedcomRecord";
 
 export interface GedcomSubmitter {
   xref: string;
@@ -44,26 +48,21 @@ export function parseGedcomSubmitter(
 export function serializeGedcomSubmitter(
   gedcomSubmitter: GedcomSubmitter,
 ): GedcomRecord {
-  return {
+  return newGedcomRecord({
     xref: gedcomSubmitter.xref,
     tag: "SUBM",
     abstag: "SUBM",
-    value: "",
-    children: [
-      {
+    children: filterTrivialGedcomRecords([
+      newGedcomRecord({
         tag: "NAME",
         abstag: "SUBM.NAME",
-        xref: "",
         value: gedcomSubmitter.name,
-        children: [],
-      },
-      {
+      }),
+      newGedcomRecord({
         tag: "_EMAIL",
         abstag: "SUBM._EMAIL",
-        xref: "",
         value: gedcomSubmitter.email,
-        children: [],
-      },
-    ].filter((record) => record.value || record.children.length),
-  };
+      }),
+    ]),
+  });
 }

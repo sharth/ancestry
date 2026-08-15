@@ -1,5 +1,9 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
-import type { GedcomRecord } from "./gedcomRecord";
+import {
+  filterTrivialGedcomRecords,
+  newGedcomRecord,
+  type GedcomRecord,
+} from "./gedcomRecord";
 
 export interface GedcomRepository {
   xref: string;
@@ -42,19 +46,16 @@ export function parseGedcomRepository(
 export function serializeGedcomRepository(
   gedcomRepository: GedcomRepository,
 ): GedcomRecord {
-  return {
+  return newGedcomRecord({
     tag: "REPO",
     abstag: "REPO",
     xref: gedcomRepository.xref,
-    value: "",
-    children: [
-      {
+    children: filterTrivialGedcomRecords([
+      newGedcomRecord({
         tag: "NAME",
         abstag: "REPO.NAME",
-        xref: "",
         value: gedcomRepository.name,
-        children: [],
-      },
-    ].filter((record) => record.children.length || record.value),
-  };
+      }),
+    ]),
+  });
 }
