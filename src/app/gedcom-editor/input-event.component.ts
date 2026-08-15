@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  input,
-  model,
-} from "@angular/core";
+import { Component, input, model } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 import type { AncestryDatabase } from "../../database/ancestry.service";
 import {
@@ -25,7 +20,6 @@ import { InputSourceCitationsComponent } from "./input-source-citations.componen
   ],
   templateUrl: "./input-event.component.html",
   styleUrl: "./input.component.css",
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputEventComponent implements FormValueControl<GedcomEvent> {
   readonly ancestryDatabase = input.required<AncestryDatabase>();

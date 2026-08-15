@@ -1,10 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  inject,
-  input,
-} from "@angular/core";
+import { Component, computed, inject, input } from "@angular/core";
 import { AncestryService } from "../../database/ancestry.service";
 import { fullname, type GedcomIndividual } from "../../gedcom/gedcomIndividual";
 import { IndividualLinkComponent } from "../individual-link/individual-link.component";
@@ -14,7 +8,6 @@ import { IndividualLinkComponent } from "../individual-link/individual-link.comp
   imports: [IndividualLinkComponent],
   templateUrl: "./individual-ancestors.component.html",
   styleUrl: "./individual.component.css",
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IndividualAncestorsComponent {
   readonly xref = input.required<string>();

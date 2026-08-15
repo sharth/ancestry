@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  input,
-} from "@angular/core";
+import { Component, computed, input } from "@angular/core";
 import type { AncestryDatabase } from "../../database/ancestry.service";
 import {
   fullname,
@@ -18,7 +13,6 @@ import { IndividualLinkComponent } from "../individual-link/individual-link.comp
   imports: [IndividualLinkComponent, GedcomEditorDialogComponent],
   templateUrl: "./individuals.component.html",
   styleUrl: "./individuals.component.css",
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IndividualsComponent {
   readonly ancestryDatabase = input.required<AncestryDatabase>();

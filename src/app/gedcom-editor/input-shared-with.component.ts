@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   ViewChildren,
   input,
@@ -21,7 +20,6 @@ import { InputIndividualXrefComponent } from "./input-individual-xref.component"
   imports: [FormField, InputIndividualXrefComponent],
   templateUrl: "./input-shared-with.component.html",
   styleUrl: "./input.component.css",
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputSharedWithComponent implements FormValueControl<
   GedcomEventSharedWith[]

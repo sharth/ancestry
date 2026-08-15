@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   Injector,
   ViewChildren,
@@ -31,7 +30,6 @@ import { InputRepositoryXrefComponent } from "./input-repository-xref.component"
     InputRepositoryCallNumberComponent,
     InputRepositoryXrefComponent,
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputRepositoryLinksComponent implements FormValueControl<
   GedcomRepositoryLink[]

@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   inject,
@@ -15,7 +14,6 @@ import { GedcomEditorComponent } from "../gedcom-editor/gedcom-editor.component"
   imports: [GedcomEditorComponent],
   templateUrl: "./gedcom-editor-dialog.component.html",
   styleUrl: "./gedcom-editor-dialog.component.css",
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GedcomEditorDialogComponent {
   private readonly cdr = inject(ChangeDetectorRef);

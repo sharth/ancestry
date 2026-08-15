@@ -1,10 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  input,
-  viewChild,
-} from "@angular/core";
+import { Component, computed, input, viewChild } from "@angular/core";
 import { RouterModule } from "@angular/router";
 import type { AncestryDatabase } from "../../database/ancestry.service";
 import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
@@ -27,7 +21,6 @@ import { SourceUnknownsComponent } from "./source-unknowns.component";
     GedcomEditorDialogComponent,
     SourceUnknownsComponent,
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SourceComponent {
   readonly ancestryDatabase = input.required<AncestryDatabase>();

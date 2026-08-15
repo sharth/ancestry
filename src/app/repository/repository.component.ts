@@ -1,10 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  input,
-  viewChild,
-} from "@angular/core";
+import { Component, computed, input, viewChild } from "@angular/core";
 import { RouterModule } from "@angular/router";
 import type { AncestryDatabase } from "../../database/ancestry.service";
 import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
@@ -21,7 +15,6 @@ import { RepositorySourcesComponent } from "./repository-sources.component";
   ],
   templateUrl: "./repository.component.html",
   styleUrl: "./repository.component.css",
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RepositoryComponent {
   readonly ancestryDatabase = input.required<AncestryDatabase>();

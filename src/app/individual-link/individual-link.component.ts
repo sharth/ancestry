@@ -1,10 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  inject,
-  input,
-} from "@angular/core";
+import { Component, computed, inject, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
 import { AncestryService } from "../../database/ancestry.service";
 import { fullname } from "../../gedcom/gedcomIndividual";
@@ -14,7 +8,6 @@ import { fullname } from "../../gedcom/gedcomIndividual";
   imports: [RouterModule],
   templateUrl: "./individual-link.component.html",
   styleUrl: "./individual-link.component.css",
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IndividualLinkComponent {
   private readonly ancestryService = inject(AncestryService);

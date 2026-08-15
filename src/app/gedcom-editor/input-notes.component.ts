@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   ViewChildren,
   afterNextRender,
@@ -17,7 +16,6 @@ import { newGedcomNote, type GedcomNote } from "../../gedcom/gedcomNote";
   imports: [FormField],
   templateUrl: "./input-notes.component.html",
   styleUrl: "./input.component.css",
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputNotesComponent implements FormValueControl<GedcomNote[]> {
   readonly ancestryDatabase = input.required<AncestryDatabase>();

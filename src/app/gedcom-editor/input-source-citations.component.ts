@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   ViewChildren,
   input,
@@ -23,7 +22,6 @@ import { InputSourceXrefComponent } from "./input-source-xref.component";
   ],
   templateUrl: "./input-source-citations.component.html",
   styleUrl: "./input.component.css",
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputSourceCitationsComponent implements FormValueControl<
   GedcomSourceCitation[]

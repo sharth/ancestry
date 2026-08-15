@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  input,
-  model,
-} from "@angular/core";
+import { Component, input, model } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 import type { AncestryDatabase } from "../../database/ancestry.service";
 import {
@@ -18,7 +13,6 @@ import { InputEventComponent } from "./input-event.component";
   imports: [FormField, InputEventComponent],
   templateUrl: "./input-individual-events.component.html",
   styleUrl: "./input.component.css",
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputIndividualEventsComponent implements FormValueControl<
   GedcomEvent[]

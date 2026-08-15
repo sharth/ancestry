@@ -1,10 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  input,
-  resource,
-} from "@angular/core";
+import { Component, inject, input, resource } from "@angular/core";
 import { DomSanitizer } from "@angular/platform-browser";
 import { AncestryService } from "../../database/ancestry.service";
 
@@ -12,7 +6,6 @@ import { AncestryService } from "../../database/ancestry.service";
   selector: "app-multimedia-preview",
   standalone: true,
   templateUrl: "./multimedia-preview.component.html",
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MultimediaPreviewComponent {
   private readonly ancestryService = inject(AncestryService);

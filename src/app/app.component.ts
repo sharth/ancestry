@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
+import { Component, inject } from "@angular/core";
 import { MatSidenavModule } from "@angular/material/sidenav";
 import { RouterLink, RouterOutlet } from "@angular/router";
 import { AncestryService } from "../database/ancestry.service";
@@ -8,7 +8,6 @@ import { AncestryService } from "../database/ancestry.service";
   imports: [RouterOutlet, MatSidenavModule, RouterLink],
   templateUrl: "./app.component.html",
   styleUrl: "./app.component.css",
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
   private readonly ancestryService = inject(AncestryService);

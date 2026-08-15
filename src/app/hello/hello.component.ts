@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
+import { Component, inject } from "@angular/core";
 import { Router } from "@angular/router";
 import { AncestryService } from "../../database/ancestry.service";
 
@@ -7,7 +7,6 @@ import { AncestryService } from "../../database/ancestry.service";
   imports: [],
   templateUrl: "./hello.component.html",
   styleUrl: "./hello.component.css",
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HelloComponent {
   private readonly ancestryService = inject(AncestryService);

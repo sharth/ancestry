@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  input,
-  model,
-} from "@angular/core";
+import { Component, input, model } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 import type { AncestryDatabase } from "../../database/ancestry.service";
 import {
@@ -30,7 +25,6 @@ import { InputUnknownRecordsComponent } from "./input-unknown-records.component"
   ],
   templateUrl: "./input-individual.component.html",
   styleUrl: "./input.component.css",
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputIndividualComponent implements FormValueControl<GedcomIndividual> {
   readonly ancestryDatabase = input.required<AncestryDatabase>();

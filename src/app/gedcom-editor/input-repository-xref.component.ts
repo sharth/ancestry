@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   ViewChild,
   computed,
@@ -15,7 +14,6 @@ import type { AncestryDatabase } from "../../database/ancestry.service";
   imports: [FormField],
   templateUrl: "./input-repository-xref.component.html",
   styleUrl: "./input.component.css",
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputRepositoryXrefComponent implements FormValueControl<string> {
   readonly ancestryDatabase = input.required<AncestryDatabase>();

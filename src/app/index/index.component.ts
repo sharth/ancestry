@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  input,
-} from "@angular/core";
+import { Component, computed, input } from "@angular/core";
 import type { AncestryDatabase } from "../../database/ancestry.service";
 
 @Component({
@@ -11,7 +6,6 @@ import type { AncestryDatabase } from "../../database/ancestry.service";
   imports: [],
   templateUrl: "./index.component.html",
   styleUrl: "./index.component.css",
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IndexComponent {
   readonly ancestryDatabase = input.required<AncestryDatabase>();

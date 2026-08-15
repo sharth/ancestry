@@ -1,10 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  inject,
-  input,
-} from "@angular/core";
+import { Component, computed, inject, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
 import { AncestryService } from "../../database/ancestry.service";
 
@@ -13,7 +7,6 @@ import { AncestryService } from "../../database/ancestry.service";
   templateUrl: "./source-repositories.component.html",
   styleUrl: "./source.component.css",
   imports: [RouterModule],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SourceRepositoriesComponent {
   readonly xref = input.required<string>();

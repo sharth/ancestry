@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  input,
-  model,
-} from "@angular/core";
+import { Component, input, model } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 import type { AncestryDatabase } from "../../database/ancestry.service";
 import {
@@ -16,7 +11,6 @@ import {
   imports: [FormField],
   templateUrl: "./input-repository.component.html",
   styleUrl: "./input.component.css",
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputRepositoryComponent implements FormValueControl<GedcomRepository> {
   readonly ancestryDatabase = input.required<AncestryDatabase>();

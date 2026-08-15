@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   Injector,
   ViewChildren,
@@ -25,7 +24,6 @@ import { InputSourceCitationsComponent } from "./input-source-citations.componen
   imports: [FormField, InputSourceCitationsComponent],
   templateUrl: "./input-individual-names.component.html",
   styleUrl: "./input.component.css",
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputIndividualNamesComponent implements FormValueControl<
   GedcomName[]

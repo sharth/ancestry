@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  input,
-} from "@angular/core";
+import { Component, computed, input } from "@angular/core";
 import type { AncestryDatabase } from "../../database/ancestry.service";
 import {
   fullname,
@@ -27,7 +22,6 @@ import { IndividualSunburstComponent } from "./individual-sunburst.component";
   ],
   templateUrl: "./individual.component.html",
   styleUrl: "./individual.component.css",
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IndividualComponent {
   readonly xref = input.required<string>();

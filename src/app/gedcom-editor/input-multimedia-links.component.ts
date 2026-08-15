@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   Injector,
   ViewChildren,
@@ -26,7 +25,6 @@ import type { GedcomMultimediaLink } from "../../gedcom/gedcomMultimediaLink";
   templateUrl: "./input-multimedia-links.component.html",
   styleUrl: "./input.component.css",
   imports: [RouterModule, FormField],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputMultimediaLinksComponent implements FormValueControl<
   GedcomMultimediaLink[]

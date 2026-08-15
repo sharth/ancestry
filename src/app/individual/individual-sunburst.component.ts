@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -29,7 +28,6 @@ interface SunburstNode {
   imports: [RouterLink],
   templateUrl: "./individual-sunburst.component.html",
   styleUrl: "./individual.component.css",
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IndividualSunburstComponent {
   readonly individual = input.required<GedcomIndividual>();

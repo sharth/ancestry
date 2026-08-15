@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  inject,
-} from "@angular/core";
+import { Component, computed, inject } from "@angular/core";
 import { RouterLink } from "@angular/router";
 import { AncestryService } from "../../database/ancestry.service";
 import { gedcomEventTags } from "../../gedcom/gedcomEvent";
@@ -32,7 +27,6 @@ interface PlaceGroup {
   standalone: true,
   imports: [RouterLink],
   templateUrl: "./places.component.html",
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PlacesComponent {
   readonly ancestryService = inject(AncestryService);

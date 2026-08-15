@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  input,
-} from "@angular/core";
+import { Component, computed, input } from "@angular/core";
 import { RouterLink } from "@angular/router";
 import type { AncestryDatabase } from "../../database/ancestry.service";
 import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
@@ -13,7 +8,6 @@ import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-edit
   imports: [RouterLink, GedcomEditorDialogComponent],
   templateUrl: "./multimedias.component.html",
   styleUrl: "./multimedias.component.css",
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MultimediasComponent {
   readonly ancestryDatabase = input.required<AncestryDatabase>();

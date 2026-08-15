@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   ViewChild,
   input,
@@ -15,7 +14,6 @@ import { displayGedcomName } from "../../gedcom/gedcomName";
   imports: [FormField],
   templateUrl: "./input-individual-xref.component.html",
   styleUrl: "./input.component.css",
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputIndividualXrefComponent implements FormValueControl<string> {
   readonly ancestryDatabase = input.required<AncestryDatabase>();

@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  input,
-} from "@angular/core";
+import { Component, computed, input } from "@angular/core";
 import { MatTableModule } from "@angular/material/table";
 import { RouterModule } from "@angular/router";
 import type { AncestryDatabase } from "../../database/ancestry.service";
@@ -16,7 +11,6 @@ import { IndividualLinkComponent } from "../individual-link/individual-link.comp
   templateUrl: "./multimedia-citations.component.html",
   styleUrl: "./multimedia.component.css",
   imports: [RouterModule, MatTableModule, IndividualLinkComponent],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MultimediaCitationsComponent {
   readonly ancestryDatabase = input.required<AncestryDatabase>();

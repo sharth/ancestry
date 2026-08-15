@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   inject,
@@ -185,7 +184,6 @@ export class GedcomEditorMultimediaComponent {
   ],
   templateUrl: "./gedcom-editor.component.html",
   styleUrl: "./gedcom-editor.component.css",
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GedcomEditorComponent {
   private readonly ancestryService = inject(AncestryService);
