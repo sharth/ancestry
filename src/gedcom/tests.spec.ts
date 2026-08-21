@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { newGedcomEvent } from "./gedcomEvent";
+import { newGedcomFact } from "./gedcomFact";
 import {
   newGedcomFamily,
   parseGedcomFamily,
@@ -152,13 +152,13 @@ const testCases: {
         }),
         newGedcomIndividual({
           xref: "@I5@",
-          events: [
-            newGedcomEvent({
+          facts: [
+            newGedcomFact({
               tag: "IDNO",
               value: "abcd",
               type: "familysearch.org",
             }),
-            newGedcomEvent({
+            newGedcomFact({
               tag: "BIRT",
               place: "place",
               address: "address",
@@ -171,7 +171,7 @@ const testCases: {
                 }),
               ],
             }),
-            newGedcomEvent({
+            newGedcomFact({
               tag: "OCCU",
               value: "Truck Driver",
               type: "Permanent",
@@ -201,8 +201,8 @@ const testCases: {
         }),
         newGedcomIndividual({
           xref: "@I9@",
-          events: [
-            newGedcomEvent({
+          facts: [
+            newGedcomFact({
               tag: "CENS",
               sharedWith: [
                 { xref: "@I7@", role: "" },

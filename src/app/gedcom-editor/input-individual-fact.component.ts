@@ -1,30 +1,30 @@
 import { Component, input, model } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 import type { AncestryDatabase } from "../../database/ancestry.service";
-import { newGedcomEvent, type GedcomEvent } from "../../gedcom/gedcomEvent";
+import { newGedcomFact, type GedcomFact } from "../../gedcom/gedcomFact";
 import {
   gedcomIndividualAttributes,
   gedcomIndividualEvents,
-} from "../../gedcom/gedcomEventMetadata";
+} from "../../gedcom/gedcomFactMetadata";
 import { InputNotesComponent } from "./input-notes.component";
 import { InputSharedWithComponent } from "./input-shared-with.component";
 import { InputSourceCitationsComponent } from "./input-source-citations.component";
 
 @Component({
-  selector: "app-input-event",
+  selector: "app-input-individual-fact",
   imports: [
     FormField,
     InputSourceCitationsComponent,
     InputNotesComponent,
     InputSharedWithComponent,
   ],
-  templateUrl: "./input-event.component.html",
+  templateUrl: "./input-individual-fact.component.html",
   styleUrl: "./input.component.css",
 })
-export class InputEventComponent implements FormValueControl<GedcomEvent> {
+export class InputIndividualFactComponent implements FormValueControl<GedcomFact> {
   readonly ancestryDatabase = input.required<AncestryDatabase>();
   readonly open = input<boolean>(false);
-  readonly value = model<GedcomEvent>(newGedcomEvent());
+  readonly value = model<GedcomFact>(newGedcomFact());
   readonly form = form(this.value);
 
   readonly gedcomEventTags = Object.entries({

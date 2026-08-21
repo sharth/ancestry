@@ -106,7 +106,7 @@ describe("GedcomEditorComponent Integration", () => {
             notes: [],
           },
         ],
-        events: [],
+        facts: [],
         sex: { sex: "M", citations: [] },
         childOfFamilyXrefs: [],
         parentOfFamilyXrefs: ["@F0@"],
@@ -121,7 +121,7 @@ describe("GedcomEditorComponent Integration", () => {
         husbandXref: "@I0@",
         wifeXref: "",
         childXrefs: [],
-        events: [],
+        facts: [],
         citations: [],
       },
     },
@@ -201,20 +201,20 @@ describe("GedcomEditorComponent Integration", () => {
     await user.type(surnameInput, "Doe");
     await fixture.whenStable();
 
-    const eventsContainer = editorComponent.querySelector<HTMLDetailsElement>(
-      "app-input-individual-events > details",
+    const factsContainer = editorComponent.querySelector<HTMLDetailsElement>(
+      "app-input-individual-facts > details",
     );
-    assert.isOk(eventsContainer);
-    await openDetails(eventsContainer);
+    assert.isOk(factsContainer);
+    await openDetails(factsContainer);
 
-    const addEventButton = eventsContainer.querySelector(
+    const addEventButton = factsContainer.querySelector(
       'button[aria-label="Add event"]',
     );
     assert.isOk(addEventButton);
     await user.click(addEventButton);
     await fixture.whenStable();
 
-    const birthDetails = eventsContainer.querySelector<HTMLDetailsElement>(
+    const birthDetails = factsContainer.querySelector<HTMLDetailsElement>(
       ":scope > details:last-of-type",
     );
     assert.isOk(birthDetails);
@@ -238,7 +238,7 @@ describe("GedcomEditorComponent Integration", () => {
     await user.click(addEventButton);
     await fixture.whenStable();
 
-    const deathDetails = eventsContainer.querySelector<HTMLDetailsElement>(
+    const deathDetails = factsContainer.querySelector<HTMLDetailsElement>(
       ":scope > details:last-of-type",
     );
     assert.isOk(deathDetails);
@@ -276,14 +276,14 @@ describe("GedcomEditorComponent Integration", () => {
       i.names.some((n) => n.givenName === "John" && n.surname === "Doe"),
     );
     assert.isOk(johnDoe);
-    expect(johnDoe.events).toContainEqual(
+    expect(johnDoe.facts).toContainEqual(
       expect.objectContaining({
         tag: "BIRT",
         date: { value: "1 Jan 1900" },
         place: "Boston",
       }),
     );
-    expect(johnDoe.events).toContainEqual(
+    expect(johnDoe.facts).toContainEqual(
       expect.objectContaining({
         tag: "DEAT",
         date: { value: "10 Dec 1980" },

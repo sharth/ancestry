@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { parseGedcomFamily, serializeGedcomFamily } from "./gedcomFamily";
+import {
+  newGedcomFamily,
+  parseGedcomFamily,
+  serializeGedcomFamily,
+} from "./gedcomFamily";
 import type { GedcomRecord } from "./gedcomRecord";
 
 describe("gedcomFamily", () => {
@@ -33,14 +37,13 @@ describe("gedcomFamily", () => {
     ],
   };
   it("parser", () => {
-    expect(parseGedcomFamily(gedcomRecord)).toEqual({
-      xref: "@F1@",
-      husbandXref: "@I1@",
-      wifeXref: "",
-      childXrefs: ["@I10@", "@I11@"],
-      events: [],
-      citations: [],
-    });
+    expect(parseGedcomFamily(gedcomRecord)).toEqual(
+      newGedcomFamily({
+        xref: "@F1@",
+        husbandXref: "@I1@",
+        childXrefs: ["@I10@", "@I11@"],
+      }),
+    );
   });
   it("serializer", () => {
     expect(serializeGedcomFamily(parseGedcomFamily(gedcomRecord))).toEqual(

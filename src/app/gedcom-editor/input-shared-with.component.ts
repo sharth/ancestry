@@ -12,7 +12,7 @@ import {
   type FormValueControl,
 } from "@angular/forms/signals";
 import type { AncestryDatabase } from "../../database/ancestry.service";
-import type { GedcomEventSharedWith } from "../../gedcom/gedcomEvent";
+import type { GedcomFactSharedWith } from "../../gedcom/gedcomFact";
 import { InputIndividualXrefComponent } from "./input-individual-xref.component";
 
 @Component({
@@ -22,13 +22,13 @@ import { InputIndividualXrefComponent } from "./input-individual-xref.component"
   styleUrl: "./input.component.css",
 })
 export class InputSharedWithComponent implements FormValueControl<
-  GedcomEventSharedWith[]
+  GedcomFactSharedWith[]
 > {
   readonly ancestryDatabase = input.required<AncestryDatabase>();
-  readonly value = model<GedcomEventSharedWith[]>([]);
+  readonly value = model<GedcomFactSharedWith[]>([]);
   readonly form = form(this.value);
 
-  readonly newControls = new WeakSet<FieldTree<GedcomEventSharedWith, number>>(
+  readonly newControls = new WeakSet<FieldTree<GedcomFactSharedWith, number>>(
     [],
   );
 

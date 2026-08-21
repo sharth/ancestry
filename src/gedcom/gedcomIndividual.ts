@@ -6,10 +6,10 @@ import {
   type GedcomChangeDate,
 } from "./gedcomChangeDate";
 import {
-  parseGedcomIndividualEvent,
-  serializeGedcomIndividualEvent,
-  type GedcomEvent,
-} from "./gedcomEvent";
+  parseGedcomIndividualFact,
+  serializeGedcomIndividualFact,
+  type GedcomFact,
+} from "./gedcomFact";
 import {
   parseGedcomName,
   serializeGedcomName,
@@ -36,7 +36,7 @@ import type { GedcomSourceCitation } from "./gedcomSourceCitation";
 export interface GedcomIndividual {
   xref: string;
   names: GedcomName[];
-  events: GedcomEvent[];
+  facts: GedcomFact[];
   sex: GedcomSex;
   changeDate: GedcomChangeDate;
   childOfFamilyXrefs: string[];
@@ -97,7 +97,7 @@ export function parseGedcomIndividual(record: GedcomRecord): GedcomIndividual {
       case "WILL":
       case "DIV":
       case "SSN":
-        gedcomIndividual.events.push(parseGedcomIndividualEvent(childRecord));
+        gedcomIndividual.facts.push(parseGedcomIndividualFact(childRecord));
         break;
       case "NAME":
         gedcomIndividual.names.push(parseGedcomName(childRecord));
@@ -155,8 +155,8 @@ export function serializeGedcomIndividual(
       ...gedcomIndividual.unknownRecords.filter(
         (record) => record.tag == "SOUR",
       ),
-      ...gedcomIndividual.events.map((event) =>
-        serializeGedcomIndividualEvent(event),
+      ...gedcomIndividual.facts.map((event) =>
+        serializeGedcomIndividualFact(event),
       ),
       ...gedcomIndividual.parentOfFamilyXrefs.map((xref) =>
         newGedcomRecord({ tag: "FAMS", value: xref }),
@@ -184,7 +184,7 @@ export function getIndividualMultimediaCitations(
 ): { event: string; citation: GedcomSourceCitation }[] {
   const references: { event: string; citation: GedcomSourceCitation }[] = [];
 
-  for (const event of individual.events) {
+  for (const event of individual.facts) {
     for (const citation of event.citations) {
       if (
         citation.multimediaLinks.some((link) => link.xref === multimediaXref)
@@ -219,7 +219,7 @@ export function newGedcomIndividual(
   return {
     names: [],
     sex: newGedcomSex(),
-    events: [],
+    facts: [],
     parentOfFamilyXrefs: [],
     childOfFamilyXrefs: [],
     unknownRecords: [],

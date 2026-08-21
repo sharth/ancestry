@@ -1,9 +1,9 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import {
   parseGedcomFamilyEvent,
-  serializeGedcomFamilyEvent,
-  type GedcomEvent,
-} from "./gedcomEvent";
+  serializeGedcomFamilyFact,
+  type GedcomFact,
+} from "./gedcomFact";
 import {
   filterTrivialGedcomRecords,
   newGedcomRecord,
@@ -20,7 +20,7 @@ export interface GedcomFamily {
   husbandXref: string;
   wifeXref: string;
   childXrefs: string[];
-  events: GedcomEvent[];
+  facts: GedcomFact[];
   citations: GedcomSourceCitation[];
 }
 
@@ -57,7 +57,7 @@ export function parseGedcomFamily(record: GedcomRecord): GedcomFamily {
       case "EVEN":
       case "MARR":
       case "MARB":
-        gedcomFamily.events.push(parseGedcomFamilyEvent(childRecord));
+        gedcomFamily.facts.push(parseGedcomFamilyEvent(childRecord));
         break;
       case "SOUR":
         gedcomFamily.citations.push(parseGedcomSourceCitation(childRecord));
@@ -99,7 +99,7 @@ export function serializeGedcomFamily(
       ...gedcomFamily.citations.map((citation) =>
         serializeGedcomSourceCitation(citation),
       ),
-      ...gedcomFamily.events.map((event) => serializeGedcomFamilyEvent(event)),
+      ...gedcomFamily.facts.map((event) => serializeGedcomFamilyFact(event)),
     ]),
   });
 }
@@ -110,7 +110,7 @@ export function getFamilyMultimediaCitations(
 ): { event: string; citation: GedcomSourceCitation }[] {
   const references: { event: string; citation: GedcomSourceCitation }[] = [];
 
-  for (const event of family.events) {
+  for (const event of family.facts) {
     for (const citation of event.citations) {
       if (
         citation.multimediaLinks.some((link) => link.xref === multimediaXref)
@@ -136,7 +136,7 @@ export function newGedcomFamily(
     husbandXref: "",
     wifeXref: "",
     childXrefs: [],
-    events: [],
+    facts: [],
     citations: [],
     ...fieldsToUpdate,
   };

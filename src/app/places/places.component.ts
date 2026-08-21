@@ -6,7 +6,7 @@ import {
   gedcomFamilyEvents,
   gedcomIndividualAttributes,
   gedcomIndividualEvents,
-} from "../../gedcom/gedcomEventMetadata";
+} from "../../gedcom/gedcomFactMetadata";
 import { fullname } from "../../gedcom/gedcomIndividual";
 
 interface EventItem {
@@ -64,7 +64,7 @@ export class PlacesComponent {
 
     for (const individual of Object.values(database.individuals)) {
       const name = fullname(individual);
-      for (const event of individual.events) {
+      for (const event of individual.facts) {
         if (event.place || event.address) {
           addEvent(event.place, event.address, {
             eventType:
@@ -81,7 +81,7 @@ export class PlacesComponent {
     }
 
     for (const family of Object.values(database.families)) {
-      for (const event of family.events) {
+      for (const event of family.facts) {
         if (event.place || event.address) {
           addEvent(event.place, event.address, {
             eventType:

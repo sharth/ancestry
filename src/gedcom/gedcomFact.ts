@@ -1,3 +1,4 @@
+// A Gedcom Fact is an event or attribute.
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import {
   parseGedcomDate,
@@ -11,7 +12,7 @@ import {
   gedcomIndividualAttributes,
   gedcomIndividualEvents,
   type GedcomEventMetadata,
-} from "./gedcomEventMetadata";
+} from "./gedcomFactMetadata";
 import {
   parseGedcomNote,
   serializeGedcomNote,
@@ -28,12 +29,12 @@ import {
   type GedcomSourceCitation,
 } from "./gedcomSourceCitation";
 
-export interface GedcomEventSharedWith {
+export interface GedcomFactSharedWith {
   xref: string;
   role: string;
 }
 
-export interface GedcomEvent {
+export interface GedcomFact {
   tag: string;
   type: string;
   address: string;
@@ -43,42 +44,40 @@ export interface GedcomEvent {
   sortDate: GedcomDate;
   value: string;
   citations: GedcomSourceCitation[];
-  sharedWith: GedcomEventSharedWith[];
+  sharedWith: GedcomFactSharedWith[];
   notes: GedcomNote[];
 }
 
-export function parseGedcomIndividualEvent(
+export function parseGedcomIndividualFact(
   gedcomRecord: GedcomRecord,
-): GedcomEvent {
+): GedcomFact {
   const gedcomEventMetadata =
     gedcomIndividualEvents[gedcomRecord.tag] ??
     gedcomIndividualAttributes[gedcomRecord.tag];
   if (gedcomEventMetadata === undefined) {
     throw new Error();
   }
-  return parseGedcomEvent(gedcomRecord, gedcomEventMetadata);
+  return parseGedcomFact(gedcomRecord, gedcomEventMetadata);
 }
 
-export function parseGedcomFamilyEvent(
-  gedcomRecord: GedcomRecord,
-): GedcomEvent {
+export function parseGedcomFamilyEvent(gedcomRecord: GedcomRecord): GedcomFact {
   const gedcomEventMetadata =
     gedcomFamilyEvents[gedcomRecord.tag] ??
     gedcomFamilyAttributes[gedcomRecord.tag];
   if (gedcomEventMetadata === undefined) {
     throw new Error();
   }
-  return parseGedcomEvent(gedcomRecord, gedcomEventMetadata);
+  return parseGedcomFact(gedcomRecord, gedcomEventMetadata);
 }
 
-function parseGedcomEvent(
+function parseGedcomFact(
   record: GedcomRecord,
   gedcomEventMetadata: GedcomEventMetadata,
-): GedcomEvent {
+): GedcomFact {
   if (record.tag === "") throw new Error();
   if (record.xref != "") throw new Error();
 
-  const gedcomEvent = newGedcomEvent({
+  const gedcomEvent = newGedcomFact({
     tag: record.tag,
   });
 
@@ -95,7 +94,7 @@ function parseGedcomEvent(
   for (const childRecord of record.children) {
     switch (childRecord.tag) {
       case "_SHAR":
-        gedcomEvent.sharedWith.push(parseGedcomShareEvent(childRecord));
+        gedcomEvent.sharedWith.push(parseGedcomShareFact(childRecord));
         break;
       case "SOUR":
         gedcomEvent.citations.push(parseGedcomSourceCitation(childRecord));
@@ -147,14 +146,14 @@ function parseGedcomEvent(
   return gedcomEvent;
 }
 
-function parseGedcomShareEvent(
+function parseGedcomShareFact(
   gedcomRecord: GedcomRecord,
-): GedcomEventSharedWith {
+): GedcomFactSharedWith {
   if (gedcomRecord.xref != "") throw new Error();
   if (gedcomRecord.tag != "_SHAR") throw new Error();
   if (gedcomRecord.value == "") throw new Error();
 
-  const result: GedcomEventSharedWith = {
+  const result: GedcomFactSharedWith = {
     xref: gedcomRecord.value,
     role: "",
   };
@@ -175,8 +174,8 @@ function parseGedcomShareEvent(
   return result;
 }
 
-export function serializeGedcomIndividualEvent(
-  gedcomEvent: GedcomEvent,
+export function serializeGedcomIndividualFact(
+  gedcomEvent: GedcomFact,
 ): GedcomRecord {
   const gedcomEventMetadata =
     gedcomIndividualEvents[gedcomEvent.tag] ??
@@ -184,11 +183,11 @@ export function serializeGedcomIndividualEvent(
   if (gedcomEventMetadata === undefined) {
     throw new Error();
   }
-  return serializeGedcomEvent(gedcomEvent, gedcomEventMetadata);
+  return serializeGedcomFact(gedcomEvent, gedcomEventMetadata);
 }
 
-export function serializeGedcomFamilyEvent(
-  gedcomEvent: GedcomEvent,
+export function serializeGedcomFamilyFact(
+  gedcomEvent: GedcomFact,
 ): GedcomRecord {
   const gedcomEventMetadata =
     gedcomFamilyEvents[gedcomEvent.tag] ??
@@ -196,11 +195,11 @@ export function serializeGedcomFamilyEvent(
   if (gedcomEventMetadata === undefined) {
     throw new Error();
   }
-  return serializeGedcomEvent(gedcomEvent, gedcomEventMetadata);
+  return serializeGedcomFact(gedcomEvent, gedcomEventMetadata);
 }
 
-function serializeGedcomEvent(
-  gedcomEvent: GedcomEvent,
+function serializeGedcomFact(
+  gedcomEvent: GedcomFact,
   gedcomEventMetadata: GedcomEventMetadata,
 ): GedcomRecord {
   const value = gedcomEventMetadata.mandatoryValue
@@ -218,7 +217,7 @@ function serializeGedcomEvent(
       serializeGedcomSortDate(gedcomEvent.sortDate),
       newGedcomRecord({ tag: "PLAC", value: gedcomEvent.place }),
       newGedcomRecord({ tag: "ADDR", value: gedcomEvent.address }),
-      ...gedcomEvent.sharedWith.map((s) => serializeGedcomSharedEvent(s)),
+      ...gedcomEvent.sharedWith.map((s) => serializeGedcomSharedFact(s)),
       ...gedcomEvent.notes.map((n) => serializeGedcomNote(n)),
       ...gedcomEvent.citations.map((c) => serializeGedcomSourceCitation(c)),
     ]
@@ -227,8 +226,8 @@ function serializeGedcomEvent(
   });
 }
 
-function serializeGedcomSharedEvent(
-  sharedWith: GedcomEventSharedWith,
+function serializeGedcomSharedFact(
+  sharedWith: GedcomFactSharedWith,
 ): GedcomRecord {
   return newGedcomRecord({
     tag: "_SHAR",
@@ -239,9 +238,9 @@ function serializeGedcomSharedEvent(
   });
 }
 
-export function newGedcomEvent(
-  fieldsToUpdate: Partial<GedcomEvent> = {},
-): GedcomEvent {
+export function newGedcomFact(
+  fieldsToUpdate: Partial<GedcomFact> = {},
+): GedcomFact {
   return {
     tag: "",
     type: "",

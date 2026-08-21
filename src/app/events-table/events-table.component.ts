@@ -1,6 +1,6 @@
 import { Component, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
-import type { GedcomEvent } from "../../gedcom/gedcomEvent";
+import type { GedcomFact } from "../../gedcom/gedcomFact";
 
 @Component({
   selector: "app-events-table",
@@ -9,5 +9,5 @@ import type { GedcomEvent } from "../../gedcom/gedcomEvent";
   styleUrl: "./events-table.component.css",
 })
 export class EventsTableComponent {
-  readonly events = input.required<GedcomEvent[]>();
+  readonly events = input.required<GedcomFact[]>();
 }

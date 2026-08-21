@@ -12,10 +12,10 @@
         {{ event.tag().value() }}
       </summary>
       @defer (when container.open) {
-        <app-input-event
+        <app-input-individual-fact
           [ancestryDatabase]="ancestryDatabase()"
           [formField]="event"
-        ></app-input-event>
+        ></app-input-individual-fact>
       }
     </details>
   }

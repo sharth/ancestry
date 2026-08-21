@@ -1,20 +1,16 @@
 import { describe, expect, it } from "vitest";
 import {
+  newGedcomIndividual,
   parseGedcomIndividual,
   serializeGedcomIndividual,
-  type GedcomIndividual,
 } from "./gedcomIndividual";
-import { parseGedcomRecords, type GedcomRecord } from "./gedcomRecord";
-
-function normalize(record: GedcomRecord): GedcomRecord {
-  return {
-    tag: record.tag,
-    abstag: "",
-    xref: record.xref,
-    value: record.value,
-    children: record.children.map(normalize),
-  };
-}
+import { newGedcomName } from "./gedcomName";
+import {
+  parseGedcomRecords,
+  serializeGedcomRecordToText,
+  type GedcomRecord,
+} from "./gedcomRecord";
+import { newGedcomSourceCitation } from "./gedcomSourceCitation";
 
 function expectToBeDefined<T>(value: T | undefined): asserts value is T {
   expect(value).toBeDefined();
@@ -29,20 +25,15 @@ describe("gedcomIndividual", () => {
       gedcomText.join("\n"),
     );
     expectToBeDefined(gedcomRecord);
-    expect(parseGedcomIndividual(gedcomRecord)).toEqual<GedcomIndividual>({
-      xref: "@I1@",
-      names: [],
-      sex: { sex: "", citations: [] },
-      events: [],
-      parentOfFamilyXrefs: [],
-      childOfFamilyXrefs: [],
-      unknownRecords: [],
-      notes: [],
-      changeDate: { date: { value: "" } },
-    });
+    const gedcomIndividual = parseGedcomIndividual(gedcomRecord);
+    expect(gedcomIndividual).toEqual(
+      newGedcomIndividual({
+        xref: "@I1@",
+      }),
+    );
     expect(
-      normalize(serializeGedcomIndividual(parseGedcomIndividual(gedcomRecord))),
-    ).toEqual(normalize(gedcomRecord));
+      serializeGedcomRecordToText(serializeGedcomIndividual(gedcomIndividual)),
+    ).toEqual(gedcomText);
   });
   it("more fields", () => {
     const gedcomText = [
@@ -57,50 +48,25 @@ describe("gedcomIndividual", () => {
     ];
     const [gedcomRecord] = parseGedcomRecords(gedcomText.join("\n"));
     expectToBeDefined(gedcomRecord);
-    expect(parseGedcomIndividual(gedcomRecord)).toEqual<GedcomIndividual>({
-      xref: "@I1@",
-      sex: { sex: "", citations: [] },
-      changeDate: {
-        date: { value: "1 JAN 1900" },
-      },
-      childOfFamilyXrefs: [],
-      events: [],
-      parentOfFamilyXrefs: [],
-      unknownRecords: [],
-      notes: [],
-      names: [
-        {
-          prefix: "",
-          givenName: "John",
-          nickName: "",
-          surnamePrefix: "",
-          surname: "Doe",
-          suffix: "",
-          nameType: "",
-          notes: [],
-          citations: [
-            {
-              sourceXref: "@S1@",
-              multimediaLinks: [],
-              notes: [],
-              text: "",
-              page: "",
-              quality: "",
-            },
-            {
-              sourceXref: "@S2@",
-              multimediaLinks: [],
-              notes: [],
-              text: "",
-              page: "",
-              quality: "",
-            },
-          ],
-        },
-      ],
-    });
+    const gedcomIndividual = parseGedcomIndividual(gedcomRecord);
+    expect(gedcomIndividual).toEqual(
+      newGedcomIndividual({
+        xref: "@I1@",
+        changeDate: { date: { value: "1 JAN 1900" } },
+        names: [
+          newGedcomName({
+            givenName: "John",
+            surname: "Doe",
+            citations: [
+              newGedcomSourceCitation({ sourceXref: "@S1@" }),
+              newGedcomSourceCitation({ sourceXref: "@S2@" }),
+            ],
+          }),
+        ],
+      }),
+    );
     expect(
-      normalize(serializeGedcomIndividual(parseGedcomIndividual(gedcomRecord))),
-    ).toEqual(normalize(gedcomRecord));
+      serializeGedcomRecordToText(serializeGedcomIndividual(gedcomIndividual)),
+    ).toEqual(gedcomText);
   });
 });

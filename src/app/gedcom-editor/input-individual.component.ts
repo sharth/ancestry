@@ -6,7 +6,7 @@ import {
   type GedcomIndividual,
 } from "../../gedcom/gedcomIndividual";
 import { InputChangeDateComponent } from "./input-change-date.component";
-import { InputIndividualEventsComponent } from "./input-individual-events.component";
+import { InputIndividualFactsComponent } from "./input-individual-facts.component";
 import { InputIndividualNamesComponent } from "./input-individual-names.component";
 import { InputIndividualSexComponent } from "./input-individual-sex.component";
 import { InputNotesComponent } from "./input-notes.component";
@@ -16,7 +16,7 @@ import { InputUnknownRecordsComponent } from "./input-unknown-records.component"
   selector: "app-input-individual",
   imports: [
     FormField,
-    InputIndividualEventsComponent,
+    InputIndividualFactsComponent,
     InputIndividualSexComponent,
     InputIndividualNamesComponent,
     InputUnknownRecordsComponent,

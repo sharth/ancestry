@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
-  newGedcomEvent,
-  parseGedcomIndividualEvent,
-  serializeGedcomIndividualEvent,
-} from "./gedcomEvent";
+  newGedcomFact,
+  parseGedcomIndividualFact,
+  serializeGedcomIndividualFact,
+} from "./gedcomFact";
 import { newGedcomRecord } from "./gedcomRecord";
 
 describe("gedcomEvent", () => {
@@ -12,21 +12,21 @@ describe("gedcomEvent", () => {
       tag: "BIRT",
       children: [newGedcomRecord({ tag: "DATE", value: "JAN 1 2025" })],
     });
-    const gedcomEvent = parseGedcomIndividualEvent(gedcomRecord);
+    const gedcomEvent = parseGedcomIndividualFact(gedcomRecord);
     expect(gedcomEvent).toEqual(
-      newGedcomEvent({
+      newGedcomFact({
         tag: "BIRT",
         date: { value: "JAN 1 2025" },
       }),
     );
-    expect(serializeGedcomIndividualEvent(gedcomEvent)).toEqual(gedcomRecord);
+    expect(serializeGedcomIndividualFact(gedcomEvent)).toEqual(gedcomRecord);
   });
 
   it("Event without a date/place serializes with value Y", () => {
     const gedcomRecord = newGedcomRecord({ tag: "BIRT", value: "Y" });
-    const gedcomEvent = parseGedcomIndividualEvent(gedcomRecord);
-    expect(gedcomEvent).toEqual(newGedcomEvent({ tag: "BIRT" }));
-    expect(serializeGedcomIndividualEvent(gedcomEvent)).toEqual(gedcomRecord);
+    const gedcomEvent = parseGedcomIndividualFact(gedcomRecord);
+    expect(gedcomEvent).toEqual(newGedcomFact({ tag: "BIRT" }));
+    expect(serializeGedcomIndividualFact(gedcomEvent)).toEqual(gedcomRecord);
   });
 
   it("Event with a date serializes with an empty string as value", () => {
@@ -34,13 +34,13 @@ describe("gedcomEvent", () => {
       tag: "DEAT",
       children: [newGedcomRecord({ tag: "DATE", value: "JAN 1 2025" })],
     });
-    const gedcomEvent = parseGedcomIndividualEvent(gedcomRecord);
+    const gedcomEvent = parseGedcomIndividualFact(gedcomRecord);
     expect(gedcomEvent).toEqual(
-      newGedcomEvent({
+      newGedcomFact({
         tag: "DEAT",
         date: { value: "JAN 1 2025" },
       }),
     );
-    expect(serializeGedcomIndividualEvent(gedcomEvent)).toEqual(gedcomRecord);
+    expect(serializeGedcomIndividualFact(gedcomEvent)).toEqual(gedcomRecord);
   });
 });
