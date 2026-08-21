@@ -6,8 +6,8 @@ import {
   type GedcomChangeDate,
 } from "./gedcomChangeDate";
 import {
-  parseGedcomEvent,
-  serializeGedcomEvent,
+  parseGedcomIndividualEvent,
+  serializeGedcomIndividualEvent,
   type GedcomEvent,
 } from "./gedcomEvent";
 import {
@@ -97,7 +97,7 @@ export function parseGedcomIndividual(record: GedcomRecord): GedcomIndividual {
       case "WILL":
       case "DIV":
       case "SSN":
-        gedcomIndividual.events.push(parseGedcomEvent(childRecord));
+        gedcomIndividual.events.push(parseGedcomIndividualEvent(childRecord));
         break;
       case "NAME":
         gedcomIndividual.names.push(parseGedcomName(childRecord));
@@ -155,7 +155,9 @@ export function serializeGedcomIndividual(
       ...gedcomIndividual.unknownRecords.filter(
         (record) => record.tag == "SOUR",
       ),
-      ...gedcomIndividual.events.map((event) => serializeGedcomEvent(event)),
+      ...gedcomIndividual.events.map((event) =>
+        serializeGedcomIndividualEvent(event),
+      ),
       ...gedcomIndividual.parentOfFamilyXrefs.map((xref) =>
         newGedcomRecord({ tag: "FAMS", value: xref }),
       ),

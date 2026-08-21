@@ -1,11 +1,11 @@
 import { Component, input, model } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 import type { AncestryDatabase } from "../../database/ancestry.service";
+import { newGedcomEvent, type GedcomEvent } from "../../gedcom/gedcomEvent";
 import {
-  gedcomEventTags,
-  newGedcomEvent,
-  type GedcomEvent,
-} from "../../gedcom/gedcomEvent";
+  gedcomIndividualAttributes,
+  gedcomIndividualEvents,
+} from "../../gedcom/gedcomEventMetadata";
 import { InputEventComponent } from "./input-event.component";
 
 @Component({
@@ -31,8 +31,11 @@ export class InputIndividualEventsComponent implements FormValueControl<
     this.value.update((events) => events.toSpliced(index, 1));
   }
 
-  readonly gedcomEventTags = gedcomEventTags
-    .entries()
-    .toArray()
-    .map(([tag, description]) => ({ tag, description }));
+  readonly gedcomEventTags = Object.entries({
+    ...gedcomIndividualAttributes,
+    ...gedcomIndividualEvents,
+  }).map(([tag, metadata]) => ({
+    tag,
+    description: metadata.humanReadableDescription,
+  }));
 }

@@ -6,6 +6,13 @@ import {
   type GedcomDate,
 } from "./gedcomDate";
 import {
+  gedcomFamilyAttributes,
+  gedcomFamilyEvents,
+  gedcomIndividualAttributes,
+  gedcomIndividualEvents,
+  type GedcomEventMetadata,
+} from "./gedcomEventMetadata";
+import {
   parseGedcomNote,
   serializeGedcomNote,
   type GedcomNote,
@@ -40,40 +47,50 @@ export interface GedcomEvent {
   notes: GedcomNote[];
 }
 
-export const gedcomEventTags = new Map([
-  ["BAPM", "Baptism"],
-  ["BIRT", "Birth"],
-  ["BURI", "Burial"],
-  ["CENS", "Census"],
-  ["DEAT", "Death"],
-  ["DIV", "Divorce"],
-  ["EDUC", "Education"],
-  ["EMIG", "Emigration"],
-  ["EVEN", "Event"],
-  ["IDNO", "ID Number"],
-  ["IMMI", "Immigration"],
-  ["MARB", "Marriage Banns"],
-  ["MARR", "Marriage"],
-  ["NAME", "Name"],
-  ["NATU", "Naturalization"],
-  ["OCCU", "Occupation"],
-  ["PROB", "Probate"],
-  ["RELI", "Religion"],
-  ["RESI", "Residence"],
-  ["RETI", "Retirement"],
-  ["SEX", "Sex"],
-  ["SSN", "Social Security Number"],
-  ["WILL", "Will"],
-]);
+export function parseGedcomIndividualEvent(
+  gedcomRecord: GedcomRecord,
+): GedcomEvent {
+  const gedcomEventMetadata =
+    gedcomIndividualEvents[gedcomRecord.tag] ??
+    gedcomIndividualAttributes[gedcomRecord.tag];
+  if (gedcomEventMetadata === undefined) {
+    throw new Error();
+  }
+  return parseGedcomEvent(gedcomRecord, gedcomEventMetadata);
+}
 
-export function parseGedcomEvent(record: GedcomRecord): GedcomEvent {
-  if (!gedcomEventTags.get(record.tag)) throw new Error();
+export function parseGedcomFamilyEvent(
+  gedcomRecord: GedcomRecord,
+): GedcomEvent {
+  const gedcomEventMetadata =
+    gedcomFamilyEvents[gedcomRecord.tag] ??
+    gedcomFamilyAttributes[gedcomRecord.tag];
+  if (gedcomEventMetadata === undefined) {
+    throw new Error();
+  }
+  return parseGedcomEvent(gedcomRecord, gedcomEventMetadata);
+}
+
+function parseGedcomEvent(
+  record: GedcomRecord,
+  gedcomEventMetadata: GedcomEventMetadata,
+): GedcomEvent {
+  if (record.tag === "") throw new Error();
   if (record.xref != "") throw new Error();
 
   const gedcomEvent = newGedcomEvent({
     tag: record.tag,
-    value: record.value,
   });
+
+  // If mandatoryValue is set, then the value has some useful meaning.
+  // If mandatoryValue is false, then the value is either "Y" or "", and is meaningless.
+  if (gedcomEventMetadata.mandatoryValue) {
+    gedcomEvent.value = record.value;
+  } else if (record.value === "Y" || record.value === "") {
+    gedcomEvent.value = "";
+  } else {
+    throw new Error("Invalid value for event");
+  }
 
   for (const childRecord of record.children) {
     switch (childRecord.tag) {
@@ -158,10 +175,42 @@ function parseGedcomShareEvent(
   return result;
 }
 
-export function serializeGedcomEvent(gedcomEvent: GedcomEvent): GedcomRecord {
+export function serializeGedcomIndividualEvent(
+  gedcomEvent: GedcomEvent,
+): GedcomRecord {
+  const gedcomEventMetadata =
+    gedcomIndividualEvents[gedcomEvent.tag] ??
+    gedcomIndividualAttributes[gedcomEvent.tag];
+  if (gedcomEventMetadata === undefined) {
+    throw new Error();
+  }
+  return serializeGedcomEvent(gedcomEvent, gedcomEventMetadata);
+}
+
+export function serializeGedcomFamilyEvent(
+  gedcomEvent: GedcomEvent,
+): GedcomRecord {
+  const gedcomEventMetadata =
+    gedcomFamilyEvents[gedcomEvent.tag] ??
+    gedcomFamilyAttributes[gedcomEvent.tag];
+  if (gedcomEventMetadata === undefined) {
+    throw new Error();
+  }
+  return serializeGedcomEvent(gedcomEvent, gedcomEventMetadata);
+}
+
+function serializeGedcomEvent(
+  gedcomEvent: GedcomEvent,
+  gedcomEventMetadata: GedcomEventMetadata,
+): GedcomRecord {
+  const value = gedcomEventMetadata.mandatoryValue
+    ? gedcomEvent.value
+    : gedcomEvent.place || gedcomEvent.date.value
+      ? ""
+      : "Y";
   return newGedcomRecord({
     tag: gedcomEvent.tag,
-    value: gedcomEvent.value,
+    value: value,
     children: [
       newGedcomRecord({ tag: "TYPE", value: gedcomEvent.type }),
       newGedcomRecord({ tag: "CAUS", value: gedcomEvent.cause }),

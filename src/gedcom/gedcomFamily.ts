@@ -1,7 +1,7 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import {
-  parseGedcomEvent,
-  serializeGedcomEvent,
+  parseGedcomFamilyEvent,
+  serializeGedcomFamilyEvent,
   type GedcomEvent,
 } from "./gedcomEvent";
 import {
@@ -57,7 +57,7 @@ export function parseGedcomFamily(record: GedcomRecord): GedcomFamily {
       case "EVEN":
       case "MARR":
       case "MARB":
-        gedcomFamily.events.push(parseGedcomEvent(childRecord));
+        gedcomFamily.events.push(parseGedcomFamilyEvent(childRecord));
         break;
       case "SOUR":
         gedcomFamily.citations.push(parseGedcomSourceCitation(childRecord));
@@ -99,7 +99,7 @@ export function serializeGedcomFamily(
       ...gedcomFamily.citations.map((citation) =>
         serializeGedcomSourceCitation(citation),
       ),
-      ...gedcomFamily.events.map((event) => serializeGedcomEvent(event)),
+      ...gedcomFamily.events.map((event) => serializeGedcomFamilyEvent(event)),
     ]),
   });
 }

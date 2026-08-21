@@ -1,11 +1,11 @@
 import { Component, input, model } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 import type { AncestryDatabase } from "../../database/ancestry.service";
+import { newGedcomEvent, type GedcomEvent } from "../../gedcom/gedcomEvent";
 import {
-  gedcomEventTags,
-  newGedcomEvent,
-  type GedcomEvent,
-} from "../../gedcom/gedcomEvent";
+  gedcomIndividualAttributes,
+  gedcomIndividualEvents,
+} from "../../gedcom/gedcomEventMetadata";
 import { InputNotesComponent } from "./input-notes.component";
 import { InputSharedWithComponent } from "./input-shared-with.component";
 import { InputSourceCitationsComponent } from "./input-source-citations.component";
@@ -27,8 +27,8 @@ export class InputEventComponent implements FormValueControl<GedcomEvent> {
   readonly value = model<GedcomEvent>(newGedcomEvent());
   readonly form = form(this.value);
 
-  readonly gedcomEventTags = gedcomEventTags
-    .entries()
-    .toArray()
-    .map(([tag, description]) => ({ tag, description }));
+  readonly gedcomEventTags = Object.entries({
+    ...gedcomIndividualEvents,
+    ...gedcomIndividualAttributes,
+  }).map(([tag, description]) => ({ tag, description }));
 }

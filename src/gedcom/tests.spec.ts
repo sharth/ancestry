@@ -101,7 +101,7 @@ const testCases: {
       "1 FAMS @F1@",
       "1 FAMC @F2@",
       "0 @I9@ INDI",
-      "1 CENS",
+      "1 CENS Y",
       "2 _SHAR @I7@",
       "2 _SHAR @I8@",
       "3 ROLE Friend",

@@ -1,7 +1,12 @@
 import { Component, computed, inject } from "@angular/core";
 import { RouterLink } from "@angular/router";
 import { AncestryService } from "../../database/ancestry.service";
-import { gedcomEventTags } from "../../gedcom/gedcomEvent";
+import {
+  gedcomFamilyAttributes,
+  gedcomFamilyEvents,
+  gedcomIndividualAttributes,
+  gedcomIndividualEvents,
+} from "../../gedcom/gedcomEventMetadata";
 import { fullname } from "../../gedcom/gedcomIndividual";
 
 interface EventItem {
@@ -62,7 +67,10 @@ export class PlacesComponent {
       for (const event of individual.events) {
         if (event.place || event.address) {
           addEvent(event.place, event.address, {
-            eventType: gedcomEventTags.get(event.tag) ?? event.tag,
+            eventType:
+              gedcomIndividualAttributes[event.tag]?.humanReadableDescription ??
+              gedcomIndividualEvents[event.tag]?.humanReadableDescription ??
+              event.tag,
             date: event.date.value,
             linkXref: individual.xref,
             linkName: name,
@@ -76,7 +84,10 @@ export class PlacesComponent {
       for (const event of family.events) {
         if (event.place || event.address) {
           addEvent(event.place, event.address, {
-            eventType: gedcomEventTags.get(event.tag) ?? event.tag,
+            eventType:
+              gedcomFamilyAttributes[event.tag]?.humanReadableDescription ??
+              gedcomFamilyEvents[event.tag]?.humanReadableDescription ??
+              event.tag,
             date: event.date.value,
             linkXref: family.xref,
             linkName: `Family ${family.xref}`,
