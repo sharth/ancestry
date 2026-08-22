@@ -13,10 +13,9 @@ export function parseGedcomRepositoryLink(
   if (gedcomRecord.xref != "") throw new Error();
   if (gedcomRecord.value == "") throw new Error();
 
-  const repositoryLink: GedcomRepositoryLink = {
+  const repositoryLink = newGedcomRepositoryLink({
     repositoryXref: gedcomRecord.value,
-    callNumber: "",
-  };
+  });
 
   for (const childRecord of gedcomRecord.children) {
     switch (childRecord.tag) {
@@ -53,5 +52,15 @@ export function serializeGedcomRepositoryLink(
         children: [],
       },
     ].filter((r) => r.value || r.children.length > 0),
+  };
+}
+
+export function newGedcomRepositoryLink(
+  fieldsToUpdate: Partial<GedcomRepositoryLink> = {},
+): GedcomRepositoryLink {
+  return {
+    repositoryXref: "",
+    callNumber: "",
+    ...fieldsToUpdate,
   };
 }

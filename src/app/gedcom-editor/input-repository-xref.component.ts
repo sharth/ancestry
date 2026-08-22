@@ -1,11 +1,4 @@
-import {
-  Component,
-  ViewChild,
-  computed,
-  input,
-  model,
-  type ElementRef,
-} from "@angular/core";
+import { Component, computed, input, model } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 import type { AncestryDatabase } from "../../database/ancestry.service";
 
@@ -25,10 +18,7 @@ export class InputRepositoryXrefComponent implements FormValueControl<string> {
     Object.values(this.ancestryDatabase().repositories),
   );
 
-  @ViewChild("selectElement")
-  private selectElement!: ElementRef<HTMLSelectElement>;
-
   focus() {
-    this.selectElement.nativeElement.focus();
+    this.form().focusBoundControl();
   }
 }

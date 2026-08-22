@@ -1,12 +1,10 @@
 import {
   Component,
   Injector,
-  ViewChildren,
   afterNextRender,
   inject,
   input,
   model,
-  type QueryList,
 } from "@angular/core";
 import {
   FormField,
@@ -16,7 +14,10 @@ import {
 } from "@angular/forms/signals";
 import { RouterModule } from "@angular/router";
 import type { AncestryDatabase } from "../../database/ancestry.service";
-import type { GedcomRepositoryLink } from "../../gedcom/gedcomRepositoryLink";
+import {
+  newGedcomRepositoryLink,
+  type GedcomRepositoryLink,
+} from "../../gedcom/gedcomRepositoryLink";
 import { InputRepositoryCallNumberComponent } from "./input-repository-call-number.component";
 import { InputRepositoryXrefComponent } from "./input-repository-xref.component";
 
@@ -40,9 +41,6 @@ export class InputRepositoryLinksComponent implements FormValueControl<
   readonly value = model<GedcomRepositoryLink[]>([]);
   readonly form = form(this.value);
 
-  @ViewChildren("focusTarget")
-  focusTargets!: QueryList<InputRepositoryXrefComponent>;
-
   // Keep track of the controls that were added by a user interation.
   readonly newControls = new WeakSet<FieldTree<GedcomRepositoryLink, number>>(
     [],
@@ -51,13 +49,14 @@ export class InputRepositoryLinksComponent implements FormValueControl<
   appendCitation() {
     this.value.update((repostitoryLinks) => [
       ...repostitoryLinks,
-      { repositoryXref: "", callNumber: "" },
+      newGedcomRepositoryLink(),
     ]);
-    this.newControls.add(this.form[this.form.length - 1]!);
+    const newControl = this.form[this.form.length - 1]!;
+    this.newControls.add(newControl);
     afterNextRender(
       {
         read: () => {
-          this.focusTargets.last.focus();
+          newControl().focusBoundControl();
         },
       },
       { injector: this._injector },
