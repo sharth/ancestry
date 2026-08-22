@@ -27,6 +27,10 @@ export class InputIndividualFactComponent implements FormValueControl<GedcomFact
   readonly value = model<GedcomFact>(newGedcomFact());
   readonly form = form(this.value);
 
+  focus(options?: FocusOptions) {
+    this.form.tag().focusBoundControl(options);
+  }
+
   readonly gedcomEventTags = Object.entries({
     ...gedcomIndividualEvents,
     ...gedcomIndividualAttributes,

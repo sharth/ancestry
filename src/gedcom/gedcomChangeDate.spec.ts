@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { assert, describe, expect, it } from "vitest";
 import {
   parseGedcomChangeDate,
   serializeGedcomChangeDate,
@@ -18,10 +18,6 @@ function normalize(record: GedcomRecord | null): GedcomRecord | null {
   };
 }
 
-function expectToBeDefined<T>(value: T | undefined): asserts value is T {
-  expect(value).toBeDefined();
-}
-
 describe("GedcomChangeDate", () => {
   it("with value", () => {
     const gedcomText = ["0 CHAN", "1 DATE 1 JAN 1900"];
@@ -29,7 +25,7 @@ describe("GedcomChangeDate", () => {
       gedcomText.join("\n"),
     );
 
-    expectToBeDefined(gedcomRecord);
+    assert.isDefined(gedcomRecord);
     expect(parseGedcomChangeDate(gedcomRecord)).toEqual({
       date: { value: "1 JAN 1900" },
     });

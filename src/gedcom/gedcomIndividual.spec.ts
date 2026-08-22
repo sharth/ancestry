@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { assert, describe, expect, it } from "vitest";
 import {
   newGedcomIndividual,
   parseGedcomIndividual,
@@ -12,10 +12,6 @@ import {
 } from "./gedcomRecord";
 import { newGedcomSourceCitation } from "./gedcomSourceCitation";
 
-function expectToBeDefined<T>(value: T | undefined): asserts value is T {
-  expect(value).toBeDefined();
-}
-
 describe("gedcomIndividual", () => {
   it("no fields", () => {
     const gedcomText = [
@@ -24,7 +20,7 @@ describe("gedcomIndividual", () => {
     const [gedcomRecord]: GedcomRecord[] = parseGedcomRecords(
       gedcomText.join("\n"),
     );
-    expectToBeDefined(gedcomRecord);
+    assert.isDefined(gedcomRecord);
     const gedcomIndividual = parseGedcomIndividual(gedcomRecord);
     expect(gedcomIndividual).toEqual(
       newGedcomIndividual({
@@ -47,7 +43,7 @@ describe("gedcomIndividual", () => {
       "2 DATE 1 JAN 1900",
     ];
     const [gedcomRecord] = parseGedcomRecords(gedcomText.join("\n"));
-    expectToBeDefined(gedcomRecord);
+    assert.isDefined(gedcomRecord);
     const gedcomIndividual = parseGedcomIndividual(gedcomRecord);
     expect(gedcomIndividual).toEqual(
       newGedcomIndividual({

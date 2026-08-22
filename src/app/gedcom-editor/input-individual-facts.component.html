@@ -1,7 +1,7 @@
 <details [open]="open()">
   <summary>Events ({{ form.length }})</summary>
   @for (event of form; track event) {
-    <details #container (toggle)="(true)">
+    <details [open]="newControls.has(event)">
       <summary>
         <button
           type="button"
@@ -11,12 +11,10 @@
         ></button>
         {{ event.tag().value() }}
       </summary>
-      @defer (when container.open) {
-        <app-input-individual-fact
-          [ancestryDatabase]="ancestryDatabase()"
-          [formField]="event"
-        ></app-input-individual-fact>
-      }
+      <app-input-individual-fact
+        [ancestryDatabase]="ancestryDatabase()"
+        [formField]="event"
+      ></app-input-individual-fact>
     </details>
   }
   <div
