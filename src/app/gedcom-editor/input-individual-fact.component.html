@@ -1,7 +1,7 @@
 <div class="form-floating">
   <select class="form-control" id="tag" [formField]="form.tag">
     @for (event of gedcomEventTags; track event.tag) {
-      <option [value]="event.tag">{{ event.description }}</option>
+      <option [value]="event.tag">{{ event.humanReadableDescription }}</option>
     }
   </select>
   <label for="tag">Tag</label>

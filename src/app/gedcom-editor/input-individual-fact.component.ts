@@ -30,5 +30,5 @@ export class InputIndividualFactComponent implements FormValueControl<GedcomFact
   readonly gedcomEventTags = Object.entries({
     ...gedcomIndividualEvents,
     ...gedcomIndividualAttributes,
-  }).map(([tag, description]) => ({ tag, description }));
+  }).map(([tag, metadata]) => ({ tag, ...metadata }));
 }

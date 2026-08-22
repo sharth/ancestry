@@ -242,7 +242,7 @@ export function newGedcomFact(
   fieldsToUpdate: Partial<GedcomFact> = {},
 ): GedcomFact {
   return {
-    tag: "",
+    tag: "EVEN",
     type: "",
     address: "",
     place: "",
