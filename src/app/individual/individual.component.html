@@ -15,11 +15,10 @@
   <h2>Events</h2>
   <app-events-table owner="individual" [events]="vm.individual.facts" />
 
-  <h2>Family Events</h2>
   @let familyXrefs = vm.individual.parentOfFamilyXrefs;
   @for (familyXref of familyXrefs; track familyXref) {
+    <h2>Events for Family {{ familyXref }}</h2>
     @if (ancestryDatabase().families[familyXref]; as family) {
-      <h3>For family {{ familyXref }}</h3>
       <app-events-table owner="family" [events]="family.facts" />
     }
   }
