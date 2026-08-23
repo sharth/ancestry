@@ -1,71 +1,56 @@
-@if (events(); as events) {
-  <table class="table table-striped">
-    <thead>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Event</th>
+      <th scope="col">Date</th>
+      <th scope="col">Location</th>
+      <th scope="col">Detail</th>
+      <th scope="col">Citations</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (event of events(); track event) {
+      @let eventMetadata = eventMetadataMap()[event.tag];
       <tr>
-        <th scope="col">Event</th>
-        <th scope="col">Date</th>
-        <th scope="col">Location</th>
-        <th scope="col">Detail</th>
-        <th scope="col">Citations</th>
+        <td>
+          @if (eventMetadata) {
+            {{ eventMetadata.humanReadableDescription }}
+          } @else {
+            {{ event.tag }}
+          }
+          @if (event.value) {
+            ({{ event.value }})
+          }
+          @if (event.type) {
+            ({{ event.type }})
+          }
+        </td>
+        <td>{{ event.date.value }}</td>
+        <td>
+          @if (event.address) {
+            {{ event.address }} <br />
+          }
+          @if (event.place) {
+            {{ event.place }} <br />
+          }
+        </td>
+        <td>
+          @if (event.cause) {
+            {{ event.cause }}<br />
+          }
+          @if (event.value) {
+            {{ event.value }}<br />
+          }
+        </td>
+        <td>
+          @for (citation of event.citations; track citation) {
+            <a routerLink="/source/{{ citation.sourceXref }}">
+              {{ citation.sourceXref }}
+            </a>
+            {{ " " }}
+          }
+        </td>
       </tr>
-    </thead>
-    <tbody>
-      @for (event of events; track event) {
-        <tr>
-          <td>
-            @if (event.tag === "BAPM" && event.type === "") {
-              Baptism
-            } @else if (event.tag === "BIRT" && event.type === "") {
-              Birth
-            } @else if (event.tag === "BURI" && event.type === "") {
-              Burial
-            } @else if (event.tag === "CENS" && event.type === "") {
-              Census
-            } @else if (event.tag === "DEAT" && event.type === "") {
-              Death
-            } @else if (event.tag === "EDUC" && event.type === "") {
-              Education
-            } @else if (event.tag === "EMIG" && event.type === "") {
-              Emigration
-            } @else if (event.tag === "EVEN") {
-              {{ event.type }}
-            } @else if (event.tag === "MARR" && event.type === "") {
-              Marriage
-            } @else if (event.tag === "OCCU" && event.type === "") {
-              Occupation
-            } @else if (event.tag === "RESI" && event.type === "") {
-              Residence
-            } @else {
-              {{ event.tag }} ({{ event.type }})
-            }
-          </td>
-          <td>{{ event.date.value }}</td>
-          <td>
-            @if (event.address) {
-              {{ event.address }} <br />
-            }
-            @if (event.place) {
-              {{ event.place }} <br />
-            }
-          </td>
-          <td>
-            @if (event.cause) {
-              {{ event.cause }}<br />
-            }
-            @if (event.value) {
-              {{ event.value }}<br />
-            }
-          </td>
-          <td>
-            @for (citation of event.citations; track citation) {
-              <a routerLink="/source/{{ citation.sourceXref }}">
-                {{ citation.sourceXref }}
-              </a>
-              {{ " " }}
-            }
-          </td>
-        </tr>
-      }
-    </tbody>
-  </table>
-}
+    }
+  </tbody>
+</table>
