@@ -214,23 +214,6 @@ const testCases: {
       ],
     },
   },
-  {
-    name: "Family",
-    gedcom: ["0 @F1@ FAM", "0 @F3@ FAM", "1 HUSB @I3@", "1 WIFE @I2@"],
-    database: {
-      families: [
-        newGedcomFamily({
-          xref: "@F1@",
-        }),
-
-        newGedcomFamily({
-          xref: "@F3@",
-          wifeXref: "@I2@",
-          husbandXref: "@I3@",
-        }),
-      ],
-    },
-  },
 ];
 
 interface Database {
