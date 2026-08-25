@@ -18,12 +18,14 @@ export interface GedcomMultimedia {
   changeDate?: GedcomChangeDate;
 }
 
-export function newGedcomMultimedia(xref: string): GedcomMultimedia {
+export function newGedcomMultimedia(
+  fieldsToUpdate: Partial<GedcomMultimedia> & Pick<GedcomMultimedia, "xref">,
+): GedcomMultimedia {
   return {
-    xref,
     filePath: "",
     mediaType: "",
     title: "",
+    ...fieldsToUpdate,
   };
 }
 
@@ -32,7 +34,9 @@ export function parseGedcomMultimedia(record: GedcomRecord): GedcomMultimedia {
   if (record.xref == "") throw new Error();
   if (record.value != "") throw new Error();
 
-  const gedcomMultimedia = newGedcomMultimedia(record.xref);
+  const gedcomMultimedia = newGedcomMultimedia({
+    xref: record.xref,
+  });
 
   for (const childRecord of record.children) {
     switch (childRecord.tag) {

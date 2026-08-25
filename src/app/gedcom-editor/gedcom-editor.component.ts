@@ -154,7 +154,7 @@ export class GedcomEditorMultimediaComponent {
     () => {
       return (
         this.ancestryDatabase().multimedias[this.xref()] ??
-        newGedcomMultimedia(this.xref())
+        newGedcomMultimedia({ xref: this.xref() })
       );
     },
     {

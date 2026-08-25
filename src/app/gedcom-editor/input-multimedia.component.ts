@@ -18,7 +18,7 @@ import {
 export class InputMultimediaComponent implements FormValueControl<GedcomMultimedia> {
   readonly ancestryService = inject(AncestryService);
   readonly ancestryDatabase = input.required<AncestryDatabase>();
-  readonly value = model<GedcomMultimedia>(newGedcomMultimedia(""));
+  readonly value = model<GedcomMultimedia>(newGedcomMultimedia({ xref: "" }));
   readonly form = form(this.value);
 
   async browseFile() {
