@@ -338,6 +338,11 @@ export const gedcomFamilyAttributes: Record<string, GedcomEventMetadata> = {
   },
 };
 
+export const gedcomIndividualFacts: Record<string, GedcomEventMetadata> = {
+  ...gedcomIndividualAttributes,
+  ...gedcomIndividualEvents,
+};
+
 export const gedcomFamilyEvents: Record<string, GedcomEventMetadata> = {
   // n ANUL [Y|<NULL>]                          {1:1}  g7:ANUL
   //   +1 TYPE <Text>                           {0:1}  g7:TYPE
@@ -427,4 +432,9 @@ export const gedcomFamilyEvents: Record<string, GedcomEventMetadata> = {
     mandatoryValue: true,
     mandatoryType: true,
   },
+};
+
+export const gedcomFamilyFacts: Record<string, GedcomEventMetadata> = {
+  ...gedcomFamilyAttributes,
+  ...gedcomFamilyEvents,
 };

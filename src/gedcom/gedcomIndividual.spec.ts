@@ -192,4 +192,45 @@ describe("gedcomIndividual", () => {
       serializeGedcomRecordToText(serializeGedcomIndividual(gedcomIndividual)),
     ).toEqual(gedcomText);
   });
+
+  it("MARR on an individual is not a recognized fact", () => {
+    const gedcomText = [
+      "0 @I1@ INDI", //
+      "1 MARR",
+      "2 DATE 1 JAN 2000",
+    ];
+    const [gedcomRecord] = parseGedcomRecords(gedcomText.join("\n"));
+    assert.isDefined(gedcomRecord);
+    const gedcomIndividual = parseGedcomIndividual(gedcomRecord);
+    expect(gedcomIndividual.facts).toHaveLength(0);
+    expect(gedcomIndividual.unknownRecords).toHaveLength(1);
+    expect(gedcomIndividual.unknownRecords[0]?.tag).toBe("MARR");
+  });
+
+  it("GRAD on an individual is a recognized fact", () => {
+    const gedcomText = [
+      "0 @I1@ INDI", //
+      "1 GRAD",
+      "2 DATE 15 JUN 2005",
+      "2 PLAC Springfield",
+    ];
+    const [gedcomRecord] = parseGedcomRecords(gedcomText.join("\n"));
+    assert.isDefined(gedcomRecord);
+    const gedcomIndividual = parseGedcomIndividual(gedcomRecord);
+    expect(gedcomIndividual).toEqual(
+      newGedcomIndividual({
+        xref: "@I1@",
+        facts: [
+          newGedcomFact({
+            tag: "GRAD",
+            date: { value: "15 JUN 2005" },
+            place: "Springfield",
+          }),
+        ],
+      }),
+    );
+    expect(
+      serializeGedcomRecordToText(serializeGedcomIndividual(gedcomIndividual)),
+    ).toEqual(gedcomText);
+  });
 });

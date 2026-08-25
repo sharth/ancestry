@@ -4,6 +4,7 @@ import {
   serializeGedcomFamilyFact,
   type GedcomFact,
 } from "./gedcomFact";
+import { gedcomFamilyFacts } from "./gedcomFactMetadata";
 import {
   filterTrivialGedcomRecords,
   newGedcomRecord,
@@ -34,6 +35,11 @@ export function parseGedcomFamily(record: GedcomRecord): GedcomFamily {
   });
 
   for (const childRecord of record.children) {
+    const metadata = gedcomFamilyFacts[childRecord.tag];
+    if (metadata !== undefined) {
+      gedcomFamily.facts.push(parseGedcomFamilyEvent(childRecord));
+      continue;
+    }
     switch (childRecord.tag) {
       case "CHIL":
         if (childRecord.xref != "") throw new Error();
@@ -52,12 +58,6 @@ export function parseGedcomFamily(record: GedcomRecord): GedcomFamily {
         if (childRecord.value == "") throw new Error();
         childRecord.children.forEach(reportUnparsedRecord);
         gedcomFamily.wifeXref = childRecord.value;
-        break;
-      case "DIV":
-      case "EVEN":
-      case "MARR":
-      case "MARB":
-        gedcomFamily.facts.push(parseGedcomFamilyEvent(childRecord));
         break;
       case "SOUR":
         gedcomFamily.citations.push(parseGedcomSourceCitation(childRecord));

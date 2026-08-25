@@ -70,7 +70,7 @@ export function parseGedcomFamilyEvent(gedcomRecord: GedcomRecord): GedcomFact {
   return parseGedcomFact(gedcomRecord, gedcomEventMetadata);
 }
 
-function parseGedcomFact(
+export function parseGedcomFact(
   record: GedcomRecord,
   gedcomEventMetadata: GedcomEventMetadata,
 ): GedcomFact {

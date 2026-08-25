@@ -6,10 +6,11 @@ import {
   type GedcomChangeDate,
 } from "./gedcomChangeDate";
 import {
-  parseGedcomIndividualFact,
+  parseGedcomFact,
   serializeGedcomIndividualFact,
   type GedcomFact,
 } from "./gedcomFact";
+import { gedcomIndividualFacts } from "./gedcomFactMetadata";
 import {
   parseGedcomName,
   serializeGedcomName,
@@ -75,30 +76,12 @@ export function parseGedcomIndividual(record: GedcomRecord): GedcomIndividual {
   });
 
   for (const childRecord of record.children) {
+    const metadata = gedcomIndividualFacts[childRecord.tag];
+    if (metadata !== undefined) {
+      gedcomIndividual.facts.push(parseGedcomFact(childRecord, metadata));
+      continue;
+    }
     switch (childRecord.tag) {
-      case "BAPM":
-      case "BIRT":
-      case "BURI":
-      case "CENS":
-      case "DEAT":
-      case "EDUC":
-      case "EMIG":
-      case "EVEN":
-      case "IDNO":
-      case "IMMI":
-      case "MARB":
-      case "MARR":
-      case "NATU":
-      case "OCCU":
-      case "PROB":
-      case "RELI":
-      case "RESI":
-      case "RETI":
-      case "WILL":
-      case "DIV":
-      case "SSN":
-        gedcomIndividual.facts.push(parseGedcomIndividualFact(childRecord));
-        break;
       case "NAME":
         gedcomIndividual.names.push(parseGedcomName(childRecord));
         break;
