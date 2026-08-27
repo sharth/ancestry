@@ -11,14 +11,14 @@
             (click)="removeCitation($index)"
           ></button>
           @let sourceXref = formGroup.sourceXref().value();
-          @let source = ancestryDatabase().sources[sourceXref];
+          @let source = workingDatabase().sources[sourceXref];
           {{ source?.abbr || sourceXref }}
         </summary>
         <div class="form-floating">
           <app-input-source-xref
             #focusTarget
             [formField]="formGroup.sourceXref"
-            [ancestryDatabase]="ancestryDatabase()"
+            [workingDatabase]="workingDatabase()"
           ></app-input-source-xref>
         </div>
         <div class="form-floating">
@@ -47,11 +47,11 @@
         </div>
         <app-input-multimedia-links
           [formField]="formGroup.multimediaLinks"
-          [ancestryDatabase]="ancestryDatabase()"
+          [workingDatabase]="workingDatabase()"
         ></app-input-multimedia-links>
         <app-input-notes
           [formField]="formGroup.notes"
-          [ancestryDatabase]="ancestryDatabase()"
+          [workingDatabase]="workingDatabase()"
         ></app-input-notes>
       </details>
     }

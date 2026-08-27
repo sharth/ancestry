@@ -26,7 +26,7 @@ import { InputSourceXrefComponent } from "./input-source-xref.component";
 export class InputSourceCitationsComponent implements FormValueControl<
   GedcomSourceCitation[]
 > {
-  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly workingDatabase = input.required<AncestryDatabase>();
   readonly value = model<GedcomSourceCitation[]>([]);
   readonly form = form(this.value);
 

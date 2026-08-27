@@ -9,7 +9,7 @@ import type { GedcomChangeDate } from "../../gedcom/gedcomChangeDate";
   template: "",
 })
 export class InputChangeDateComponent implements FormValueControl<GedcomChangeDate> {
-  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly workingDatabase = input.required<AncestryDatabase>();
   readonly value = model<GedcomChangeDate>({ date: { value: "" } });
 
   readonly changeDateEffect = effect(() => {

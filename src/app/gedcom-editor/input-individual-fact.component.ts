@@ -22,7 +22,7 @@ import { InputSourceCitationsComponent } from "./input-source-citations.componen
   styleUrl: "./input.component.css",
 })
 export class InputIndividualFactComponent implements FormValueControl<GedcomFact> {
-  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly workingDatabase = input.required<AncestryDatabase>();
   readonly open = input<boolean>(false);
   readonly value = model<GedcomFact>(newGedcomFact());
   readonly form = form(this.value);

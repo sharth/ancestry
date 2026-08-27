@@ -25,7 +25,7 @@ describe("InputRepositoryXrefComponent", () => {
 
     fixture = TestBed.createComponent(InputRepositoryXrefComponent);
     component = fixture.componentInstance;
-    fixture.componentRef.setInput("ancestryDatabase", mockDatabase);
+    fixture.componentRef.setInput("workingDatabase", mockDatabase);
     fixture.componentRef.setInput("value", "R1");
     fixture.detectChanges();
   });

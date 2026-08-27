@@ -17,12 +17,12 @@ import { displayGedcomName } from "../../gedcom/gedcomName";
   styleUrl: "./input.component.css",
 })
 export class InputSourceXrefComponent implements FormValueControl<string> {
-  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly workingDatabase = input.required<AncestryDatabase>();
   readonly value = model<string>("");
   readonly form = form(this.value);
 
   readonly sources = computed(() =>
-    Object.values(this.ancestryDatabase().sources),
+    Object.values(this.workingDatabase().sources),
   );
 
   public readonly displayGedcomName = displayGedcomName;

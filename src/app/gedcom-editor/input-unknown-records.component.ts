@@ -15,7 +15,7 @@ import {
 export class InputUnknownRecordsComponent implements FormValueControl<
   GedcomRecord[]
 > {
-  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly workingDatabase = input.required<AncestryDatabase>();
   readonly open = input<boolean>(false);
   readonly value = model<GedcomRecord[]>([]);
 

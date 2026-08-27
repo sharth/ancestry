@@ -2,25 +2,25 @@
   @switch (type()) {
     @case ("INDI") {
       <app-gedcom-editor-individual
-        [(ancestryDatabase)]="computedDatabase"
+        [(workingDatabase)]="workingDatabase"
         [xref]="effectiveXref()"
       ></app-gedcom-editor-individual>
     }
     @case ("SOUR") {
       <app-gedcom-editor-source
-        [(ancestryDatabase)]="computedDatabase"
+        [(workingDatabase)]="workingDatabase"
         [xref]="effectiveXref()"
       ></app-gedcom-editor-source>
     }
     @case ("OBJE") {
       <app-gedcom-editor-multimedia
-        [(ancestryDatabase)]="computedDatabase"
+        [(workingDatabase)]="workingDatabase"
         [xref]="effectiveXref()"
       ></app-gedcom-editor-multimedia>
     }
     @case ("REPO") {
       <app-gedcom-editor-repository
-        [(ancestryDatabase)]="computedDatabase"
+        [(workingDatabase)]="workingDatabase"
         [xref]="effectiveXref()"
       ></app-gedcom-editor-repository>
     }

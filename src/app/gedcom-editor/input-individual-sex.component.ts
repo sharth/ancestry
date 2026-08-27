@@ -12,7 +12,7 @@ import { InputSourceCitationsComponent } from "./input-source-citations.componen
 })
 export class InputIndividualSexComponent implements FormValueControl<GedcomSex> {
   readonly open = input<boolean>(false);
-  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly workingDatabase = input.required<AncestryDatabase>();
 
   readonly value = model<GedcomSex>({ sex: "", citations: [] });
   readonly form = form(this.value);

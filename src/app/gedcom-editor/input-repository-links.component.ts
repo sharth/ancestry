@@ -37,7 +37,7 @@ export class InputRepositoryLinksComponent implements FormValueControl<
 > {
   private readonly _injector = inject(Injector);
 
-  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly workingDatabase = input.required<AncestryDatabase>();
   readonly value = model<GedcomRepositoryLink[]>([]);
   readonly form = form(this.value);
 

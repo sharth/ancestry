@@ -27,7 +27,7 @@ export class InputIndividualFactsComponent implements FormValueControl<
 > {
   private readonly _injector = inject(Injector);
 
-  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly workingDatabase = input.required<AncestryDatabase>();
   readonly open = input<boolean>(false);
   readonly value = model<GedcomFact[]>([]);
   readonly form = form(this.value);

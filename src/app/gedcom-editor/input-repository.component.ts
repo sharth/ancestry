@@ -13,7 +13,7 @@ import {
   styleUrl: "./input.component.css",
 })
 export class InputRepositoryComponent implements FormValueControl<GedcomRepository> {
-  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly workingDatabase = input.required<AncestryDatabase>();
   readonly value = model<GedcomRepository>(newGedcomRepository(""));
   readonly form = form(this.value);
 }

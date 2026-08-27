@@ -30,12 +30,12 @@ export class InputMultimediaLinksComponent implements FormValueControl<
   GedcomMultimediaLink[]
 > {
   private readonly _injector = inject(Injector);
-  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly workingDatabase = input.required<AncestryDatabase>();
   readonly value = model<GedcomMultimediaLink[]>([]);
   readonly form = form(this.value);
 
   readonly multimedias = computed(() =>
-    Object.values(this.ancestryDatabase().multimedias),
+    Object.values(this.workingDatabase().multimedias),
   );
 
   // Keep track of the controls that were added by a user interation.

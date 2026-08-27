@@ -33,7 +33,7 @@ describe("InputRepositoryLinksComponent", () => {
 
     fixture = TestBed.createComponent(InputRepositoryLinksComponent);
     component = fixture.componentInstance;
-    fixture.componentRef.setInput("ancestryDatabase", mockDatabase);
+    fixture.componentRef.setInput("workingDatabase", mockDatabase);
     fixture.componentRef.setInput("value", []);
     fixture.detectChanges();
   });

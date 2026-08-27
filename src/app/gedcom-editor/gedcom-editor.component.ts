@@ -37,24 +37,24 @@ import { InputSourceComponent } from "./input-source.component";
   selector: "app-gedcom-editor-individual",
   imports: [FormField, InputIndividualComponent],
   template: `<app-input-individual
-    [ancestryDatabase]="ancestryDatabase()"
+    [workingDatabase]="workingDatabase()"
     [formField]="form"
   ></app-input-individual>`,
 })
 export class GedcomEditorIndividualComponent {
   readonly xref = input.required<string>();
-  readonly ancestryDatabase = model.required<AncestryDatabase>();
+  readonly workingDatabase = model.required<AncestryDatabase>();
 
   readonly individual = linkedSignal<GedcomIndividual>(
     () => {
       return (
-        this.ancestryDatabase().individuals[this.xref()] ??
+        this.workingDatabase().individuals[this.xref()] ??
         newGedcomIndividual({ xref: this.xref() })
       );
     },
     {
       set: (individual) => {
-        this.ancestryDatabase.update((database) => ({
+        this.workingDatabase.update((database) => ({
           ...database,
           individuals: {
             ...database.individuals,
@@ -72,24 +72,24 @@ export class GedcomEditorIndividualComponent {
   selector: "app-gedcom-editor-source",
   imports: [FormField, InputSourceComponent],
   template: `<app-input-source
-    [ancestryDatabase]="ancestryDatabase()"
+    [workingDatabase]="workingDatabase()"
     [formField]="form"
   ></app-input-source>`,
 })
 export class GedcomEditorSourceComponent {
   readonly xref = input.required<string>();
-  readonly ancestryDatabase = model.required<AncestryDatabase>();
+  readonly workingDatabase = model.required<AncestryDatabase>();
 
   readonly source = linkedSignal<GedcomSource>(
     () => {
       return (
-        this.ancestryDatabase().sources[this.xref()] ??
+        this.workingDatabase().sources[this.xref()] ??
         newGedcomSource(this.xref())
       );
     },
     {
       set: (source) => {
-        this.ancestryDatabase.update((database) => ({
+        this.workingDatabase.update((database) => ({
           ...database,
           sources: {
             ...database.sources,
@@ -107,24 +107,24 @@ export class GedcomEditorSourceComponent {
   selector: "app-gedcom-editor-repository",
   imports: [FormField, InputRepositoryComponent],
   template: `<app-input-repository
-    [ancestryDatabase]="ancestryDatabase()"
+    [workingDatabase]="workingDatabase()"
     [formField]="form"
   ></app-input-repository>`,
 })
 export class GedcomEditorRepositoryComponent {
   readonly xref = input.required<string>();
-  readonly ancestryDatabase = model.required<AncestryDatabase>();
+  readonly workingDatabase = model.required<AncestryDatabase>();
 
   readonly repository = linkedSignal<GedcomRepository>(
     () => {
       return (
-        this.ancestryDatabase().repositories[this.xref()] ??
+        this.workingDatabase().repositories[this.xref()] ??
         newGedcomRepository(this.xref())
       );
     },
     {
       set: (repository) => {
-        this.ancestryDatabase.update((database) => ({
+        this.workingDatabase.update((database) => ({
           ...database,
           repositories: {
             ...database.repositories,
@@ -142,24 +142,24 @@ export class GedcomEditorRepositoryComponent {
   selector: "app-gedcom-editor-multimedia",
   imports: [FormField, InputMultimediaComponent],
   template: `<app-input-multimedia
-    [ancestryDatabase]="ancestryDatabase()"
+    [workingDatabase]="workingDatabase()"
     [formField]="form"
   ></app-input-multimedia>`,
 })
 export class GedcomEditorMultimediaComponent {
   readonly xref = input.required<string>();
-  readonly ancestryDatabase = model.required<AncestryDatabase>();
+  readonly workingDatabase = model.required<AncestryDatabase>();
 
   readonly multimedia = linkedSignal<GedcomMultimedia>(
     () => {
       return (
-        this.ancestryDatabase().multimedias[this.xref()] ??
+        this.workingDatabase().multimedias[this.xref()] ??
         newGedcomMultimedia({ xref: this.xref() })
       );
     },
     {
       set: (multimedia) => {
-        this.ancestryDatabase.update((database) => ({
+        this.workingDatabase.update((database) => ({
           ...database,
           multimedias: {
             ...database.multimedias,
@@ -195,7 +195,7 @@ export class GedcomEditorComponent {
   readonly ancestryDatabase = input.required<AncestryDatabase>();
   readonly finished = output();
 
-  readonly computedDatabase = linkedSignal<AncestryDatabase>(() =>
+  readonly workingDatabase = linkedSignal<AncestryDatabase>(() =>
     this.ancestryDatabase(),
   );
 
@@ -218,7 +218,7 @@ export class GedcomEditorComponent {
 
   readonly differences = computed(() =>
     this.ancestryService
-      .compareGedcomDatabase(this.computedDatabase())
+      .compareGedcomDatabase(this.workingDatabase())
       .filter(
         ({ canonicalRecord, currentRecord }) =>
           canonicalRecord == undefined ||
@@ -229,7 +229,7 @@ export class GedcomEditorComponent {
   );
 
   async submitForm() {
-    const computedDatabase = this.computedDatabase();
+    const computedDatabase = this.workingDatabase();
     await this.ancestryService.updateGedcomDatabase(computedDatabase);
     await this.router.navigate([], {
       relativeTo: this.route,

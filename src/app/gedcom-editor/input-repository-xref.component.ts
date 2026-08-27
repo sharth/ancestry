@@ -9,13 +9,13 @@ import type { AncestryDatabase } from "../../database/ancestry.service";
   styleUrl: "./input.component.css",
 })
 export class InputRepositoryXrefComponent implements FormValueControl<string> {
-  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly workingDatabase = input.required<AncestryDatabase>();
 
   readonly value = model<string>("");
   readonly form = form(this.value);
 
   readonly repositories = computed(() =>
-    Object.values(this.ancestryDatabase().repositories),
+    Object.values(this.workingDatabase().repositories),
   );
 
   focus() {

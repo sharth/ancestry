@@ -30,7 +30,7 @@ export class InputIndividualNamesComponent implements FormValueControl<
 > {
   private readonly _injector = inject(Injector);
 
-  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly workingDatabase = input.required<AncestryDatabase>();
 
   // Set true to expand the details by default.
   readonly open = input<boolean>(false);

@@ -9,7 +9,7 @@ import type { AncestryDatabase } from "../../database/ancestry.service";
   styleUrl: "./input.component.css",
 })
 export class InputRepositoryCallNumberComponent implements FormValueControl<string> {
-  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly workingDatabase = input.required<AncestryDatabase>();
 
   readonly value = model<string>("");
   readonly form = form(this.value);

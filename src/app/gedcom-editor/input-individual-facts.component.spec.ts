@@ -25,7 +25,7 @@ describe("InputIndividualFactsComponent", () => {
 
     fixture = TestBed.createComponent(InputIndividualFactsComponent);
     component = fixture.componentInstance;
-    fixture.componentRef.setInput("ancestryDatabase", mockDatabase);
+    fixture.componentRef.setInput("workingDatabase", mockDatabase);
     fixture.componentRef.setInput("open", true);
     fixture.detectChanges();
   });

@@ -18,7 +18,7 @@ import { newGedcomNote, type GedcomNote } from "../../gedcom/gedcomNote";
   styleUrl: "./input.component.css",
 })
 export class InputNotesComponent implements FormValueControl<GedcomNote[]> {
-  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly workingDatabase = input.required<AncestryDatabase>();
   readonly value = model<GedcomNote[]>([]);
   readonly form = form(this.value);
   readonly open = input<boolean>(false);

@@ -24,7 +24,7 @@ import { InputIndividualXrefComponent } from "./input-individual-xref.component"
 export class InputSharedWithComponent implements FormValueControl<
   GedcomFactSharedWith[]
 > {
-  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly workingDatabase = input.required<AncestryDatabase>();
   readonly value = model<GedcomFactSharedWith[]>([]);
   readonly form = form(this.value);
 

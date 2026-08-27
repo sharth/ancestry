@@ -12,17 +12,17 @@
             (click)="removeCitation($index)"
           ></button>
           {{
-            ancestryDatabase().repositories[repositoryXref]?.name ??
+            workingDatabase().repositories[repositoryXref]?.name ??
               "Unknown repository"
           }}
         </summary>
         <app-input-repository-xref
           [formField]="formGroup.repositoryXref"
-          [ancestryDatabase]="ancestryDatabase()"
+          [workingDatabase]="workingDatabase()"
         ></app-input-repository-xref>
         <app-input-repository-call-number
           [formField]="formGroup.callNumber"
-          [ancestryDatabase]="ancestryDatabase()"
+          [workingDatabase]="workingDatabase()"
         ></app-input-repository-call-number>
       </details>
     }
