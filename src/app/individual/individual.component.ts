@@ -1,4 +1,4 @@
-import { Component, computed, input } from "@angular/core";
+import { Component, computed, input, signal } from "@angular/core";
 import type { AncestryDatabase } from "../../database/ancestry.service";
 import {
   fullname,
@@ -10,6 +10,8 @@ import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-edit
 import { IndividualAncestorsComponent } from "./individual-ancestors.component";
 import { IndividualRelativesComponent } from "./individual-relatives.component";
 import { IndividualSunburstComponent } from "./individual-sunburst.component";
+
+export type IndividualTab = "facts" | "sunburst" | "gedcom";
 
 @Component({
   selector: "app-individual",
@@ -26,6 +28,8 @@ import { IndividualSunburstComponent } from "./individual-sunburst.component";
 export class IndividualComponent {
   readonly xref = input.required<string>();
   readonly ancestryDatabase = input.required<AncestryDatabase>();
+
+  readonly activeTab = signal<IndividualTab>("facts");
 
   readonly vm = computed(() => {
     const ancestryDatabase = this.ancestryDatabase();

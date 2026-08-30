@@ -6,34 +6,85 @@
   <!-- TODO: Include the citations. -->
   <p>{{ vm.sex }}</p>
 
-  <h2>Relatives</h2>
-  <app-individual-relatives
-    [ancestryDatabase]="ancestryDatabase()"
-    [individual]="vm.individual"
-  />
+  <ul class="nav nav-tabs mb-3" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button
+        class="nav-link"
+        [class.active]="activeTab() === 'facts'"
+        (click)="activeTab.set('facts')"
+        type="button"
+        role="tab"
+        [attr.aria-selected]="activeTab() === 'facts'"
+      >
+        Facts
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button
+        class="nav-link"
+        [class.active]="activeTab() === 'sunburst'"
+        (click)="activeTab.set('sunburst')"
+        type="button"
+        role="tab"
+        [attr.aria-selected]="activeTab() === 'sunburst'"
+      >
+        Sunburst
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button
+        class="nav-link"
+        [class.active]="activeTab() === 'gedcom'"
+        (click)="activeTab.set('gedcom')"
+        type="button"
+        role="tab"
+        [attr.aria-selected]="activeTab() === 'gedcom'"
+      >
+        Gedcom
+      </button>
+    </li>
+  </ul>
 
-  <h2>Events</h2>
-  <app-events-table owner="individual" [events]="vm.individual.facts" />
+  @if (activeTab() === "facts") {
+    <div class="row">
+      <div class="col-md-6">
+        <h2>Events</h2>
+        <app-events-table owner="individual" [events]="vm.individual.facts" />
 
-  @let familyXrefs = vm.individual.parentOfFamilyXrefs;
-  @for (familyXref of familyXrefs; track familyXref) {
-    <h2>Events for Family {{ familyXref }}</h2>
-    @if (ancestryDatabase().families[familyXref]; as family) {
-      <app-events-table owner="family" [events]="family.facts" />
-    }
+        @let familyXrefs = vm.individual.parentOfFamilyXrefs;
+        @for (familyXref of familyXrefs; track familyXref) {
+          <h2>Events for Family {{ familyXref }}</h2>
+          @if (ancestryDatabase().families[familyXref]; as family) {
+            <app-events-table owner="family" [events]="family.facts" />
+          }
+        }
+      </div>
+
+      <div class="col-md-6">
+        <h2>Relatives</h2>
+        <app-individual-relatives
+          [ancestryDatabase]="ancestryDatabase()"
+          [individual]="vm.individual"
+        />
+      </div>
+    </div>
   }
 
-  <h2>Ancestors</h2>
-  <app-individual-ancestors [xref]="xref()" />
+  @if (activeTab() === "sunburst") {
+    <h2>Sunburst</h2>
+    <app-individual-sunburst
+      [ancestryDatabase]="ancestryDatabase()"
+      [individual]="vm.individual"
+    />
 
-  <h2>Sunburst</h2>
-  <app-individual-sunburst
-    [ancestryDatabase]="ancestryDatabase()"
-    [individual]="vm.individual"
-  />
+    <h2>Ancestors</h2>
+    <app-individual-ancestors [xref]="xref()" />
+  }
 
-  <h2>Gedcom</h2>
-  <pre>{{ vm.gedcom }}</pre>
+  @if (activeTab() === "gedcom") {
+    <h2>Gedcom</h2>
+    <pre>{{ vm.gedcom }}</pre>
+  }
 
   <div class="position-fixed bottom-0 end-0 rounded-circle m-5">
     <button
