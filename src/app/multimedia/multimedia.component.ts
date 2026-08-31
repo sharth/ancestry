@@ -4,6 +4,8 @@ import {
   AncestryService,
   type AncestryDatabase,
 } from "../../database/ancestry.service";
+import { serializeGedcomMultimedia } from "../../gedcom/gedcomMultimedia";
+import { GedcomDisplayComponent } from "../gedcom-display/gedcom-display.component";
 import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
 import { MultimediaCitationsComponent } from "./multimedia-citations.component";
 import { MultimediaPreviewComponent } from "./multimedia-preview.component";
@@ -15,6 +17,7 @@ import { MultimediaPreviewComponent } from "./multimedia-preview.component";
     GedcomEditorDialogComponent,
     MultimediaPreviewComponent,
     MultimediaCitationsComponent,
+    GedcomDisplayComponent,
   ],
   templateUrl: "./multimedia.component.html",
   styleUrl: "./multimedia.component.css",
@@ -31,6 +34,9 @@ export class MultimediaComponent {
       return undefined;
     }
 
-    return { multimedia };
+    return {
+      multimedia,
+      gedcomRecord: serializeGedcomMultimedia(multimedia),
+    };
   });
 }

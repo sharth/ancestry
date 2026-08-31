@@ -3,6 +3,7 @@ import { RouterModule } from "@angular/router";
 import type { AncestryDatabase } from "../../database/ancestry.service";
 import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
 import { serializeGedcomSource } from "../../gedcom/gedcomSource";
+import { GedcomDisplayComponent } from "../gedcom-display/gedcom-display.component";
 import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
 import { SourceCitationsComponent } from "./source-citations.component";
 import { SourceMultimediaComponent } from "./source-multimedia.component";
@@ -20,6 +21,7 @@ import { SourceUnknownsComponent } from "./source-unknowns.component";
     SourceMultimediaComponent,
     GedcomEditorDialogComponent,
     SourceUnknownsComponent,
+    GedcomDisplayComponent,
   ],
 })
 export class SourceComponent {
@@ -35,19 +37,7 @@ export class SourceComponent {
 
     return {
       source,
-      newGedcomRecord: serializeGedcomSource(source),
-      newGedcomText: serializeGedcomRecordToText(serializeGedcomSource(source)),
+      gedcomRecord: serializeGedcomSource(source),
     };
   });
-
-  readonly editDialog =
-    viewChild.required<GedcomEditorDialogComponent>("editDialog");
-
-  openSourceEditor() {
-    this.editDialog().showModal();
-  }
-
-  closeSourceEditor() {
-    // No longer needed as dialog closes itself on finished
-  }
 }

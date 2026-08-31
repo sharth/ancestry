@@ -1,0 +1,12 @@
+.gedcom-display {
+  display: block;
+  overflow-x: auto;
+}
+
+pre {
+  margin: 0;
+  padding-left: attr(data-level em);
+  overflow-x: visible;
+  width: max-content;
+  min-width: 100%;
+}

@@ -1,0 +1,5 @@
+<div class="gedcom-display">
+  @for (line of serializedGedcom(); track $index) {
+    <pre [attr.data-level]="line.level">{{ line.text }}</pre>
+  }
+</div>

@@ -1,8 +1,8 @@
-import { Component, computed, input, viewChild } from "@angular/core";
+import { Component, computed, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
 import type { AncestryDatabase } from "../../database/ancestry.service";
-import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
 import { serializeGedcomRepository } from "../../gedcom/gedcomRepository";
+import { GedcomDisplayComponent } from "../gedcom-display/gedcom-display.component";
 import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
 import { RepositorySourcesComponent } from "./repository-sources.component";
 
@@ -12,6 +12,7 @@ import { RepositorySourcesComponent } from "./repository-sources.component";
     RouterModule,
     RepositorySourcesComponent,
     GedcomEditorDialogComponent,
+    GedcomDisplayComponent,
   ],
   templateUrl: "./repository.component.html",
   styleUrl: "./repository.component.css",
@@ -29,16 +30,7 @@ export class RepositoryComponent {
 
     return {
       name: repository.name,
-      gedcom: serializeGedcomRecordToText(
-        serializeGedcomRepository(repository),
-      ).join("\n"),
+      gedcomRecord: serializeGedcomRepository(repository),
     };
   });
-
-  readonly editDialog =
-    viewChild.required<GedcomEditorDialogComponent>("editDialog");
-
-  openRepositoryEditor() {
-    this.editDialog().showModal();
-  }
 }

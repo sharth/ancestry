@@ -4,8 +4,8 @@ import {
   fullname,
   serializeGedcomIndividual,
 } from "../../gedcom/gedcomIndividual";
-import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
 import { EventsTableComponent } from "../events-table/events-table.component";
+import { GedcomDisplayComponent } from "../gedcom-display/gedcom-display.component";
 import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
 import { IndividualAncestorsComponent } from "./individual-ancestors.component";
 import { IndividualRelativesComponent } from "./individual-relatives.component";
@@ -21,6 +21,7 @@ export type IndividualTab = "facts" | "sunburst" | "gedcom";
     GedcomEditorDialogComponent,
     IndividualSunburstComponent,
     EventsTableComponent,
+    GedcomDisplayComponent,
   ],
   templateUrl: "./individual.component.html",
   styleUrl: "./individual.component.css",
@@ -41,9 +42,7 @@ export class IndividualComponent {
       individual,
       name: fullname(individual),
       sex: individual.sex.sex || "Unknown",
-      gedcom: serializeGedcomRecordToText(
-        serializeGedcomIndividual(individual),
-      ).join("\n"),
+      gedcomRecord: serializeGedcomIndividual(individual),
     };
   });
 }
