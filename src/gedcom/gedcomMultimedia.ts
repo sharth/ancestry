@@ -109,9 +109,9 @@ export function serializeGedcomMultimedia(
           }),
         ]),
       }),
-      gedcomMultimedia.changeDate
-        ? serializeGedcomChangeDate(gedcomMultimedia.changeDate)
-        : null,
+      gedcomMultimedia.changeDate ?
+        serializeGedcomChangeDate(gedcomMultimedia.changeDate)
+      : null,
     ]),
   });
 }

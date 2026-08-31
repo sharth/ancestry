@@ -202,11 +202,10 @@ function serializeGedcomFact(
   gedcomEvent: GedcomFact,
   gedcomEventMetadata: GedcomEventMetadata,
 ): GedcomRecord {
-  const value = gedcomEventMetadata.mandatoryValue
-    ? gedcomEvent.value
-    : gedcomEvent.place || gedcomEvent.date.value
-      ? ""
-      : "Y";
+  const value =
+    gedcomEventMetadata.mandatoryValue ? gedcomEvent.value
+    : gedcomEvent.place || gedcomEvent.date.value ? ""
+    : "Y";
   return newGedcomRecord({
     tag: gedcomEvent.tag,
     value: value,

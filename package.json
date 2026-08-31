@@ -57,6 +57,7 @@
     "vitest": "^4.0.13"
   },
   "prettier": {
+    "experimentalTernaries": true,
     "importOrderCaseSensitive": true,
     "importOrderTypeScriptVersion": "6.0.3",
     "importOrderParserPlugins": [
