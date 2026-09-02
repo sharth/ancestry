@@ -1,4 +1,11 @@
 @if (vm(); as vm) {
+  <h2>Sunburst</h2>
+  <app-individual-sunburst
+    [ancestryDatabase]="ancestryDatabase()"
+    [individual]="vm.individual"
+  />
+
+  <h2>Ancestors</h2>
   <ol>
     @for (ancestor of vm.ancestors; let ahnentafel = $index; track $index) {
       @if (ancestor !== undefined) {
@@ -8,4 +15,10 @@
       }
     }
   </ol>
+
+  <h2>Relatives</h2>
+  <app-individual-relatives
+    [ancestryDatabase]="ancestryDatabase()"
+    [individual]="vm.individual"
+  />
 }

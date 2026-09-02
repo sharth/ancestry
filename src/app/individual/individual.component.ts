@@ -1,27 +1,20 @@
 import { Component, computed, input, signal } from "@angular/core";
 import type { AncestryDatabase } from "../../database/ancestry.service";
-import {
-  fullname,
-  serializeGedcomIndividual,
-} from "../../gedcom/gedcomIndividual";
-import { EventsTableComponent } from "../events-table/events-table.component";
-import { GedcomDisplayComponent } from "../gedcom-display/gedcom-display.component";
+import { fullname } from "../../gedcom/gedcomIndividual";
 import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
 import { IndividualAncestorsComponent } from "./individual-ancestors.component";
-import { IndividualRelativesComponent } from "./individual-relatives.component";
-import { IndividualSunburstComponent } from "./individual-sunburst.component";
+import { IndividualFactsComponent } from "./individual-facts.component";
+import { IndividualGedcomComponent } from "./individual-gedcom.component";
 
-export type IndividualTab = "facts" | "sunburst" | "gedcom";
+export type IndividualTab = "facts" | "ancestors" | "gedcom";
 
 @Component({
   selector: "app-individual",
   imports: [
-    IndividualRelativesComponent,
+    IndividualFactsComponent,
     IndividualAncestorsComponent,
+    IndividualGedcomComponent,
     GedcomEditorDialogComponent,
-    IndividualSunburstComponent,
-    EventsTableComponent,
-    GedcomDisplayComponent,
   ],
   templateUrl: "./individual.component.html",
   styleUrl: "./individual.component.css",
@@ -42,7 +35,6 @@ export class IndividualComponent {
       individual,
       name: fullname(individual),
       sex: individual.sex.sex || "Unknown",
-      gedcomRecord: serializeGedcomIndividual(individual),
     };
   });
 }

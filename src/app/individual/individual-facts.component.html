@@ -1,0 +1,24 @@
+@if (vm(); as vm) {
+  <div class="row">
+    <div class="col-md-6">
+      <h2>Events</h2>
+      <app-events-table owner="individual" [events]="vm.individual.facts" />
+
+      @let familyXrefs = vm.individual.parentOfFamilyXrefs;
+      @for (familyXref of familyXrefs; track familyXref) {
+        <h2>Events for Family {{ familyXref }}</h2>
+        @if (ancestryDatabase().families[familyXref]; as family) {
+          <app-events-table owner="family" [events]="family.facts" />
+        }
+      }
+    </div>
+
+    <div class="col-md-6">
+      <h2>Relatives</h2>
+      <app-individual-relatives
+        [ancestryDatabase]="ancestryDatabase()"
+        [individual]="vm.individual"
+      />
+    </div>
+  </div>
+}

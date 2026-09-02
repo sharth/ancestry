@@ -22,13 +22,13 @@
     <li class="nav-item" role="presentation">
       <button
         class="nav-link"
-        [class.active]="activeTab() === 'sunburst'"
-        (click)="activeTab.set('sunburst')"
+        [class.active]="activeTab() === 'ancestors'"
+        (click)="activeTab.set('ancestors')"
         type="button"
         role="tab"
-        [attr.aria-selected]="activeTab() === 'sunburst'"
+        [attr.aria-selected]="activeTab() === 'ancestors'"
       >
-        Sunburst
+        Ancestors
       </button>
     </li>
     <li class="nav-item" role="presentation">
@@ -46,44 +46,24 @@
   </ul>
 
   @if (activeTab() === "facts") {
-    <div class="row">
-      <div class="col-md-6">
-        <h2>Events</h2>
-        <app-events-table owner="individual" [events]="vm.individual.facts" />
-
-        @let familyXrefs = vm.individual.parentOfFamilyXrefs;
-        @for (familyXref of familyXrefs; track familyXref) {
-          <h2>Events for Family {{ familyXref }}</h2>
-          @if (ancestryDatabase().families[familyXref]; as family) {
-            <app-events-table owner="family" [events]="family.facts" />
-          }
-        }
-      </div>
-
-      <div class="col-md-6">
-        <h2>Relatives</h2>
-        <app-individual-relatives
-          [ancestryDatabase]="ancestryDatabase()"
-          [individual]="vm.individual"
-        />
-      </div>
-    </div>
+    <app-individual-facts
+      [ancestryDatabase]="ancestryDatabase()"
+      [xref]="xref()"
+    />
   }
 
-  @if (activeTab() === "sunburst") {
-    <h2>Sunburst</h2>
-    <app-individual-sunburst
+  @if (activeTab() === "ancestors") {
+    <app-individual-ancestors
       [ancestryDatabase]="ancestryDatabase()"
-      [individual]="vm.individual"
+      [xref]="xref()"
     />
-
-    <h2>Ancestors</h2>
-    <app-individual-ancestors [xref]="xref()" />
   }
 
   @if (activeTab() === "gedcom") {
-    <h2>Gedcom</h2>
-    <app-gedcom-display [gedcomRecord]="vm.gedcomRecord" />
+    <app-individual-gedcom
+      [ancestryDatabase]="ancestryDatabase()"
+      [xref]="xref()"
+    />
   }
 
   <div class="position-fixed bottom-0 end-0 rounded-circle m-5">
