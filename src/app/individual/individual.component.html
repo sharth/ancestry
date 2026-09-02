@@ -8,63 +8,23 @@
 
   <ul class="nav nav-tabs mb-3" role="tablist">
     <li class="nav-item" role="presentation">
-      <button
-        class="nav-link"
-        [class.active]="activeTab() === 'facts'"
-        (click)="activeTab.set('facts')"
-        type="button"
-        role="tab"
-        [attr.aria-selected]="activeTab() === 'facts'"
-      >
+      <a class="nav-link" routerLink="facts" routerLinkActive="active">
         Facts
-      </button>
+      </a>
     </li>
     <li class="nav-item" role="presentation">
-      <button
-        class="nav-link"
-        [class.active]="activeTab() === 'ancestors'"
-        (click)="activeTab.set('ancestors')"
-        type="button"
-        role="tab"
-        [attr.aria-selected]="activeTab() === 'ancestors'"
-      >
+      <a class="nav-link" routerLink="ancestors" routerLinkActive="active">
         Ancestors
-      </button>
+      </a>
     </li>
     <li class="nav-item" role="presentation">
-      <button
-        class="nav-link"
-        [class.active]="activeTab() === 'gedcom'"
-        (click)="activeTab.set('gedcom')"
-        type="button"
-        role="tab"
-        [attr.aria-selected]="activeTab() === 'gedcom'"
-      >
+      <a class="nav-link" routerLink="gedcom" routerLinkActive="active">
         Gedcom
-      </button>
+      </a>
     </li>
   </ul>
 
-  @if (activeTab() === "facts") {
-    <app-individual-facts
-      [ancestryDatabase]="ancestryDatabase()"
-      [xref]="xref()"
-    />
-  }
-
-  @if (activeTab() === "ancestors") {
-    <app-individual-ancestors
-      [ancestryDatabase]="ancestryDatabase()"
-      [xref]="xref()"
-    />
-  }
-
-  @if (activeTab() === "gedcom") {
-    <app-individual-gedcom
-      [ancestryDatabase]="ancestryDatabase()"
-      [xref]="xref()"
-    />
-  }
+  <router-outlet />
 
   <div class="position-fixed bottom-0 end-0 rounded-circle m-5">
     <button

@@ -2,6 +2,9 @@ import type { Routes } from "@angular/router";
 import { ancestryDatabaseResolver } from "../database/ancestry.service";
 import { HelloComponent } from "./hello/hello.component";
 import { IndexComponent } from "./index/index.component";
+import { IndividualAncestorsComponent } from "./individual/individual-ancestors.component";
+import { IndividualFactsComponent } from "./individual/individual-facts.component";
+import { IndividualGedcomComponent } from "./individual/individual-gedcom.component";
 import { IndividualComponent } from "./individual/individual.component";
 import { IndividualsComponent } from "./individuals/individuals.component";
 import { MultimediaComponent } from "./multimedia/multimedia.component";
@@ -33,6 +36,12 @@ export const routes: Routes = [
     path: "individual/:xref",
     component: IndividualComponent,
     resolve: { ancestryDatabase: ancestryDatabaseResolver },
+    children: [
+      { path: "", redirectTo: "facts", pathMatch: "full" },
+      { path: "facts", component: IndividualFactsComponent },
+      { path: "ancestors", component: IndividualAncestorsComponent },
+      { path: "gedcom", component: IndividualGedcomComponent },
+    ],
   },
   {
     path: "repositories",
