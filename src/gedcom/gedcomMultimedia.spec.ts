@@ -1,4 +1,5 @@
 import { assert, describe, expect, it } from "vitest";
+import { newGedcomChangeDate } from "./gedcomChangeDate";
 import {
   newGedcomMultimedia,
   parseGedcomMultimedia,
@@ -28,7 +29,7 @@ describe("gedcomMultimedia", () => {
         filePath: "path/to/file.jpg",
         mediaType: "jpg",
         title: "My Title",
-        changeDate: { date: { value: "1 JAN 2020" } },
+        changeDate: newGedcomChangeDate({ value: "1 JAN 2020" }),
       }),
     );
     expect(

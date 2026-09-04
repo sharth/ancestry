@@ -7,7 +7,15 @@ import {
   AncestryService,
   type AncestryDatabase,
 } from "../../database/ancestry.service";
-import type { GedcomIndividual } from "../../gedcom/gedcomIndividual";
+import { newGedcomFamily } from "../../gedcom/gedcomFamily";
+import {
+  newGedcomIndividual,
+  type GedcomIndividual,
+} from "../../gedcom/gedcomIndividual";
+import { newGedcomMultimedia } from "../../gedcom/gedcomMultimedia";
+import { newGedcomName } from "../../gedcom/gedcomName";
+import { newGedcomSex } from "../../gedcom/gedcomSex";
+import { newGedcomSource } from "../../gedcom/gedcomSource";
 import {
   GedcomEditorComponent,
   calculateNextIndividualXref,
@@ -23,19 +31,17 @@ describe("GedcomEditorComponent helpers", () => {
 
     it("should return the next available index", () => {
       const individuals = {
-        "@I1@": { xref: "@I1@" },
-        "@I5@": { xref: "@I5@" },
+        "@I1@": newGedcomIndividual({ xref: "@I1@" }),
+        "@I5@": newGedcomIndividual({ xref: "@I5@" }),
       };
-      // @ts-expect-error - Partial mock
       expect(calculateNextIndividualXref(individuals)).toBe("@I6@");
     });
 
     it("should handle non-conforming xrefs by ignoring them", () => {
       const individuals = {
-        "@I1@": { xref: "@I1@" },
-        OTHER: { xref: "OTHER" },
+        "@I1@": newGedcomIndividual({ xref: "@I1@" }),
+        OTHER: newGedcomIndividual({ xref: "OTHER" }),
       };
-      // @ts-expect-error - Partial mock
       expect(calculateNextIndividualXref(individuals)).toBe("@I2@");
     });
   });
@@ -47,10 +53,9 @@ describe("GedcomEditorComponent helpers", () => {
 
     it("should return the next available index", () => {
       const sources = {
-        "@S1@": { xref: "@S1@" },
-        "@S10@": { xref: "@S10@" },
+        "@S1@": newGedcomSource({ xref: "@S1@" }),
+        "@S10@": newGedcomSource({ xref: "@S10@" }),
       };
-      // @ts-expect-error - Partial mock
       expect(calculateNextSourceXref(sources)).toBe("@S11@");
     });
   });
@@ -62,19 +67,17 @@ describe("GedcomEditorComponent helpers", () => {
 
     it("should return the next available index", () => {
       const multimedias = {
-        "@M1@": { xref: "@M1@" },
-        "@M3@": { xref: "@M3@" },
+        "@M1@": newGedcomMultimedia({ xref: "@M1@" }),
+        "@M3@": newGedcomMultimedia({ xref: "@M3@" }),
       };
-      // @ts-expect-error - Partial mock
       expect(calculateNextMultimediaXref(multimedias)).toBe("@M4@");
     });
 
     it("should handle non-conforming xrefs by ignoring them", () => {
       const multimedias = {
-        "@M1@": { xref: "@M1@" },
-        OTHER: { xref: "OTHER" },
+        "@M1@": newGedcomMultimedia({ xref: "@M1@" }),
+        OTHER: newGedcomMultimedia({ xref: "OTHER" }),
       };
-      // @ts-expect-error - Partial mock
       expect(calculateNextMultimediaXref(multimedias)).toBe("@M2@");
     });
   });
@@ -91,39 +94,18 @@ describe("GedcomEditorComponent Integration", () => {
 
   const initialDatabase: AncestryDatabase = {
     individuals: {
-      "@I0@": {
+      "@I0@": newGedcomIndividual({
         xref: "@I0@",
-        names: [
-          {
-            givenName: "Stock",
-            surname: "Individual",
-            prefix: "",
-            nickName: "",
-            surnamePrefix: "",
-            suffix: "",
-            nameType: "",
-            citations: [],
-            notes: [],
-          },
-        ],
-        facts: [],
-        sex: { sex: "M", citations: [] },
-        childOfFamilyXrefs: [],
+        names: [newGedcomName({ givenName: "Stock", surname: "Individual" })],
+        sex: newGedcomSex({ sex: "M" }),
         parentOfFamilyXrefs: ["@F0@"],
-        notes: [],
-        unknownRecords: [],
-        changeDate: { date: { value: "" } },
-      },
+      }),
     },
     families: {
-      "@F0@": {
+      "@F0@": newGedcomFamily({
         xref: "@F0@",
         husbandXref: "@I0@",
-        wifeXref: "",
-        childXrefs: [],
-        facts: [],
-        citations: [],
-      },
+      }),
     },
     sources: {},
     multimedias: {},

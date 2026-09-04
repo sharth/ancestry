@@ -1,10 +1,5 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import {
-  parseGedcomDate,
-  serializeGedcomDate,
-  type GedcomDate,
-} from "./gedcomDate";
-import {
   filterTrivialGedcomRecord,
   filterTrivialGedcomRecords,
   newGedcomRecord,
@@ -12,7 +7,16 @@ import {
 } from "./gedcomRecord";
 
 export interface GedcomChangeDate {
-  date: GedcomDate;
+  value: string;
+}
+
+export function newGedcomChangeDate(
+  fieldsToUpdate: Partial<GedcomChangeDate> = {},
+): GedcomChangeDate {
+  return {
+    value: "",
+    ...fieldsToUpdate,
+  };
 }
 
 export function parseGedcomChangeDate(
@@ -22,12 +26,15 @@ export function parseGedcomChangeDate(
   if (gedcomRecord.xref !== "") throw new Error();
   if (gedcomRecord.value !== "") throw new Error();
 
-  const gedcomChangeDate: GedcomChangeDate = { date: { value: "" } };
+  const gedcomChangeDate = newGedcomChangeDate();
 
   for (const childRecord of gedcomRecord.children) {
     switch (childRecord.tag) {
       case "DATE":
-        gedcomChangeDate.date = parseGedcomDate(childRecord);
+        if (childRecord.xref !== "") throw new Error();
+        if (childRecord.value === "") throw new Error();
+        if (childRecord.children.length) throw new Error();
+        gedcomChangeDate.value = childRecord.value;
         break;
 
       default:
@@ -46,14 +53,11 @@ export function serializeGedcomChangeDate(
     newGedcomRecord({
       tag: "CHAN",
       children: filterTrivialGedcomRecords([
-        serializeGedcomDate(gedcomChangeDate.date),
+        newGedcomRecord({
+          tag: "DATE",
+          value: gedcomChangeDate.value,
+        }),
       ]),
     }),
   );
-}
-
-export function newGedcomChangeDate(value = ""): GedcomChangeDate {
-  return {
-    date: { value: value },
-  };
 }

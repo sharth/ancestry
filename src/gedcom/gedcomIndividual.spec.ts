@@ -1,4 +1,5 @@
 import { assert, describe, expect, it } from "vitest";
+import { newGedcomChangeDate } from "./gedcomChangeDate";
 import { newGedcomFact } from "./gedcomFact";
 import {
   newGedcomIndividual,
@@ -46,7 +47,7 @@ describe("gedcomIndividual", () => {
     expect(gedcomIndividual).toEqual(
       newGedcomIndividual({
         xref: "@I1@",
-        changeDate: { date: { value: "1 JAN 1900" } },
+        changeDate: newGedcomChangeDate({ value: "1 JAN 1900" }),
         names: [
           newGedcomName({
             givenName: "John",
