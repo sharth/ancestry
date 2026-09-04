@@ -2,6 +2,7 @@ import { TestBed, type ComponentFixture } from "@angular/core/testing";
 import { provideRouter } from "@angular/router";
 import { beforeEach, describe, expect, it } from "vitest";
 import type { AncestryDatabase } from "../../database/ancestry.service";
+import { newGedcomDate } from "../../gedcom/gedcomDate";
 import { newGedcomFact } from "../../gedcom/gedcomFact";
 import { newGedcomFamily } from "../../gedcom/gedcomFamily";
 import { newGedcomIndividual } from "../../gedcom/gedcomIndividual";
@@ -27,9 +28,9 @@ describe("IndividualFactsComponent", () => {
           facts: [
             newGedcomFact({
               tag: "BIRT",
-              date: { value: "1 JAN 1900" },
+              date: newGedcomDate({ value: "1 JAN 1900" }),
               place: "Some Place",
-              sortDate: { value: "1900" },
+              sortDate: newGedcomDate({ value: "1900" }),
             }),
           ],
           parentOfFamilyXrefs: ["@F1@"],

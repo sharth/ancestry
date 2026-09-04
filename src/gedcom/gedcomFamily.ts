@@ -25,6 +25,19 @@ export interface GedcomFamily {
   citations: GedcomSourceCitation[];
 }
 
+export function newGedcomFamily(
+  fieldsToUpdate: Partial<GedcomFamily> & Pick<GedcomFamily, "xref">,
+): GedcomFamily {
+  return {
+    husbandXref: "",
+    wifeXref: "",
+    childXrefs: [],
+    facts: [],
+    citations: [],
+    ...fieldsToUpdate,
+  };
+}
+
 export function parseGedcomFamily(record: GedcomRecord): GedcomFamily {
   if (record.abstag !== "FAM") throw new Error();
   if (record.xref == "") throw new Error();
@@ -127,17 +140,4 @@ export function getFamilyMultimediaCitations(
   }
 
   return references;
-}
-
-export function newGedcomFamily(
-  fieldsToUpdate: Partial<GedcomFamily> & Pick<GedcomFamily, "xref">,
-): GedcomFamily {
-  return {
-    husbandXref: "",
-    wifeXref: "",
-    childXrefs: [],
-    facts: [],
-    citations: [],
-    ...fieldsToUpdate,
-  };
 }

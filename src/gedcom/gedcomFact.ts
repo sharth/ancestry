@@ -1,6 +1,7 @@
 // A Gedcom Fact is an event or attribute.
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import {
+  newGedcomDate,
   parseGedcomDate,
   serializeGedcomDate,
   serializeGedcomSortDate,
@@ -46,6 +47,25 @@ export interface GedcomFact {
   citations: GedcomSourceCitation[];
   sharedWith: GedcomFactSharedWith[];
   notes: GedcomNote[];
+}
+
+export function newGedcomFact(
+  fieldsToUpdate: Partial<GedcomFact> = {},
+): GedcomFact {
+  return {
+    tag: "EVEN",
+    type: "",
+    address: "",
+    place: "",
+    value: "",
+    cause: "",
+    date: newGedcomDate(),
+    sortDate: newGedcomDate(),
+    citations: [],
+    sharedWith: [],
+    notes: [],
+    ...fieldsToUpdate,
+  };
 }
 
 export function parseGedcomIndividualFact(
@@ -235,23 +255,4 @@ function serializeGedcomSharedFact(
       newGedcomRecord({ tag: "ROLE", value: sharedWith.role }),
     ]),
   });
-}
-
-export function newGedcomFact(
-  fieldsToUpdate: Partial<GedcomFact> = {},
-): GedcomFact {
-  return {
-    tag: "EVEN",
-    type: "",
-    address: "",
-    place: "",
-    value: "",
-    cause: "",
-    date: { value: "" },
-    sortDate: { value: "" },
-    citations: [],
-    sharedWith: [],
-    notes: [],
-    ...fieldsToUpdate,
-  };
 }

@@ -10,10 +10,12 @@ export interface GedcomRepository {
   name: string;
 }
 
-export function newGedcomRepository(xref: string): GedcomRepository {
+export function newGedcomRepository(
+  fieldsToUpdate: Partial<GedcomRepository> & Pick<GedcomRepository, "xref">,
+): GedcomRepository {
   return {
-    xref,
     name: "",
+    ...fieldsToUpdate,
   };
 }
 
@@ -24,7 +26,9 @@ export function parseGedcomRepository(
   if (gedcomRecord.xref == "") throw new Error();
   if (gedcomRecord.value != "") throw new Error();
 
-  const gedcomRepository = newGedcomRepository(gedcomRecord.xref);
+  const gedcomRepository = newGedcomRepository({
+    xref: gedcomRecord.xref,
+  });
 
   for (const childRecord of gedcomRecord.children) {
     switch (childRecord.tag) {

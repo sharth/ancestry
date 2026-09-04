@@ -28,11 +28,10 @@ export interface GedcomName {
   notes: GedcomNote[];
 }
 
-export function parseGedcomName(gedcomRecord: GedcomRecord): GedcomName {
-  if (gedcomRecord.tag !== "NAME") throw new Error();
-  if (gedcomRecord.xref != "") throw new Error();
-
-  const gedcomName: GedcomName = {
+export function newGedcomName(
+  fieldsToUpdate: Partial<GedcomName> = {},
+): GedcomName {
+  return {
     prefix: "",
     givenName: "",
     nickName: "",
@@ -42,7 +41,15 @@ export function parseGedcomName(gedcomRecord: GedcomRecord): GedcomName {
     nameType: "",
     citations: [],
     notes: [],
+    ...fieldsToUpdate,
   };
+}
+
+export function parseGedcomName(gedcomRecord: GedcomRecord): GedcomName {
+  if (gedcomRecord.tag !== "NAME") throw new Error();
+  if (gedcomRecord.xref != "") throw new Error();
+
+  const gedcomName = newGedcomName();
 
   for (const childRecord of gedcomRecord.children) {
     switch (childRecord.tag) {
@@ -160,21 +167,4 @@ export function displayGedcomName(gedcomName: GedcomName) {
     .filter((part) => part != "")
     .join(" ");
   return name === "//" ? "" : name;
-}
-
-export function newGedcomName(
-  fieldsToUpdate: Partial<GedcomName> = {},
-): GedcomName {
-  return {
-    prefix: "",
-    givenName: "",
-    nickName: "",
-    surnamePrefix: "",
-    surname: "",
-    suffix: "",
-    nameType: "",
-    citations: [],
-    notes: [],
-    ...fieldsToUpdate,
-  };
 }

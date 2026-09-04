@@ -5,14 +5,23 @@ export interface GedcomNote {
   text: string;
 }
 
+export function newGedcomNote(
+  fieldsToUpdate: Partial<GedcomNote> = {},
+): GedcomNote {
+  return {
+    text: "",
+    ...fieldsToUpdate,
+  };
+}
+
 export function parseGedcomNote(gedcomRecord: GedcomRecord): GedcomNote {
   if (gedcomRecord.tag !== "NOTE") throw new Error();
   if (gedcomRecord.xref != "") throw new Error();
   if (gedcomRecord.value == "") throw new Error();
 
-  const gedcomNote: GedcomNote = {
+  const gedcomNote = newGedcomNote({
     text: gedcomRecord.value,
-  };
+  });
 
   for (const childRecord of gedcomRecord.children) {
     switch (childRecord.tag) {
@@ -27,10 +36,4 @@ export function parseGedcomNote(gedcomRecord: GedcomRecord): GedcomNote {
 
 export function serializeGedcomNote(gedcomNote: GedcomNote): GedcomRecord {
   return newGedcomRecord({ tag: "NOTE", value: gedcomNote.text });
-}
-
-export function newGedcomNote(): GedcomNote {
-  return {
-    text: "",
-  };
 }

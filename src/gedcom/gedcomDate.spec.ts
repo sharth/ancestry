@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  newGedcomDate,
   parseGedcomDate,
   serializeGedcomDate,
   type GedcomDate,
@@ -23,8 +24,18 @@ describe("gedcomDate", () => {
       gedcomRecord,
     );
   });
+
   it("serializes to null if empty", () => {
-    const gedcomDate: GedcomDate = { value: "" };
+    const gedcomDate = newGedcomDate({ value: "" });
     expect(serializeGedcomDate(gedcomDate)).toBeNull();
+  });
+
+  it("newGedcomDate remembers fields", () => {
+    expect(newGedcomDate()).toEqual<GedcomDate>({
+      value: "",
+    });
+    expect(newGedcomDate({ value: "1 JAN 2000" })).toEqual<GedcomDate>({
+      value: "1 JAN 2000",
+    });
   });
 });

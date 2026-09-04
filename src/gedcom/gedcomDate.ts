@@ -23,14 +23,23 @@ export const monthNames = [
   "DEC",
 ];
 
+export function newGedcomDate(
+  fieldsToUpdate: Partial<GedcomDate> = {},
+): GedcomDate {
+  return {
+    value: "",
+    ...fieldsToUpdate,
+  };
+}
+
 export function parseGedcomDate(gedcomRecord: GedcomRecord): GedcomDate {
   if (gedcomRecord.xref != "") throw new Error();
   if (gedcomRecord.value == "") throw new Error();
   if (gedcomRecord.children.length != 0) throw new Error();
 
-  return {
+  return newGedcomDate({
     value: gedcomRecord.value,
-  };
+  });
 }
 
 export function serializeGedcomDate(

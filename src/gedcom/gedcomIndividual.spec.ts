@@ -1,5 +1,6 @@
 import { assert, describe, expect, it } from "vitest";
 import { newGedcomChangeDate } from "./gedcomChangeDate";
+import { newGedcomDate } from "./gedcomDate";
 import { newGedcomFact } from "./gedcomFact";
 import {
   newGedcomIndividual,
@@ -173,8 +174,8 @@ describe("gedcomIndividual", () => {
             place: "place",
             address: "address",
             cause: "normal",
-            date: { value: "ABT 1 Jan 2000" },
-            sortDate: { value: "1 Jan 2000" },
+            date: newGedcomDate({ value: "ABT 1 Jan 2000" }),
+            sortDate: newGedcomDate({ value: "1 Jan 2000" }),
             citations: [
               newGedcomSourceCitation({
                 sourceXref: "@S1@",
@@ -224,7 +225,7 @@ describe("gedcomIndividual", () => {
         facts: [
           newGedcomFact({
             tag: "GRAD",
-            date: { value: "15 JUN 2005" },
+            date: newGedcomDate({ value: "15 JUN 2005" }),
             place: "Springfield",
           }),
         ],

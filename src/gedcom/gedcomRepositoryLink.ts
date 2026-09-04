@@ -6,6 +6,16 @@ export interface GedcomRepositoryLink {
   callNumber: string;
 }
 
+export function newGedcomRepositoryLink(
+  fieldsToUpdate: Partial<GedcomRepositoryLink> = {},
+): GedcomRepositoryLink {
+  return {
+    repositoryXref: "",
+    callNumber: "",
+    ...fieldsToUpdate,
+  };
+}
+
 export function parseGedcomRepositoryLink(
   gedcomRecord: GedcomRecord,
 ): GedcomRepositoryLink {
@@ -52,15 +62,5 @@ export function serializeGedcomRepositoryLink(
         children: [],
       },
     ].filter((r) => r.value || r.children.length > 0),
-  };
-}
-
-export function newGedcomRepositoryLink(
-  fieldsToUpdate: Partial<GedcomRepositoryLink> = {},
-): GedcomRepositoryLink {
-  return {
-    repositoryXref: "",
-    callNumber: "",
-    ...fieldsToUpdate,
   };
 }

@@ -24,6 +24,20 @@ export interface GedcomSourceCitation {
   multimediaLinks: GedcomMultimediaLink[];
 }
 
+export function newGedcomSourceCitation(
+  fieldsToUpdate: Partial<GedcomSourceCitation> = {},
+): GedcomSourceCitation {
+  return {
+    sourceXref: "",
+    text: "",
+    page: "",
+    quality: "",
+    notes: [],
+    multimediaLinks: [],
+    ...fieldsToUpdate,
+  };
+}
+
 export function parseGedcomSourceCitation(
   gedcomRecord: GedcomRecord,
 ): GedcomSourceCitation {
@@ -31,14 +45,9 @@ export function parseGedcomSourceCitation(
   if (gedcomRecord.xref != "") throw new Error();
   if (gedcomRecord.value == "") throw new Error();
 
-  const gedcomCitation: GedcomSourceCitation = {
+  const gedcomCitation = newGedcomSourceCitation({
     sourceXref: gedcomRecord.value,
-    text: "",
-    page: "",
-    quality: "",
-    notes: [],
-    multimediaLinks: [],
-  };
+  });
 
   for (const childRecord of gedcomRecord.children) {
     switch (childRecord.tag) {
@@ -116,18 +125,4 @@ export function serializeGedcomSourceCitation(
       }),
     ]),
   });
-}
-
-export function newGedcomSourceCitation(
-  fieldsToUpdate: Partial<GedcomSourceCitation> = {},
-): GedcomSourceCitation {
-  return {
-    sourceXref: "",
-    text: "",
-    page: "",
-    quality: "",
-    notes: [],
-    multimediaLinks: [],
-    ...fieldsToUpdate,
-  };
 }

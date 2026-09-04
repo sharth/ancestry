@@ -30,8 +30,9 @@ export function parseGedcomSex(gedcomRecord: GedcomRecord): GedcomSex {
   if (gedcomRecord.xref != "") throw new Error();
   if (gedcomRecord.value == "") throw new Error();
 
-  const gedcomSex = newGedcomSex();
-  gedcomSex.sex = gedcomRecord.value;
+  const gedcomSex = newGedcomSex({
+    sex: gedcomRecord.value,
+  });
 
   for (const childRecord of gedcomRecord.children) {
     switch (childRecord.tag) {

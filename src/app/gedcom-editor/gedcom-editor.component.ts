@@ -119,7 +119,7 @@ export class GedcomEditorRepositoryComponent {
     () => {
       return (
         this.workingDatabase().repositories[this.xref()] ??
-        newGedcomRepository(this.xref())
+        newGedcomRepository({ xref: this.xref() })
       );
     },
     {

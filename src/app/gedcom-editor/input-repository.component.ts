@@ -14,6 +14,6 @@ import {
 })
 export class InputRepositoryComponent implements FormValueControl<GedcomRepository> {
   readonly workingDatabase = input.required<AncestryDatabase>();
-  readonly value = model<GedcomRepository>(newGedcomRepository(""));
+  readonly value = model<GedcomRepository>(newGedcomRepository({ xref: "" }));
   readonly form = form(this.value);
 }

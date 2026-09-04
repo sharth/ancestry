@@ -46,6 +46,22 @@ export interface GedcomIndividual {
   unknownRecords: GedcomRecord[];
 }
 
+export function newGedcomIndividual(
+  fieldsToUpdate: Partial<GedcomIndividual> & Pick<GedcomIndividual, "xref">,
+): GedcomIndividual {
+  return {
+    names: [],
+    sex: newGedcomSex(),
+    facts: [],
+    parentOfFamilyXrefs: [],
+    childOfFamilyXrefs: [],
+    unknownRecords: [],
+    notes: [],
+    changeDate: newGedcomChangeDate(),
+    ...fieldsToUpdate,
+  };
+}
+
 export function fullname(gedcomIndividual: GedcomIndividual): string {
   const gedcomName = gedcomIndividual.names.at(0);
   if (gedcomName == null) return "";
@@ -194,20 +210,4 @@ export function getIndividualMultimediaCitations(
   }
 
   return references;
-}
-
-export function newGedcomIndividual(
-  fieldsToUpdate: Partial<GedcomIndividual> & Pick<GedcomIndividual, "xref">,
-): GedcomIndividual {
-  return {
-    names: [],
-    sex: newGedcomSex(),
-    facts: [],
-    parentOfFamilyXrefs: [],
-    childOfFamilyXrefs: [],
-    unknownRecords: [],
-    notes: [],
-    changeDate: newGedcomChangeDate(),
-    ...fieldsToUpdate,
-  };
 }

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { newGedcomDate } from "./gedcomDate";
 import {
   newGedcomFact,
   parseGedcomIndividualFact,
@@ -16,7 +17,7 @@ describe("gedcomEvent", () => {
     expect(gedcomEvent).toEqual(
       newGedcomFact({
         tag: "BIRT",
-        date: { value: "JAN 1 2025" },
+        date: newGedcomDate({ value: "JAN 1 2025" }),
       }),
     );
     expect(serializeGedcomIndividualFact(gedcomEvent)).toEqual(gedcomRecord);
@@ -38,7 +39,7 @@ describe("gedcomEvent", () => {
     expect(gedcomEvent).toEqual(
       newGedcomFact({
         tag: "DEAT",
-        date: { value: "JAN 1 2025" },
+        date: newGedcomDate({ value: "JAN 1 2025" }),
       }),
     );
     expect(serializeGedcomIndividualFact(gedcomEvent)).toEqual(gedcomRecord);
