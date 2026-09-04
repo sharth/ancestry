@@ -21,6 +21,6 @@ import { InputUnknownRecordsComponent } from "./input-unknown-records.component"
 })
 export class InputSourceComponent implements FormValueControl<GedcomSource> {
   readonly workingDatabase = input.required<AncestryDatabase>();
-  readonly value = model<GedcomSource>(newGedcomSource(""));
+  readonly value = model<GedcomSource>(newGedcomSource({ xref: "" }));
   readonly form = form(this.value);
 }

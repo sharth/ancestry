@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { parseGedcomRecords, type GedcomRecord } from "./gedcomRecord";
+import { newGedcomRecord, parseGedcomRecords } from "./gedcomRecord";
 import {
+  newGedcomSource,
   parseGedcomSource,
   serializeGedcomSource,
-  type GedcomSource,
 } from "./gedcomSource";
 
 function expectToBeDefined<T>(value: T | undefined): asserts value is T {
@@ -12,23 +12,14 @@ function expectToBeDefined<T>(value: T | undefined): asserts value is T {
 
 describe("GedcomSource", () => {
   it("no fields", () => {
-    const gedcomRecord: GedcomRecord = {
+    const gedcomRecord = newGedcomRecord({
       tag: "SOUR",
       abstag: "SOUR",
       xref: "@S1@",
-      value: "",
-      children: [],
-    };
-    const gedcomSource: GedcomSource = {
+    });
+    const gedcomSource = newGedcomSource({
       xref: "@S1@",
-      abbr: "",
-      title: "",
-      text: "",
-      repositoryLinks: [],
-      unknownRecords: [],
-      multimediaLinks: [],
-      changeDate: { date: { value: "" } },
-    };
+    });
     expect(parseGedcomSource(gedcomRecord)).toEqual(gedcomSource);
     expect(serializeGedcomSource(parseGedcomSource(gedcomRecord))).toEqual(
       gedcomRecord,
@@ -46,31 +37,26 @@ describe("GedcomSource", () => {
     ];
     const [gedcomRecord] = parseGedcomRecords(gedcomText.join("\n"));
     expectToBeDefined(gedcomRecord);
-    expect(parseGedcomSource(gedcomRecord)).toEqual({
-      xref: "@S2@",
-      abbr: "abbr",
-      title: "title",
-      text: "text and more text",
-      multimediaLinks: [],
-      repositoryLinks: [],
-      changeDate: { date: { value: "" } },
-      unknownRecords: [
-        {
-          tag: "_TMPLT",
-          abstag: "SOUR._TMPLT",
-          xref: "",
-          value: "",
-          children: [
-            {
-              tag: "TID",
-              abstag: "SOUR._TMPLT.TID",
-              xref: "",
-              value: "72",
-              children: [],
-            },
-          ],
-        },
-      ],
-    });
+    expect(parseGedcomSource(gedcomRecord)).toEqual(
+      newGedcomSource({
+        xref: "@S2@",
+        abbr: "abbr",
+        title: "title",
+        text: "text and more text",
+        unknownRecords: [
+          newGedcomRecord({
+            tag: "_TMPLT",
+            abstag: "SOUR._TMPLT",
+            children: [
+              newGedcomRecord({
+                tag: "TID",
+                abstag: "SOUR._TMPLT.TID",
+                value: "72",
+              }),
+            ],
+          }),
+        ],
+      }),
+    );
   });
 });

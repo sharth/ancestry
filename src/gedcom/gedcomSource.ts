@@ -1,5 +1,6 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import {
+  newGedcomChangeDate,
   parseGedcomChangeDate,
   serializeGedcomChangeDate,
   type GedcomChangeDate,
@@ -31,16 +32,18 @@ export interface GedcomSource {
   changeDate: GedcomChangeDate;
 }
 
-export function newGedcomSource(xref: string): GedcomSource {
+export function newGedcomSource(
+  fieldsToUpdate: Partial<GedcomSource> & Pick<GedcomSource, "xref">,
+): GedcomSource {
   return {
-    xref: xref,
     abbr: "",
     title: "",
     text: "",
     repositoryLinks: [],
     unknownRecords: [],
     multimediaLinks: [],
-    changeDate: { date: { value: "" } },
+    changeDate: newGedcomChangeDate(),
+    ...fieldsToUpdate,
   };
 }
 
@@ -49,7 +52,7 @@ export function parseGedcomSource(record: GedcomRecord): GedcomSource {
   if (record.xref == "") throw new Error();
   if (record.value != "") throw new Error();
 
-  const gedcomSource = newGedcomSource(record.xref);
+  const gedcomSource = newGedcomSource({ xref: record.xref });
 
   for (const childRecord of record.children) {
     switch (childRecord.tag) {

@@ -84,7 +84,7 @@ export class GedcomEditorSourceComponent {
     () => {
       return (
         this.workingDatabase().sources[this.xref()] ??
-        newGedcomSource(this.xref())
+        newGedcomSource({ xref: this.xref() })
       );
     },
     {
