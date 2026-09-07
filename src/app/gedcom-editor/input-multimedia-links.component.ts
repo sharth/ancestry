@@ -18,7 +18,10 @@ import {
 } from "@angular/forms/signals";
 import { RouterModule } from "@angular/router";
 import type { AncestryDatabase } from "../../database/ancestry.service";
-import type { GedcomMultimediaLink } from "../../gedcom/gedcomMultimediaLink";
+import {
+  newGedcomMultimediaLink,
+  type GedcomMultimediaLink,
+} from "../../gedcom/gedcomMultimediaLink";
 
 @Component({
   selector: "app-input-multimedia-links",
@@ -48,7 +51,7 @@ export class InputMultimediaLinksComponent implements FormValueControl<
   appendMultimediaLink() {
     this.value.update((multimediaLinks) => [
       ...multimediaLinks,
-      { xref: "", title: "" },
+      newGedcomMultimediaLink(),
     ]);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.newControls.add(this.form[this.form.length - 1]!);

@@ -16,7 +16,7 @@ import {
   type FormValueControl,
 } from "@angular/forms/signals";
 import type { AncestryDatabase } from "../../database/ancestry.service";
-import type { GedcomName } from "../../gedcom/gedcomName";
+import { newGedcomName, type GedcomName } from "../../gedcom/gedcomName";
 import { InputSourceCitationsComponent } from "./input-source-citations.component";
 
 @Component({
@@ -46,20 +46,7 @@ export class InputIndividualNamesComponent implements FormValueControl<
   >;
 
   appendName() {
-    this.value.update((names) => [
-      ...names,
-      {
-        prefix: "",
-        givenName: "",
-        nickName: "",
-        surnamePrefix: "",
-        surname: "",
-        suffix: "",
-        nameType: "",
-        citations: [],
-        notes: [],
-      },
-    ]);
+    this.value.update((names) => [...names, newGedcomName()]);
     this.newControls.add(this.form[this.form.length - 1]!);
     afterNextRender(
       {

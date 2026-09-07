@@ -10,6 +10,16 @@ export interface GedcomMultimediaLink {
   title: string;
 }
 
+export function newGedcomMultimediaLink(
+  fieldsToUpdate: Partial<GedcomMultimediaLink> = {},
+): GedcomMultimediaLink {
+  return {
+    xref: "",
+    title: "",
+    ...fieldsToUpdate,
+  };
+}
+
 export function parseGedcomMultimediaLink(
   record: GedcomRecord,
 ): GedcomMultimediaLink {
@@ -17,10 +27,9 @@ export function parseGedcomMultimediaLink(
   if (record.xref != "") throw new Error();
   if (record.value == "") throw new Error();
 
-  const gedcomMultimediaLink: GedcomMultimediaLink = {
+  const gedcomMultimediaLink = newGedcomMultimediaLink({
     xref: record.value,
-    title: "",
-  };
+  });
 
   for (const childRecord of record.children) {
     switch (childRecord.tag) {
