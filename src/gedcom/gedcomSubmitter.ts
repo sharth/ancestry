@@ -11,6 +11,16 @@ export interface GedcomSubmitter {
   email: string;
 }
 
+export function newGedcomSubmitter(
+  fieldsToUpdate: Partial<GedcomSubmitter> & Pick<GedcomSubmitter, "xref">,
+) {
+  return {
+    name: "",
+    email: "",
+    ...fieldsToUpdate,
+  };
+}
+
 export function parseGedcomSubmitter(
   gedcomRecord: GedcomRecord,
 ): GedcomSubmitter {
@@ -18,11 +28,9 @@ export function parseGedcomSubmitter(
   if (gedcomRecord.xref == "") throw new Error();
   if (gedcomRecord.value != "") throw new Error();
 
-  const gedcomSubmitter: GedcomSubmitter = {
+  const gedcomSubmitter = newGedcomSubmitter({
     xref: gedcomRecord.xref,
-    name: "",
-    email: "",
-  };
+  });
 
   for (const childRecord of gedcomRecord.children) {
     switch (childRecord.tag) {
