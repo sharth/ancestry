@@ -1,5 +1,5 @@
 import { Component, computed, input } from "@angular/core";
-import type { AncestryDatabase } from "../../database/ancestry.service";
+import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import {
   fullname,
   surname,
@@ -15,7 +15,7 @@ import { IndividualLinkComponent } from "../individual-link/individual-link.comp
   styleUrl: "./individuals.component.css",
 })
 export class IndividualsComponent {
-  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly ancestryDatabase = input.required<GedcomDatabase>();
 
   readonly vm = computed(() => {
     const ancestryDatabase = this.ancestryDatabase();

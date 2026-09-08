@@ -6,7 +6,7 @@ import {
   viewChild,
   type ElementRef,
 } from "@angular/core";
-import type { AncestryDatabase } from "../../database/ancestry.service";
+import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { GedcomEditorComponent } from "../gedcom-editor/gedcom-editor.component";
 
 @Component({
@@ -20,7 +20,7 @@ export class GedcomEditorDialogComponent {
 
   readonly xref = input<string>();
   readonly type = input.required<"INDI" | "SOUR" | "OBJE" | "REPO">();
-  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly ancestryDatabase = input.required<GedcomDatabase>();
 
   readonly editDialog =
     viewChild.required<ElementRef<HTMLDialogElement>>("editDialog");

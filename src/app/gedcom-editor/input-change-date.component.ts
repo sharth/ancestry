@@ -1,10 +1,10 @@
 import { Component, effect, input, model } from "@angular/core";
 import type { FormValueControl } from "@angular/forms/signals";
-import type { AncestryDatabase } from "../../database/ancestry.service";
 import {
   newGedcomChangeDate,
   type GedcomChangeDate,
 } from "../../gedcom/gedcomChangeDate";
+import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 
 @Component({
   selector: "app-input-change-date",
@@ -12,7 +12,7 @@ import {
   template: "",
 })
 export class InputChangeDateComponent implements FormValueControl<GedcomChangeDate> {
-  readonly workingDatabase = input.required<AncestryDatabase>();
+  readonly workingDatabase = input.required<GedcomDatabase>();
   readonly value = model<GedcomChangeDate>(newGedcomChangeDate());
 
   readonly changeDateEffect = effect(() => {

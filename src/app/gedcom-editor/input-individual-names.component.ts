@@ -15,7 +15,7 @@ import {
   type FieldTree,
   type FormValueControl,
 } from "@angular/forms/signals";
-import type { AncestryDatabase } from "../../database/ancestry.service";
+import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomName, type GedcomName } from "../../gedcom/gedcomName";
 import { InputSourceCitationsComponent } from "./input-source-citations.component";
 
@@ -30,7 +30,7 @@ export class InputIndividualNamesComponent implements FormValueControl<
 > {
   private readonly _injector = inject(Injector);
 
-  readonly workingDatabase = input.required<AncestryDatabase>();
+  readonly workingDatabase = input.required<GedcomDatabase>();
 
   // Set true to expand the details by default.
   readonly open = input<boolean>(false);

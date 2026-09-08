@@ -1,6 +1,6 @@
 import { Component, computed, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
-import type { AncestryDatabase } from "../../database/ancestry.service";
+import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { serializeGedcomRepository } from "../../gedcom/gedcomRepository";
 import { GedcomDisplayComponent } from "../gedcom-display/gedcom-display.component";
 import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
@@ -18,7 +18,7 @@ import { RepositorySourcesComponent } from "./repository-sources.component";
   styleUrl: "./repository.component.css",
 })
 export class RepositoryComponent {
-  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly ancestryDatabase = input.required<GedcomDatabase>();
   readonly xref = input.required<string>();
 
   readonly vm = computed(() => {

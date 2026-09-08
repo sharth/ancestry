@@ -1,7 +1,7 @@
 import { TestBed, type ComponentFixture } from "@angular/core/testing";
 import { provideRouter } from "@angular/router";
 import { beforeEach, describe, expect, it } from "vitest";
-import type { AncestryDatabase } from "../../database/ancestry.service";
+import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomDate } from "../../gedcom/gedcomDate";
 import { newGedcomFact } from "../../gedcom/gedcomFact";
 import { newGedcomFamily } from "../../gedcom/gedcomFamily";
@@ -21,7 +21,7 @@ describe("IndividualFactsComponent", () => {
     fixture = TestBed.createComponent(IndividualFactsComponent);
     component = fixture.componentInstance;
 
-    const mockDatabase: AncestryDatabase = {
+    const mockDatabase = newGedcomDatabase({
       individuals: {
         "@I1@": newGedcomIndividual({
           xref: "@I1@",
@@ -42,11 +42,7 @@ describe("IndividualFactsComponent", () => {
           husbandXref: "@I1@",
         }),
       },
-      sources: {},
-      repositories: {},
-      multimedias: {},
-      submitters: {},
-    };
+    });
 
     fixture.componentRef.setInput("ancestryDatabase", mockDatabase);
     fixture.componentRef.setInput("xref", "@I1@");

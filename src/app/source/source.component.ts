@@ -1,7 +1,6 @@
-import { Component, computed, input, viewChild } from "@angular/core";
+import { Component, computed, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
-import type { AncestryDatabase } from "../../database/ancestry.service";
-import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
+import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { serializeGedcomSource } from "../../gedcom/gedcomSource";
 import { GedcomDisplayComponent } from "../gedcom-display/gedcom-display.component";
 import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
@@ -25,7 +24,7 @@ import { SourceUnknownsComponent } from "./source-unknowns.component";
   ],
 })
 export class SourceComponent {
-  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly ancestryDatabase = input.required<GedcomDatabase>();
   readonly xref = input.required<string>();
 
   readonly vm = computed(() => {

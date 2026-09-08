@@ -12,7 +12,7 @@ import {
   type FieldTree,
   type FormValueControl,
 } from "@angular/forms/signals";
-import type { AncestryDatabase } from "../../database/ancestry.service";
+import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomFact, type GedcomFact } from "../../gedcom/gedcomFact";
 import { InputIndividualFactComponent } from "./input-individual-fact.component";
 
@@ -27,7 +27,7 @@ export class InputIndividualFactsComponent implements FormValueControl<
 > {
   private readonly _injector = inject(Injector);
 
-  readonly workingDatabase = input.required<AncestryDatabase>();
+  readonly workingDatabase = input.required<GedcomDatabase>();
   readonly open = input<boolean>(false);
   readonly value = model<GedcomFact[]>([]);
   readonly form = form(this.value);

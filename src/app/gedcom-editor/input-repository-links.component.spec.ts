@@ -6,7 +6,7 @@ import {
 import { provideRouter } from "@angular/router";
 import { userEvent } from "@testing-library/user-event";
 import { assert, beforeEach, describe, expect, it, vi } from "vitest";
-import type { AncestryDatabase } from "../../database/ancestry.service";
+import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { InputRepositoryLinksComponent } from "./input-repository-links.component";
 import { InputRepositoryXrefComponent } from "./input-repository-xref.component";
 
@@ -14,16 +14,11 @@ describe("InputRepositoryLinksComponent", () => {
   let fixture: ComponentFixture<InputRepositoryLinksComponent>;
   let component: InputRepositoryLinksComponent;
 
-  const mockDatabase: AncestryDatabase = {
-    individuals: {},
-    families: {},
-    sources: {},
-    multimedias: {},
-    submitters: {},
+  const mockDatabase = newGedcomDatabase({
     repositories: {
       R1: { xref: "R1", name: "Mock Repository 1" },
     },
-  };
+  });
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({

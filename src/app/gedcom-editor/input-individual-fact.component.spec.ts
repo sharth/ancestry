@@ -1,6 +1,6 @@
 import { TestBed, type ComponentFixture } from "@angular/core/testing";
 import { assert, beforeEach, describe, expect, it } from "vitest";
-import type { AncestryDatabase } from "../../database/ancestry.service";
+import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomFact } from "../../gedcom/gedcomFact";
 import { InputIndividualFactComponent } from "./input-individual-fact.component";
 
@@ -8,14 +8,7 @@ describe("InputIndividualFactComponent", () => {
   let fixture: ComponentFixture<InputIndividualFactComponent>;
   let component: InputIndividualFactComponent;
 
-  const mockDatabase: AncestryDatabase = {
-    individuals: {},
-    families: {},
-    sources: {},
-    multimedias: {},
-    submitters: {},
-    repositories: {},
-  };
+  const mockDatabase = newGedcomDatabase();
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({

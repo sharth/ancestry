@@ -3,48 +3,14 @@ import { toObservable } from "@angular/core/rxjs-interop";
 import { RedirectCommand, Router, type ResolveFn } from "@angular/router";
 import Dexie from "dexie";
 import { filter, firstValueFrom } from "rxjs";
-import { monthNames } from "../gedcom/gedcomDate";
 import {
-  parseGedcomFamily,
-  serializeGedcomFamily,
-  type GedcomFamily,
-} from "../gedcom/gedcomFamily";
-import { parseGedcomHeader, type GedcomHeader } from "../gedcom/gedcomHeader";
-import {
-  parseGedcomIndividual,
-  serializeGedcomIndividual,
-  type GedcomIndividual,
-} from "../gedcom/gedcomIndividual";
-import {
-  parseGedcomMultimedia,
-  serializeGedcomMultimedia,
-  type GedcomMultimedia,
-} from "../gedcom/gedcomMultimedia";
-import {
-  parseGedcomRecords,
-  serializeGedcomRecordToText,
-  type GedcomRecord,
-} from "../gedcom/gedcomRecord";
-import {
-  parseGedcomRepository,
-  serializeGedcomRepository,
-  type GedcomRepository,
-} from "../gedcom/gedcomRepository";
-import {
-  parseGedcomSource,
-  serializeGedcomSource,
-  type GedcomSource,
-} from "../gedcom/gedcomSource";
-import {
-  parseGedcomSubmitter,
-  serializeGedcomSubmitter,
-  type GedcomSubmitter,
-} from "../gedcom/gedcomSubmitter";
-import {
-  parseGedcomTrailer,
-  type GedcomTrailer,
-} from "../gedcom/gedcomTrailer";
-import { reportUnparsedRecord } from "../util/record-unparsed-records";
+  compareGedcomDatabase,
+  parseGedcomDatabase,
+  serializeGedcomDatabase,
+  type GedcomDatabase,
+} from "../gedcom/gedcomDatabase";
+import type { GedcomRecord} from "../gedcom/gedcomRecord";
+import { parseGedcomRecords } from "../gedcom/gedcomRecord";
 
 interface DatabaseState {
   id?: number;
@@ -111,7 +77,7 @@ export class AncestryService {
     },
   });
 
-  readonly ancestryDatabase = computed<AncestryDatabase | undefined>(() => {
+  readonly ancestryDatabase = computed<GedcomDatabase | undefined>(() => {
     const gedcomResourceValue = this.gedcomResource.value();
     if (
       gedcomResourceValue === undefined ||
@@ -120,207 +86,23 @@ export class AncestryService {
       return undefined;
     }
 
-    const headers = new Array<GedcomHeader>();
-    const trailers = new Array<GedcomTrailer>();
-    const submitters: Record<string, GedcomSubmitter> = {};
-    const individuals: Record<string, GedcomIndividual> = {};
-    const families: Record<string, GedcomFamily> = {};
-    const repositories: Record<string, GedcomRepository> = {};
-    const sources: Record<string, GedcomSource> = {};
-    const multimedias: Record<string, GedcomMultimedia> = {};
-
-    for (const gedcomRecord of gedcomResourceValue.gedcomRecords) {
-      switch (gedcomRecord.tag) {
-        case "HEAD":
-          headers.push(parseGedcomHeader(gedcomRecord));
-          break;
-        case "TRLR":
-          trailers.push(parseGedcomTrailer(gedcomRecord));
-          break;
-        case "SUBM": {
-          const submitter = parseGedcomSubmitter(gedcomRecord);
-          submitters[submitter.xref] = submitter;
-          break;
-        }
-        case "INDI": {
-          const individual = parseGedcomIndividual(gedcomRecord);
-          individuals[individual.xref] = individual;
-          break;
-        }
-        case "FAM": {
-          const family = parseGedcomFamily(gedcomRecord);
-          families[family.xref] = family;
-          break;
-        }
-        case "REPO": {
-          const repository = parseGedcomRepository(gedcomRecord);
-          repositories[repository.xref] = repository;
-          break;
-        }
-        case "SOUR": {
-          const source = parseGedcomSource(gedcomRecord);
-          sources[source.xref] = source;
-          break;
-        }
-        case "OBJE": {
-          const multimedia = parseGedcomMultimedia(gedcomRecord);
-          multimedias[multimedia.xref] = multimedia;
-          break;
-        }
-        default:
-          reportUnparsedRecord(gedcomRecord);
-          break;
-      }
-    }
-
-    // For whatever reason, GEDCOM has the family references in both the FAM and INDI.
-    // Ensure that these are consistent.
-    for (const family of Object.values(families)) {
-      if (family.husbandXref) {
-        const husband = individuals[family.husbandXref];
-        if (!husband) throw new Error();
-        if (!husband.parentOfFamilyXrefs.includes(family.xref))
-          throw new Error();
-      }
-      if (family.wifeXref) {
-        const wife = individuals[family.wifeXref];
-        if (!wife) throw new Error();
-        if (!wife.parentOfFamilyXrefs.includes(family.xref)) throw new Error();
-      }
-      for (const childXref of family.childXrefs) {
-        const child = individuals[childXref];
-        if (!child) throw new Error();
-        if (!child.childOfFamilyXrefs.includes(family.xref)) throw new Error();
-      }
-    }
-    for (const individual of Object.values(individuals)) {
-      for (const familyXref of individual.parentOfFamilyXrefs) {
-        const family = families[familyXref];
-        const parents = [family?.husbandXref, family?.wifeXref].filter(
-          (e) => e != null,
-        );
-        if (!family) throw new Error();
-        if (!parents.includes(individual.xref)) throw new Error();
-      }
-      for (const familyXref of individual.childOfFamilyXrefs) {
-        const family = families[familyXref];
-        if (!family) throw new Error();
-        if (!family.childXrefs.includes(individual.xref)) throw new Error();
-      }
-    }
-
-    return {
-      headers,
-      trailers,
-      individuals,
-      sources,
-      families,
-      repositories,
-      multimedias,
-      submitters,
-    };
+    return parseGedcomDatabase(gedcomResourceValue.gedcomRecords);
   });
 
-  compareGedcomDatabase(
-    ancestryDatabase: AncestryDatabase,
-  ): { canonicalRecord?: GedcomRecord; currentRecord?: GedcomRecord }[] {
+  compareGedcomDatabase(gedcomDatabase: GedcomDatabase): {
+    originalGedcomRecord?: GedcomRecord;
+    updatedGedcomRecord?: GedcomRecord;
+  }[] {
+    return compareGedcomDatabase(
+      this.gedcomResource.value()?.gedcomRecords ?? [],
+      gedcomDatabase,
+    );
+  }
+
+  async updateGedcomDatabase(gedcomDatabase: GedcomDatabase) {
     const gedcomResource = this.gedcomResource.value();
-
-    function hash(gedcomRecord: GedcomRecord) {
-      return `${gedcomRecord.tag} ${gedcomRecord.xref} ${gedcomRecord.value}`;
-    }
-    const recordMap = new Map<
-      string,
-      { canonicalRecord?: GedcomRecord; currentRecord?: GedcomRecord }
-    >();
-    gedcomResource?.gedcomRecords.forEach((gedcomRecord) => {
-      recordMap.set(hash(gedcomRecord), { canonicalRecord: gedcomRecord });
-    });
-
-    const now = new Date();
-    const day = now.getDate();
-    const month = monthNames[now.getMonth()];
-    const year = now.getFullYear();
-
-    [
-      {
-        tag: "HEAD",
-        abstag: "HEAD",
-        xref: "",
-        value: "",
-        children: [
-          {
-            tag: "GEDC",
-            abstag: "HEAD.GEDC",
-            xref: "",
-            value: "",
-            children: [
-              {
-                tag: "VERS",
-                abstag: "HEAD.GEDC.VERS",
-                xref: "",
-                value: "7.0.14",
-                children: [],
-              },
-            ],
-          },
-          {
-            tag: "SOUR",
-            abstag: "HEAD.SOUR",
-            xref: "",
-            value: "https://github.com/sharth/ancestry",
-            children: [],
-          },
-          {
-            tag: "DATE",
-            abstag: "HEAD.DATE",
-            xref: "",
-            value: `${day} ${month} ${year}`,
-            children: [],
-          },
-        ],
-      },
-      ...Object.values(ancestryDatabase.submitters).map((s) =>
-        serializeGedcomSubmitter(s),
-      ),
-      ...Object.values(ancestryDatabase.individuals).map((i) =>
-        serializeGedcomIndividual(i),
-      ),
-      ...Object.values(ancestryDatabase.families).map((f) =>
-        serializeGedcomFamily(f),
-      ),
-      ...Object.values(ancestryDatabase.sources).map((s) =>
-        serializeGedcomSource(s),
-      ),
-      ...Object.values(ancestryDatabase.repositories).map((r) =>
-        serializeGedcomRepository(r),
-      ),
-      ...Object.values(ancestryDatabase.multimedias).map((m) =>
-        serializeGedcomMultimedia(m),
-      ),
-      { tag: "TRLR", abstag: "TRLR", xref: "", value: "", children: [] },
-    ].forEach((gedcomRecord: GedcomRecord) => {
-      const h = hash(gedcomRecord);
-      const r = recordMap.get(h);
-      if (r === undefined) {
-        recordMap.set(h, { currentRecord: gedcomRecord });
-      } else {
-        r.currentRecord = gedcomRecord;
-      }
-    });
-
-    return recordMap.values().toArray();
-  }
-
-  serializeGedcomDatabase(ancestryDatabase: AncestryDatabase): string[] {
-    return this.compareGedcomDatabase(ancestryDatabase)
-      .map(({ currentRecord }) => currentRecord)
-      .filter((r) => r != null)
-      .flatMap((r) => serializeGedcomRecordToText(r));
-  }
-
-  async updateGedcomDatabase(ancestryDatabase: AncestryDatabase) {
-    const text = this.serializeGedcomDatabase(ancestryDatabase).join("\n");
+    const originalGedcomRecords = gedcomResource?.gedcomRecords ?? [];
+    const text = serializeGedcomDatabase(originalGedcomRecords, gedcomDatabase);
 
     const gedcomFileHandle = this.gedcomResource.value()?.gedcomFileHandle;
     if (gedcomFileHandle == undefined) {
@@ -328,7 +110,7 @@ export class AncestryService {
     }
 
     const writableStream = await gedcomFileHandle.createWritable();
-    await writableStream.write(text);
+    await writableStream.write(text.join("\n"));
     await writableStream.write("\n");
     await writableStream.close();
     this.gedcomResource.reload();
@@ -397,17 +179,8 @@ export class AncestryService {
   }
 }
 
-export interface AncestryDatabase {
-  submitters: Record<string, GedcomSubmitter>;
-  individuals: Record<string, GedcomIndividual>;
-  families: Record<string, GedcomFamily>;
-  sources: Record<string, GedcomSource>;
-  repositories: Record<string, GedcomRepository>;
-  multimedias: Record<string, GedcomMultimedia>;
-}
-
 export const ancestryDatabaseResolver: ResolveFn<
-  AncestryDatabase | RedirectCommand
+  GedcomDatabase | RedirectCommand
 > = async () => {
   const ancestryService = inject(AncestryService);
   const router = inject(Router);

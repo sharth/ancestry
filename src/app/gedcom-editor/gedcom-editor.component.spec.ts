@@ -3,10 +3,11 @@ import { TestBed, type ComponentFixture } from "@angular/core/testing";
 import { provideRouter } from "@angular/router";
 import { userEvent } from "@testing-library/user-event";
 import { assert, beforeEach, describe, expect, it, vi } from "vitest";
+import { AncestryService } from "../../database/ancestry.service";
 import {
-  AncestryService,
-  type AncestryDatabase,
-} from "../../database/ancestry.service";
+  newGedcomDatabase,
+  type GedcomDatabase,
+} from "../../gedcom/gedcomDatabase";
 import { newGedcomFamily } from "../../gedcom/gedcomFamily";
 import {
   newGedcomIndividual,
@@ -92,7 +93,7 @@ describe("GedcomEditorComponent Integration", () => {
     gedcomResource: any;
   };
 
-  const initialDatabase: AncestryDatabase = {
+  const initialDatabase = newGedcomDatabase({
     individuals: {
       "@I0@": newGedcomIndividual({
         xref: "@I0@",
@@ -107,11 +108,7 @@ describe("GedcomEditorComponent Integration", () => {
         husbandXref: "@I0@",
       }),
     },
-    sources: {},
-    multimedias: {},
-    submitters: {},
-    repositories: {},
-  };
+  });
 
   async function openDetails(details: HTMLDetailsElement) {
     details.open = true;
@@ -250,7 +247,7 @@ describe("GedcomEditorComponent Integration", () => {
     // Verify updateGedcomDatabase was called
     expect(mockAncestryService.updateGedcomDatabase).toHaveBeenCalled();
     const updatedDatabase = mockAncestryService.updateGedcomDatabase.mock
-      .calls[0][0] as AncestryDatabase;
+      .calls[0][0] as GedcomDatabase;
 
     // Check that John Doe exists
     const individuals = Object.values(updatedDatabase.individuals);

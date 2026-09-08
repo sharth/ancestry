@@ -9,10 +9,8 @@ import {
 } from "@angular/core";
 import { FormField, form } from "@angular/forms/signals";
 import { ActivatedRoute, Router } from "@angular/router";
-import {
-  AncestryService,
-  type AncestryDatabase,
-} from "../../database/ancestry.service";
+import { AncestryService } from "../../database/ancestry.service";
+import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import {
   newGedcomIndividual,
   type GedcomIndividual,
@@ -43,7 +41,7 @@ import { InputSourceComponent } from "./input-source.component";
 })
 export class GedcomEditorIndividualComponent {
   readonly xref = input.required<string>();
-  readonly workingDatabase = model.required<AncestryDatabase>();
+  readonly workingDatabase = model.required<GedcomDatabase>();
 
   readonly individual = linkedSignal<GedcomIndividual>(
     () => {
@@ -78,7 +76,7 @@ export class GedcomEditorIndividualComponent {
 })
 export class GedcomEditorSourceComponent {
   readonly xref = input.required<string>();
-  readonly workingDatabase = model.required<AncestryDatabase>();
+  readonly workingDatabase = model.required<GedcomDatabase>();
 
   readonly source = linkedSignal<GedcomSource>(
     () => {
@@ -113,7 +111,7 @@ export class GedcomEditorSourceComponent {
 })
 export class GedcomEditorRepositoryComponent {
   readonly xref = input.required<string>();
-  readonly workingDatabase = model.required<AncestryDatabase>();
+  readonly workingDatabase = model.required<GedcomDatabase>();
 
   readonly repository = linkedSignal<GedcomRepository>(
     () => {
@@ -148,7 +146,7 @@ export class GedcomEditorRepositoryComponent {
 })
 export class GedcomEditorMultimediaComponent {
   readonly xref = input.required<string>();
-  readonly workingDatabase = model.required<AncestryDatabase>();
+  readonly workingDatabase = model.required<GedcomDatabase>();
 
   readonly multimedia = linkedSignal<GedcomMultimedia>(
     () => {
@@ -192,10 +190,10 @@ export class GedcomEditorComponent {
 
   readonly xref = input<string>();
   readonly type = input.required<"INDI" | "SOUR" | "OBJE" | "REPO">();
-  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly ancestryDatabase = input.required<GedcomDatabase>();
   readonly finished = output();
 
-  readonly workingDatabase = linkedSignal<AncestryDatabase>(() =>
+  readonly workingDatabase = linkedSignal<GedcomDatabase>(() =>
     this.ancestryDatabase(),
   );
 
@@ -220,11 +218,11 @@ export class GedcomEditorComponent {
     this.ancestryService
       .compareGedcomDatabase(this.workingDatabase())
       .filter(
-        ({ canonicalRecord, currentRecord }) =>
-          canonicalRecord == undefined ||
-          currentRecord == undefined ||
-          serializeGedcomRecordToText(canonicalRecord).join("\n") !==
-            serializeGedcomRecordToText(currentRecord).join("\n"),
+        ({ originalGedcomRecord, updatedGedcomRecord }) =>
+          originalGedcomRecord == undefined ||
+          updatedGedcomRecord == undefined ||
+          serializeGedcomRecordToText(originalGedcomRecord).join("\n") !==
+            serializeGedcomRecordToText(updatedGedcomRecord).join("\n"),
       ),
   );
 

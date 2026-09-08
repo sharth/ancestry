@@ -13,7 +13,7 @@ import {
   type FormValueControl,
 } from "@angular/forms/signals";
 import { RouterModule } from "@angular/router";
-import type { AncestryDatabase } from "../../database/ancestry.service";
+import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import {
   newGedcomRepositoryLink,
   type GedcomRepositoryLink,
@@ -37,7 +37,7 @@ export class InputRepositoryLinksComponent implements FormValueControl<
 > {
   private readonly _injector = inject(Injector);
 
-  readonly workingDatabase = input.required<AncestryDatabase>();
+  readonly workingDatabase = input.required<GedcomDatabase>();
   readonly value = model<GedcomRepositoryLink[]>([]);
   readonly form = form(this.value);
 

@@ -1,5 +1,5 @@
 import { Component, computed, input } from "@angular/core";
-import type { AncestryDatabase } from "../../database/ancestry.service";
+import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { EventsTableComponent } from "../events-table/events-table.component";
 import { IndividualRelativesComponent } from "./individual-relatives.component";
 
@@ -10,7 +10,7 @@ import { IndividualRelativesComponent } from "./individual-relatives.component";
   styleUrl: "./individual.component.css",
 })
 export class IndividualFactsComponent {
-  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly ancestryDatabase = input.required<GedcomDatabase>();
   readonly xref = input.required<string>();
 
   readonly vm = computed(() => {

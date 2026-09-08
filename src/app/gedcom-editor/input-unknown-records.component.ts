@@ -1,6 +1,6 @@
 import { Component, input, model } from "@angular/core";
 import type { FormValueControl } from "@angular/forms/signals";
-import type { AncestryDatabase } from "../../database/ancestry.service";
+import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import {
   serializeGedcomRecordToText,
   type GedcomRecord,
@@ -15,7 +15,7 @@ import {
 export class InputUnknownRecordsComponent implements FormValueControl<
   GedcomRecord[]
 > {
-  readonly workingDatabase = input.required<AncestryDatabase>();
+  readonly workingDatabase = input.required<GedcomDatabase>();
   readonly open = input<boolean>(false);
   readonly value = model<GedcomRecord[]>([]);
 

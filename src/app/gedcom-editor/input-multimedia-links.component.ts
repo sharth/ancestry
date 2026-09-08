@@ -17,7 +17,7 @@ import {
   type FormValueControl,
 } from "@angular/forms/signals";
 import { RouterModule } from "@angular/router";
-import type { AncestryDatabase } from "../../database/ancestry.service";
+import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import {
   newGedcomMultimediaLink,
   type GedcomMultimediaLink,
@@ -33,7 +33,7 @@ export class InputMultimediaLinksComponent implements FormValueControl<
   GedcomMultimediaLink[]
 > {
   private readonly _injector = inject(Injector);
-  readonly workingDatabase = input.required<AncestryDatabase>();
+  readonly workingDatabase = input.required<GedcomDatabase>();
   readonly value = model<GedcomMultimediaLink[]>([]);
   readonly form = form(this.value);
 

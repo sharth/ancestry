@@ -1,6 +1,6 @@
 import { Component, input, model } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
-import type { AncestryDatabase } from "../../database/ancestry.service";
+import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomSource, type GedcomSource } from "../../gedcom/gedcomSource";
 import { InputChangeDateComponent } from "./input-change-date.component";
 import { InputMultimediaLinksComponent } from "./input-multimedia-links.component";
@@ -20,7 +20,7 @@ import { InputUnknownRecordsComponent } from "./input-unknown-records.component"
   styleUrl: "./input.component.css",
 })
 export class InputSourceComponent implements FormValueControl<GedcomSource> {
-  readonly workingDatabase = input.required<AncestryDatabase>();
+  readonly workingDatabase = input.required<GedcomDatabase>();
   readonly value = model<GedcomSource>(newGedcomSource({ xref: "" }));
   readonly form = form(this.value);
 }

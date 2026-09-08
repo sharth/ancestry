@@ -1,6 +1,6 @@
 import { Component, computed, input } from "@angular/core";
 import { RouterLink } from "@angular/router";
-import type { AncestryDatabase } from "../../database/ancestry.service";
+import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
 
 @Component({
@@ -10,7 +10,7 @@ import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-edit
   styleUrl: "./sources.component.css",
 })
 export class SourcesComponent {
-  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly ancestryDatabase = input.required<GedcomDatabase>();
 
   vm = computed(() => {
     const ancestryDatabase = this.ancestryDatabase();

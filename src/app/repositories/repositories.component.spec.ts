@@ -1,7 +1,7 @@
 import { TestBed, type ComponentFixture } from "@angular/core/testing";
 import { provideRouter } from "@angular/router";
 import { beforeEach, describe, expect, it } from "vitest";
-import type { AncestryDatabase } from "../../database/ancestry.service";
+import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { RepositoriesComponent } from "./repositories.component";
 
 describe("RepositoriesComponent", () => {
@@ -18,14 +18,7 @@ describe("RepositoriesComponent", () => {
     component = fixture.componentInstance;
 
     // Provide mock AncestryDatabase
-    const mockDatabase: AncestryDatabase = {
-      individuals: {},
-      families: {},
-      sources: {},
-      repositories: {},
-      multimedias: {},
-      submitters: {},
-    };
+    const mockDatabase = newGedcomDatabase();
     fixture.componentRef.setInput("ancestryDatabase", mockDatabase);
 
     fixture.detectChanges();

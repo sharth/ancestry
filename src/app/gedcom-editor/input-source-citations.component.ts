@@ -6,7 +6,7 @@ import {
   type QueryList,
 } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
-import type { AncestryDatabase } from "../../database/ancestry.service";
+import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import {
   newGedcomSourceCitation,
   type GedcomSourceCitation,
@@ -29,7 +29,7 @@ import { InputSourceXrefComponent } from "./input-source-xref.component";
 export class InputSourceCitationsComponent implements FormValueControl<
   GedcomSourceCitation[]
 > {
-  readonly workingDatabase = input.required<AncestryDatabase>();
+  readonly workingDatabase = input.required<GedcomDatabase>();
   readonly value = model<GedcomSourceCitation[]>([]);
   readonly form = form(this.value);
 

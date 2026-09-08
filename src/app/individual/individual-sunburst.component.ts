@@ -8,7 +8,7 @@ import {
 } from "@angular/core";
 import { RouterLink } from "@angular/router";
 import * as d3 from "d3";
-import type { AncestryDatabase } from "../../database/ancestry.service";
+import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { fullname, type GedcomIndividual } from "../../gedcom/gedcomIndividual";
 
 interface SunburstNode {
@@ -31,7 +31,7 @@ interface SunburstNode {
 })
 export class IndividualSunburstComponent {
   readonly individual = input.required<GedcomIndividual>();
-  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly ancestryDatabase = input.required<GedcomDatabase>();
 
   private readonly svgElement =
     viewChild.required<ElementRef<SVGSVGElement>>("svgElement");

@@ -1,14 +1,6 @@
-import {
-  Component,
-  ViewChildren,
-  afterNextRender,
-  input,
-  model,
-  type ElementRef,
-  type QueryList,
-} from "@angular/core";
+import { Component, input, model } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
-import type { AncestryDatabase } from "../../database/ancestry.service";
+import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomNote, type GedcomNote } from "../../gedcom/gedcomNote";
 
 @Component({
@@ -18,7 +10,7 @@ import { newGedcomNote, type GedcomNote } from "../../gedcom/gedcomNote";
   styleUrl: "./input.component.css",
 })
 export class InputNotesComponent implements FormValueControl<GedcomNote[]> {
-  readonly workingDatabase = input.required<AncestryDatabase>();
+  readonly workingDatabase = input.required<GedcomDatabase>();
   readonly value = model<GedcomNote[]>([]);
   readonly form = form(this.value);
   readonly open = input<boolean>(false);

@@ -1,6 +1,6 @@
 import { Component, input, model } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
-import type { AncestryDatabase } from "../../database/ancestry.service";
+import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import {
   newGedcomRepository,
   type GedcomRepository,
@@ -13,7 +13,7 @@ import {
   styleUrl: "./input.component.css",
 })
 export class InputRepositoryComponent implements FormValueControl<GedcomRepository> {
-  readonly workingDatabase = input.required<AncestryDatabase>();
+  readonly workingDatabase = input.required<GedcomDatabase>();
   readonly value = model<GedcomRepository>(newGedcomRepository({ xref: "" }));
   readonly form = form(this.value);
 }

@@ -11,7 +11,7 @@ import {
   type FieldTree,
   type FormValueControl,
 } from "@angular/forms/signals";
-import type { AncestryDatabase } from "../../database/ancestry.service";
+import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import type { GedcomFactSharedWith } from "../../gedcom/gedcomFact";
 import { InputIndividualXrefComponent } from "./input-individual-xref.component";
 
@@ -24,7 +24,7 @@ import { InputIndividualXrefComponent } from "./input-individual-xref.component"
 export class InputSharedWithComponent implements FormValueControl<
   GedcomFactSharedWith[]
 > {
-  readonly workingDatabase = input.required<AncestryDatabase>();
+  readonly workingDatabase = input.required<GedcomDatabase>();
   readonly value = model<GedcomFactSharedWith[]>([]);
   readonly form = form(this.value);
 

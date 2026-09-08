@@ -1,7 +1,7 @@
 import { Component, computed, input } from "@angular/core";
 import { MatTableModule } from "@angular/material/table";
 import { RouterModule } from "@angular/router";
-import type { AncestryDatabase } from "../../database/ancestry.service";
+import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { getFamilyMultimediaCitations } from "../../gedcom/gedcomFamily";
 import { getIndividualMultimediaCitations } from "../../gedcom/gedcomIndividual";
 import { IndividualLinkComponent } from "../individual-link/individual-link.component";
@@ -13,7 +13,7 @@ import { IndividualLinkComponent } from "../individual-link/individual-link.comp
   imports: [RouterModule, MatTableModule, IndividualLinkComponent],
 })
 export class MultimediaCitationsComponent {
-  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly ancestryDatabase = input.required<GedcomDatabase>();
   readonly xref = input.required<string>();
 
   readonly vm = computed(() => {

@@ -1,9 +1,7 @@
 import { Component, computed, inject, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
-import {
-  AncestryService,
-  type AncestryDatabase,
-} from "../../database/ancestry.service";
+import { AncestryService } from "../../database/ancestry.service";
+import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { serializeGedcomMultimedia } from "../../gedcom/gedcomMultimedia";
 import { GedcomDisplayComponent } from "../gedcom-display/gedcom-display.component";
 import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
@@ -24,7 +22,7 @@ import { MultimediaPreviewComponent } from "./multimedia-preview.component";
 })
 export class MultimediaComponent {
   readonly ancestryService = inject(AncestryService);
-  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly ancestryDatabase = input.required<GedcomDatabase>();
   readonly xref = input.required<string>();
 
   readonly vm = computed(() => {

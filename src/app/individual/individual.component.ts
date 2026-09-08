@@ -1,6 +1,6 @@
 import { Component, computed, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
-import type { AncestryDatabase } from "../../database/ancestry.service";
+import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { fullname } from "../../gedcom/gedcomIndividual";
 import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
 
@@ -12,7 +12,7 @@ import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-edit
 })
 export class IndividualComponent {
   readonly xref = input.required<string>();
-  readonly ancestryDatabase = input.required<AncestryDatabase>();
+  readonly ancestryDatabase = input.required<GedcomDatabase>();
 
   readonly vm = computed(() => {
     const ancestryDatabase = this.ancestryDatabase();

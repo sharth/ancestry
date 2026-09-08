@@ -1,9 +1,7 @@
 import { Component, inject, input, model } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
-import {
-  AncestryService,
-  type AncestryDatabase,
-} from "../../database/ancestry.service";
+import { AncestryService } from "../../database/ancestry.service";
+import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import {
   newGedcomMultimedia,
   type GedcomMultimedia,
@@ -17,7 +15,7 @@ import {
 })
 export class InputMultimediaComponent implements FormValueControl<GedcomMultimedia> {
   readonly ancestryService = inject(AncestryService);
-  readonly workingDatabase = input.required<AncestryDatabase>();
+  readonly workingDatabase = input.required<GedcomDatabase>();
   readonly value = model<GedcomMultimedia>(newGedcomMultimedia({ xref: "" }));
   readonly form = form(this.value);
 

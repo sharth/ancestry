@@ -1,6 +1,6 @@
 import { TestBed, type ComponentFixture } from "@angular/core/testing";
 import { assert, beforeEach, describe, it } from "vitest";
-import type { AncestryDatabase } from "../../database/ancestry.service";
+import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomIndividual } from "../../gedcom/gedcomIndividual";
 import { IndividualGedcomComponent } from "./individual-gedcom.component";
 
@@ -16,7 +16,7 @@ describe("IndividualGedcomComponent", () => {
     fixture = TestBed.createComponent(IndividualGedcomComponent);
     component = fixture.componentInstance;
 
-    const mockDatabase: AncestryDatabase = {
+    const mockDatabase: GedcomDatabase = {
       individuals: {
         "@I1@": newGedcomIndividual({ xref: "@I1@" }),
       },
