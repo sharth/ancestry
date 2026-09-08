@@ -41,14 +41,14 @@ export class InputRepositoryLinksComponent implements FormValueControl<
   readonly value = model<GedcomRepositoryLink[]>([]);
   readonly form = form(this.value);
 
-  // Keep track of the controls that were added by a user interation.
+  // Keep track of the controls that were added by a user interaction.
   readonly newControls = new WeakSet<FieldTree<GedcomRepositoryLink, number>>(
     [],
   );
 
   appendCitation() {
-    this.value.update((repostitoryLinks) => [
-      ...repostitoryLinks,
+    this.value.update((repositoryLinks) => [
+      ...repositoryLinks,
       newGedcomRepositoryLink(),
     ]);
     const newControl = this.form[this.form.length - 1]!;
