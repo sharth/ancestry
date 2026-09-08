@@ -237,3 +237,55 @@ function generateGedcomHeader(now = new Date()): GedcomHeader {
     }),
   };
 }
+
+export function calculateNextIndividualXref(
+  gedcomDatabase: GedcomDatabase,
+): string {
+  const nextIndex = Object.values(gedcomDatabase.individuals)
+    .map((individual) => /^@I(\d+)@/.exec(individual.xref))
+    .filter((match) => match != undefined)
+    .map((match) => match[1])
+    .filter((id) => id !== undefined)
+    .map((id) => parseInt(id))
+    .reduce((acc, index) => Math.max(acc, index + 1), 0);
+  return `@I${nextIndex}@`;
+}
+
+export function calculateNextSourceXref(
+  gedcomDatabase: GedcomDatabase,
+): string {
+  const nextIndex = Object.values(gedcomDatabase.sources)
+    .map((source) => /^@S(\d+)@/.exec(source.xref))
+    .filter((match) => match != undefined)
+    .map((match) => match[1])
+    .filter((id) => id !== undefined)
+    .map((id) => parseInt(id))
+    .reduce((acc, index) => Math.max(acc, index + 1), 0);
+  return `@S${nextIndex}@`;
+}
+
+export function calculateNextMultimediaXref(
+  gedcomDatabase: GedcomDatabase,
+): string {
+  const nextIndex = Object.values(gedcomDatabase.multimedias)
+    .map((multimedia) => /^@M(\d+)@/.exec(multimedia.xref))
+    .filter((match) => match != undefined)
+    .map((match) => match[1])
+    .filter((id) => id !== undefined)
+    .map((id) => parseInt(id))
+    .reduce((acc, index) => Math.max(acc, index + 1), 0);
+  return `@M${nextIndex}@`;
+}
+
+export function calculateNextRepositoryXref(
+  gedcomDatabase: GedcomDatabase,
+): string {
+  const nextIndex = Object.values(gedcomDatabase.repositories)
+    .map((repository) => /^@R(\d+)@/.exec(repository.xref))
+    .filter((match) => match != undefined)
+    .map((match) => match[1])
+    .filter((id) => id !== undefined)
+    .map((id) => parseInt(id))
+    .reduce((acc, index) => Math.max(acc, index + 1), 0);
+  return `@R${nextIndex}@`;
+}

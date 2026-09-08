@@ -10,7 +10,13 @@ import {
 import { FormField, form } from "@angular/forms/signals";
 import { ActivatedRoute, Router } from "@angular/router";
 import { AncestryService } from "../../database/ancestry.service";
-import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
+import {
+  calculateNextIndividualXref,
+  calculateNextMultimediaXref,
+  calculateNextRepositoryXref,
+  calculateNextSourceXref,
+  type GedcomDatabase,
+} from "../../gedcom/gedcomDatabase";
 import {
   newGedcomIndividual,
   type GedcomIndividual,
@@ -204,13 +210,13 @@ export class GedcomEditorComponent {
     const database = this.ancestryDatabase();
     switch (this.type()) {
       case "INDI":
-        return calculateNextIndividualXref(database.individuals);
+        return calculateNextIndividualXref(database);
       case "SOUR":
-        return calculateNextSourceXref(database.sources);
+        return calculateNextSourceXref(database);
       case "OBJE":
-        return calculateNextMultimediaXref(database.multimedias);
+        return calculateNextMultimediaXref(database);
       case "REPO":
-        return calculateNextRepositoryXref(database.repositories);
+        return calculateNextRepositoryXref(database);
     }
   });
 
@@ -240,56 +246,4 @@ export class GedcomEditorComponent {
   cancelForm() {
     this.finished.emit();
   }
-}
-
-export function calculateNextIndividualXref(
-  individuals: Record<string, GedcomIndividual>,
-): string {
-  const nextIndex = Object.values(individuals)
-    .map((individual) => /^@I(\d+)@/.exec(individual.xref))
-    .filter((match) => match != undefined)
-    .map((match) => match[1])
-    .filter((id) => id !== undefined)
-    .map((id) => parseInt(id))
-    .reduce((acc, index) => Math.max(acc, index + 1), 0);
-  return `@I${nextIndex}@`;
-}
-
-export function calculateNextSourceXref(
-  sources: Record<string, GedcomSource>,
-): string {
-  const nextIndex = Object.values(sources)
-    .map((source) => /^@S(\d+)@/.exec(source.xref))
-    .filter((match) => match != undefined)
-    .map((match) => match[1])
-    .filter((id) => id !== undefined)
-    .map((id) => parseInt(id))
-    .reduce((acc, index) => Math.max(acc, index + 1), 0);
-  return `@S${nextIndex}@`;
-}
-
-export function calculateNextMultimediaXref(
-  multimedias: Record<string, GedcomMultimedia>,
-): string {
-  const nextIndex = Object.values(multimedias)
-    .map((multimedia) => /^@M(\d+)@/.exec(multimedia.xref))
-    .filter((match) => match != undefined)
-    .map((match) => match[1])
-    .filter((id) => id !== undefined)
-    .map((id) => parseInt(id))
-    .reduce((acc, index) => Math.max(acc, index + 1), 0);
-  return `@M${nextIndex}@`;
-}
-
-export function calculateNextRepositoryXref(
-  repositories: Record<string, GedcomRepository>,
-): string {
-  const nextIndex = Object.values(repositories)
-    .map((repository) => /^@R(\d+)@/.exec(repository.xref))
-    .filter((match) => match != undefined)
-    .map((match) => match[1])
-    .filter((id) => id !== undefined)
-    .map((id) => parseInt(id))
-    .reduce((acc, index) => Math.max(acc, index + 1), 0);
-  return `@R${nextIndex}@`;
 }

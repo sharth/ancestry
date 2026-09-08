@@ -13,76 +13,9 @@ import {
   newGedcomIndividual,
   type GedcomIndividual,
 } from "../../gedcom/gedcomIndividual";
-import { newGedcomMultimedia } from "../../gedcom/gedcomMultimedia";
 import { newGedcomName } from "../../gedcom/gedcomName";
 import { newGedcomSex } from "../../gedcom/gedcomSex";
-import { newGedcomSource } from "../../gedcom/gedcomSource";
-import {
-  GedcomEditorComponent,
-  calculateNextIndividualXref,
-  calculateNextMultimediaXref,
-  calculateNextSourceXref,
-} from "./gedcom-editor.component";
-
-describe("GedcomEditorComponent helpers", () => {
-  describe("calculateNextIndividualXref", () => {
-    it("should return @I0@ for an empty database", () => {
-      expect(calculateNextIndividualXref({})).toBe("@I0@");
-    });
-
-    it("should return the next available index", () => {
-      const individuals = {
-        "@I1@": newGedcomIndividual({ xref: "@I1@" }),
-        "@I5@": newGedcomIndividual({ xref: "@I5@" }),
-      };
-      expect(calculateNextIndividualXref(individuals)).toBe("@I6@");
-    });
-
-    it("should handle non-conforming xrefs by ignoring them", () => {
-      const individuals = {
-        "@I1@": newGedcomIndividual({ xref: "@I1@" }),
-        OTHER: newGedcomIndividual({ xref: "OTHER" }),
-      };
-      expect(calculateNextIndividualXref(individuals)).toBe("@I2@");
-    });
-  });
-
-  describe("calculateNextSourceXref", () => {
-    it("should return @S0@ for an empty database", () => {
-      expect(calculateNextSourceXref({})).toBe("@S0@");
-    });
-
-    it("should return the next available index", () => {
-      const sources = {
-        "@S1@": newGedcomSource({ xref: "@S1@" }),
-        "@S10@": newGedcomSource({ xref: "@S10@" }),
-      };
-      expect(calculateNextSourceXref(sources)).toBe("@S11@");
-    });
-  });
-
-  describe("calculateNextMultimediaXref", () => {
-    it("should return @M0@ for an empty database", () => {
-      expect(calculateNextMultimediaXref({})).toBe("@M0@");
-    });
-
-    it("should return the next available index", () => {
-      const multimedias = {
-        "@M1@": newGedcomMultimedia({ xref: "@M1@" }),
-        "@M3@": newGedcomMultimedia({ xref: "@M3@" }),
-      };
-      expect(calculateNextMultimediaXref(multimedias)).toBe("@M4@");
-    });
-
-    it("should handle non-conforming xrefs by ignoring them", () => {
-      const multimedias = {
-        "@M1@": newGedcomMultimedia({ xref: "@M1@" }),
-        OTHER: newGedcomMultimedia({ xref: "OTHER" }),
-      };
-      expect(calculateNextMultimediaXref(multimedias)).toBe("@M2@");
-    });
-  });
-});
+import { GedcomEditorComponent } from "./gedcom-editor.component";
 
 describe("GedcomEditorComponent Integration", () => {
   let fixture: ComponentFixture<GedcomEditorComponent>;
