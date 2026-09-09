@@ -10,13 +10,19 @@
       <td class="old-gedcom">
         @for (difference of differences(); track $index) {
           @let class = difference.identical ? "identical" : "different";
-          <div class="{{ class }}">{{ difference.lhs || "&nbsp;" }}</div>
+          @let indent = difference.lhs && /^\d+/.exec(difference.lhs)?.[0];
+          <div class="{{ class }}" [attr.data-indent]="indent">
+            {{ difference.lhs || "&nbsp;" }}
+          </div>
         }
       </td>
       <td class="new-gedcom">
         @for (difference of differences(); track $index) {
           @let class = difference.identical ? "identical" : "different";
-          <div class="{{ class }}">{{ difference.rhs || "&nbsp;" }}</div>
+          @let indent = difference.rhs && /^\d+/.exec(difference.rhs)?.[0];
+          <div class="{{ class }}" [attr.data-indent]="indent">
+            {{ difference.rhs || "&nbsp;" }}
+          </div>
         }
       </td>
     </tr>

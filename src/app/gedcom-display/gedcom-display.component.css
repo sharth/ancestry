@@ -5,7 +5,7 @@
 
 pre {
   margin: 0;
-  padding-left: attr(data-level em);
+  padding-left: attr(data-indent em);
   overflow-x: visible;
   width: max-content;
   min-width: 100%;

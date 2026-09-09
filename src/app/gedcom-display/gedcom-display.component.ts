@@ -13,9 +13,6 @@ import {
 export class GedcomDisplayComponent {
   readonly gedcomRecord = input.required<GedcomRecord>();
   readonly serializedGedcom = computed(() =>
-    serializeGedcomRecordToText(this.gedcomRecord()).map((line) => ({
-      text: line,
-      level: /^\d+/.exec(line)?.[0],
-    })),
+    serializeGedcomRecordToText(this.gedcomRecord()),
   );
 }

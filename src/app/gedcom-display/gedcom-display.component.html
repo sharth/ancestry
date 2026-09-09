@@ -1,5 +1,6 @@
 <div class="gedcom-display">
   @for (line of serializedGedcom(); track $index) {
-    <pre [attr.data-level]="line.level">{{ line.text }}</pre>
+    @let indent = /^\d+/.exec(line)?.[0];
+    <pre [attr.data-indent]="indent">{{ line }}</pre>
   }
 </div>
