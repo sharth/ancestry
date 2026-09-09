@@ -41,7 +41,7 @@ export class InputMultimediaLinksComponent implements FormValueControl<
     Object.values(this.workingDatabase().multimedias),
   );
 
-  // Keep track of the controls that were added by a user interation.
+  // Keep track of the controls that were added by a user interaction.
   readonly newControls = new WeakSet<FieldTree<GedcomMultimediaLink, number>>();
 
   @ViewChildren("focusTarget") private focusTargets!: QueryList<
