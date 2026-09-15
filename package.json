@@ -37,7 +37,7 @@
     "@types/d3": "^7.4.3",
     "@types/wicg-file-system-access": "^2023.10.7",
     "@vitest/browser-playwright": "^4.1.11",
-    "angular-eslint": "^22.4.0",
+    "angular-eslint": "^22.5.0",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
     "d3": "^7.9.0",
@@ -51,7 +51,7 @@
     "prettier": "^3.9.6",
     "true-myth": "^9.4.0",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.69.0",
+    "typescript-eslint": "^8.70.0",
     "uuid": "^14.0.2",
     "vest": "^6.3.2",
     "vitest": "^4.0.13"
