@@ -38,8 +38,8 @@ describe("GedcomDisplayComponent", () => {
     const pres = element.querySelectorAll("pre");
     expect(pres.length).toBe(2);
     expect(pres[0]!.textContent).toBe("0 @R1@ REPO"); // eslint-disable-line @typescript-eslint/no-non-null-assertion
-    expect(pres[0]!.getAttribute("data-level")).toBe("0"); // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    expect(pres[0]!.getAttribute("data-indent")).toBe("0"); // eslint-disable-line @typescript-eslint/no-non-null-assertion
     expect(pres[1]!.textContent).toBe("1 NAME Test Repository"); // eslint-disable-line @typescript-eslint/no-non-null-assertion
-    expect(pres[1]!.getAttribute("data-level")).toBe("1"); // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    expect(pres[1]!.getAttribute("data-indent")).toBe("1"); // eslint-disable-line @typescript-eslint/no-non-null-assertion
   });
 });

@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
+import { newGedcomDatabase } from "../gedcom/gedcomDatabase";
+import { newGedcomIndividual } from "../gedcom/gedcomIndividual";
+import { newGedcomMultimedia } from "../gedcom/gedcomMultimedia";
+import { newGedcomSource } from "../gedcom/gedcomSource";
 import {
   calculateNextIndividualXref,
   calculateNextMultimediaXref,
   calculateNextSourceXref,
-  newGedcomDatabase,
-} from "./gedcomDatabase";
-import { newGedcomIndividual } from "./gedcomIndividual";
-import { newGedcomMultimedia } from "./gedcomMultimedia";
-import { newGedcomSource } from "./gedcomSource";
+} from "./next-xref";
 
 describe("GedcomEditorComponent helpers", () => {
   describe("calculateNextIndividualXref", () => {

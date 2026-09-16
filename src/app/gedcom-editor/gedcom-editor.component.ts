@@ -10,13 +10,7 @@ import {
 import { FormField, form } from "@angular/forms/signals";
 import { ActivatedRoute, Router } from "@angular/router";
 import { AncestryService } from "../../database/ancestry.service";
-import {
-  calculateNextIndividualXref,
-  calculateNextMultimediaXref,
-  calculateNextRepositoryXref,
-  calculateNextSourceXref,
-  type GedcomDatabase,
-} from "../../gedcom/gedcomDatabase";
+import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import {
   newGedcomIndividual,
   type GedcomIndividual,
@@ -31,6 +25,12 @@ import {
   type GedcomRepository,
 } from "../../gedcom/gedcomRepository";
 import { newGedcomSource, type GedcomSource } from "../../gedcom/gedcomSource";
+import {
+  calculateNextIndividualXref,
+  calculateNextMultimediaXref,
+  calculateNextRepositoryXref,
+  calculateNextSourceXref,
+} from "../../util/next-xref";
 import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
 import { InputIndividualComponent } from "./input-individual.component";
 import { InputMultimediaComponent } from "./input-multimedia.component";
