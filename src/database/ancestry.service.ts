@@ -9,8 +9,7 @@ import {
   serializeGedcomDatabase,
   type GedcomDatabase,
 } from "../gedcom/gedcomDatabase";
-import type { GedcomRecord} from "../gedcom/gedcomRecord";
-import { parseGedcomRecords } from "../gedcom/gedcomRecord";
+import { parseGedcomRecords, type GedcomRecord } from "../gedcom/gedcomRecord";
 
 interface DatabaseState {
   id?: number;
