@@ -1,14 +1,14 @@
 import { TestBed, type ComponentFixture } from "@angular/core/testing";
 import { beforeEach, describe, expect, it } from "vitest";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
-import { RepositoriesComponent } from "./repositories.component";
+import { SourcesComponent } from "./sources.component";
 
 describe("RepositoriesComponent", () => {
-  let component: RepositoriesComponent;
-  let fixture: ComponentFixture<RepositoriesComponent>;
+  let component: SourcesComponent;
+  let fixture: ComponentFixture<SourcesComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(RepositoriesComponent);
+    fixture = TestBed.createComponent(SourcesComponent);
     component = fixture.componentInstance;
 
     fixture.componentRef.setInput("ancestryDatabase", newGedcomDatabase());
