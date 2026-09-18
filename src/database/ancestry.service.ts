@@ -115,17 +115,7 @@ export class AncestryService {
     this.gedcomResource.reload();
   }
 
-  async openGedcom() {
-    const [fileHandle] = await window.showOpenFilePicker({
-      types: [
-        {
-          description: "Gedcom",
-          accept: {
-            "text/plain": [".ged"],
-          },
-        },
-      ],
-    });
+  async openGedcom(fileHandle: FileSystemFileHandle) {
     await this.dexieDatabase.transaction(
       "rw",
       this.dexieDatabase.metadata,
@@ -141,11 +131,7 @@ export class AncestryService {
     console.log("Parsing complete");
   }
 
-  async openMultimedia() {
-    const directoryHandle = await window.showDirectoryPicker({
-      id: "multimedia",
-      mode: "read",
-    });
+  async openMultimedia(directoryHandle: FileSystemDirectoryHandle) {
     await this.dexieDatabase.transaction(
       "rw",
       this.dexieDatabase.metadata,

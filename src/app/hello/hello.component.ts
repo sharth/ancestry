@@ -16,7 +16,15 @@ export class HelloComponent {
 
   async openGedcom() {
     try {
-      await this.ancestryService.openGedcom();
+      const [fileHandle] = await window.showOpenFilePicker({
+        types: [
+          {
+            description: "Gedcom",
+            accept: { "text/plain": [".ged"] },
+          },
+        ],
+      });
+      await this.ancestryService.openGedcom(fileHandle);
       // If successful, we can optionally navigate or just let the user see the file is loaded.
       // The user request says: "If a gedcom file is loaded, perhaps we should ask the user if they would like to load a new file on this page."
       // But also "If no gedcom file is loaded, we should always redirect the user to the /hello page."
@@ -32,7 +40,11 @@ export class HelloComponent {
 
   async openMultimedia() {
     try {
-      await this.ancestryService.openMultimedia();
+      const directoryHandle = await window.showDirectoryPicker({
+        id: "multimedia",
+        mode: "read",
+      });
+      await this.ancestryService.openMultimedia(directoryHandle);
     } catch (err) {
       console.error(err);
     }
