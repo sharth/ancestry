@@ -14,15 +14,11 @@ describe("InputRepositoryXrefComponent", () => {
   });
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [InputRepositoryXrefComponent],
-    }).compileComponents();
-
     fixture = TestBed.createComponent(InputRepositoryXrefComponent);
     component = fixture.componentInstance;
     fixture.componentRef.setInput("workingDatabase", mockDatabase);
     fixture.componentRef.setInput("value", "R1");
-    fixture.detectChanges();
+    await fixture.whenStable();
   });
 
   it("should create", () => {

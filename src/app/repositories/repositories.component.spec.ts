@@ -7,12 +7,12 @@ describe("RepositoriesComponent", () => {
   let component: RepositoriesComponent;
   let fixture: ComponentFixture<RepositoriesComponent>;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     fixture = TestBed.createComponent(RepositoriesComponent);
     component = fixture.componentInstance;
 
     fixture.componentRef.setInput("ancestryDatabase", newGedcomDatabase());
-    fixture.detectChanges();
+    await fixture.whenStable();
   });
 
   it("should create", () => {

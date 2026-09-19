@@ -8,7 +8,7 @@ describe("RepositoryComponent", () => {
   let component: RepositoryComponent;
   let fixture: ComponentFixture<RepositoryComponent>;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     fixture = TestBed.createComponent(RepositoryComponent);
     component = fixture.componentInstance;
 
@@ -24,7 +24,7 @@ describe("RepositoryComponent", () => {
       }),
     );
     fixture.componentRef.setInput("xref", "@R1@");
-    fixture.detectChanges();
+    await fixture.whenStable();
   });
 
   it("should create", () => {

@@ -8,10 +8,6 @@ describe("GedcomDisplayComponent", () => {
   let fixture: ComponentFixture<GedcomDisplayComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [GedcomDisplayComponent],
-    }).compileComponents();
-
     fixture = TestBed.createComponent(GedcomDisplayComponent);
     component = fixture.componentInstance;
 
@@ -23,7 +19,7 @@ describe("GedcomDisplayComponent", () => {
         children: [newGedcomRecord({ tag: "NAME", value: "Test Repository" })],
       }),
     );
-    fixture.detectChanges();
+    await fixture.whenStable();
   });
 
   it("should create", () => {

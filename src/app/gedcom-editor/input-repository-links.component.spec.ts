@@ -30,7 +30,7 @@ describe("InputRepositoryLinksComponent", () => {
     component = fixture.componentInstance;
     fixture.componentRef.setInput("workingDatabase", mockDatabase);
     fixture.componentRef.setInput("value", []);
-    fixture.detectChanges();
+    await fixture.whenStable();
   });
 
   it("should create", () => {
@@ -51,7 +51,7 @@ describe("InputRepositoryLinksComponent", () => {
     const deferBlocks = await fixture.getDeferBlocks();
     assert.isAtLeast(deferBlocks.length, 1);
     await deferBlocks[0]!.render(DeferBlockState.Complete);
-    fixture.detectChanges();
+    await fixture.whenStable();
 
     // Now details lookalike button should be rendered. Let's find it.
     const addButton = containerDetails.querySelector(

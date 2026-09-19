@@ -46,7 +46,7 @@ describe("IndividualFactsComponent", () => {
 
     fixture.componentRef.setInput("ancestryDatabase", mockDatabase);
     fixture.componentRef.setInput("xref", "@I1@");
-    fixture.detectChanges();
+    await fixture.whenStable();
   });
 
   it("should create", () => {

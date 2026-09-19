@@ -11,15 +11,11 @@ describe("InputIndividualFactComponent", () => {
   const mockDatabase = newGedcomDatabase();
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [InputIndividualFactComponent],
-    }).compileComponents();
-
     fixture = TestBed.createComponent(InputIndividualFactComponent);
     component = fixture.componentInstance;
     fixture.componentRef.setInput("workingDatabase", mockDatabase);
     fixture.componentRef.setInput("value", newGedcomFact());
-    fixture.detectChanges();
+    await fixture.whenStable();
   });
 
   it("should create", () => {

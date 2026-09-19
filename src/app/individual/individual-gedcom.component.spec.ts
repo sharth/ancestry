@@ -9,10 +9,6 @@ describe("IndividualGedcomComponent", () => {
   let fixture: ComponentFixture<IndividualGedcomComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [IndividualGedcomComponent],
-    }).compileComponents();
-
     fixture = TestBed.createComponent(IndividualGedcomComponent);
     component = fixture.componentInstance;
 
@@ -29,7 +25,7 @@ describe("IndividualGedcomComponent", () => {
 
     fixture.componentRef.setInput("ancestryDatabase", mockDatabase);
     fixture.componentRef.setInput("xref", "@I1@");
-    fixture.detectChanges();
+    await fixture.whenStable();
   });
 
   it("should create", () => {
