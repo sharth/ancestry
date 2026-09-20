@@ -2,6 +2,7 @@
   <summary>Multimedia ({{ form.length }})</summary>
   @defer (when container.open) {
     @for (multimediaLink of form; track multimediaLink) {
+      @let mediaXref = multimediaLink.xref().value();
       <details [open]="newControls.has(multimediaLink)">
         <summary>
           <button
@@ -10,25 +11,45 @@
             aria-label="Remove multimedia link"
             (click)="removeMultimediaLink($index)"
           ></button>
-          {{
-            multimediaLink.title().value() ||
-              multimediaLink.xref().value() ||
-              "Untitled"
-          }}
+          {{ multimediaLink.title().value() || mediaXref || "Untitled" }}
         </summary>
-        <div class="form-floating">
-          <select
-            #focusTarget
-            class="form-select"
-            [formField]="multimediaLink.xref"
-          >
-            <option selected value="">Multimedia...</option>
-            @for (multimedia of multimedias(); track multimedia.xref) {
-              <option value="{{ multimedia.xref }}">
-                {{ multimedia.xref }}
-              </option>
+        <div class="d-flex gap-2 align-items-center mb-2">
+          <div class="form-floating flex-grow-1">
+            <select
+              #focusTarget
+              id="media_{{ $index }}"
+              class="form-select"
+              [formField]="multimediaLink.xref"
+            >
+              <option selected value="">Multimedia...</option>
+              @for (multimedia of multimedias(); track multimedia.xref) {
+                <option value="{{ multimedia.xref }}">
+                  {{ multimedia.title || multimedia.xref }}
+                </option>
+              }
+            </select>
+            <label for="media_{{ $index }}">Multimedia Record</label>
+          </div>
+          @if (gedcomEditor) {
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-primary text-nowrap"
+              /* (click)="createNewMultimedia($index)" */
+              title="Create a new multimedia record and open in tab"
+            >
+              <i class="bi bi-plus"></i> New
+            </button>
+            @if (mediaXref) {
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary text-nowrap"
+                /* (click)="openMultimediaInSession(mediaXref)" */
+                title="Edit multimedia in a session tab"
+              >
+                <i class="bi bi-pencil"></i> Edit
+              </button>
             }
-          </select>
+          }
         </div>
         <div class="form-floating">
           <input

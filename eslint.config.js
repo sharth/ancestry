@@ -34,6 +34,11 @@ export default defineConfig([
         { allowConstantLoopConditions: "only-allowed-literals" },
       ],
       "@typescript-eslint/no-unnecessary-type-arguments": "off",
+      "@typescript-eslint/prefer-nullish-coalescing": [
+        "error",
+        { ignorePrimitives: true },
+      ],
+      "@typescript-eslint/switch-exhaustiveness-check": "error",
       "@angular-eslint/directive-selector": [
         "error",
         { type: "attribute", prefix: "app", style: "camelCase" },

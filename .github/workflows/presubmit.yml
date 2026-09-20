@@ -16,5 +16,6 @@ jobs:
           node-version: "22"
           cache: "npm"
       - run: npm clean-install
+      - run: npx playwright install chromium --with-deps
       - run: npx @angular/cli build
       - run: npx @angular/cli test --no-progress --no-watch

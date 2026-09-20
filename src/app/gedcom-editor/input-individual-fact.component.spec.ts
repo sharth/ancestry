@@ -8,12 +8,10 @@ describe("InputIndividualFactComponent", () => {
   let fixture: ComponentFixture<InputIndividualFactComponent>;
   let component: InputIndividualFactComponent;
 
-  const mockDatabase = newGedcomDatabase();
-
   beforeEach(async () => {
     fixture = TestBed.createComponent(InputIndividualFactComponent);
     component = fixture.componentInstance;
-    fixture.componentRef.setInput("workingDatabase", mockDatabase);
+    fixture.componentRef.setInput("workingDatabase", newGedcomDatabase());
     fixture.componentRef.setInput("value", newGedcomFact());
     await fixture.whenStable();
   });
@@ -28,7 +26,6 @@ describe("InputIndividualFactComponent", () => {
     assert.isOk(tagSelect);
 
     component.focus();
-
     expect(document.activeElement).toBe(tagSelect);
   });
 });

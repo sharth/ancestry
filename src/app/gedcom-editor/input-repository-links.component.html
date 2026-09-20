@@ -16,10 +16,34 @@
               "Unknown repository"
           }}
         </summary>
-        <app-input-repository-xref
-          [formField]="formGroup.repositoryXref"
-          [workingDatabase]="workingDatabase()"
-        ></app-input-repository-xref>
+        <div class="d-flex gap-2 align-items-center mb-2">
+          <div class="flex-grow-1">
+            <app-input-repository-xref
+              [formField]="formGroup.repositoryXref"
+              [workingDatabase]="workingDatabase()"
+            ></app-input-repository-xref>
+          </div>
+          @if (gedcomEditor) {
+            <!-- <button
+              type="button"
+              class="btn btn-sm btn-outline-primary text-nowrap"
+              (click)="createNewRepository($index)"
+              title="Create a new repository and open in tab"
+            >
+              <i class="bi bi-plus"></i> New
+            </button>
+            @if (repositoryXref) {
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary text-nowrap"
+                /* (click)="openRepositoryInSession(repositoryXref)" */
+                title="Edit repository in a session tab"
+              >
+                <i class="bi bi-pencil"></i> Edit
+              </button>
+            } -->
+          }
+        </div>
         <app-input-repository-call-number
           [formField]="formGroup.callNumber"
           [workingDatabase]="workingDatabase()"

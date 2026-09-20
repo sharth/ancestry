@@ -1,0 +1,12 @@
+.add-to-session-details summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.add-to-session-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.working-set-tabs {
+  overflow-x: auto;
+}

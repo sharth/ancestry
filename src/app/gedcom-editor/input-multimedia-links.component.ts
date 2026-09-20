@@ -22,6 +22,7 @@ import {
   newGedcomMultimediaLink,
   type GedcomMultimediaLink,
 } from "../../gedcom/gedcomMultimediaLink";
+import { GedcomEditorComponent } from "./gedcom-editor.component";
 
 @Component({
   selector: "app-input-multimedia-links",
@@ -33,6 +34,10 @@ export class InputMultimediaLinksComponent implements FormValueControl<
   GedcomMultimediaLink[]
 > {
   private readonly _injector = inject(Injector);
+  readonly gedcomEditor = inject(GedcomEditorComponent, {
+    optional: true,
+  });
+
   readonly workingDatabase = input.required<GedcomDatabase>();
   readonly value = model<GedcomMultimediaLink[]>([]);
   readonly form = form(this.value);
@@ -67,5 +72,18 @@ export class InputMultimediaLinksComponent implements FormValueControl<
 
   removeMultimediaLink(index: number) {
     this.value.update((multimediaLinks) => multimediaLinks.toSpliced(index, 1));
+  }
+
+  createNewMultimedia(linkIndex: number) {
+    if (this.gedcomEditor) {
+      const xref = this.gedcomEditor.openNewMultimedia();
+      this.form[linkIndex]?.xref().value.set(xref);
+    }
+  }
+
+  openMultimediaInSession(xref: string) {
+    if (this.gedcomEditor) {
+      this.gedcomEditor.openMultimedia(xref);
+    }
   }
 }

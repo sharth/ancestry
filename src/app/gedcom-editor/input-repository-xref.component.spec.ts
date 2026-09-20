@@ -25,12 +25,13 @@ describe("InputRepositoryXrefComponent", () => {
     expect(component).toBeTruthy();
   });
 
-  it("should focus the select element when focus() is called", () => {
+  it("should focus the select element when focus() is called", async () => {
     const element = fixture.nativeElement as HTMLElement;
     const select = element.querySelector<HTMLSelectElement>("select#xref");
     assert.isOk(select);
 
     component.focus();
+    await fixture.whenStable();
 
     expect(document.activeElement).toBe(select);
   });

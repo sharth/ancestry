@@ -1,29 +1,175 @@
 <form (submit)="submitForm()" class="vstack gap-3">
-  @switch (type()) {
-    @case ("INDI") {
-      <app-gedcom-editor-individual
-        [(workingDatabase)]="workingDatabase"
-        [xref]="effectiveXref()"
-      ></app-gedcom-editor-individual>
-    }
-    @case ("SOUR") {
-      <app-gedcom-editor-source
-        [(workingDatabase)]="workingDatabase"
-        [xref]="effectiveXref()"
-      ></app-gedcom-editor-source>
-    }
-    @case ("OBJE") {
-      <app-gedcom-editor-multimedia
-        [(workingDatabase)]="workingDatabase"
-        [xref]="effectiveXref()"
-      ></app-gedcom-editor-multimedia>
-    }
-    @case ("REPO") {
-      <app-gedcom-editor-repository
-        [(workingDatabase)]="workingDatabase"
-        [xref]="effectiveXref()"
-      ></app-gedcom-editor-repository>
-    }
+  <div
+    class="working-set-tabs d-flex flex-wrap align-items-center justify-content-between gap-2 border-bottom pb-2"
+  >
+    <div class="d-flex flex-wrap gap-1 align-items-center" role="tablist">
+      @for (item of xrefsIncludedInView(); track item.xref) {
+        <div class="btn-group" role="group">
+          <button
+            type="button"
+            class="btn btn-sm text-start"
+            [class.btn-primary]="activeTab().xref === item.xref"
+            [class.btn-outline-secondary]="activeTab().xref !== item.xref"
+            (click)="openTab(item)"
+          >
+            <i class="bi me-1" [class]="tabIcon(item)"></i>
+            <span>{{ tabLabel(item) }}</span>
+          </button>
+        </div>
+      }
+    </div>
+
+    <details class="add-to-session-details position-relative">
+      <summary class="btn btn-sm btn-outline-primary">
+        <i class="bi bi-plus-lg me-1"></i>Add to Session
+      </summary>
+      <div
+        class="add-to-session-menu p-2 border rounded shadow-sm bg-body mt-1 position-absolute end-0"
+        style="z-index: 1050; min-width: 250px"
+      >
+        <div class="fw-bold mb-1 small text-secondary">Create New Record</div>
+        <div class="d-flex flex-wrap gap-1 mb-2">
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary"
+            (click)="openNewIndividual()"
+          >
+            <i class="bi bi-person me-1"></i>Individual
+          </button>
+          <!-- 
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary"
+            (click)="session.createAndOpenSource()"
+          >
+            <i class="bi bi-journal-bookmark me-1"></i>Source
+          </button>
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary"
+            (click)="session.createAndOpenRepository()"
+          >
+            <i class="bi bi-building me-1"></i>Repository
+          </button>
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary"
+            (click)="session.createAndOpenMultimedia()"
+          >
+            <i class="bi bi-image me-1"></i>Multimedia
+          </button>
+        --></div>
+        <div class="fw-bold mb-1 small text-secondary">
+          Open Existing Record
+        </div>
+        <!--
+        <select
+          class="form-select form-select-sm"
+          (change)="onSelectExistingRecord($event)"
+        >
+          <option value="" selected>Select record to open...</option>
+          <optgroup label="Individuals">
+            @for (indi of allIndividuals(); track indi.xref) {
+              <option [value]="'INDI:' + indi.xref">
+                {{
+                  session.getRecordLabel(
+                    { type: "INDI", xref: indi.xref },
+                    workingDatabase()
+                  )
+                }}
+              </option>
+            }
+          </optgroup>
+          <optgroup label="Sources">
+            @for (src of allSources(); track src.xref) {
+              <option [value]="'SOUR:' + src.xref">
+                {{
+                  session.getRecordLabel(
+                    { type: "SOUR", xref: src.xref },
+                    workingDatabase()
+                  )
+                }}
+              </option>
+            }
+          </optgroup>
+          <optgroup label="Repositories">
+            @for (repo of allRepositories(); track repo.xref) {
+              <option [value]="'REPO:' + repo.xref">
+                {{
+                  session.getRecordLabel(
+                    { type: "REPO", xref: repo.xref },
+                    workingDatabase()
+                  )
+                }}
+              </option>
+            }
+          </optgroup>
+          <optgroup label="Multimedia">
+            @for (media of allMultimedias(); track media.xref) {
+              <option [value]="'OBJE:' + media.xref">
+                {{
+                  session.getRecordLabel(
+                    { type: "OBJE", xref: media.xref },
+                    workingDatabase()
+                  )
+                }}
+              </option>
+            }
+          </optgroup>
+        </select>
+        -->
+      </div>
+    </details>
+  </div>
+
+  @for (tabInformation of xrefsIncludedInView(); track tabInformation.xref) {
+    @let isActive =
+      activeTab().type === tabInformation.type &&
+      activeTab().xref === tabInformation.xref;
+    <div [hidden]="!isActive">
+      @switch (tabInformation.type) {
+        @case ("INDI") {
+          @if (form.individuals[tabInformation.xref]; as individual) {
+            <app-input-individual
+              [workingDatabase]="workingDatabase()"
+              [formField]="individual"
+            />
+          }
+        }
+        @case ("SOUR") {
+          @if (form.sources[tabInformation.xref]; as source) {
+            <app-input-source
+              [workingDatabase]="workingDatabase()"
+              [formField]="source"
+            />
+          }
+        }
+        <!-- @case ("FAM") {
+          @if (form.families[tabInformation.xref]; as family) {
+            <app-input-family
+              [workingDatabase]="workingDatabase()"
+              [formField]="family"
+            />
+          }
+        } -->
+        @case ("REPO") {
+          @if (form.repositories[tabInformation.xref]; as repository) {
+            <app-input-repository
+              [workingDatabase]="workingDatabase()"
+              [formField]="repository"
+            />
+          }
+        }
+        @case ("OBJE") {
+          @if (form.multimedias[tabInformation.xref]; as multimedia) {
+            <app-input-multimedia
+              [workingDatabase]="workingDatabase()"
+              [formField]="multimedia"
+            />
+          }
+        }
+      }
+    </div>
   }
 
   <h2>Gedcom Delta</h2>
@@ -34,6 +180,8 @@
     ></app-gedcom-diff>
   }
 
-  <input type="submit" />
-  <input type="button" value="Cancel" (click)="cancelForm()" />
+  <div>
+    <input type="submit" />
+    <input type="button" value="Cancel" (click)="cancelForm()" />
+  </div>
 </form>

@@ -18,6 +18,7 @@ import {
   newGedcomRepositoryLink,
   type GedcomRepositoryLink,
 } from "../../gedcom/gedcomRepositoryLink";
+import { GedcomEditorComponent } from "./gedcom-editor.component";
 import { InputRepositoryCallNumberComponent } from "./input-repository-call-number.component";
 import { InputRepositoryXrefComponent } from "./input-repository-xref.component";
 
@@ -36,6 +37,7 @@ export class InputRepositoryLinksComponent implements FormValueControl<
   GedcomRepositoryLink[]
 > {
   private readonly _injector = inject(Injector);
+  readonly gedcomEditor = inject(GedcomEditorComponent, { optional: true });
 
   readonly workingDatabase = input.required<GedcomDatabase>();
   readonly value = model<GedcomRepositoryLink[]>([]);
@@ -66,4 +68,15 @@ export class InputRepositoryLinksComponent implements FormValueControl<
   removeCitation(index: number) {
     this.value.update((repositoryLinks) => repositoryLinks.toSpliced(index, 1));
   }
+
+  // createNewRepository(linkIndex: number) {
+  //   if (!this.session) return;
+  //   const newXref = this.session.createAndOpenRepository();
+  //   this.form[linkIndex]?.repositoryXref().value.set(newXref);
+  // }
+
+  // openRepositoryInSession(xref: string) {
+  //   if (!this.session || !xref) return;
+  //   this.session.openRecord("REPO", xref, true);
+  // }
 }
