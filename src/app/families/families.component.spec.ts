@@ -1,4 +1,4 @@
-import { inputBinding } from "@angular/core";
+import { inputBinding, signal } from "@angular/core";
 import type { ComponentFixture } from "@angular/core/testing";
 import { provideRouter } from "@angular/router";
 import { render } from "@testing-library/angular/zoneless";
@@ -11,9 +11,11 @@ describe("FamiliesComponent", () => {
   let fixture: ComponentFixture<FamiliesComponent>;
 
   beforeEach(async () => {
+    const ancestryDatabase = signal(newGedcomDatabase());
+
     const renderResult = await render(FamiliesComponent, {
       providers: [provideRouter([])],
-      bindings: [inputBinding("ancestryDatabase", () => newGedcomDatabase())],
+      bindings: [inputBinding("ancestryDatabase", ancestryDatabase)],
     });
 
     fixture = renderResult.fixture;
