@@ -20,27 +20,6 @@
 import type { GedcomDate } from "./gedcomDate";
 import type { GedcomFact } from "./gedcomFact";
 
-export type GedcomDateQualifier =
-  | "" // An exact date.
-  | "ABT" // ABT, CAL, EST, INT: approximately the given date.
-  | "BEF"
-  | "AFT"
-  | "BET" // BET x AND y.
-  | "FROM" // FROM x [TO y].
-  | "TO"; // TO x.
-
-export interface ParsedGedcomDate {
-  qualifier: GedcomDateQualifier;
-  // The year, using astronomical numbering where 1 BCE is year 0.
-  year: number;
-  hasMonth: boolean;
-  hasDay: boolean;
-  // Fractional years at the beginning and end of the first date's precision.
-  // For example "1900" starts at 1900.0 and ends just before 1901.0.
-  start: number;
-  end: number;
-}
-
 const DAYS_PER_YEAR = 365.2425;
 const DAYS_BEFORE_MONTH = [
   0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365,
@@ -61,25 +40,10 @@ const MONTHS = [
   "DECEMBER",
 ];
 
-const QUALIFIERS: Record<string, GedcomDateQualifier> = {
-  ABT: "ABT",
-  ABOUT: "ABT",
-  CAL: "ABT",
-  EST: "ABT",
-  INT: "ABT",
-  C: "ABT",
-  CA: "ABT",
-  CIRCA: "ABT",
-  BEF: "BEF",
-  BEFORE: "BEF",
-  BY: "BEF",
-  AFT: "AFT",
-  AFTER: "AFT",
-  BET: "BET",
-  BETWEEN: "BET",
-  FROM: "FROM",
-  TO: "TO",
-};
+// Words placing a date just before or after the date that follows them. Other
+// qualifiers (ABT, CAL, EST, INT, BET, FROM, TO) sort at the date itself.
+const BEFORE_WORDS = new Set(["BEF", "BEFORE", "BY"]);
+const AFTER_WORDS = new Set(["AFT", "AFTER"]);
 
 const BCE_EPOCHS = new Set(["BC", "BCE"]);
 
@@ -109,17 +73,27 @@ function tokenize(value: string): string[] {
     .filter((token) => token !== "");
 }
 
+interface ParsedGedcomDate {
+  // The year as written, using astronomical numbering where 1 BCE is year 0.
+  year: number;
+  // A fractional year for ordering, e.g. about 1900.5 for 1 JUL 1900.
+  sortKey: number;
+}
+
 function parseTokens(tokens: string[]): ParsedGedcomDate | undefined {
-  let qualifier: GedcomDateQualifier | undefined;
+  let shift: "before" | "after" | undefined;
   let day: number | undefined;
   let month: number | undefined;
 
   for (const [i, token] of tokens.entries()) {
     const next = tokens.at(i + 1) ?? "";
 
-    const tokenQualifier = QUALIFIERS[token];
-    if (tokenQualifier !== undefined) {
-      qualifier ??= tokenQualifier;
+    if (BEFORE_WORDS.has(token)) {
+      shift ??= "before";
+      continue;
+    }
+    if (AFTER_WORDS.has(token)) {
+      shift ??= "after";
       continue;
     }
 
@@ -131,7 +105,7 @@ function parseTokens(tokens: string[]): ParsedGedcomDate | undefined {
 
     const numberMatch = /^(\d+)(\/\d+)?$/.exec(token);
     if (numberMatch?.[1] === undefined) {
-      // An unrecognized word, which is ignored.
+      // An unrecognized word, such as ABT or a phrase, which is ignored.
       continue;
     }
 
@@ -152,22 +126,19 @@ function parseTokens(tokens: string[]): ParsedGedcomDate | undefined {
       year = 1 - year;
     }
 
-    const hasMonth = month !== undefined;
-    const hasDay = hasMonth && day !== undefined;
-    const start = toFractionalYear(year, month ?? 1, day ?? 1);
-    const end =
-      hasDay ? toFractionalYear(year, month ?? 1, (day ?? 1) + 1)
-      : hasMonth ? toFractionalYear(year, (month ?? 1) + 1, 1)
-      : toFractionalYear(year + 1, 1, 1);
+    let sortKey = toFractionalYear(year, month ?? 1, day ?? 1);
+    if (shift === "before") {
+      // Just before the first day the date covers.
+      sortKey -= 1e-6;
+    } else if (shift === "after") {
+      // The day after the last day the date covers.
+      sortKey =
+        month === undefined ? year + 1
+        : day === undefined ? toFractionalYear(year, month + 1, 1)
+        : toFractionalYear(year, month, day + 1);
+    }
 
-    return {
-      qualifier: qualifier ?? "",
-      year: Math.floor(start),
-      hasMonth,
-      hasDay,
-      start,
-      end,
-    };
+    return { year, sortKey };
   }
 
   return undefined;
@@ -175,29 +146,25 @@ function parseTokens(tokens: string[]): ParsedGedcomDate | undefined {
 
 // Parses the first date within a GEDCOM date value, returning undefined if the
 // value doesn't contain a recognizable year.
-export function parseGedcomDateValue(
-  value: string,
-): ParsedGedcomDate | undefined {
+function parseGedcomDateValue(value: string): ParsedGedcomDate | undefined {
   // Date phrases are enclosed in parentheses. Prefer the date outside of the
   // phrase, but fall back to one within it, e.g. "(about 1850)".
   const withoutPhrases = value.replace(/\([^)]*\)?/g, " ");
   return parseTokens(tokenize(withoutPhrases)) ?? parseTokens(tokenize(value));
 }
 
-// Returns a number suitable for chronologically ordering the given date, or
-// undefined if it can't be interpreted.
+// Returns a fractional year for chronologically ordering the given date, or
+// undefined if it can't be interpreted. BEF and AFT dates sort just before and
+// after the date they qualify.
 export function gedcomDateSortKey(date: GedcomDate): number | undefined {
-  const parsed = parseGedcomDateValue(date.value);
-  if (parsed === undefined) return undefined;
-  if (parsed.qualifier === "BEF") {
-    // Just before the first moment covered by the date.
-    return parsed.start - 1e-6;
-  }
-  if (parsed.qualifier === "AFT") {
-    // Just after the last moment covered by the date.
-    return parsed.end;
-  }
-  return parsed.start;
+  return parseGedcomDateValue(date.value)?.sortKey;
+}
+
+// Returns the year of the given date as written, e.g. 1900 for "BEF 1900", or
+// undefined if it can't be interpreted. Years BCE are zero or negative, with
+// 1 BCE as year 0.
+export function gedcomDateYear(date: GedcomDate): number | undefined {
+  return parseGedcomDateValue(date.value)?.year;
 }
 
 // Returns the sort key for a fact, preferring its sort date (SDATE) over its
@@ -227,19 +194,6 @@ export function sortChronologically<T>(
       return a.index - b.index;
     })
     .map(({ item }) => item);
-}
-
-// Returns the age, in whole years, at `event` of someone born at `birth`, or
-// undefined if it can't be determined.
-export function ageAt(
-  birth: ParsedGedcomDate,
-  event: ParsedGedcomDate,
-): number | undefined {
-  const age =
-    birth.hasDay && event.hasDay ?
-      Math.floor(event.start - birth.start + 1e-9)
-    : event.year - birth.year;
-  return age >= 0 ? age : undefined;
 }
 
 // Formats a year for display, e.g. 1900 or 44 BC.

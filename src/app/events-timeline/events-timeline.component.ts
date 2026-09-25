@@ -3,10 +3,9 @@ import { RouterModule } from "@angular/router";
 import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomDate } from "../../gedcom/gedcomDate";
 import {
-  ageAt,
   formatGedcomDateValue,
   formatYear,
-  parseGedcomDateValue,
+  gedcomDateYear,
   sortChronologically,
 } from "../../gedcom/gedcomDateSort";
 import type { GedcomFact } from "../../gedcom/gedcomFact";
@@ -50,7 +49,7 @@ export class EventsTimelineComponent {
 
   readonly rows = computed(() => {
     const birthDate = this.birthDate();
-    const birth = birthDate ? parseGedcomDateValue(birthDate.value) : undefined;
+    const birthYear = birthDate ? gedcomDateYear(birthDate) : undefined;
     const sources = this.ancestryService.ancestryDatabase()?.sources ?? {};
 
     return sortChronologically(this.events(), (event) => event.fact).map(
@@ -65,14 +64,23 @@ export class EventsTimelineComponent {
         const typeIsTitle =
           (fact.tag === "EVEN" || fact.tag === "FACT") && fact.type !== "";
 
-        const date = parseGedcomDateValue(fact.date.value);
+        const year = gedcomDateYear(fact.date);
         const isBirth = birthDate !== undefined && fact.date === birthDate;
 
         return {
           event,
           title: typeIsTitle ? fact.type : description,
-          year: date ? formatYear(date.year) : "",
-          age: birth && date && !isBirth ? ageAt(birth, date) : undefined,
+          year: year !== undefined ? formatYear(year) : "",
+          // Like ancestry.com, the age is the difference in years.
+          age:
+            (
+              birthYear !== undefined &&
+              year !== undefined &&
+              year >= birthYear &&
+              !isBirth
+            ) ?
+              year - birthYear
+            : undefined,
           isBirth,
           date: formatGedcomDateValue(fact.date.value),
           details: [

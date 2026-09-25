@@ -1,11 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { newGedcomDate } from "./gedcomDate";
 import {
-  ageAt,
   formatGedcomDateValue,
   formatYear,
   gedcomDateSortKey,
-  parseGedcomDateValue,
+  gedcomDateYear,
   sortChronologically,
 } from "./gedcomDateSort";
 import { newGedcomFact } from "./gedcomFact";
@@ -14,89 +13,51 @@ function key(value: string): number | undefined {
   return gedcomDateSortKey(newGedcomDate({ value }));
 }
 
-describe("parseGedcomDateValue", () => {
-  it("parses exact dates", () => {
-    expect(parseGedcomDateValue("11 DEC 1878")).toMatchObject({
-      qualifier: "",
-      year: 1878,
-      hasMonth: true,
-      hasDay: true,
-    });
-    expect(parseGedcomDateValue("DEC 1878")).toMatchObject({
-      year: 1878,
-      hasMonth: true,
-      hasDay: false,
-    });
-    expect(parseGedcomDateValue("1878")).toMatchObject({
-      year: 1878,
-      hasMonth: false,
-      hasDay: false,
-    });
+function year(value: string): number | undefined {
+  return gedcomDateYear(newGedcomDate({ value }));
+}
+
+describe("gedcomDateYear", () => {
+  it("returns the year of exact dates", () => {
+    expect(year("11 DEC 1878")).toBe(1878);
+    expect(year("DEC 1878")).toBe(1878);
+    expect(year("1878")).toBe(1878);
   });
 
-  it("parses qualifiers", () => {
-    expect(parseGedcomDateValue("ABT 1900")?.qualifier).toBe("ABT");
-    expect(parseGedcomDateValue("CAL 1900")?.qualifier).toBe("ABT");
-    expect(parseGedcomDateValue("EST 1900")?.qualifier).toBe("ABT");
-    expect(parseGedcomDateValue("BEF 1900")?.qualifier).toBe("BEF");
-    expect(parseGedcomDateValue("AFT 1900")?.qualifier).toBe("AFT");
-    expect(parseGedcomDateValue("BET 1900 AND 1910")).toMatchObject({
-      qualifier: "BET",
-      year: 1900,
-    });
-    expect(parseGedcomDateValue("FROM 1900 TO 1910")).toMatchObject({
-      qualifier: "FROM",
-      year: 1900,
-    });
-    expect(parseGedcomDateValue("TO 1910")).toMatchObject({
-      qualifier: "TO",
-      year: 1910,
-    });
+  it("returns the year as written, whatever the qualifier", () => {
+    expect(year("ABT 1900")).toBe(1900);
+    expect(year("CAL 1900")).toBe(1900);
+    expect(year("EST 1900")).toBe(1900);
+    expect(year("BEF 1900")).toBe(1900);
+    expect(year("AFT 1900")).toBe(1900);
+    expect(year("BET 1900 AND 1910")).toBe(1900);
+    expect(year("FROM 1900 TO 1910")).toBe(1900);
+    expect(year("TO 1910")).toBe(1910);
   });
 
   it("parses epochs", () => {
-    expect(parseGedcomDateValue("44 BCE")?.year).toBe(-43);
-    expect(parseGedcomDateValue("44 B.C.")?.year).toBe(-43);
-    expect(parseGedcomDateValue("ABT 44 BC")?.year).toBe(-43);
-    expect(parseGedcomDateValue("1 BCE")?.year).toBe(0);
+    expect(year("44 BCE")).toBe(-43);
+    expect(year("44 B.C.")).toBe(-43);
+    expect(year("ABT 44 BC")).toBe(-43);
+    expect(year("1 BCE")).toBe(0);
   });
 
   it("parses dual years", () => {
-    expect(parseGedcomDateValue("10 FEB 1699/00")?.year).toBe(1700);
-  });
-
-  it("ignores calendars, assuming Gregorian", () => {
-    expect(parseGedcomDateValue("@#DJULIAN@ 1 JAN 1700")).toMatchObject({
-      year: 1700,
-      hasDay: true,
-    });
-    expect(parseGedcomDateValue("JULIAN 1 JAN 1700")).toMatchObject({
-      year: 1700,
-      hasDay: true,
-    });
+    expect(year("10 FEB 1699/00")).toBe(1700);
   });
 
   it("parses date phrases", () => {
-    expect(parseGedcomDateValue("INT 1900 (about then)")).toMatchObject({
-      qualifier: "ABT",
-      year: 1900,
-    });
-    expect(parseGedcomDateValue("(sometime in 1900)")?.year).toBe(1900);
-    expect(parseGedcomDateValue("(unknown)")).toBeUndefined();
-    expect(parseGedcomDateValue("")).toBeUndefined();
+    expect(year("INT 1900 (about then)")).toBe(1900);
+    expect(year("(sometime in 1900)")).toBe(1900);
+    expect(year("(unknown)")).toBeUndefined();
+    expect(year("")).toBeUndefined();
   });
 
   it("parses nonstandard dates leniently", () => {
-    expect(
-      parseGedcomDateValue("abt. 1850 BC (or abt. 1851 BC)"),
-    ).toMatchObject({ qualifier: "ABT", year: -1849 });
-    expect(parseGedcomDateValue("1850 or 1851")?.year).toBe(1850);
-    expect(parseGedcomDateValue("1850?")?.year).toBe(1850);
-    expect(parseGedcomDateValue("1850 AD")?.year).toBe(1850);
-    expect(parseGedcomDateValue("11 December 1878")).toMatchObject({
-      year: 1878,
-      hasDay: true,
-    });
+    expect(year("abt. 1850 BC (or abt. 1851 BC)")).toBe(-1849);
+    expect(year("1850 or 1851")).toBe(1850);
+    expect(year("1850?")).toBe(1850);
+    expect(year("1850 AD")).toBe(1850);
   });
 });
 
@@ -121,6 +82,16 @@ describe("gedcomDateSortKey", () => {
     expect(key("BEF 1900")).toBeLessThan(key("1 JAN 1900") ?? 0);
     expect(key("AFT 1900")).toBeGreaterThan(key("31 DEC 1900") ?? 0);
     expect(key("AFT DEC 1900")).toBeLessThan(key("1 JAN 1901") ?? 0);
+  });
+
+  it("ignores calendars, assuming Gregorian", () => {
+    expect(key("@#DJULIAN@ 1 JAN 1700")).toBe(key("1 JAN 1700"));
+    expect(key("JULIAN 1 JAN 1700")).toBe(key("1 JAN 1700"));
+  });
+
+  it("accepts full and abbreviated month names", () => {
+    expect(key("11 December 1878")).toBe(key("11 DEC 1878"));
+    expect(key("11 Sept 1878")).toBe(key("11 SEP 1878"));
   });
 
   it("returns undefined for uninterpretable dates", () => {
@@ -177,30 +148,6 @@ describe("sortChronologically", () => {
       "U1",
       "U2",
     ]);
-  });
-});
-
-function parse(value: string) {
-  const parsed = parseGedcomDateValue(value);
-  if (parsed === undefined) throw new Error(`Unparseable date: ${value}`);
-  return parsed;
-}
-
-describe("ageAt", () => {
-  const birth = parse("11 DEC 1878");
-
-  it("uses whole years when both dates are exact", () => {
-    expect(ageAt(birth, parse("10 DEC 1910"))).toBe(31);
-    expect(ageAt(birth, parse("11 DEC 1910"))).toBe(32);
-  });
-
-  it("uses the difference in years otherwise", () => {
-    expect(ageAt(birth, parse("1910"))).toBe(32);
-    expect(ageAt(birth, parse("ABT 1940"))).toBe(62);
-  });
-
-  it("ignores events before birth", () => {
-    expect(ageAt(birth, parse("1870"))).toBeUndefined();
   });
 });
 
