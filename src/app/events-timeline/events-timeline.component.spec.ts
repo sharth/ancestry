@@ -14,8 +14,12 @@ import {
 
 const fakeAncestryService = {
   ancestryDatabase: () => ({
+    individuals: {},
     sources: {
-      "@S1@": { abbr: "1910 Census", title: "1910 United States Federal Census" },
+      "@S1@": {
+        abbr: "1910 Census",
+        title: "1910 United States Federal Census",
+      },
       "@S2@": { abbr: "", title: "Massachusetts, Death Index, 1901-1980" },
     },
   }),
