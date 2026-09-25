@@ -1,6 +1,5 @@
 import { Component, computed, input } from "@angular/core";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
-import { gedcomDateYear } from "../../gedcom/gedcomDateSort";
 import {
   EventsTimelineComponent,
   type TimelineEvent,
@@ -48,7 +47,7 @@ export class IndividualFactsComponent {
     ];
 
     const birthDate = individual.facts.find(
-      (fact) => fact.tag === "BIRT" && gedcomDateYear(fact.date) !== undefined,
+      (fact) => fact.tag === "BIRT",
     )?.date;
 
     return {

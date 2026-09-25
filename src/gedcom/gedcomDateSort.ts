@@ -167,10 +167,11 @@ export function gedcomDateYear(date: GedcomDate): number | undefined {
   return parseGedcomDateValue(date.value)?.year;
 }
 
-// Returns the sort key for a fact, preferring its sort date (SDATE) over its
-// date (DATE), as recommended by GEDCOM 7.
+// Returns the sort key for a fact. When the fact has a sort date (SDATE), that
+// is used, even if it can't be interpreted, as recommended by GEDCOM 7.
+// Otherwise, the date (DATE) is used.
 export function gedcomFactSortKey(fact: GedcomFact): number | undefined {
-  return gedcomDateSortKey(fact.sortDate) ?? gedcomDateSortKey(fact.date);
+  return gedcomDateSortKey(fact.sortDate.value ? fact.sortDate : fact.date);
 }
 
 // Returns a copy of `items` sorted chronologically. Items without an

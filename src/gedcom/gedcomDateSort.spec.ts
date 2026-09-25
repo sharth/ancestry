@@ -117,10 +117,11 @@ describe("sortChronologically", () => {
     ]);
   });
 
-  it("falls back to the date if the sort date is uninterpretable", () => {
+  it("uses the sort date even if it is uninterpretable", () => {
+    // A would sort first by its date, but its sort date makes it undated.
     const a = newGedcomFact({
       tag: "A",
-      date: newGedcomDate({ value: "1950" }),
+      date: newGedcomDate({ value: "1850" }),
       sortDate: newGedcomDate({ value: "(unknown)" }),
     });
     const b = newGedcomFact({
