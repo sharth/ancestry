@@ -22,7 +22,7 @@ import {
   newGedcomMultimediaLink,
   type GedcomMultimediaLink,
 } from "../../gedcom/gedcomMultimediaLink";
-import { GedcomEditorComponent } from "./gedcom-editor.component";
+import { GEDCOM_EDITOR } from "./gedcom-editor-interface";
 
 @Component({
   selector: "app-input-multimedia-links",
@@ -34,9 +34,7 @@ export class InputMultimediaLinksComponent implements FormValueControl<
   GedcomMultimediaLink[]
 > {
   private readonly _injector = inject(Injector);
-  readonly gedcomEditor = inject(GedcomEditorComponent, {
-    optional: true,
-  });
+  readonly gedcomEditor = inject(GEDCOM_EDITOR, { optional: true });
 
   readonly workingDatabase = input.required<GedcomDatabase>();
   readonly value = model<GedcomMultimediaLink[]>([]);
