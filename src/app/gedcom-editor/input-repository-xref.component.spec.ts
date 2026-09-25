@@ -1,4 +1,6 @@
-import { TestBed, type ComponentFixture } from "@angular/core/testing";
+import { inputBinding } from "@angular/core";
+import type { ComponentFixture } from "@angular/core/testing";
+import { render } from "@testing-library/angular/zoneless";
 import { assert, beforeEach, describe, expect, it } from "vitest";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { InputRepositoryXrefComponent } from "./input-repository-xref.component";
@@ -14,11 +16,16 @@ describe("InputRepositoryXrefComponent", () => {
   });
 
   beforeEach(async () => {
-    fixture = TestBed.createComponent(InputRepositoryXrefComponent);
+    const renderResult = await render(InputRepositoryXrefComponent, {
+      bindings: [
+        inputBinding("workingDatabase", () => mockDatabase),
+        inputBinding("value", () => "R1"),
+      ],
+      waitForStableOnRender: true,
+    });
+
+    fixture = renderResult.fixture;
     component = fixture.componentInstance;
-    fixture.componentRef.setInput("workingDatabase", mockDatabase);
-    fixture.componentRef.setInput("value", "R1");
-    await fixture.whenStable();
   });
 
   it("should create", () => {

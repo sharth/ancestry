@@ -1,5 +1,6 @@
-import { TestBed, type ComponentFixture } from "@angular/core/testing";
+import type { ComponentFixture } from "@angular/core/testing";
 import { provideRouter } from "@angular/router";
+import { render } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AncestryService } from "../database/ancestry.service";
 import { AppComponent } from "./app.component";
@@ -14,17 +15,16 @@ describe("AppComponent", () => {
       clearDatabase: vi.fn(),
     };
 
-    await TestBed.configureTestingModule({
-      imports: [AppComponent],
+    const renderResult = await render(AppComponent, {
       providers: [
         { provide: AncestryService, useValue: spy },
         provideRouter([]),
       ],
-    }).compileComponents();
+      waitForStableOnRender: true,
+    });
 
-    fixture = TestBed.createComponent(AppComponent);
+    fixture = renderResult.fixture;
     component = fixture.componentInstance;
-    await fixture.whenStable();
   });
 
   it("should create", () => {

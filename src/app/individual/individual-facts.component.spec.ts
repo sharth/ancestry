@@ -1,5 +1,7 @@
-import { TestBed, type ComponentFixture } from "@angular/core/testing";
+import { inputBinding } from "@angular/core";
+import type { ComponentFixture } from "@angular/core/testing";
 import { provideRouter } from "@angular/router";
+import { render } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it } from "vitest";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomDate } from "../../gedcom/gedcomDate";
@@ -13,14 +15,6 @@ describe("IndividualFactsComponent", () => {
   let fixture: ComponentFixture<IndividualFactsComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [IndividualFactsComponent],
-      providers: [provideRouter([])],
-    }).compileComponents();
-
-    fixture = TestBed.createComponent(IndividualFactsComponent);
-    component = fixture.componentInstance;
-
     const mockDatabase = newGedcomDatabase({
       individuals: {
         "@I1@": newGedcomIndividual({
@@ -44,9 +38,17 @@ describe("IndividualFactsComponent", () => {
       },
     });
 
-    fixture.componentRef.setInput("ancestryDatabase", mockDatabase);
-    fixture.componentRef.setInput("xref", "@I1@");
-    await fixture.whenStable();
+    const renderResult = await render(IndividualFactsComponent, {
+      providers: [provideRouter([])],
+      bindings: [
+        inputBinding("ancestryDatabase", () => mockDatabase),
+        inputBinding("xref", () => "@I1@"),
+      ],
+      waitForStableOnRender: true,
+    });
+
+    fixture = renderResult.fixture;
+    component = fixture.componentInstance;
   });
 
   it("should create", () => {
