@@ -1,5 +1,6 @@
-import { TestBed, type ComponentFixture } from "@angular/core/testing";
+import { inputBinding, signal } from "@angular/core";
 import { provideRouter } from "@angular/router";
+import { render } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it } from "vitest";
 import { newGedcomDate } from "../../gedcom/gedcomDate";
 import { newGedcomFact } from "../../gedcom/gedcomFact";
@@ -10,15 +11,9 @@ import {
 } from "./events-timeline.component";
 
 describe("EventsTimelineComponent", () => {
-  let fixture: ComponentFixture<EventsTimelineComponent>;
   let element: HTMLElement;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [EventsTimelineComponent],
-      providers: [provideRouter([])],
-    }).compileComponents();
-
     const events: TimelineEvent[] = [
       {
         owner: "individual",
@@ -47,10 +42,12 @@ describe("EventsTimelineComponent", () => {
       },
     ];
 
-    fixture = TestBed.createComponent(EventsTimelineComponent);
-    fixture.componentRef.setInput("events", events);
-    await fixture.whenStable();
-    element = fixture.nativeElement as HTMLElement;
+    const renderResult = await render(EventsTimelineComponent, {
+      providers: [provideRouter([])],
+      bindings: [inputBinding("events", signal(events))],
+    });
+
+    element = renderResult.fixture.nativeElement as HTMLElement;
   });
 
   it("orders events by sort date, then date, with undated events last", () => {
