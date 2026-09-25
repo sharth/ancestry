@@ -21,8 +21,10 @@ import { IndividualLinkComponent } from "../individual-link/individual-link.comp
 export interface TimelineEvent {
   fact: GedcomFact;
   owner: "individual" | "family";
-  // For family events shown on an individual's timeline, the family and the
-  // individual's spouse in that family.
+  // For family events shown on an individual's timeline, the family the event
+  // belongs to and the individual's spouse in that family. Every family event
+  // belongs to exactly one family, so someone with several marriages has
+  // events with different familyXrefs rather than events with several.
   familyXref?: string;
   spouseXref?: string;
 }

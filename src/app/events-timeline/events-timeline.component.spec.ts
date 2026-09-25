@@ -1,4 +1,5 @@
-import { inputBinding, signal } from "@angular/core";
+import { inputBinding, signal, type WritableSignal } from "@angular/core";
+import type { ComponentFixture } from "@angular/core/testing";
 import { provideRouter } from "@angular/router";
 import { render } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -11,11 +12,13 @@ import {
 } from "./events-timeline.component";
 
 describe("EventsTimelineComponent", () => {
+  let events: WritableSignal<TimelineEvent[]>;
+  let fixture: ComponentFixture<EventsTimelineComponent>;
   let component: EventsTimelineComponent;
   let element: HTMLElement;
 
   beforeEach(async () => {
-    const events: TimelineEvent[] = [
+    events = signal<TimelineEvent[]>([
       {
         owner: "individual",
         fact: newGedcomFact({ tag: "OCCU", value: "Carpenter" }),
@@ -41,15 +44,16 @@ describe("EventsTimelineComponent", () => {
           sortDate: newGedcomDate({ value: "1905" }),
         }),
       },
-    ];
+    ]);
 
     const renderResult = await render(EventsTimelineComponent, {
       providers: [provideRouter([])],
-      bindings: [inputBinding("events", signal(events))],
+      bindings: [inputBinding("events", events)],
     });
 
-    component = renderResult.fixture.componentInstance;
-    element = renderResult.fixture.nativeElement as HTMLElement;
+    fixture = renderResult.fixture;
+    component = fixture.componentInstance;
+    element = fixture.nativeElement as HTMLElement;
   });
 
   it("orders events by sort date, then date, with undated events last", () => {
@@ -72,5 +76,59 @@ describe("EventsTimelineComponent", () => {
     expect(
       element.querySelector('a[href="/family/@F1@"]')?.textContent,
     ).toContain("Family");
+  });
+
+  it("links each family event to its own family and spouse", async () => {
+    // Someone married twice has events from two families.
+    events.set([
+      {
+        owner: "family",
+        familyXref: "@F2@",
+        spouseXref: "@I3@",
+        fact: newGedcomFact({
+          tag: "MARR",
+          date: newGedcomDate({ value: "1930" }),
+        }),
+      },
+      {
+        owner: "family",
+        familyXref: "@F1@",
+        spouseXref: "@I2@",
+        fact: newGedcomFact({
+          tag: "MARR",
+          date: newGedcomDate({ value: "1912" }),
+        }),
+      },
+      {
+        owner: "family",
+        familyXref: "@F1@",
+        spouseXref: "@I2@",
+        fact: newGedcomFact({
+          tag: "DIV",
+          date: newGedcomDate({ value: "1925" }),
+        }),
+      },
+    ]);
+    await fixture.whenStable();
+
+    expect(
+      component
+        .rows()
+        .map(({ title, event }) => [title, event.familyXref, event.spouseXref]),
+    ).toEqual([
+      ["Marriage", "@F1@", "@I2@"],
+      ["Divorce", "@F1@", "@I2@"],
+      ["Marriage", "@F2@", "@I3@"],
+    ]);
+
+    const familyLinks = Array.from(
+      element.querySelectorAll(".timeline-family-link"),
+      (link) => link.getAttribute("href"),
+    );
+    expect(familyLinks).toEqual([
+      "/family/@F1@",
+      "/family/@F1@",
+      "/family/@F2@",
+    ]);
   });
 });
