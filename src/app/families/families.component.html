@@ -1,0 +1,33 @@
+@if (vm(); as vm) {
+  <h1>{{ vm.families.length }} Families</h1>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Family</th>
+        <th scope="col">Husband</th>
+        <th scope="col">Wife</th>
+        <th scope="col">Children</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (family of vm.families; track family.xref) {
+        <tr>
+          <td>
+            <a routerLink="/family/{{ family.xref }}">{{ family.xref }}</a>
+          </td>
+          <td>
+            @if (family.husbandXref) {
+              <app-individual-link [xref]="family.husbandXref" />
+            }
+          </td>
+          <td>
+            @if (family.wifeXref) {
+              <app-individual-link [xref]="family.wifeXref" />
+            }
+          </td>
+          <td>{{ family.childXrefs.length }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}
