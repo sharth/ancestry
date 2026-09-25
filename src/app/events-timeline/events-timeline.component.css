@@ -1,0 +1,141 @@
+:host {
+  display: block;
+  --timeline-gap: 0.75rem;
+  /* Vertical position of the dot, aligned with the card's title. */
+  --timeline-dot-top: 1.4rem;
+}
+
+.timeline {
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.timeline-item {
+  display: grid;
+  grid-template-columns: 3.5rem 1.75rem minmax(0, 1fr);
+  padding-bottom: var(--timeline-gap);
+}
+
+.timeline-item:last-child {
+  padding-bottom: 0;
+}
+
+.timeline-when {
+  padding-top: 0.8rem;
+  text-align: right;
+  line-height: 1.2;
+}
+
+.timeline-year {
+  font-weight: 600;
+}
+
+.timeline-age {
+  font-size: 0.8rem;
+  color: var(--bs-secondary-color);
+}
+
+/* The vertical line connecting the events, with a dot for each event. */
+.timeline-rail {
+  position: relative;
+}
+
+.timeline-rail::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: calc(-1 * var(--timeline-gap));
+  left: 50%;
+  width: 2px;
+  transform: translateX(-50%);
+  background-color: var(--bs-border-color);
+}
+
+.timeline-item:first-child .timeline-rail::before {
+  top: var(--timeline-dot-top);
+}
+
+.timeline-item:last-child .timeline-rail::before {
+  bottom: auto;
+  height: var(--timeline-dot-top);
+}
+
+.timeline-item:only-child .timeline-rail::before {
+  display: none;
+}
+
+.timeline-rail::after {
+  content: "";
+  position: absolute;
+  top: var(--timeline-dot-top);
+  left: 50%;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background-color: var(--bs-secondary-color);
+}
+
+.timeline-card {
+  box-shadow: var(--bs-box-shadow-sm);
+}
+
+.timeline-card .card-body {
+  padding: 0.75rem 1rem;
+}
+
+.timeline-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.timeline-separator {
+  margin: 0 0.25rem;
+}
+
+.timeline-muted {
+  color: var(--bs-secondary-color);
+}
+
+.timeline-details {
+  margin-top: 0.5rem;
+}
+
+.timeline-note {
+  margin: 0.5rem 0 0;
+  font-size: 0.9rem;
+  font-style: italic;
+  white-space: pre-line;
+}
+
+.timeline-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.timeline-sources summary {
+  color: var(--bs-secondary-color);
+  cursor: pointer;
+}
+
+.timeline-sources ul {
+  margin: 0.25rem 0 0;
+  padding-left: 1.25rem;
+}
+
+.timeline-family-link {
+  margin-left: auto;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.timeline-empty {
+  color: var(--bs-secondary-color);
+}

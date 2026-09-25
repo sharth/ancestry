@@ -44,3 +44,4 @@ Thumbs.db
 # Test output
 __screenshots__
 .vitest-attachments
+.vitest/
