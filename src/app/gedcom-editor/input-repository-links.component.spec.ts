@@ -1,4 +1,4 @@
-import { inputBinding } from "@angular/core";
+import { inputBinding, signal } from "@angular/core";
 import {
   DeferBlockBehavior,
   type ComponentFixture,
@@ -16,18 +16,21 @@ describe("InputRepositoryLinksComponent", () => {
   let component: InputRepositoryLinksComponent;
   let nativeElement: HTMLElement;
 
-  const mockDatabase = newGedcomDatabase({
-    repositories: {
-      R1: { xref: "R1", name: "Mock Repository 1" },
-    },
-  });
+  const workingDatabase = signal(
+    newGedcomDatabase({
+      repositories: {
+        R1: { xref: "R1", name: "Mock Repository 1" },
+      },
+    }),
+  );
+  const value = signal([]);
 
   beforeEach(async () => {
     const renderResult = await render(InputRepositoryLinksComponent, {
       providers: [provideRouter([])],
       bindings: [
-        inputBinding("workingDatabase", () => mockDatabase),
-        inputBinding("value", () => []),
+        inputBinding("workingDatabase", workingDatabase),
+        inputBinding("value", value),
       ],
       configureTestBed: (testBed) => {
         testBed.configureTestingModule({

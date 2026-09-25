@@ -1,5 +1,6 @@
 import { TestBed, type ComponentFixture } from "@angular/core/testing";
 import { provideRouter } from "@angular/router";
+import { render } from "@testing-library/angular/zoneless";
 import { userEvent } from "@testing-library/user-event";
 import { produce } from "immer";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -53,11 +54,12 @@ describe("GedcomEditorComponent Integration", () => {
   }
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
+    const renderResult = await render(GedcomEditorComponent, {
       providers: [provideRouter([])],
-    }).compileComponents();
+      skipDetectChanges: true,
+    });
 
-    fixture = TestBed.createComponent(GedcomEditorComponent);
+    fixture = renderResult.fixture;
     component = fixture.componentInstance;
     ancestryService = TestBed.inject(AncestryService);
 

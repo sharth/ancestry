@@ -19,12 +19,13 @@ describe("FamilyComponent", () => {
         },
       }),
     );
+    const xref = signal("@F1@");
 
     const renderResult = await render(FamilyComponent, {
       providers: [provideRouter([])],
       bindings: [
         inputBinding("ancestryDatabase", ancestryDatabase),
-        inputBinding("xref", signal("@F1@")),
+        inputBinding("xref", xref),
       ],
     });
 

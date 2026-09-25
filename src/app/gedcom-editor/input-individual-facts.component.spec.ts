@@ -1,4 +1,6 @@
-import { TestBed, type ComponentFixture } from "@angular/core/testing";
+import { inputBinding, signal } from "@angular/core";
+import type { ComponentFixture } from "@angular/core/testing";
+import { render } from "@testing-library/angular/zoneless";
 import { userEvent } from "@testing-library/user-event";
 import { assert, beforeEach, describe, expect, it, vi } from "vitest";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
@@ -9,14 +11,20 @@ describe("InputIndividualFactsComponent", () => {
   let fixture: ComponentFixture<InputIndividualFactsComponent>;
   let component: InputIndividualFactsComponent;
 
-  const mockDatabase = newGedcomDatabase();
+  const workingDatabase = signal(newGedcomDatabase());
+  const open = signal(true);
 
   beforeEach(async () => {
-    fixture = TestBed.createComponent(InputIndividualFactsComponent);
+    const renderResult = await render(InputIndividualFactsComponent, {
+      bindings: [
+        inputBinding("workingDatabase", workingDatabase),
+        inputBinding("open", open),
+      ],
+      waitForStableOnRender: true,
+    });
+
+    fixture = renderResult.fixture;
     component = fixture.componentInstance;
-    fixture.componentRef.setInput("workingDatabase", mockDatabase);
-    fixture.componentRef.setInput("open", true);
-    await fixture.whenStable();
   });
 
   it("should create", () => {
