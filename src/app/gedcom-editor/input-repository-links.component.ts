@@ -18,7 +18,7 @@ import {
   newGedcomRepositoryLink,
   type GedcomRepositoryLink,
 } from "../../gedcom/gedcomRepositoryLink";
-import { GedcomEditorComponent } from "./gedcom-editor.component";
+import { GEDCOM_EDITOR } from "./gedcom-editor-interface";
 import { InputRepositoryCallNumberComponent } from "./input-repository-call-number.component";
 import { InputRepositoryXrefComponent } from "./input-repository-xref.component";
 
@@ -37,7 +37,7 @@ export class InputRepositoryLinksComponent implements FormValueControl<
   GedcomRepositoryLink[]
 > {
   private readonly _injector = inject(Injector);
-  readonly gedcomEditor = inject(GedcomEditorComponent, { optional: true });
+  readonly gedcomEditor = inject(GEDCOM_EDITOR, { optional: true });
 
   readonly workingDatabase = input.required<GedcomDatabase>();
   readonly value = model<GedcomRepositoryLink[]>([]);

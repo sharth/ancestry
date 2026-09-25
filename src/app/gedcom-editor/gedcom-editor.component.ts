@@ -26,6 +26,10 @@ import {
   calculateNextSourceXref,
 } from "../../util/next-xref";
 import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
+import {
+  GEDCOM_EDITOR,
+  type GedcomEditorInterface,
+} from "./gedcom-editor-interface";
 import { InputIndividualComponent } from "./input-individual.component";
 import { InputMultimediaComponent } from "./input-multimedia.component";
 import { InputRepositoryComponent } from "./input-repository.component";
@@ -41,10 +45,11 @@ import { InputSourceComponent } from "./input-source.component";
     InputRepositoryComponent,
     InputSourceComponent,
   ],
+  providers: [{ provide: GEDCOM_EDITOR, useExisting: GedcomEditorComponent }],
   templateUrl: "./gedcom-editor.component.html",
   styleUrl: "./gedcom-editor.component.css",
 })
-export class GedcomEditorComponent {
+export class GedcomEditorComponent implements GedcomEditorInterface {
   private readonly ancestryService = inject(AncestryService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
