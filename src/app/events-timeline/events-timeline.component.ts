@@ -92,6 +92,7 @@ export class EventsTimelineComponent {
             xref: citation.sourceXref,
             title: sources[citation.sourceXref]?.title || citation.sourceXref,
             page: citation.page,
+            text: citation.text,
           })),
         };
       },

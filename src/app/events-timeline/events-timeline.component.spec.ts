@@ -30,7 +30,11 @@ describe("EventsTimelineComponent", () => {
           date: newGedcomDate({ value: "ABT 1910" }),
           place: "Boston, Suffolk, Massachusetts, USA",
           citations: [
-            newGedcomSourceCitation({ sourceXref: "@S1@" }),
+            newGedcomSourceCitation({
+              sourceXref: "@S1@",
+              page: "p. 12",
+              text: "Age 45, born Massachusetts",
+            }),
             newGedcomSourceCitation({ sourceXref: "@S2@" }),
           ],
         }),
@@ -73,6 +77,8 @@ describe("EventsTimelineComponent", () => {
     expect(text).toContain("Abt. 1910 • Boston, Suffolk, Massachusetts, USA");
     expect(text).toContain("2 sources");
     expect(text).toContain("Carpenter");
+    expect(text).toContain("@S1@ — p. 12");
+    expect(text).toContain("Age 45, born Massachusetts");
     expect(
       element.querySelector('a[href="/family/@F1@"]')?.textContent,
     ).toContain("Family");

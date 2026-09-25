@@ -56,6 +56,11 @@
                             — {{ source.page }}</span
                           >
                         }
+                        @if (source.text) {
+                          <div class="timeline-muted">
+                            {{ source.text }}
+                          </div>
+                        }
                       </li>
                     }
                   </ul>
