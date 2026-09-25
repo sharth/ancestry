@@ -1,5 +1,7 @@
 import type { Routes } from "@angular/router";
 import { ancestryDatabaseResolver } from "../database/ancestry.service";
+import { FamiliesComponent } from "./families/families.component";
+import { FamilyComponent } from "./family/family.component";
 import { HelloComponent } from "./hello/hello.component";
 import { IndexComponent } from "./index/index.component";
 import { IndividualAncestorsComponent } from "./individual/individual-ancestors.component";
@@ -42,6 +44,16 @@ export const routes: Routes = [
       { path: "ancestors", component: IndividualAncestorsComponent },
       { path: "gedcom", component: IndividualGedcomComponent },
     ],
+  },
+  {
+    path: "families",
+    component: FamiliesComponent,
+    resolve: { ancestryDatabase: ancestryDatabaseResolver },
+  },
+  {
+    path: "family/:xref",
+    component: FamilyComponent,
+    resolve: { ancestryDatabase: ancestryDatabaseResolver },
   },
   {
     path: "repositories",

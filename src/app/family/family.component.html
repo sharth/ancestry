@@ -1,0 +1,49 @@
+@if (vm(); as vm) {
+  <h1>{{ vm.title }}</h1>
+
+  <h2>Members</h2>
+  <dl>
+    <dt>Husband</dt>
+    @if (vm.family.husbandXref) {
+      <dd><app-individual-link [xref]="vm.family.husbandXref" /></dd>
+    } @else {
+      <dd>None</dd>
+    }
+    <dt>Wife</dt>
+    @if (vm.family.wifeXref) {
+      <dd><app-individual-link [xref]="vm.family.wifeXref" /></dd>
+    } @else {
+      <dd>None</dd>
+    }
+    <dt>Children</dt>
+    @for (childXref of vm.family.childXrefs; track childXref) {
+      <dd><app-individual-link [xref]="childXref" /></dd>
+    } @empty {
+      <dd>None</dd>
+    }
+  </dl>
+
+  <h2>Events</h2>
+  <app-events-table [events]="vm.family.facts" owner="family" />
+
+  @if (vm.family.citations.length > 0) {
+    <h2>Citations</h2>
+    <ul>
+      @for (citation of vm.family.citations; track citation) {
+        <li>
+          <a routerLink="/source/{{ citation.sourceXref }}">{{
+            citation.sourceXref
+          }}</a>
+          @if (citation.page) {
+            {{ citation.page }}
+          }
+        </li>
+      }
+    </ul>
+  }
+
+  <h2>Gedcom</h2>
+  <app-gedcom-display [gedcomRecord]="vm.gedcomRecord" />
+} @else {
+  <h1>Family {{ xref() }} not found</h1>
+}
