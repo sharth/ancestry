@@ -27,6 +27,10 @@ describe("IndividualFactsComponent", () => {
           xref: "@I1@",
           facts: [
             newGedcomFact({
+              tag: "DEAT",
+              date: newGedcomDate({ value: "1970" }),
+            }),
+            newGedcomFact({
               tag: "BIRT",
               date: newGedcomDate({ value: "1 JAN 1900" }),
               place: "Some Place",
@@ -40,6 +44,13 @@ describe("IndividualFactsComponent", () => {
         "@F1@": newGedcomFamily({
           xref: "@F1@",
           husbandXref: "@I1@",
+          wifeXref: "@I2@",
+          facts: [
+            newGedcomFact({
+              tag: "MARR",
+              date: newGedcomDate({ value: "12 JUN 1925" }),
+            }),
+          ],
         }),
       },
     });
@@ -58,8 +69,23 @@ describe("IndividualFactsComponent", () => {
     const headings = Array.from(element.querySelectorAll("h2")).map(
       (h) => h.textContent,
     );
-    expect(headings).toContain("Events");
-    expect(headings).toContain("Events for Family @F1@");
-    expect(headings).toContain("Relatives");
+    expect(headings).toEqual(["Events", "Relatives"]);
+  });
+
+  it("should merge individual and family events chronologically", () => {
+    const element = fixture.nativeElement as HTMLElement;
+    const titles = Array.from(
+      element.querySelectorAll(".timeline-title"),
+      (title) => title.textContent.trim(),
+    );
+    const labels = Array.from(
+      element.querySelectorAll(".timeline-when"),
+      (when) =>
+        Array.from(when.children, (child) => child.textContent.trim()).join(
+          " ",
+        ),
+    );
+    expect(titles).toEqual(["Birth", "Marriage", "Death"]);
+    expect(labels).toEqual(["1900 (Age)", "1925 25", "1970 70"]);
   });
 });

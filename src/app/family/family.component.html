@@ -24,7 +24,7 @@
   </dl>
 
   <h2>Events</h2>
-  <app-events-table [events]="vm.family.facts" owner="family" />
+  <app-events-timeline [events]="vm.events" />
 
   @if (vm.family.citations.length > 0) {
     <h2>Citations</h2>

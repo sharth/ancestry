@@ -1,0 +1,80 @@
+<ol class="timeline">
+  @for (row of rows(); track row.event) {
+    @let fact = row.event.fact;
+    <li class="timeline-item">
+      <div class="timeline-when">
+        <div class="timeline-year">{{ row.year }}</div>
+        @if (row.isBirth) {
+          <div class="timeline-age">(Age)</div>
+        } @else if (row.age !== undefined) {
+          <div class="timeline-age">{{ row.age }}</div>
+        }
+      </div>
+      <div class="timeline-rail" aria-hidden="true"></div>
+      <div class="timeline-card card">
+        <div class="card-body">
+          <h3 class="timeline-title">{{ row.title }}</h3>
+          @if (row.date || fact.place) {
+            <div>
+              {{ row.date }}
+              @if (row.date && fact.place) {
+                <span class="timeline-separator">•</span>
+              }
+              {{ fact.place }}
+            </div>
+          }
+          @if (fact.address) {
+            <div class="timeline-muted">{{ fact.address }}</div>
+          }
+          @if (row.details.length > 0) {
+            <div class="timeline-details">{{ row.details.join("; ") }}</div>
+          }
+          @if (row.event.spouseXref) {
+            <div class="timeline-details">
+              with <app-individual-link [xref]="row.event.spouseXref" />
+            </div>
+          }
+          @for (note of fact.notes; track note) {
+            <p class="timeline-note">{{ note.text }}</p>
+          }
+          @if (row.sources.length > 0 || row.event.familyXref) {
+            <div class="timeline-footer">
+              @if (row.sources.length > 0) {
+                <details class="timeline-sources">
+                  <summary>
+                    {{ row.sources.length }}
+                    {{ row.sources.length === 1 ? "source" : "sources" }}
+                  </summary>
+                  <ul>
+                    @for (source of row.sources; track $index) {
+                      <li>
+                        <a routerLink="/source/{{ source.xref }}">{{
+                          source.title
+                        }}</a>
+                        @if (source.page) {
+                          <span class="timeline-muted">
+                            — {{ source.page }}</span
+                          >
+                        }
+                      </li>
+                    }
+                  </ul>
+                </details>
+              }
+              @if (row.event.familyXref) {
+                <a
+                  class="timeline-family-link"
+                  routerLink="/family/{{ row.event.familyXref }}"
+                >
+                  <i class="bi bi-people" aria-hidden="true"></i> Family
+                </a>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </li>
+  } @empty {
+    <li class="timeline-empty">No events.</li>
+  }
+</ol>

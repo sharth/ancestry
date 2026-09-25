@@ -3,7 +3,10 @@ import { RouterModule } from "@angular/router";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { serializeGedcomFamily } from "../../gedcom/gedcomFamily";
 import { fullname } from "../../gedcom/gedcomIndividual";
-import { EventsTableComponent } from "../events-table/events-table.component";
+import {
+  EventsTimelineComponent,
+  type TimelineEvent,
+} from "../events-timeline/events-timeline.component";
 import { GedcomDisplayComponent } from "../gedcom-display/gedcom-display.component";
 import { IndividualLinkComponent } from "../individual-link/individual-link.component";
 
@@ -11,7 +14,7 @@ import { IndividualLinkComponent } from "../individual-link/individual-link.comp
   selector: "app-family",
   imports: [
     RouterModule,
-    EventsTableComponent,
+    EventsTimelineComponent,
     GedcomDisplayComponent,
     IndividualLinkComponent,
   ],
@@ -39,9 +42,15 @@ export class FamilyComponent {
         .map(name)
         .join(" & ") || family.xref;
 
+    const events: TimelineEvent[] = family.facts.map((fact) => ({
+      fact,
+      owner: "family",
+    }));
+
     return {
       title,
       family,
+      events,
       gedcomRecord: serializeGedcomFamily(family),
     };
   });
