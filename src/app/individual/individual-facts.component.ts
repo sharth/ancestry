@@ -27,9 +27,9 @@ export class IndividualFactsComponent {
     // The individual's own events, merged with the events of each family in
     // which they are a spouse.
     const events: TimelineEvent[] = [
-      ...individual.facts.map((fact) => ({
+      ...individual.facts.map((fact): TimelineEvent => ({
         fact,
-        owner: "individual" as const,
+        owner: "individual",
       })),
       ...individual.parentOfFamilyXrefs.flatMap((familyXref) => {
         const family = ancestryDatabase.families[familyXref];
@@ -38,9 +38,9 @@ export class IndividualFactsComponent {
           family.husbandXref === individual.xref ?
             family.wifeXref
           : family.husbandXref;
-        return family.facts.map((fact) => ({
+        return family.facts.map((fact): TimelineEvent => ({
           fact,
-          owner: "family" as const,
+          owner: "family",
           familyXref,
           spouseXref: spouseXref || undefined,
         }));
