@@ -11,6 +11,7 @@ import {
 } from "./events-timeline.component";
 
 describe("EventsTimelineComponent", () => {
+  let component: EventsTimelineComponent;
   let element: HTMLElement;
 
   beforeEach(async () => {
@@ -47,23 +48,20 @@ describe("EventsTimelineComponent", () => {
       bindings: [inputBinding("events", signal(events))],
     });
 
+    component = renderResult.fixture.componentInstance;
     element = renderResult.fixture.nativeElement as HTMLElement;
   });
 
   it("orders events by sort date, then date, with undated events last", () => {
-    const titles = Array.from(
-      element.querySelectorAll(".timeline-title"),
-      (title) => title.textContent.trim(),
-    );
-    expect(titles).toEqual(["Marriage", "Residence", "Occupation"]);
+    expect(component.rows().map((row) => row.title)).toEqual([
+      "Marriage",
+      "Residence",
+      "Occupation",
+    ]);
   });
 
   it("shows the year from the date, never the sort date", () => {
-    const years = Array.from(
-      element.querySelectorAll(".timeline-year"),
-      (year) => year.textContent.trim(),
-    );
-    expect(years).toEqual(["", "1910", ""]);
+    expect(component.rows().map((row) => row.year)).toEqual(["", "1910", ""]);
   });
 
   it("shows event details", () => {
