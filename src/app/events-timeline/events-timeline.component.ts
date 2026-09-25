@@ -88,9 +88,12 @@ export class EventsTimelineComponent {
             typeIsTitle ? "" : fact.type,
             fact.cause ? `Cause: ${fact.cause}` : "",
           ].filter((detail) => detail !== ""),
-          sources: fact.citations.map((citation) => ({
+          citations: fact.citations.map((citation) => ({
             xref: citation.sourceXref,
-            title: sources[citation.sourceXref]?.title || citation.sourceXref,
+            sourceTitle:
+              sources[citation.sourceXref]?.abbr ||
+              sources[citation.sourceXref]?.title ||
+              citation.sourceXref,
             page: citation.page,
             text: citation.text,
           })),

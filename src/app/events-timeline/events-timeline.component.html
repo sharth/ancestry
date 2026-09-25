@@ -37,28 +37,28 @@
           @for (note of fact.notes; track note) {
             <p class="timeline-note">{{ note.text }}</p>
           }
-          @if (row.sources.length > 0 || row.event.familyXref) {
+          @if (row.citations.length > 0 || row.event.familyXref) {
             <div class="timeline-footer">
-              @if (row.sources.length > 0) {
+              @if (row.citations.length > 0) {
                 <details class="timeline-sources">
                   <summary>
-                    {{ row.sources.length }}
-                    {{ row.sources.length === 1 ? "source" : "sources" }}
+                    {{ row.citations.length }}
+                    {{ row.citations.length === 1 ? "source" : "sources" }}
                   </summary>
                   <ul>
-                    @for (source of row.sources; track $index) {
+                    @for (citation of row.citations; track $index) {
                       <li>
-                        <a routerLink="/source/{{ source.xref }}">{{
-                          source.title
+                        <a routerLink="/source/{{ citation.xref }}">{{
+                          citation.sourceTitle
                         }}</a>
-                        @if (source.page) {
+                        @if (citation.page) {
                           <span class="timeline-muted">
-                            — {{ source.page }}</span
+                            — {{ citation.page }}</span
                           >
                         }
-                        @if (source.text) {
+                        @if (citation.text) {
                           <div class="timeline-muted">
-                            {{ source.text }}
+                            {{ citation.text }}
                           </div>
                         }
                       </li>
