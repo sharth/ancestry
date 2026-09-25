@@ -1,4 +1,4 @@
-import { inputBinding } from "@angular/core";
+import { inputBinding, signal } from "@angular/core";
 import type { ComponentFixture } from "@angular/core/testing";
 import { render } from "@testing-library/angular/zoneless";
 import { userEvent } from "@testing-library/user-event";
@@ -11,13 +11,14 @@ describe("InputIndividualFactsComponent", () => {
   let fixture: ComponentFixture<InputIndividualFactsComponent>;
   let component: InputIndividualFactsComponent;
 
-  const mockDatabase = newGedcomDatabase();
+  const workingDatabase = signal(newGedcomDatabase());
+  const open = signal(true);
 
   beforeEach(async () => {
     const renderResult = await render(InputIndividualFactsComponent, {
       bindings: [
-        inputBinding("workingDatabase", () => mockDatabase),
-        inputBinding("open", () => true),
+        inputBinding("workingDatabase", workingDatabase),
+        inputBinding("open", open),
       ],
       waitForStableOnRender: true,
     });

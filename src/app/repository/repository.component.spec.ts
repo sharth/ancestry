@@ -1,4 +1,4 @@
-import { inputBinding } from "@angular/core";
+import { inputBinding, signal } from "@angular/core";
 import type { ComponentFixture } from "@angular/core/testing";
 import { render } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -11,19 +11,22 @@ describe("RepositoryComponent", () => {
   let fixture: ComponentFixture<RepositoryComponent>;
 
   beforeEach(async () => {
-    const ancestryDatabase = newGedcomDatabase({
-      repositories: {
-        "@R1@": newGedcomRepository({
-          xref: "@R1@",
-          name: "Test Repository",
-        }),
-      },
-    });
+    const ancestryDatabase = signal(
+      newGedcomDatabase({
+        repositories: {
+          "@R1@": newGedcomRepository({
+            xref: "@R1@",
+            name: "Test Repository",
+          }),
+        },
+      }),
+    );
+    const xref = signal("@R1@");
 
     const renderResult = await render(RepositoryComponent, {
       bindings: [
-        inputBinding("ancestryDatabase", () => ancestryDatabase),
-        inputBinding("xref", () => "@R1@"),
+        inputBinding("ancestryDatabase", ancestryDatabase),
+        inputBinding("xref", xref),
       ],
       waitForStableOnRender: true,
     });

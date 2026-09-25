@@ -1,4 +1,4 @@
-import { inputBinding } from "@angular/core";
+import { inputBinding, signal } from "@angular/core";
 import type { ComponentFixture } from "@angular/core/testing";
 import { render } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -10,14 +10,16 @@ describe("GedcomDisplayComponent", () => {
   let fixture: ComponentFixture<GedcomDisplayComponent>;
 
   beforeEach(async () => {
-    const gedcomRecord = newGedcomRecord({
-      tag: "REPO",
-      xref: "@R1@",
-      children: [newGedcomRecord({ tag: "NAME", value: "Test Repository" })],
-    });
+    const gedcomRecord = signal(
+      newGedcomRecord({
+        tag: "REPO",
+        xref: "@R1@",
+        children: [newGedcomRecord({ tag: "NAME", value: "Test Repository" })],
+      }),
+    );
 
     const renderResult = await render(GedcomDisplayComponent, {
-      bindings: [inputBinding("gedcomRecord", () => gedcomRecord)],
+      bindings: [inputBinding("gedcomRecord", gedcomRecord)],
       waitForStableOnRender: true,
     });
 

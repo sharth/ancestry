@@ -1,4 +1,4 @@
-import { inputBinding } from "@angular/core";
+import { inputBinding, signal } from "@angular/core";
 import type { ComponentFixture } from "@angular/core/testing";
 import { render } from "@testing-library/angular/zoneless";
 import { assert, beforeEach, describe, expect, it } from "vitest";
@@ -9,17 +9,20 @@ describe("InputRepositoryXrefComponent", () => {
   let fixture: ComponentFixture<InputRepositoryXrefComponent>;
   let component: InputRepositoryXrefComponent;
 
-  const mockDatabase = newGedcomDatabase({
-    repositories: {
-      R1: { xref: "R1", name: "Mock Repository 1" },
-    },
-  });
+  const workingDatabase = signal(
+    newGedcomDatabase({
+      repositories: {
+        R1: { xref: "R1", name: "Mock Repository 1" },
+      },
+    }),
+  );
+  const value = signal("R1");
 
   beforeEach(async () => {
     const renderResult = await render(InputRepositoryXrefComponent, {
       bindings: [
-        inputBinding("workingDatabase", () => mockDatabase),
-        inputBinding("value", () => "R1"),
+        inputBinding("workingDatabase", workingDatabase),
+        inputBinding("value", value),
       ],
       waitForStableOnRender: true,
     });

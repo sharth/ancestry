@@ -1,4 +1,4 @@
-import { inputBinding } from "@angular/core";
+import { inputBinding, signal } from "@angular/core";
 import type { ComponentFixture } from "@angular/core/testing";
 import { provideRouter } from "@angular/router";
 import { render } from "@testing-library/angular/zoneless";
@@ -15,34 +15,37 @@ describe("IndividualFactsComponent", () => {
   let fixture: ComponentFixture<IndividualFactsComponent>;
 
   beforeEach(async () => {
-    const mockDatabase = newGedcomDatabase({
-      individuals: {
-        "@I1@": newGedcomIndividual({
-          xref: "@I1@",
-          facts: [
-            newGedcomFact({
-              tag: "BIRT",
-              date: newGedcomDate({ value: "1 JAN 1900" }),
-              place: "Some Place",
-              sortDate: newGedcomDate({ value: "1900" }),
-            }),
-          ],
-          parentOfFamilyXrefs: ["@F1@"],
-        }),
-      },
-      families: {
-        "@F1@": newGedcomFamily({
-          xref: "@F1@",
-          husbandXref: "@I1@",
-        }),
-      },
-    });
+    const ancestryDatabase = signal(
+      newGedcomDatabase({
+        individuals: {
+          "@I1@": newGedcomIndividual({
+            xref: "@I1@",
+            facts: [
+              newGedcomFact({
+                tag: "BIRT",
+                date: newGedcomDate({ value: "1 JAN 1900" }),
+                place: "Some Place",
+                sortDate: newGedcomDate({ value: "1900" }),
+              }),
+            ],
+            parentOfFamilyXrefs: ["@F1@"],
+          }),
+        },
+        families: {
+          "@F1@": newGedcomFamily({
+            xref: "@F1@",
+            husbandXref: "@I1@",
+          }),
+        },
+      }),
+    );
+    const xref = signal("@I1@");
 
     const renderResult = await render(IndividualFactsComponent, {
       providers: [provideRouter([])],
       bindings: [
-        inputBinding("ancestryDatabase", () => mockDatabase),
-        inputBinding("xref", () => "@I1@"),
+        inputBinding("ancestryDatabase", ancestryDatabase),
+        inputBinding("xref", xref),
       ],
       waitForStableOnRender: true,
     });
