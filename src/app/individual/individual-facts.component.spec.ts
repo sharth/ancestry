@@ -54,13 +54,15 @@ describe("IndividualFactsComponent", () => {
         },
       }),
     );
+    const xref = signal("@I1@");
 
     const renderResult = await render(IndividualFactsComponent, {
       providers: [provideRouter([])],
       bindings: [
         inputBinding("ancestryDatabase", ancestryDatabase),
-        inputBinding("xref", signal("@I1@")),
+        inputBinding("xref", xref),
       ],
+      waitForStableOnRender: true,
     });
 
     fixture = renderResult.fixture;
