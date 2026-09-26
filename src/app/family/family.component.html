@@ -23,27 +23,25 @@
     }
   </dl>
 
-  <h2>Events</h2>
-  <app-events-timeline [events]="vm.events" />
+  <ul class="nav nav-tabs mb-3" role="tablist">
+    <li class="nav-item" role="presentation">
+      <a class="nav-link" routerLink="facts" routerLinkActive="active">
+        Facts
+      </a>
+    </li>
+    <li class="nav-item" role="presentation">
+      <a class="nav-link" routerLink="sources" routerLinkActive="active">
+        Sources
+      </a>
+    </li>
+    <li class="nav-item" role="presentation">
+      <a class="nav-link" routerLink="gedcom" routerLinkActive="active">
+        Gedcom
+      </a>
+    </li>
+  </ul>
 
-  @if (vm.family.citations.length > 0) {
-    <h2>Citations</h2>
-    <ul>
-      @for (citation of vm.family.citations; track citation) {
-        <li>
-          <a routerLink="/source/{{ citation.sourceXref }}">{{
-            citation.sourceXref
-          }}</a>
-          @if (citation.page) {
-            {{ citation.page }}
-          }
-        </li>
-      }
-    </ul>
-  }
-
-  <h2>Gedcom</h2>
-  <app-gedcom-display [gedcomRecord]="vm.gedcomRecord" />
+  <router-outlet />
 } @else {
   <h1>Family {{ xref() }} not found</h1>
 }

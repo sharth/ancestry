@@ -211,3 +211,21 @@ export function getIndividualMultimediaCitations(
 
   return references;
 }
+
+export function getIndividualSourceCitations(
+  individual: GedcomIndividual,
+): { event: string; citation: GedcomSourceCitation }[] {
+  const references: { event: string; citation: GedcomSourceCitation }[] = [];
+
+  for (const event of individual.facts) {
+    for (const citation of event.citations) {
+      references.push({ event: event.tag, citation });
+    }
+  }
+
+  for (const citation of individual.sex.citations) {
+    references.push({ event: "SEX", citation });
+  }
+
+  return references;
+}

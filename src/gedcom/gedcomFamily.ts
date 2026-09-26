@@ -141,3 +141,21 @@ export function getFamilyMultimediaCitations(
 
   return references;
 }
+
+export function getFamilySourceCitations(
+  family: GedcomFamily,
+): { event: string; citation: GedcomSourceCitation }[] {
+  const references: { event: string; citation: GedcomSourceCitation }[] = [];
+
+  for (const event of family.facts) {
+    for (const citation of event.citations) {
+      references.push({ event: event.tag, citation });
+    }
+  }
+
+  for (const citation of family.citations) {
+    references.push({ event: "FAM", citation });
+  }
+
+  return references;
+}
