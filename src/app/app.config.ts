@@ -1,13 +1,11 @@
 import type { ApplicationConfig } from "@angular/core";
 import {
-  RouteReuseStrategy,
   provideRouter,
   withComponentInputBinding,
   withHashLocation,
   withInMemoryScrolling,
 } from "@angular/router";
 import { routes } from "./app.routes";
-import { NoRouteReuseStrategy } from "./no-reuse-route-strategy";
 
 declare const USE_HASH_LOCATION: boolean;
 
@@ -21,7 +19,6 @@ export const appConfig: ApplicationConfig = {
         scrollPositionRestoration: "enabled",
       }),
     ),
-    { provide: RouteReuseStrategy, useClass: NoRouteReuseStrategy },
   ],
 };
 
