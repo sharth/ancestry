@@ -11,6 +11,7 @@ header {
   grid-row: 1;
   grid-column: 1 / span 2;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 1rem;
   padding: 0.75rem 1.5rem;
@@ -56,4 +57,54 @@ main {
   background-color: #ffffff;
   border-left: 1px solid #dee2e6;
   border-top: 1px solid #dee2e6;
+}
+
+.nav-backdrop {
+  display: none;
+  padding: 0;
+  border: none;
+}
+
+/* Below Bootstrap's `md` breakpoint, the nav becomes a hidden, slide-in
+   panel (toggled by the header button) instead of a permanent column,
+   since a fixed 240px sidebar leaves little room for content on a phone. */
+@media (max-width: 767.98px) {
+  :host {
+    grid-template-columns: 1fr;
+  }
+
+  header {
+    grid-column: 1;
+    padding: 0.75rem 1rem;
+  }
+
+  nav {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1050;
+    width: min(80vw, 300px);
+    transform: translateX(-100%);
+    box-shadow: 2px 0 8px rgb(0 0 0 / 15%);
+    transition: transform 0.2s ease-in-out;
+  }
+
+  nav.open {
+    transform: translateX(0);
+  }
+
+  main {
+    grid-column: 1;
+    padding: 1rem;
+    border-left: none;
+  }
+
+  .nav-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 1040;
+    background-color: rgb(0 0 0 / 40%);
+  }
 }
