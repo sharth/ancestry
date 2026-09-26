@@ -25,7 +25,7 @@ export class MultimediaCitationsComponent {
         ...Object.values(ancestryDatabase.individuals).flatMap((individual) =>
           getIndividualMultimediaCitations(individual, xref).map(
             (citation) => ({
-              type: "Individual",
+              type: "Individual" as const,
               individual,
               event: citation.event,
               citation: citation.citation,
@@ -35,7 +35,7 @@ export class MultimediaCitationsComponent {
         // Family Citations
         ...Object.values(ancestryDatabase.families).flatMap((family) =>
           getFamilyMultimediaCitations(family, xref).map((citation) => ({
-            type: "Family",
+            type: "Family" as const,
             family,
             event: citation.event,
             citation: citation.citation,
