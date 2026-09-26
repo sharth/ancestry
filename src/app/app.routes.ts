@@ -1,12 +1,16 @@
 import type { Routes } from "@angular/router";
 import { ancestryDatabaseResolver } from "../database/ancestry.service";
 import { FamiliesComponent } from "./families/families.component";
+import { FamilyFactsComponent } from "./family/family-facts.component";
+import { FamilyGedcomComponent } from "./family/family-gedcom.component";
+import { FamilySourcesComponent } from "./family/family-sources.component";
 import { FamilyComponent } from "./family/family.component";
 import { HelloComponent } from "./hello/hello.component";
 import { IndexComponent } from "./index/index.component";
 import { IndividualAncestorsComponent } from "./individual/individual-ancestors.component";
 import { IndividualFactsComponent } from "./individual/individual-facts.component";
 import { IndividualGedcomComponent } from "./individual/individual-gedcom.component";
+import { IndividualSourcesComponent } from "./individual/individual-sources.component";
 import { IndividualComponent } from "./individual/individual.component";
 import { IndividualsComponent } from "./individuals/individuals.component";
 import { MultimediaComponent } from "./multimedia/multimedia.component";
@@ -42,6 +46,7 @@ export const routes: Routes = [
       { path: "", redirectTo: "facts", pathMatch: "full" },
       { path: "facts", component: IndividualFactsComponent },
       { path: "ancestors", component: IndividualAncestorsComponent },
+      { path: "sources", component: IndividualSourcesComponent },
       { path: "gedcom", component: IndividualGedcomComponent },
     ],
   },
@@ -54,6 +59,12 @@ export const routes: Routes = [
     path: "family/:xref",
     component: FamilyComponent,
     resolve: { ancestryDatabase: ancestryDatabaseResolver },
+    children: [
+      { path: "", redirectTo: "facts", pathMatch: "full" },
+      { path: "facts", component: FamilyFactsComponent },
+      { path: "sources", component: FamilySourcesComponent },
+      { path: "gedcom", component: FamilyGedcomComponent },
+    ],
   },
   {
     path: "repositories",

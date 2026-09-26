@@ -3,6 +3,7 @@ import type { ComponentFixture } from "@angular/core/testing";
 import { provideRouter } from "@angular/router";
 import { render } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it } from "vitest";
+import { page } from "vitest/browser";
 import {
   newGedcomDatabase,
   type GedcomDatabase,
@@ -16,6 +17,7 @@ import { IndividualFactsComponent } from "./individual-facts.component";
 describe("IndividualFactsComponent", () => {
   let component: IndividualFactsComponent;
   let fixture: ComponentFixture<IndividualFactsComponent>;
+  let element: HTMLElement;
   let ancestryDatabase: WritableSignal<GedcomDatabase>;
 
   beforeEach(async () => {
@@ -67,14 +69,18 @@ describe("IndividualFactsComponent", () => {
 
     fixture = renderResult.fixture;
     component = fixture.componentInstance;
+    element = fixture.nativeElement as HTMLElement;
   });
 
   it("should create", () => {
     expect(component).toBeTruthy();
   });
 
+  it("matches screenshot", async () => {
+    await expect(page.elementLocator(element)).toMatchScreenshot();
+  });
+
   it("should render events and relatives sections", () => {
-    const element = fixture.nativeElement as HTMLElement;
     const headings = Array.from(element.querySelectorAll("h2")).map(
       (h) => h.textContent,
     );
@@ -82,7 +88,6 @@ describe("IndividualFactsComponent", () => {
   });
 
   it("should merge individual and family events chronologically", () => {
-    const element = fixture.nativeElement as HTMLElement;
     const titles = Array.from(
       element.querySelectorAll(".timeline-title"),
       (title) => title.textContent.trim(),
