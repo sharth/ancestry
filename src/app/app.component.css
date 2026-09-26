@@ -49,6 +49,14 @@ nav a:hover {
   color: #0d6efd;
 }
 
+.nav-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  border-top: 1px solid #dee2e6;
+}
+
 main {
   grid-row: 2;
   grid-column: 2;
