@@ -1,6 +1,5 @@
-import { Component, inject, signal } from "@angular/core";
+import { Component, signal } from "@angular/core";
 import { RouterLink, RouterOutlet } from "@angular/router";
-import { AncestryService } from "../database/ancestry.service";
 
 @Component({
   selector: "app-root",
@@ -9,8 +8,6 @@ import { AncestryService } from "../database/ancestry.service";
   styleUrl: "./app.component.css",
 })
 export class AppComponent {
-  private readonly ancestryService = inject(AncestryService);
-
   readonly sidebarOpen = signal(false);
 
   toggleSidebar() {
@@ -19,22 +16,5 @@ export class AppComponent {
 
   closeSidebar() {
     this.sidebarOpen.set(false);
-  }
-
-  async requestPermissions() {
-    try {
-      await this.ancestryService.requestPermissions();
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
-  async clearDatabase() {
-    try {
-      await this.ancestryService.clearDatabase();
-      window.location.reload();
-    } catch (err) {
-      console.error(err);
-    }
   }
 }

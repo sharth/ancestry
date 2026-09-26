@@ -1,9 +1,8 @@
 import type { ComponentFixture } from "@angular/core/testing";
 import { provideRouter } from "@angular/router";
 import { render } from "@testing-library/angular/zoneless";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { page } from "vitest/browser";
-import { AncestryService } from "../database/ancestry.service";
 import { AppComponent } from "./app.component";
 
 describe("AppComponent", () => {
@@ -12,16 +11,8 @@ describe("AppComponent", () => {
   let element: HTMLElement;
 
   beforeEach(async () => {
-    const spy = {
-      requestPermissions: vi.fn(),
-      clearDatabase: vi.fn(),
-    };
-
     const renderResult = await render(AppComponent, {
-      providers: [
-        { provide: AncestryService, useValue: spy },
-        provideRouter([]),
-      ],
+      providers: [provideRouter([])],
       waitForStableOnRender: true,
     });
 
