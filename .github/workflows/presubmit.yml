@@ -24,9 +24,8 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: vitest-screenshot-attachments
-          path: |
-            .vitest/attachments
-            .vitest-screenshots
+          path: .vitest/attachments
+          include-hidden-files: true
           retention-days: 5
   prettier:
     runs-on: ubuntu-latest
