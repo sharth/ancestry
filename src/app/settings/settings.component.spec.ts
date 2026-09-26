@@ -46,6 +46,10 @@ describe("SettingsComponent", () => {
   });
 
   it("matches screenshot", async () => {
+    // Guarantee the empty state regardless of GEDCOM/multimedia state left
+    // behind by other specs sharing the same IndexedDB database.
+    await ancestryService.clearDatabase();
+    await fixture.whenStable();
     await expect(page.elementLocator(element)).toMatchScreenshot();
   });
 
