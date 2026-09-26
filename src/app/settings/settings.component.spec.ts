@@ -1,12 +1,14 @@
 import { TestBed, type ComponentFixture } from "@angular/core/testing";
 import { render } from "@testing-library/angular/zoneless";
 import { aroundEach, assert, beforeEach, describe, expect, it } from "vitest";
+import { page } from "vitest/browser";
 import { AncestryService } from "../../database/ancestry.service";
 import { SettingsComponent } from "./settings.component";
 
 describe("SettingsComponent", () => {
   let component: SettingsComponent;
   let fixture: ComponentFixture<SettingsComponent>;
+  let element: HTMLElement;
   let ancestryService: AncestryService;
 
   let gedcomFileHandle: FileSystemFileHandle;
@@ -19,6 +21,7 @@ describe("SettingsComponent", () => {
     ancestryService = TestBed.inject(AncestryService);
     fixture = renderResult.fixture;
     component = fixture.componentInstance;
+    element = fixture.nativeElement as HTMLElement;
   });
 
   beforeEach(async () => {
@@ -40,6 +43,10 @@ describe("SettingsComponent", () => {
 
   it("should create", () => {
     expect(component).toBeTruthy();
+  });
+
+  it("matches screenshot", async () => {
+    await expect(page.elementLocator(element)).toMatchScreenshot();
   });
 
   it("should call openGedcom when button is clicked", () => {
