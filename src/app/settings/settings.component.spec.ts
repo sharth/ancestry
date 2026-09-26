@@ -2,18 +2,17 @@ import { TestBed, type ComponentFixture } from "@angular/core/testing";
 import { render } from "@testing-library/angular/zoneless";
 import { aroundEach, assert, beforeEach, describe, expect, it } from "vitest";
 import { AncestryService } from "../../database/ancestry.service";
-import { HelloComponent } from "./hello.component";
+import { SettingsComponent } from "./settings.component";
 
-describe("HelloComponent", () => {
-  let component: HelloComponent;
-  let fixture: ComponentFixture<HelloComponent>;
+describe("SettingsComponent", () => {
+  let component: SettingsComponent;
+  let fixture: ComponentFixture<SettingsComponent>;
   let ancestryService: AncestryService;
 
   let gedcomFileHandle: FileSystemFileHandle;
-  let multimediaDirectoryHandle: FileSystemDirectoryHandle;
 
   beforeEach(async () => {
-    const renderResult = await render(HelloComponent, {
+    const renderResult = await render(SettingsComponent, {
       waitForStableOnRender: true,
     });
 
@@ -27,10 +26,7 @@ describe("HelloComponent", () => {
     gedcomFileHandle = await rootDirectory.getFileHandle("ancestry.ged", {
       create: true,
     });
-    multimediaDirectoryHandle = await rootDirectory.getDirectoryHandle(
-      "multimedia",
-      { create: true },
-    );
+    await rootDirectory.getDirectoryHandle("multimedia", { create: true });
   });
 
   // Polyfill window.showOpenFilePicker

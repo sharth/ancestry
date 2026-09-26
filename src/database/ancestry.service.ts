@@ -177,7 +177,7 @@ export const ancestryDatabaseResolver: ResolveFn<
   );
   const database = ancestryService.ancestryDatabase();
   if (database === undefined) {
-    return new RedirectCommand(router.parseUrl("/hello"));
+    return new RedirectCommand(router.parseUrl("/settings"));
   }
   return database;
 };
