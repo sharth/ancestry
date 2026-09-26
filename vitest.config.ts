@@ -18,13 +18,7 @@ export default defineConfig({
             platform,
             ext,
           }) =>
-            [
-              root,
-              ".vitest-screenshots",
-              testFileDirectory,
-              testFileName,
-              `${arg}-${browserName}-${platform}${ext}`,
-            ].join("/"),
+            `${root}/.vitest-screenshots/${testFileDirectory}/${testFileName}/${arg}-${browserName}-${platform}${ext}`,
         },
       },
     },
