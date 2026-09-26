@@ -1,4 +1,3 @@
-import path from "node:path";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
@@ -19,13 +18,13 @@ export default defineConfig({
             platform,
             ext,
           }) =>
-            path.join(
+            [
               root,
               ".vitest-screenshots",
               testFileDirectory,
               testFileName,
               `${arg}-${browserName}-${platform}${ext}`,
-            ),
+            ].join("/"),
         },
       },
     },

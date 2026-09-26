@@ -19,7 +19,7 @@ describe("IndexComponent", () => {
 
     fixture = renderResult.fixture;
     component = fixture.componentInstance;
-    element = fixture.nativeElement;
+    element = fixture.nativeElement as HTMLElement;
   });
 
   it("should create", () => {
