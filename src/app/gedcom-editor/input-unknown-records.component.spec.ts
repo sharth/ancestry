@@ -12,11 +12,9 @@ describe("InputUnknownRecordsComponent", () => {
   let fixture: ComponentFixture<InputUnknownRecordsComponent>;
   let component: InputUnknownRecordsComponent;
 
-  const workingDatabase = signal(newGedcomDatabase());
-
   beforeEach(async () => {
     const renderResult = await render(InputUnknownRecordsComponent, {
-      bindings: [inputBinding("workingDatabase", workingDatabase)],
+      bindings: [inputBinding("workingDatabase", signal(newGedcomDatabase()))],
       configureTestBed: (testBed) => {
         testBed.configureTestingModule({
           deferBlockBehavior: DeferBlockBehavior.Playthrough,

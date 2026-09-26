@@ -12,11 +12,9 @@ describe("InputNotesComponent", () => {
   let fixture: ComponentFixture<InputNotesComponent>;
   let component: InputNotesComponent;
 
-  const workingDatabase = signal(newGedcomDatabase());
-
   beforeEach(async () => {
     const renderResult = await render(InputNotesComponent, {
-      bindings: [inputBinding("workingDatabase", workingDatabase)],
+      bindings: [inputBinding("workingDatabase", signal(newGedcomDatabase()))],
       configureTestBed: (testBed) => {
         testBed.configureTestingModule({
           deferBlockBehavior: DeferBlockBehavior.Playthrough,

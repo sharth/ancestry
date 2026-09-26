@@ -9,11 +9,9 @@ describe("InputSourceComponent", () => {
   let fixture: ComponentFixture<InputSourceComponent>;
   let component: InputSourceComponent;
 
-  const workingDatabase = signal(newGedcomDatabase());
-
   beforeEach(async () => {
     const renderResult = await render(InputSourceComponent, {
-      bindings: [inputBinding("workingDatabase", workingDatabase)],
+      bindings: [inputBinding("workingDatabase", signal(newGedcomDatabase()))],
       waitForStableOnRender: true,
     });
 

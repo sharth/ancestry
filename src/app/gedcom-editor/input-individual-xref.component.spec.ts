@@ -9,11 +9,9 @@ describe("InputIndividualXrefComponent", () => {
   let fixture: ComponentFixture<InputIndividualXrefComponent>;
   let component: InputIndividualXrefComponent;
 
-  const workingDatabase = signal(newGedcomDatabase());
-
   beforeEach(async () => {
     const renderResult = await render(InputIndividualXrefComponent, {
-      bindings: [inputBinding("workingDatabase", workingDatabase)],
+      bindings: [inputBinding("workingDatabase", signal(newGedcomDatabase()))],
       waitForStableOnRender: true,
     });
 

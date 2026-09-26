@@ -13,12 +13,10 @@ describe("InputMultimediaLinksComponent", () => {
   let fixture: ComponentFixture<InputMultimediaLinksComponent>;
   let component: InputMultimediaLinksComponent;
 
-  const workingDatabase = signal(newGedcomDatabase());
-
   beforeEach(async () => {
     const renderResult = await render(InputMultimediaLinksComponent, {
       providers: [provideRouter([])],
-      bindings: [inputBinding("workingDatabase", workingDatabase)],
+      bindings: [inputBinding("workingDatabase", signal(newGedcomDatabase()))],
       configureTestBed: (testBed) => {
         testBed.configureTestingModule({
           deferBlockBehavior: DeferBlockBehavior.Playthrough,

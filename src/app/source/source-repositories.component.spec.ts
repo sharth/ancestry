@@ -10,10 +10,9 @@ describe("SourceRepositoriesComponent", () => {
   let fixture: ComponentFixture<SourceRepositoriesComponent>;
 
   beforeEach(async () => {
-    const xref = signal("@S1@");
     const renderResult = await render(SourceRepositoriesComponent, {
       providers: [provideRouter([])],
-      bindings: [inputBinding("xref", xref)],
+      bindings: [inputBinding("xref", signal("@S1@"))],
       waitForStableOnRender: true,
     });
     fixture = renderResult.fixture;

@@ -12,18 +12,18 @@ describe("MultimediaComponent", () => {
   let fixture: ComponentFixture<MultimediaComponent>;
 
   beforeEach(async () => {
-    const ancestryDatabase = signal(
-      newGedcomDatabase({
-        multimedias: { "@M1@": newGedcomMultimedia({ xref: "@M1@" }) },
-      }),
-    );
-    const xref = signal("@M1@");
-
     const renderResult = await render(MultimediaComponent, {
       providers: [provideRouter([])],
       bindings: [
-        inputBinding("ancestryDatabase", ancestryDatabase),
-        inputBinding("xref", xref),
+        inputBinding(
+          "ancestryDatabase",
+          signal(
+            newGedcomDatabase({
+              multimedias: { "@M1@": newGedcomMultimedia({ xref: "@M1@" }) },
+            }),
+          ),
+        ),
+        inputBinding("xref", signal("@M1@")),
       ],
       waitForStableOnRender: true,
     });

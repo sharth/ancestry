@@ -9,13 +9,10 @@ describe("GedcomDiffComponent", () => {
   let fixture: ComponentFixture<GedcomDiffComponent>;
 
   beforeEach(async () => {
-    const newGedcomRecord = signal(undefined);
-    const oldGedcomRecord = signal(undefined);
-
     const renderResult = await render(GedcomDiffComponent, {
       bindings: [
-        inputBinding("newGedcomRecord", newGedcomRecord),
-        inputBinding("oldGedcomRecord", oldGedcomRecord),
+        inputBinding("newGedcomRecord", signal(undefined)),
+        inputBinding("oldGedcomRecord", signal(undefined)),
       ],
       waitForStableOnRender: true,
     });

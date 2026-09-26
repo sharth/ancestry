@@ -12,18 +12,18 @@ describe("IndividualComponent", () => {
   let fixture: ComponentFixture<IndividualComponent>;
 
   beforeEach(async () => {
-    const ancestryDatabase = signal(
-      newGedcomDatabase({
-        individuals: { "@I1@": newGedcomIndividual({ xref: "@I1@" }) },
-      }),
-    );
-    const xref = signal("@I1@");
-
     const renderResult = await render(IndividualComponent, {
       providers: [provideRouter([])],
       bindings: [
-        inputBinding("ancestryDatabase", ancestryDatabase),
-        inputBinding("xref", xref),
+        inputBinding(
+          "ancestryDatabase",
+          signal(
+            newGedcomDatabase({
+              individuals: { "@I1@": newGedcomIndividual({ xref: "@I1@" }) },
+            }),
+          ),
+        ),
+        inputBinding("xref", signal("@I1@")),
       ],
       waitForStableOnRender: true,
     });

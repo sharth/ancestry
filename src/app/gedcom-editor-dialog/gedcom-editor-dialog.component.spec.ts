@@ -11,14 +11,11 @@ describe("GedcomEditorDialogComponent", () => {
   let fixture: ComponentFixture<GedcomEditorDialogComponent>;
 
   beforeEach(async () => {
-    const type = signal<"INDI" | "SOUR" | "OBJE" | "REPO">("INDI");
-    const ancestryDatabase = signal(newGedcomDatabase());
-
     const renderResult = await render(GedcomEditorDialogComponent, {
       providers: [provideRouter([])],
       bindings: [
-        inputBinding("type", type),
-        inputBinding("ancestryDatabase", ancestryDatabase),
+        inputBinding("type", signal<"INDI" | "SOUR" | "OBJE" | "REPO">("INDI")),
+        inputBinding("ancestryDatabase", signal(newGedcomDatabase())),
       ],
       waitForStableOnRender: true,
     });

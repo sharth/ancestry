@@ -12,11 +12,9 @@ describe("InputIndividualNamesComponent", () => {
   let fixture: ComponentFixture<InputIndividualNamesComponent>;
   let component: InputIndividualNamesComponent;
 
-  const workingDatabase = signal(newGedcomDatabase());
-
   beforeEach(async () => {
     const renderResult = await render(InputIndividualNamesComponent, {
-      bindings: [inputBinding("workingDatabase", workingDatabase)],
+      bindings: [inputBinding("workingDatabase", signal(newGedcomDatabase()))],
       configureTestBed: (testBed) => {
         testBed.configureTestingModule({
           deferBlockBehavior: DeferBlockBehavior.Playthrough,

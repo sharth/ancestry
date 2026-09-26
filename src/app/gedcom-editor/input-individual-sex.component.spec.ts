@@ -12,11 +12,9 @@ describe("InputIndividualSexComponent", () => {
   let fixture: ComponentFixture<InputIndividualSexComponent>;
   let component: InputIndividualSexComponent;
 
-  const workingDatabase = signal(newGedcomDatabase());
-
   beforeEach(async () => {
     const renderResult = await render(InputIndividualSexComponent, {
-      bindings: [inputBinding("workingDatabase", workingDatabase)],
+      bindings: [inputBinding("workingDatabase", signal(newGedcomDatabase()))],
       configureTestBed: (testBed) => {
         testBed.configureTestingModule({
           deferBlockBehavior: DeferBlockBehavior.Playthrough,

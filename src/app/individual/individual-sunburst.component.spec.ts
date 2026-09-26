@@ -12,14 +12,14 @@ describe("IndividualSunburstComponent", () => {
   let fixture: ComponentFixture<IndividualSunburstComponent>;
 
   beforeEach(async () => {
-    const ancestryDatabase = signal(newGedcomDatabase());
-    const individual = signal(newGedcomIndividual({ xref: "@I1@" }));
-
     const renderResult = await render(IndividualSunburstComponent, {
       providers: [provideRouter([])],
       bindings: [
-        inputBinding("ancestryDatabase", ancestryDatabase),
-        inputBinding("individual", individual),
+        inputBinding("ancestryDatabase", signal(newGedcomDatabase())),
+        inputBinding(
+          "individual",
+          signal(newGedcomIndividual({ xref: "@I1@" })),
+        ),
       ],
       waitForStableOnRender: true,
     });

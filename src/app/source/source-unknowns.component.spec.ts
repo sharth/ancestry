@@ -10,10 +10,9 @@ describe("SourceUnknownsComponent", () => {
   let fixture: ComponentFixture<SourceUnknownsComponent>;
 
   beforeEach(async () => {
-    const xref = signal("@S1@");
     const renderResult = await render(SourceUnknownsComponent, {
       providers: [provideRouter([])],
-      bindings: [inputBinding("xref", xref)],
+      bindings: [inputBinding("xref", signal("@S1@"))],
       waitForStableOnRender: true,
     });
     fixture = renderResult.fixture;

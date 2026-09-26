@@ -10,10 +10,9 @@ describe("SourceMultimediaComponent", () => {
   let fixture: ComponentFixture<SourceMultimediaComponent>;
 
   beforeEach(async () => {
-    const xref = signal("@S1@");
     const renderResult = await render(SourceMultimediaComponent, {
       providers: [provideRouter([])],
-      bindings: [inputBinding("xref", xref)],
+      bindings: [inputBinding("xref", signal("@S1@"))],
       waitForStableOnRender: true,
     });
     fixture = renderResult.fixture;

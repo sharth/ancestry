@@ -10,10 +10,8 @@ describe("MultimediasComponent", () => {
   let fixture: ComponentFixture<MultimediasComponent>;
 
   beforeEach(async () => {
-    const ancestryDatabase = signal(newGedcomDatabase());
-
     const renderResult = await render(MultimediasComponent, {
-      bindings: [inputBinding("ancestryDatabase", ancestryDatabase)],
+      bindings: [inputBinding("ancestryDatabase", signal(newGedcomDatabase()))],
       waitForStableOnRender: true,
     });
 

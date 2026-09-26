@@ -11,11 +11,9 @@ describe("IndividualsComponent", () => {
   let fixture: ComponentFixture<IndividualsComponent>;
 
   beforeEach(async () => {
-    const ancestryDatabase = signal(newGedcomDatabase());
-
     const renderResult = await render(IndividualsComponent, {
       providers: [provideRouter([])],
-      bindings: [inputBinding("ancestryDatabase", ancestryDatabase)],
+      bindings: [inputBinding("ancestryDatabase", signal(newGedcomDatabase()))],
       waitForStableOnRender: true,
     });
 

@@ -9,9 +9,8 @@ describe("MultimediaPreviewComponent", () => {
   let fixture: ComponentFixture<MultimediaPreviewComponent>;
 
   beforeEach(async () => {
-    const filePath = signal("photo.jpg");
     const renderResult = await render(MultimediaPreviewComponent, {
-      bindings: [inputBinding("filePath", filePath)],
+      bindings: [inputBinding("filePath", signal("photo.jpg"))],
       waitForStableOnRender: true,
     });
     fixture = renderResult.fixture;

@@ -9,11 +9,9 @@ describe("InputChangeDateComponent", () => {
   let fixture: ComponentFixture<InputChangeDateComponent>;
   let component: InputChangeDateComponent;
 
-  const workingDatabase = signal(newGedcomDatabase());
-
   beforeEach(async () => {
     const renderResult = await render(InputChangeDateComponent, {
-      bindings: [inputBinding("workingDatabase", workingDatabase)],
+      bindings: [inputBinding("workingDatabase", signal(newGedcomDatabase()))],
       waitForStableOnRender: true,
     });
 

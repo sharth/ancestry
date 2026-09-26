@@ -11,19 +11,19 @@ describe("SourceComponent", () => {
   let fixture: ComponentFixture<SourceComponent>;
 
   beforeEach(async () => {
-    const ancestryDatabase = signal(
-      newGedcomDatabase({
-        sources: {
-          "@S1@": newGedcomSource({ xref: "@S1@" }),
-        },
-      }),
-    );
-    const xref = signal("@S1@");
-
     const renderResult = await render(SourceComponent, {
       bindings: [
-        inputBinding("ancestryDatabase", ancestryDatabase),
-        inputBinding("xref", xref),
+        inputBinding(
+          "ancestryDatabase",
+          signal(
+            newGedcomDatabase({
+              sources: {
+                "@S1@": newGedcomSource({ xref: "@S1@" }),
+              },
+            }),
+          ),
+        ),
+        inputBinding("xref", signal("@S1@")),
       ],
       waitForStableOnRender: true,
     });

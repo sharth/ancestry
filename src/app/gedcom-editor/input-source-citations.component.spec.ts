@@ -13,12 +13,10 @@ describe("InputSourceCitationsComponent", () => {
   let fixture: ComponentFixture<InputSourceCitationsComponent>;
   let component: InputSourceCitationsComponent;
 
-  const workingDatabase = signal(newGedcomDatabase());
-
   beforeEach(async () => {
     const renderResult = await render(InputSourceCitationsComponent, {
       providers: [provideRouter([])],
-      bindings: [inputBinding("workingDatabase", workingDatabase)],
+      bindings: [inputBinding("workingDatabase", signal(newGedcomDatabase()))],
       configureTestBed: (testBed) => {
         testBed.configureTestingModule({
           deferBlockBehavior: DeferBlockBehavior.Playthrough,

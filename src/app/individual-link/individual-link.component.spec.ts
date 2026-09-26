@@ -10,10 +10,9 @@ describe("IndividualLinkComponent", () => {
   let fixture: ComponentFixture<IndividualLinkComponent>;
 
   beforeEach(async () => {
-    const xref = signal("@I1@");
     const renderResult = await render(IndividualLinkComponent, {
       providers: [provideRouter([])],
-      bindings: [inputBinding("xref", xref)],
+      bindings: [inputBinding("xref", signal("@I1@"))],
       waitForStableOnRender: true,
     });
     fixture = renderResult.fixture;

@@ -11,14 +11,11 @@ describe("MultimediaCitationsComponent", () => {
   let fixture: ComponentFixture<MultimediaCitationsComponent>;
 
   beforeEach(async () => {
-    const ancestryDatabase = signal(newGedcomDatabase());
-    const xref = signal("@M1@");
-
     const renderResult = await render(MultimediaCitationsComponent, {
       providers: [provideRouter([])],
       bindings: [
-        inputBinding("ancestryDatabase", ancestryDatabase),
-        inputBinding("xref", xref),
+        inputBinding("ancestryDatabase", signal(newGedcomDatabase())),
+        inputBinding("xref", signal("@M1@")),
       ],
       waitForStableOnRender: true,
     });

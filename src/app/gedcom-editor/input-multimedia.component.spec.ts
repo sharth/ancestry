@@ -9,11 +9,9 @@ describe("InputMultimediaComponent", () => {
   let fixture: ComponentFixture<InputMultimediaComponent>;
   let component: InputMultimediaComponent;
 
-  const workingDatabase = signal(newGedcomDatabase());
-
   beforeEach(async () => {
     const renderResult = await render(InputMultimediaComponent, {
-      bindings: [inputBinding("workingDatabase", workingDatabase)],
+      bindings: [inputBinding("workingDatabase", signal(newGedcomDatabase()))],
       waitForStableOnRender: true,
     });
 
