@@ -27,9 +27,7 @@ describe("FamilyFactsComponent", () => {
               individuals: {
                 "@I1@": newGedcomIndividual({
                   xref: "@I1@",
-                  names: [
-                    newGedcomName({ givenName: "John", surname: "Doe" }),
-                  ],
+                  names: [newGedcomName({ givenName: "John", surname: "Doe" })],
                 }),
                 "@I2@": newGedcomIndividual({
                   xref: "@I2@",

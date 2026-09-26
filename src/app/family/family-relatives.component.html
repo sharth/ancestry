@@ -2,7 +2,9 @@
   <dl>
     <dt>Husband</dt>
     @if (vm.husband) {
-      <dd><app-individual-link [xref]="vm.husband.xref"></app-individual-link></dd>
+      <dd>
+        <app-individual-link [xref]="vm.husband.xref"></app-individual-link>
+      </dd>
     } @else {
       <dd>None</dd>
     }
