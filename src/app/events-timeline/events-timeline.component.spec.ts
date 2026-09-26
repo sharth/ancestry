@@ -3,6 +3,7 @@ import type { ComponentFixture } from "@angular/core/testing";
 import { provideRouter } from "@angular/router";
 import { render } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it } from "vitest";
+import { AncestryService } from "../../database/ancestry.service";
 import { newGedcomDate } from "../../gedcom/gedcomDate";
 import { newGedcomFact } from "../../gedcom/gedcomFact";
 import { newGedcomSourceCitation } from "../../gedcom/gedcomSourceCitation";
@@ -10,6 +11,19 @@ import {
   EventsTimelineComponent,
   type TimelineEvent,
 } from "./events-timeline.component";
+
+const fakeAncestryService = {
+  ancestryDatabase: () => ({
+    individuals: {},
+    sources: {
+      "@S1@": {
+        abbr: "1910 Census",
+        title: "1910 United States Federal Census",
+      },
+      "@S2@": { abbr: "", title: "Massachusetts, Death Index, 1901-1980" },
+    },
+  }),
+};
 
 describe("EventsTimelineComponent", () => {
   let events: WritableSignal<TimelineEvent[]>;
@@ -30,8 +44,13 @@ describe("EventsTimelineComponent", () => {
           date: newGedcomDate({ value: "ABT 1910" }),
           place: "Boston, Suffolk, Massachusetts, USA",
           citations: [
-            newGedcomSourceCitation({ sourceXref: "@S1@" }),
+            newGedcomSourceCitation({
+              sourceXref: "@S1@",
+              page: "p. 12",
+              text: "Age 45, born Massachusetts",
+            }),
             newGedcomSourceCitation({ sourceXref: "@S2@" }),
+            newGedcomSourceCitation({ sourceXref: "@S3@" }),
           ],
         }),
       },
@@ -47,7 +66,10 @@ describe("EventsTimelineComponent", () => {
     ]);
 
     const renderResult = await render(EventsTimelineComponent, {
-      providers: [provideRouter([])],
+      providers: [
+        { provide: AncestryService, useValue: fakeAncestryService },
+        provideRouter([]),
+      ],
       bindings: [inputBinding("events", events)],
     });
 
@@ -71,8 +93,13 @@ describe("EventsTimelineComponent", () => {
   it("shows event details", () => {
     const text = element.textContent.replace(/\s+/g, " ");
     expect(text).toContain("Abt. 1910 • Boston, Suffolk, Massachusetts, USA");
-    expect(text).toContain("2 sources");
+    expect(text).toContain("3 sources");
     expect(text).toContain("Carpenter");
+    // The source's abbreviation is preferred, then its title, then its xref.
+    expect(text).toContain("1910 Census — p. 12");
+    expect(text).toContain("Age 45, born Massachusetts");
+    expect(text).toContain("Massachusetts, Death Index, 1901-1980");
+    expect(text).toContain("@S3@");
     expect(
       element.querySelector('a[href="/family/@F1@"]')?.textContent,
     ).toContain("Family");

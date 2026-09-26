@@ -1,17 +1,18 @@
 import { inputBinding, signal } from "@angular/core";
 import type { ComponentFixture } from "@angular/core/testing";
+import { provideRouter } from "@angular/router";
 import { render } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it } from "vitest";
-import { page } from "vitest/browser";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
-import { IndexComponent } from "./index.component";
+import { IndividualsComponent } from "./individuals.component";
 
-describe("IndexComponent", () => {
-  let component: IndexComponent;
-  let fixture: ComponentFixture<IndexComponent>;
+describe("IndividualsComponent", () => {
+  let component: IndividualsComponent;
+  let fixture: ComponentFixture<IndividualsComponent>;
 
   beforeEach(async () => {
-    const renderResult = await render(IndexComponent, {
+    const renderResult = await render(IndividualsComponent, {
+      providers: [provideRouter([])],
       bindings: [inputBinding("ancestryDatabase", signal(newGedcomDatabase()))],
       waitForStableOnRender: true,
     });
@@ -22,10 +23,5 @@ describe("IndexComponent", () => {
 
   it("should create", () => {
     expect(component).toBeTruthy();
-  });
-
-  it("matches screenshot", async () => {
-    const element = fixture.nativeElement as HTMLElement;
-    await expect(page.elementLocator(element)).toMatchScreenshot();
   });
 });
