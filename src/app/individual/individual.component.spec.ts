@@ -27,63 +27,65 @@ describe("IndividualComponent", () => {
   let fixture: ComponentFixture<IndividualComponent>;
   let element: HTMLElement;
 
-  const ancestryDatabase = newGedcomDatabase({
-    individuals: {
-      "@I1@": newGedcomIndividual({
-        xref: "@I1@",
-        names: [newGedcomName({ givenName: "John", surname: "Doe" })],
-        sex: newGedcomSex({ sex: "M" }),
-        facts: [
-          newGedcomFact({
-            tag: "BIRT",
-            date: { value: "1 JAN 1900" },
-            place: "Springfield",
-            citations: [
-              newGedcomSourceCitation({
-                sourceXref: "@S1@",
-                page: "Page 42",
-                text: "Birth record excerpt",
-              }),
-            ],
-          }),
-        ],
-        parentOfFamilyXrefs: ["@F1@"],
-      }),
-      "@I2@": newGedcomIndividual({
-        xref: "@I2@",
-        names: [newGedcomName({ givenName: "Jane", surname: "Smith" })],
-        sex: newGedcomSex({ sex: "F" }),
-        parentOfFamilyXrefs: ["@F1@"],
-      }),
-      "@I3@": newGedcomIndividual({
-        xref: "@I3@",
-        names: [newGedcomName({ givenName: "Baby", surname: "Doe" })],
-        childOfFamilyXrefs: ["@F1@"],
-      }),
-    },
-    families: {
-      "@F1@": newGedcomFamily({
-        xref: "@F1@",
-        husbandXref: "@I1@",
-        wifeXref: "@I2@",
-        childXrefs: ["@I3@"],
-        facts: [
-          newGedcomFact({
-            tag: "MARR",
-            date: { value: "20 JUN 1924" },
-            place: "Springfield",
-          }),
-        ],
-      }),
-    },
-    sources: {
-      "@S1@": newGedcomSource({
-        xref: "@S1@",
-        abbr: "Vital Records",
-        title: "Springfield Vital Records Office",
-      }),
-    },
-  });
+  const ancestryDatabase = signal(
+    newGedcomDatabase({
+      individuals: {
+        "@I1@": newGedcomIndividual({
+          xref: "@I1@",
+          names: [newGedcomName({ givenName: "John", surname: "Doe" })],
+          sex: newGedcomSex({ sex: "M" }),
+          facts: [
+            newGedcomFact({
+              tag: "BIRT",
+              date: { value: "1 JAN 1900" },
+              place: "Springfield",
+              citations: [
+                newGedcomSourceCitation({
+                  sourceXref: "@S1@",
+                  page: "Page 42",
+                  text: "Birth record excerpt",
+                }),
+              ],
+            }),
+          ],
+          parentOfFamilyXrefs: ["@F1@"],
+        }),
+        "@I2@": newGedcomIndividual({
+          xref: "@I2@",
+          names: [newGedcomName({ givenName: "Jane", surname: "Smith" })],
+          sex: newGedcomSex({ sex: "F" }),
+          parentOfFamilyXrefs: ["@F1@"],
+        }),
+        "@I3@": newGedcomIndividual({
+          xref: "@I3@",
+          names: [newGedcomName({ givenName: "Baby", surname: "Doe" })],
+          childOfFamilyXrefs: ["@F1@"],
+        }),
+      },
+      families: {
+        "@F1@": newGedcomFamily({
+          xref: "@F1@",
+          husbandXref: "@I1@",
+          wifeXref: "@I2@",
+          childXrefs: ["@I3@"],
+          facts: [
+            newGedcomFact({
+              tag: "MARR",
+              date: { value: "20 JUN 1924" },
+              place: "Springfield",
+            }),
+          ],
+        }),
+      },
+      sources: {
+        "@S1@": newGedcomSource({
+          xref: "@S1@",
+          abbr: "Vital Records",
+          title: "Springfield Vital Records Office",
+        }),
+      },
+    }),
+  );
 
   beforeEach(async () => {
     const renderResult = await render(IndividualComponent, {
@@ -95,7 +97,7 @@ describe("IndividualComponent", () => {
               path: "facts",
               component: IndividualFactsComponent,
               resolve: {
-                ancestryDatabase: () => ancestryDatabase,
+                ancestryDatabase: () => ancestryDatabase(),
                 xref: () => "@I1@",
               },
             },
@@ -103,7 +105,7 @@ describe("IndividualComponent", () => {
               path: "ancestors",
               component: IndividualAncestorsComponent,
               resolve: {
-                ancestryDatabase: () => ancestryDatabase,
+                ancestryDatabase: () => ancestryDatabase(),
                 xref: () => "@I1@",
               },
             },
@@ -111,7 +113,7 @@ describe("IndividualComponent", () => {
               path: "sources",
               component: IndividualSourcesComponent,
               resolve: {
-                ancestryDatabase: () => ancestryDatabase,
+                ancestryDatabase: () => ancestryDatabase(),
                 xref: () => "@I1@",
               },
             },
@@ -119,7 +121,7 @@ describe("IndividualComponent", () => {
               path: "gedcom",
               component: IndividualGedcomComponent,
               resolve: {
-                ancestryDatabase: () => ancestryDatabase,
+                ancestryDatabase: () => ancestryDatabase(),
                 xref: () => "@I1@",
               },
             },
@@ -128,7 +130,7 @@ describe("IndividualComponent", () => {
         ),
       ],
       bindings: [
-        inputBinding("ancestryDatabase", signal(ancestryDatabase)),
+        inputBinding("ancestryDatabase", ancestryDatabase),
         inputBinding("xref", signal("@I1@")),
       ],
       waitForStableOnRender: true,
