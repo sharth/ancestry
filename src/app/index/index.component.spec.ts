@@ -9,6 +9,7 @@ import { IndexComponent } from "./index.component";
 describe("IndexComponent", () => {
   let component: IndexComponent;
   let fixture: ComponentFixture<IndexComponent>;
+  let element: HTMLElement;
 
   beforeEach(async () => {
     const renderResult = await render(IndexComponent, {
@@ -18,6 +19,7 @@ describe("IndexComponent", () => {
 
     fixture = renderResult.fixture;
     component = fixture.componentInstance;
+    element = fixture.nativeElement;
   });
 
   it("should create", () => {
@@ -25,7 +27,6 @@ describe("IndexComponent", () => {
   });
 
   it("matches screenshot", async () => {
-    const element = fixture.nativeElement as HTMLElement;
     await expect(page.elementLocator(element)).toMatchScreenshot();
   });
 });
