@@ -41,6 +41,6 @@ testem.log
 .DS_Store
 Thumbs.db
 
-# Test output (screenshot baselines under __screenshots__ ARE committed)
+# Test output (screenshot baselines under .vitest-screenshots ARE committed)
 .vitest-attachments
 .vitest/
