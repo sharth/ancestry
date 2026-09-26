@@ -88,9 +88,9 @@ resolves/declares the same data key (see `individual/:xref` and `family/:xref` i
 Detail pages for individuals and families both follow the same shape: a parent component renders the
 identity info that's always visible (name, members, etc.) plus a Bootstrap `nav-tabs` bar and a
 `<router-outlet>`, and each tab (Facts, Ancestors, Sources, Gedcom) is a separate routed child component
-reading the same `ancestryDatabase`/`xref` inputs. `NoRouteReuseStrategy` (`app.config.ts`) forces every
-navigation, including between these tabs, to destroy and recreate the target component rather than reuse
-an existing instance.
+reading the same `ancestryDatabase`/`xref` inputs, which are consumed reactively (via `computed()`), so
+Angular's default route reuse strategy keeps working correctly across navigations, including between these
+tabs.
 
 UI is plain Bootstrap (classes + `bootstrap-icons`), not a component library — there's no Angular Material
 or similar; use `<table class="table table-striped">`, `btn`/`card`/`container` classes, etc. to match the

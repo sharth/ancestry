@@ -1,0 +1,24 @@
+@if (vm(); as vm) {
+  <dl>
+    <dt>Husband</dt>
+    @if (vm.husband) {
+      <dd>
+        <app-individual-link [xref]="vm.husband.xref"></app-individual-link>
+      </dd>
+    } @else {
+      <dd>None</dd>
+    }
+    <dt>Wife</dt>
+    @if (vm.wife) {
+      <dd><app-individual-link [xref]="vm.wife.xref"></app-individual-link></dd>
+    } @else {
+      <dd>None</dd>
+    }
+    <dt>Children</dt>
+    @for (child of vm.children; track child.xref) {
+      <dd><app-individual-link [xref]="child.xref"></app-individual-link></dd>
+    } @empty {
+      <dd>None</dd>
+    }
+  </dl>
+}
