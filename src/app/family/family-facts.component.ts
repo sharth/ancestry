@@ -4,10 +4,11 @@ import {
   EventsTimelineComponent,
   type TimelineEvent,
 } from "../events-timeline/events-timeline.component";
+import { FamilyRelativesComponent } from "./family-relatives.component";
 
 @Component({
   selector: "app-family-facts",
-  imports: [EventsTimelineComponent],
+  imports: [EventsTimelineComponent, FamilyRelativesComponent],
   templateUrl: "./family-facts.component.html",
   styleUrl: "./family.component.css",
 })
@@ -26,6 +27,6 @@ export class FamilyFactsComponent {
       owner: "family",
     }));
 
-    return { events };
+    return { family, events };
   });
 }
