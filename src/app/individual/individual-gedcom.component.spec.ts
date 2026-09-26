@@ -3,7 +3,7 @@ import type { ComponentFixture } from "@angular/core/testing";
 import { render } from "@testing-library/angular/zoneless";
 import { assert, beforeEach, describe, expect, it } from "vitest";
 import { page } from "vitest/browser";
-import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
+import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomFact } from "../../gedcom/gedcomFact";
 import { newGedcomIndividual } from "../../gedcom/gedcomIndividual";
 import { newGedcomName } from "../../gedcom/gedcomName";
@@ -16,27 +16,24 @@ describe("IndividualGedcomComponent", () => {
   let element: HTMLElement;
 
   beforeEach(async () => {
-    const ancestryDatabase = signal<GedcomDatabase>({
-      individuals: {
-        "@I1@": newGedcomIndividual({
-          xref: "@I1@",
-          names: [newGedcomName({ givenName: "John", surname: "Doe" })],
-          sex: newGedcomSex({ sex: "M" }),
-          facts: [
-            newGedcomFact({
-              tag: "BIRT",
-              date: { value: "1 JAN 1900" },
-              place: "Springfield",
-            }),
-          ],
-        }),
-      },
-      families: {},
-      sources: {},
-      repositories: {},
-      multimedias: {},
-      submitters: {},
-    });
+    const ancestryDatabase = signal(
+      newGedcomDatabase({
+        individuals: {
+          "@I1@": newGedcomIndividual({
+            xref: "@I1@",
+            names: [newGedcomName({ givenName: "John", surname: "Doe" })],
+            sex: newGedcomSex({ sex: "M" }),
+            facts: [
+              newGedcomFact({
+                tag: "BIRT",
+                date: { value: "1 JAN 1900" },
+                place: "Springfield",
+              }),
+            ],
+          }),
+        },
+      }),
+    );
     const xref = signal("@I1@");
 
     const renderResult = await render(IndividualGedcomComponent, {
