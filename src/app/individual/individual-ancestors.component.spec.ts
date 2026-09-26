@@ -6,28 +6,10 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { page } from "vitest/browser";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomFamily } from "../../gedcom/gedcomFamily";
-import {
-  newGedcomIndividual,
-  type GedcomIndividual,
-} from "../../gedcom/gedcomIndividual";
+import { newGedcomIndividual } from "../../gedcom/gedcomIndividual";
 import { newGedcomName } from "../../gedcom/gedcomName";
 import { newGedcomSex } from "../../gedcom/gedcomSex";
 import { IndividualAncestorsComponent } from "./individual-ancestors.component";
-
-function individual(
-  xref: string,
-  givenName: string,
-  surname: string,
-  sex: string,
-  extraFields: Partial<GedcomIndividual> = {},
-) {
-  return newGedcomIndividual({
-    xref,
-    names: [newGedcomName({ givenName, surname })],
-    sex: newGedcomSex({ sex }),
-    ...extraFields,
-  });
-}
 
 describe("IndividualAncestorsComponent", () => {
   let component: IndividualAncestorsComponent;
@@ -37,27 +19,48 @@ describe("IndividualAncestorsComponent", () => {
   beforeEach(async () => {
     const ancestryDatabase = newGedcomDatabase({
       individuals: {
-        "@I1@": individual("@I1@", "John", "Doe", "M", {
+        "@I1@": newGedcomIndividual({
+          xref: "@I1@",
+          names: [newGedcomName({ givenName: "John", surname: "Doe" })],
+          sex: newGedcomSex({ sex: "M" }),
           childOfFamilyXrefs: ["@F1@"],
         }),
-        "@I2@": individual("@I2@", "James", "Doe", "M", {
+        "@I2@": newGedcomIndividual({
+          xref: "@I2@",
+          names: [newGedcomName({ givenName: "James", surname: "Doe" })],
+          sex: newGedcomSex({ sex: "M" }),
           childOfFamilyXrefs: ["@F2@"],
           parentOfFamilyXrefs: ["@F1@"],
         }),
-        "@I3@": individual("@I3@", "Mary", "Smith", "F", {
+        "@I3@": newGedcomIndividual({
+          xref: "@I3@",
+          names: [newGedcomName({ givenName: "Mary", surname: "Smith" })],
+          sex: newGedcomSex({ sex: "F" }),
           childOfFamilyXrefs: ["@F3@"],
           parentOfFamilyXrefs: ["@F1@"],
         }),
-        "@I4@": individual("@I4@", "William", "Doe", "M", {
+        "@I4@": newGedcomIndividual({
+          xref: "@I4@",
+          names: [newGedcomName({ givenName: "William", surname: "Doe" })],
+          sex: newGedcomSex({ sex: "M" }),
           parentOfFamilyXrefs: ["@F2@"],
         }),
-        "@I5@": individual("@I5@", "Elizabeth", "Brown", "F", {
+        "@I5@": newGedcomIndividual({
+          xref: "@I5@",
+          names: [newGedcomName({ givenName: "Elizabeth", surname: "Brown" })],
+          sex: newGedcomSex({ sex: "F" }),
           parentOfFamilyXrefs: ["@F2@"],
         }),
-        "@I6@": individual("@I6@", "Robert", "Smith", "M", {
+        "@I6@": newGedcomIndividual({
+          xref: "@I6@",
+          names: [newGedcomName({ givenName: "Robert", surname: "Smith" })],
+          sex: newGedcomSex({ sex: "M" }),
           parentOfFamilyXrefs: ["@F3@"],
         }),
-        "@I7@": individual("@I7@", "Margaret", "Jones", "F", {
+        "@I7@": newGedcomIndividual({
+          xref: "@I7@",
+          names: [newGedcomName({ givenName: "Margaret", surname: "Jones" })],
+          sex: newGedcomSex({ sex: "F" }),
           parentOfFamilyXrefs: ["@F3@"],
         }),
       },
