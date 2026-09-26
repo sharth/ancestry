@@ -3,12 +3,12 @@ import { Router } from "@angular/router";
 import { AncestryService } from "../../database/ancestry.service";
 
 @Component({
-  selector: "app-hello",
+  selector: "app-settings",
   imports: [],
-  templateUrl: "./hello.component.html",
-  styleUrl: "./hello.component.css",
+  templateUrl: "./settings.component.html",
+  styleUrl: "./settings.component.css",
 })
-export class HelloComponent {
+export class SettingsComponent {
   private readonly ancestryService = inject(AncestryService);
   private readonly router = inject(Router);
 
@@ -25,14 +25,6 @@ export class HelloComponent {
         ],
       });
       await this.ancestryService.openGedcom(fileHandle);
-      // If successful, we can optionally navigate or just let the user see the file is loaded.
-      // The user request says: "If a gedcom file is loaded, perhaps we should ask the user if they would like to load a new file on this page."
-      // But also "If no gedcom file is loaded, we should always redirect the user to the /hello page."
-      // If we seek to make it "better", upon loading, we probably want to send them to the main view if they just loaded it?
-      // Or maybe stay here. The requirements didn't explicitly say "auto-redirect after load", but standard flow implies it.
-      // However, keeping them here allows them to load multimedia too.
-      // Let's stick to the prompt: "The file handle for both of these should get stored in the dexie database."
-      // I'll leave them here to optionally load multimedia, but maybe provide a "Go to App" button if loaded.
     } catch (err) {
       console.error(err);
     }
@@ -45,6 +37,14 @@ export class HelloComponent {
         mode: "read",
       });
       await this.ancestryService.openMultimedia(directoryHandle);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async requestPermissions() {
+    try {
+      await this.ancestryService.requestPermissions();
     } catch (err) {
       console.error(err);
     }

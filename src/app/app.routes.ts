@@ -5,7 +5,6 @@ import { FamilyFactsComponent } from "./family/family-facts.component";
 import { FamilyGedcomComponent } from "./family/family-gedcom.component";
 import { FamilySourcesComponent } from "./family/family-sources.component";
 import { FamilyComponent } from "./family/family.component";
-import { HelloComponent } from "./hello/hello.component";
 import { IndexComponent } from "./index/index.component";
 import { IndividualAncestorsComponent } from "./individual/individual-ancestors.component";
 import { IndividualFactsComponent } from "./individual/individual-facts.component";
@@ -19,6 +18,7 @@ import { PageNotFoundComponent } from "./page-not-found/page-not-found.component
 import { PlacesComponent } from "./places/places.component";
 import { RepositoriesComponent } from "./repositories/repositories.component";
 import { RepositoryComponent } from "./repository/repository.component";
+import { SettingsComponent } from "./settings/settings.component";
 import { SourceComponent } from "./source/source.component";
 import { SourcesComponent } from "./sources/sources.component";
 import { ValidationComponent } from "./validation/validation.component";
@@ -31,8 +31,8 @@ export const routes: Routes = [
     runGuardsAndResolvers: "always",
   },
   {
-    path: "hello",
-    component: HelloComponent,
+    path: "settings",
+    component: SettingsComponent,
   },
   {
     path: "individuals",
