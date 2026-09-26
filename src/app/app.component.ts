@@ -1,4 +1,4 @@
-import { Component, inject } from "@angular/core";
+import { Component, inject, signal } from "@angular/core";
 import { RouterLink, RouterOutlet } from "@angular/router";
 import { AncestryService } from "../database/ancestry.service";
 
@@ -10,6 +10,16 @@ import { AncestryService } from "../database/ancestry.service";
 })
 export class AppComponent {
   private readonly ancestryService = inject(AncestryService);
+
+  readonly sidebarOpen = signal(false);
+
+  toggleSidebar() {
+    this.sidebarOpen.update((open) => !open);
+  }
+
+  closeSidebar() {
+    this.sidebarOpen.set(false);
+  }
 
   async requestPermissions() {
     try {
