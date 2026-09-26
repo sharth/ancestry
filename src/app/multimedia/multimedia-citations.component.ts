@@ -1,5 +1,4 @@
 import { Component, computed, input } from "@angular/core";
-import { MatTableModule } from "@angular/material/table";
 import { RouterModule } from "@angular/router";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { getFamilyMultimediaCitations } from "../../gedcom/gedcomFamily";
@@ -10,7 +9,7 @@ import { IndividualLinkComponent } from "../individual-link/individual-link.comp
   selector: "app-multimedia-citations",
   templateUrl: "./multimedia-citations.component.html",
   styleUrl: "./multimedia.component.css",
-  imports: [RouterModule, MatTableModule, IndividualLinkComponent],
+  imports: [RouterModule, IndividualLinkComponent],
 })
 export class MultimediaCitationsComponent {
   readonly ancestryDatabase = input.required<GedcomDatabase>();
@@ -26,7 +25,7 @@ export class MultimediaCitationsComponent {
         ...Object.values(ancestryDatabase.individuals).flatMap((individual) =>
           getIndividualMultimediaCitations(individual, xref).map(
             (citation) => ({
-              type: "Individual",
+              type: "Individual" as const,
               individual,
               event: citation.event,
               citation: citation.citation,
@@ -36,7 +35,7 @@ export class MultimediaCitationsComponent {
         // Family Citations
         ...Object.values(ancestryDatabase.families).flatMap((family) =>
           getFamilyMultimediaCitations(family, xref).map((citation) => ({
-            type: "Family",
+            type: "Family" as const,
             family,
             event: citation.event,
             citation: citation.citation,

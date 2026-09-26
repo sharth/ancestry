@@ -1,11 +1,10 @@
 import { Component, inject } from "@angular/core";
-import { MatSidenavModule } from "@angular/material/sidenav";
 import { RouterLink, RouterOutlet } from "@angular/router";
 import { AncestryService } from "../database/ancestry.service";
 
 @Component({
   selector: "app-root",
-  imports: [RouterOutlet, MatSidenavModule, RouterLink],
+  imports: [RouterOutlet, RouterLink],
   templateUrl: "./app.component.html",
   styleUrl: "./app.component.css",
 })

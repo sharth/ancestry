@@ -1,5 +1,4 @@
 import { Component, computed, inject, input } from "@angular/core";
-import { MatTableModule } from "@angular/material/table";
 import { RouterModule } from "@angular/router";
 import { AncestryService } from "../../database/ancestry.service";
 import { IndividualLinkComponent } from "../individual-link/individual-link.component";
@@ -8,7 +7,7 @@ import { IndividualLinkComponent } from "../individual-link/individual-link.comp
   selector: "app-source-citations",
   templateUrl: "./source-citations.component.html",
   styleUrl: "./source.component.css",
-  imports: [RouterModule, MatTableModule, IndividualLinkComponent],
+  imports: [RouterModule, IndividualLinkComponent],
 })
 export class SourceCitationsComponent {
   readonly xref = input.required<string>();
