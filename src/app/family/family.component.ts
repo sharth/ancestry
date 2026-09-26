@@ -2,11 +2,10 @@ import { Component, computed, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { fullname } from "../../gedcom/gedcomIndividual";
-import { IndividualLinkComponent } from "../individual-link/individual-link.component";
 
 @Component({
   selector: "app-family",
-  imports: [RouterModule, IndividualLinkComponent],
+  imports: [RouterModule],
   templateUrl: "./family.component.html",
   styleUrl: "./family.component.css",
 })
@@ -33,7 +32,6 @@ export class FamilyComponent {
 
     return {
       title,
-      family,
     };
   });
 }

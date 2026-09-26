@@ -7,6 +7,8 @@ import { page } from "vitest/browser";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomFact } from "../../gedcom/gedcomFact";
 import { newGedcomFamily } from "../../gedcom/gedcomFamily";
+import { newGedcomIndividual } from "../../gedcom/gedcomIndividual";
+import { newGedcomName } from "../../gedcom/gedcomName";
 import { FamilyFactsComponent } from "./family-facts.component";
 
 describe("FamilyFactsComponent", () => {
@@ -22,6 +24,20 @@ describe("FamilyFactsComponent", () => {
           "ancestryDatabase",
           signal(
             newGedcomDatabase({
+              individuals: {
+                "@I1@": newGedcomIndividual({
+                  xref: "@I1@",
+                  names: [
+                    newGedcomName({ givenName: "John", surname: "Doe" }),
+                  ],
+                }),
+                "@I2@": newGedcomIndividual({
+                  xref: "@I2@",
+                  names: [
+                    newGedcomName({ givenName: "Jane", surname: "Smith" }),
+                  ],
+                }),
+              },
               families: {
                 "@F1@": newGedcomFamily({
                   xref: "@F1@",
@@ -59,5 +75,12 @@ describe("FamilyFactsComponent", () => {
 
   it("matches screenshot", async () => {
     await expect(page.elementLocator(element)).toMatchScreenshot();
+  });
+
+  it("should render events and relatives sections", () => {
+    const headings = Array.from(element.querySelectorAll("h2")).map(
+      (h) => h.textContent,
+    );
+    expect(headings).toEqual(["Events", "Relatives"]);
   });
 });
