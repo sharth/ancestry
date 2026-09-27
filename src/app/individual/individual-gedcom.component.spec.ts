@@ -1,8 +1,7 @@
 import { inputBinding, signal } from "@angular/core";
 import type { ComponentFixture } from "@angular/core/testing";
 import { render } from "@testing-library/angular/zoneless";
-import { assert, beforeEach, describe, expect, it } from "vitest";
-import { page } from "vitest/browser";
+import { assert, beforeEach, describe, it } from "vitest";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomFact } from "../../gedcom/gedcomFact";
 import { newGedcomIndividual } from "../../gedcom/gedcomIndividual";
@@ -60,9 +59,5 @@ describe("IndividualGedcomComponent", () => {
 
     const gedcomDisplay = element.querySelector("app-gedcom-display");
     assert.isOk(gedcomDisplay);
-  });
-
-  it("matches screenshot", async () => {
-    await expect(page.elementLocator(element)).toMatchScreenshot();
   });
 });

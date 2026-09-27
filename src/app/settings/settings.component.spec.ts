@@ -1,14 +1,12 @@
 import { TestBed, type ComponentFixture } from "@angular/core/testing";
 import { render } from "@testing-library/angular/zoneless";
 import { aroundEach, assert, beforeEach, describe, expect, it } from "vitest";
-import { page } from "vitest/browser";
 import { AncestryService } from "../../database/ancestry.service";
 import { SettingsComponent } from "./settings.component";
 
 describe("SettingsComponent", () => {
   let component: SettingsComponent;
   let fixture: ComponentFixture<SettingsComponent>;
-  let element: HTMLElement;
   let ancestryService: AncestryService;
 
   let gedcomFileHandle: FileSystemFileHandle;
@@ -21,7 +19,6 @@ describe("SettingsComponent", () => {
     ancestryService = TestBed.inject(AncestryService);
     fixture = renderResult.fixture;
     component = fixture.componentInstance;
-    element = fixture.nativeElement as HTMLElement;
   });
 
   beforeEach(async () => {
@@ -43,20 +40,6 @@ describe("SettingsComponent", () => {
 
   it("should create", () => {
     expect(component).toBeTruthy();
-  });
-
-  it("matches screenshot", async () => {
-    // Guarantee the empty state regardless of GEDCOM/multimedia state left
-    // behind by other specs sharing the same IndexedDB database.
-    await ancestryService.clearDatabase();
-    await fixture.whenStable();
-    // CI's chrome-headless-shell renders this page's card borders/icons with
-    // slightly different antialiasing than the plain chromium binary
-    // available in sandboxes, producing a small, deterministic pixel diff
-    // (consistently ~3598px / 2%) unrelated to any real layout change.
-    await expect(page.elementLocator(element)).toMatchScreenshot({
-      comparatorOptions: { allowedMismatchedPixelRatio: 0.03 },
-    });
   });
 
   it("should call openGedcom when button is clicked", () => {

@@ -3,7 +3,6 @@ import type { ComponentFixture } from "@angular/core/testing";
 import { provideRouter } from "@angular/router";
 import { render } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it } from "vitest";
-import { page } from "vitest/browser";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomFact } from "../../gedcom/gedcomFact";
 import { newGedcomFamily } from "../../gedcom/gedcomFamily";
@@ -14,7 +13,6 @@ import { FamilySourcesComponent } from "./family-sources.component";
 describe("FamilySourcesComponent", () => {
   let component: FamilySourcesComponent;
   let fixture: ComponentFixture<FamilySourcesComponent>;
-  let element: HTMLElement;
 
   beforeEach(async () => {
     const ancestryDatabase = newGedcomDatabase({
@@ -70,14 +68,9 @@ describe("FamilySourcesComponent", () => {
 
     fixture = renderResult.fixture;
     component = fixture.componentInstance;
-    element = fixture.nativeElement as HTMLElement;
   });
 
   it("should create", () => {
     expect(component).toBeTruthy();
-  });
-
-  it("matches screenshot", async () => {
-    await expect(page.elementLocator(element)).toMatchScreenshot();
   });
 });

@@ -38,10 +38,6 @@ the `chromium`/`chrome` instance's `launchOptions.executablePath` — no `vitest
 If results look stale after this, clear `node_modules/.vite .angular/cache .vitest .vitest-attachments`
 first.
 
-Screenshot-based tests (`toMatchScreenshot()`) compare against baseline PNGs committed under
-`.vitest-screenshots/`. A baseline generated against plain `chromium` instead of `chrome-headless-shell`
-can differ slightly in font rasterization from what real CI produces.
-
 ## Architecture
 
 This is an Angular 22 (zoneless, standalone components) single-page app for browsing and editing GEDCOM
