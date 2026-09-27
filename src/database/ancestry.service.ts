@@ -244,6 +244,32 @@ export class AncestryService {
     );
   }
 
+  // Resolves a multimedia path (as stored in a GEDCOM OBJE.FILE value, using
+  // forward or backward slashes) to a file handle within the currently
+  // loaded directory. Returns undefined if no directory is loaded, or if the
+  // path doesn't resolve to a file within it.
+  async getMultimediaFileHandle(
+    relativePath: string,
+  ): Promise<FileSystemFileHandle | undefined> {
+    let directoryHandle = this.gedcomResource.value()?.directoryHandle;
+    if (!directoryHandle) {
+      return undefined;
+    }
+
+    const pathParts = relativePath
+      .split(/[/\\]/)
+      .filter((part) => part.length > 0);
+    const fileName = pathParts.at(-1);
+    if (fileName === undefined) {
+      return undefined;
+    }
+
+    for (const part of pathParts.slice(0, -1)) {
+      directoryHandle = await directoryHandle.getDirectoryHandle(part);
+    }
+    return directoryHandle.getFileHandle(fileName);
+  }
+
   async requestPermissions() {
     const dataSource = (await this.dexieDatabase.metadata.get(1))?.dataSource;
     if (dataSource?.mode === "gedcom") {
