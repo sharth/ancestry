@@ -58,7 +58,9 @@ export class InputMultimediaLinksComponent implements FormValueControl<
 
   setCrop(index: number, crop: GedcomMultimediaCrop | undefined) {
     this.value.update((multimediaLinks) =>
-      multimediaLinks.map((link, i) => (i === index ? { ...link, crop } : link)),
+      multimediaLinks.map((link, i) =>
+        i === index ? { ...link, crop } : link,
+      ),
     );
   }
 

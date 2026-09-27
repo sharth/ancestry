@@ -284,7 +284,10 @@ export class AncestryService {
       }
       return await directoryHandle.getFileHandle(fileName);
     } catch (error) {
-      console.error(`Failed to resolve multimedia file ${relativePath}:`, error);
+      console.error(
+        `Failed to resolve multimedia file ${relativePath}:`,
+        error,
+      );
       return undefined;
     }
   }

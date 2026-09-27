@@ -1,4 +1,12 @@
-import { Component, computed, inject, input, model, resource, signal } from "@angular/core";
+import {
+  Component,
+  computed,
+  inject,
+  input,
+  model,
+  resource,
+  signal,
+} from "@angular/core";
 import { DomSanitizer } from "@angular/platform-browser";
 import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomMultimediaCrop } from "../../gedcom/gedcomMultimediaLink";
@@ -50,7 +58,12 @@ export class InputMultimediaCropComponent {
   readonly cropStyle = computed(() => {
     const crop = this.value();
     const naturalSize = this.naturalSize();
-    if (!crop || !naturalSize || naturalSize.width === 0 || naturalSize.height === 0) {
+    if (
+      !crop ||
+      !naturalSize ||
+      naturalSize.width === 0 ||
+      naturalSize.height === 0
+    ) {
       return undefined;
     }
     const { top = 0, left = 0, width = 0, height = 0 } = crop;
@@ -64,7 +77,10 @@ export class InputMultimediaCropComponent {
 
   onImageLoad(event: Event) {
     const img = event.target as HTMLImageElement;
-    this.naturalSize.set({ width: img.naturalWidth, height: img.naturalHeight });
+    this.naturalSize.set({
+      width: img.naturalWidth,
+      height: img.naturalHeight,
+    });
   }
 
   startDrag(event: PointerEvent) {

@@ -6,7 +6,12 @@
     (pointerup)="endDrag()"
     (pointerleave)="endDrag()"
   >
-    <img [src]="fileUrl" alt="" (load)="onImageLoad($event)" draggable="false" />
+    <img
+      [src]="fileUrl"
+      alt=""
+      (load)="onImageLoad($event)"
+      draggable="false"
+    />
     @if (cropStyle(); as cropStyle) {
       <div class="crop-rect" [style]="cropStyle"></div>
     }
