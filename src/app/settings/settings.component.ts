@@ -1,6 +1,9 @@
 import { Component, inject, signal } from "@angular/core";
 import { Router } from "@angular/router";
-import { AncestryService, findGedcomFilenames } from "../../database/ancestry.service";
+import {
+  AncestryService,
+  findGedcomFilenames,
+} from "../../database/ancestry.service";
 
 @Component({
   selector: "app-settings",
@@ -17,7 +20,8 @@ export class SettingsComponent {
   // Set while a chosen directory contains more than one GEDCOM file at its
   // root, so the user needs to pick which one to use.
   readonly directoryGedcomChoices = signal<
-    { directoryHandle: FileSystemDirectoryHandle; filenames: string[] } | undefined
+    | { directoryHandle: FileSystemDirectoryHandle; filenames: string[] }
+    | undefined
   >(undefined);
   readonly directoryError = signal<string | undefined>(undefined);
 
