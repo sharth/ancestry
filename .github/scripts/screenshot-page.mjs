@@ -2,7 +2,7 @@
 // Usage: node screenshot-page.mjs <distDir> <route> <outputFile> [port]
 import { createReadStream, existsSync } from "node:fs";
 import http from "node:http";
-import { extname, resolve, sep } from "node:path";
+import { extname, isAbsolute, relative, resolve } from "node:path";
 import { chromium } from "playwright";
 
 const [distDir, route, outputFile, portArg] = process.argv.slice(2);
@@ -35,8 +35,10 @@ const server = http.createServer((req, res) => {
   );
   // Reject any request that escapes distRoot (e.g. via `..` segments)
   // before touching the filesystem.
+  const relativePath = relative(distRoot, requestedPath);
   const isWithinDistRoot =
-    requestedPath === distRoot || requestedPath.startsWith(distRoot + sep);
+    relativePath === "" ||
+    (!relativePath.startsWith("..") && !isAbsolute(relativePath));
   const filePath =
     isWithinDistRoot && existsSync(requestedPath) ? requestedPath : indexPath;
   res.setHeader(
