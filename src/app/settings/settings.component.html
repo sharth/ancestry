@@ -4,50 +4,94 @@
       <h1>Settings</h1>
     </div>
     <div class="card-body">
-      <p class="lead">
-        To get started, please load a GEDCOM file. You may optionally load a
-        multimedia directory to view photos and documents.
-      </p>
+      <p class="lead">Choose where your family tree data comes from.</p>
+
+      @let dataSource = gedcomResource.value()?.dataSource;
 
       <div class="d-grid gap-3">
-        <div class="p-3 border rounded bg-light">
-          <h5>GEDCOM File</h5>
-          @if (gedcomResource.value()?.gedcomFileHandle) {
+        <div
+          class="p-3 border rounded"
+          [class.bg-light]="dataSource?.mode !== 'builtin'"
+          [class.border-success]="dataSource?.mode === 'builtin'"
+        >
+          <h5>Example Data</h5>
+          <p class="text-muted">
+            Load a sample GEDCOM file (the British Royal Family) with no setup
+            required. Good for trying the app out.
+          </p>
+          @if (dataSource?.mode === "builtin") {
+            <p class="text-success">Loaded: Royal Family (example data)</p>
+          }
+          <button class="btn btn-outline-primary" (click)="useExampleData()">
+            Use Example Data
+          </button>
+        </div>
+
+        <div
+          class="p-3 border rounded"
+          [class.bg-light]="dataSource?.mode !== 'gedcom'"
+          [class.border-success]="dataSource?.mode === 'gedcom'"
+        >
+          <h5>GEDCOM File Only</h5>
+          <p class="text-muted">
+            Load a single GEDCOM file from your computer. Multimedia isn't
+            supported with this option, since a GEDCOM file's photo and
+            document references are either relative paths (which this option
+            has no folder to resolve them against) or absolute paths (which a
+            website can't read from your computer). Choose a folder below
+            instead if you want photos and documents to work.
+          </p>
+          @if (dataSource?.mode === "gedcom") {
             <p class="text-success">
               Loaded: {{ gedcomResource.value()?.gedcomFileHandle?.name }}
             </p>
-            <button class="btn btn-outline-primary" (click)="openGedcom()">
-              Load Different GEDCOM
-            </button>
-          } @else {
-            <p class="text-danger">No GEDCOM file loaded.</p>
-            <button class="btn btn-primary" (click)="openGedcom()">
-              Load GEDCOM File
-            </button>
           }
+          <button class="btn btn-outline-primary" (click)="openGedcom()">
+            Choose GEDCOM File
+          </button>
         </div>
 
-        <div class="p-3 border rounded bg-light">
-          <h5>Multimedia Directory</h5>
-          @if (gedcomResource.value()?.directoryHandle) {
+        <div
+          class="p-3 border rounded"
+          [class.bg-light]="dataSource?.mode !== 'directory'"
+          [class.border-success]="dataSource?.mode === 'directory'"
+        >
+          <h5>Folder <span class="badge text-bg-primary">Recommended</span></h5>
+          <p class="text-muted">
+            Load a folder containing your GEDCOM file and its multimedia.
+            We'll look for GEDCOM files in the folder's root, and multimedia
+            referenced by a relative path will be loaded from the same
+            folder.
+          </p>
+          @if (dataSource?.mode === "directory") {
             <p class="text-success">
-              Loaded: {{ gedcomResource.value()?.directoryHandle?.name }}
+              Loaded: {{ gedcomResource.value()?.directoryHandle?.name }}/{{
+                dataSource.gedcomFilename
+              }}
             </p>
-            <button
-              class="btn btn-outline-secondary"
-              (click)="openMultimedia()"
-            >
-              Change Multimedia Directory
-            </button>
-          } @else {
-            <p class="text-muted">No multimedia directory loaded (Optional).</p>
-            <button class="btn btn-secondary" (click)="openMultimedia()">
-              Load Multimedia Directory
-            </button>
           }
+          @if (directoryError()) {
+            <p class="text-danger">{{ directoryError() }}</p>
+          }
+          @if (directoryGedcomChoices(); as choices) {
+            <p>Which GEDCOM file should we use?</p>
+            <div class="d-grid gap-2 mb-2">
+              @for (filename of choices.filenames; track filename) {
+                <button
+                  class="btn btn-outline-secondary text-start"
+                  (click)="chooseGedcomInDirectory(filename)"
+                >
+                  {{ filename }}
+                </button>
+              }
+            </div>
+          }
+          <button class="btn btn-outline-primary" (click)="chooseDirectory()">
+            Choose Folder
+          </button>
         </div>
 
-        @if (gedcomResource.value()?.gedcomFileHandle) {
+        @if (gedcomResource.value()?.gedcomRecords?.length) {
           <hr />
           <button class="btn btn-success btn-lg" (click)="enterApp()">
             Enter Application
