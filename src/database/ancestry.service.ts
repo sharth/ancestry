@@ -11,7 +11,28 @@ import {
 } from "../gedcom/gedcomDatabase";
 import { parseGedcomRecords, type GedcomRecord } from "../gedcom/gedcomRecord";
 
+export const BUILTIN_GEDCOM_URL = "assets/samples/royal-family.ged";
+
+export type DataSource =
+  | { mode: "builtin" }
+  | { mode: "gedcom"; gedcomHandle: FileSystemFileHandle }
+  | {
+      mode: "directory";
+      directoryHandle: FileSystemDirectoryHandle;
+      gedcomFilename: string;
+    };
+
 interface DatabaseState {
+  id?: number;
+  dataSource?: DataSource;
+}
+
+// Older versions of this table stored `gedcomHandle`/`multimediaHandle`
+// directly rather than as a `dataSource` union; migrate anyone who has that
+// shape already in IndexedDB into the "gedcom" mode (multimedia handles
+// stored independently of a directory aren't representable anymore, so they
+// are dropped, matching the new gedcom-only vs. directory split).
+interface LegacyDatabaseState {
   id?: number;
   gedcomHandle?: FileSystemFileHandle;
   multimediaHandle?: FileSystemDirectoryHandle;
@@ -25,7 +46,39 @@ class DexieDatabase extends Dexie {
     this.version(5).stores({
       metadata: "++id",
     });
+    this.version(6)
+      .stores({
+        metadata: "++id",
+      })
+      .upgrade(async (transaction) => {
+        await transaction
+          .table<LegacyDatabaseState, number>("metadata")
+          .toCollection()
+          .modify((state) => {
+            const legacy = state as DatabaseState & LegacyDatabaseState;
+            if (legacy.gedcomHandle !== undefined) {
+              legacy.dataSource = {
+                mode: "gedcom",
+                gedcomHandle: legacy.gedcomHandle,
+              };
+            }
+            delete legacy.gedcomHandle;
+            delete legacy.multimediaHandle;
+          });
+      });
   }
+}
+
+export async function findGedcomFilenames(
+  directoryHandle: FileSystemDirectoryHandle,
+): Promise<string[]> {
+  const filenames: string[] = [];
+  for await (const [name, handle] of directoryHandle.entries()) {
+    if (handle.kind === "file" && name.toLowerCase().endsWith(".ged")) {
+      filenames.push(name);
+    }
+  }
+  return filenames.sort();
 }
 
 @Service()
@@ -49,24 +102,48 @@ export class AncestryService {
     }),
     loader: async () => {
       const metadata = await this.dexieDatabase.metadata.get(1);
-      const gedcomFileHandle = metadata?.gedcomHandle;
-      const directoryHandle = metadata?.multimediaHandle;
+      const dataSource = metadata?.dataSource;
 
-      if (gedcomFileHandle == undefined) {
+      if (dataSource === undefined) {
         return {
+          dataSource: undefined,
           gedcomFileHandle: undefined,
           gedcomFile: undefined,
           gedcomText: undefined,
           gedcomRecords: [],
-          directoryHandle,
+          directoryHandle: undefined,
         };
       }
+
+      if (dataSource.mode === "builtin") {
+        const response = await fetch(BUILTIN_GEDCOM_URL);
+        const gedcomText = await response.text();
+        const gedcomRecords = parseGedcomRecords(gedcomText);
+        return {
+          dataSource,
+          gedcomFileHandle: undefined,
+          gedcomFile: undefined,
+          gedcomText,
+          gedcomRecords,
+          directoryHandle: undefined,
+        };
+      }
+
+      const gedcomFileHandle =
+        dataSource.mode === "gedcom"
+          ? dataSource.gedcomHandle
+          : await dataSource.directoryHandle.getFileHandle(
+              dataSource.gedcomFilename,
+            );
+      const directoryHandle =
+        dataSource.mode === "directory" ? dataSource.directoryHandle : undefined;
 
       const gedcomFile = await gedcomFileHandle.getFile();
       const gedcomText = await gedcomFile.text();
       const gedcomRecords = parseGedcomRecords(gedcomText);
 
       return {
+        dataSource,
         gedcomFileHandle,
         gedcomFile,
         gedcomText,
@@ -115,7 +192,7 @@ export class AncestryService {
     this.gedcomResource.reload();
   }
 
-  async openGedcom(fileHandle: FileSystemFileHandle) {
+  private async setDataSource(dataSource: DataSource) {
     await this.dexieDatabase.transaction(
       "rw",
       this.dexieDatabase.metadata,
@@ -124,25 +201,29 @@ export class AncestryService {
         const metadata = (await this.dexieDatabase.metadata.get(1)) ?? {
           id: 1,
         };
-        metadata.gedcomHandle = fileHandle;
+        metadata.dataSource = dataSource;
         await this.dexieDatabase.metadata.put(metadata);
       },
     );
-    console.log("Parsing complete");
   }
 
-  async openMultimedia(directoryHandle: FileSystemDirectoryHandle) {
-    await this.dexieDatabase.transaction(
-      "rw",
-      this.dexieDatabase.metadata,
-      async () => {
-        const metadata = (await this.dexieDatabase.metadata.get(1)) ?? {
-          id: 1,
-        };
-        metadata.multimediaHandle = directoryHandle;
-        await this.dexieDatabase.metadata.put(metadata);
-      },
-    );
+  async openBuiltin() {
+    await this.setDataSource({ mode: "builtin" });
+  }
+
+  async openGedcom(gedcomHandle: FileSystemFileHandle) {
+    await this.setDataSource({ mode: "gedcom", gedcomHandle });
+  }
+
+  async openDirectory(
+    directoryHandle: FileSystemDirectoryHandle,
+    gedcomFilename: string,
+  ) {
+    await this.setDataSource({
+      mode: "directory",
+      directoryHandle,
+      gedcomFilename,
+    });
   }
 
   async clearDatabase() {
@@ -156,9 +237,12 @@ export class AncestryService {
   }
 
   async requestPermissions() {
-    const metadata = await this.dexieDatabase.metadata.get(1);
-    await metadata?.gedcomHandle?.requestPermission();
-    await metadata?.multimediaHandle?.requestPermission();
+    const dataSource = (await this.dexieDatabase.metadata.get(1))?.dataSource;
+    if (dataSource?.mode === "gedcom") {
+      await dataSource.gedcomHandle.requestPermission();
+    } else if (dataSource?.mode === "directory") {
+      await dataSource.directoryHandle.requestPermission();
+    }
 
     this.gedcomResource.reload();
   }
