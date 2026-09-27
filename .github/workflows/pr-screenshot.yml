@@ -50,6 +50,13 @@ jobs:
           npx @angular/cli build
           cd ..
           node head/.github/scripts/screenshot-page.mjs head/dist/angular/browser "$ROUTE" head.png 4301
+      - name: Diff base and head screenshots
+        run: |
+          mkdir -p diff-tools
+          npm --prefix diff-tools init -y
+          npm --prefix diff-tools install --no-save pixelmatch pngjs
+          cp head/.github/scripts/diff-images.mjs diff-tools/
+          node diff-tools/diff-images.mjs base.png head.png diff.png
       - name: Publish screenshots to image branch
         id: publish
         run: |
@@ -66,6 +73,7 @@ jobs:
           mkdir -p "head/$IMAGE_DIR"
           cp base.png "head/$IMAGE_DIR/base.png"
           cp head.png "head/$IMAGE_DIR/head.png"
+          cp diff.png "head/$IMAGE_DIR/diff.png"
           cd head
           git add "$IMAGE_DIR"
           git commit -m "Screenshots for PR #${{ github.event.pull_request.number }} ($ROUTE)"
@@ -83,9 +91,9 @@ jobs:
               marker,
               `### Screenshot preview: \`${route}\``,
               "",
-              "| Base | Head |",
-              "| --- | --- |",
-              `| ![Base](${rawBase}/base.png) | ![Head](${rawBase}/head.png) |`,
+              "| Base | Head | Diff |",
+              "| --- | --- | --- |",
+              `| ![Base](${rawBase}/base.png) | ![Head](${rawBase}/head.png) | ![Diff](${rawBase}/diff.png) |`,
             ].join("\n");
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
