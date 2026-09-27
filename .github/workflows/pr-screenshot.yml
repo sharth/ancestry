@@ -1,0 +1,110 @@
+name: PR Screenshot Diff
+permissions:
+  contents: write
+  pull-requests: write
+on:
+  pull_request:
+    branches: ["main"]
+    types: [opened, synchronize, reopened]
+concurrency:
+  group: pr-screenshot-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  screenshot:
+    runs-on: ubuntu-latest
+    env:
+      # The page to screenshot, as a route path. Change this to preview a
+      # different page.
+      ROUTE: /settings
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: head
+      - name: Checkout PR base
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: base
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: head/package-lock.json
+      - name: Install dependencies and browser
+        working-directory: head
+        run: |
+          npm clean-install
+          npx playwright install chromium --with-deps
+      - name: Build and screenshot base
+        run: |
+          cd base
+          npm clean-install
+          npx @angular/cli build
+          cd ..
+          node head/.github/scripts/screenshot-page.mjs base/dist/angular/browser "$ROUTE" base.png 4300
+      - name: Build and screenshot head
+        run: |
+          cd head
+          npx @angular/cli build
+          cd ..
+          node head/.github/scripts/screenshot-page.mjs head/dist/angular/browser "$ROUTE" head.png 4301
+      - name: Publish screenshots to image branch
+        id: publish
+        run: |
+          IMAGE_DIR="pr-${{ github.event.pull_request.number }}/${{ github.event.pull_request.head.sha }}"
+          git -C head config user.name "github-actions[bot]"
+          git -C head config user.email "github-actions[bot]@users.noreply.github.com"
+          git -C head fetch origin screenshots || true
+          if git -C head rev-parse --verify origin/screenshots >/dev/null 2>&1; then
+            git -C head checkout -B screenshots origin/screenshots
+          else
+            git -C head checkout --orphan screenshots
+            git -C head rm -rf --quiet . || true
+          fi
+          mkdir -p "head/$IMAGE_DIR"
+          cp base.png "head/$IMAGE_DIR/base.png"
+          cp head.png "head/$IMAGE_DIR/head.png"
+          cd head
+          git add "$IMAGE_DIR"
+          git commit -m "Screenshots for PR #${{ github.event.pull_request.number }} ($ROUTE)"
+          git push origin screenshots
+          echo "image_dir=$IMAGE_DIR" >> "$GITHUB_OUTPUT"
+      - name: Post or update sticky comment
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const route = process.env.ROUTE;
+            const imageDir = "${{ steps.publish.outputs.image_dir }}";
+            const rawBase = `https://raw.githubusercontent.com/${{ github.repository }}/screenshots/${imageDir}`;
+            const marker = "<!-- pr-screenshot-diff -->";
+            const body = [
+              marker,
+              `### Screenshot preview: \`${route}\``,
+              "",
+              "| Base | Head |",
+              "| --- | --- |",
+              `| ![Base](${rawBase}/base.png) | ![Head](${rawBase}/head.png) |`,
+            ].join("\n");
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const existing = comments.find((c) => c.body.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
