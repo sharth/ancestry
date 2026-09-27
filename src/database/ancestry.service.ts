@@ -130,13 +130,15 @@ export class AncestryService {
       }
 
       const gedcomFileHandle =
-        dataSource.mode === "gedcom"
-          ? dataSource.gedcomHandle
-          : await dataSource.directoryHandle.getFileHandle(
-              dataSource.gedcomFilename,
-            );
+        dataSource.mode === "gedcom" ?
+          dataSource.gedcomHandle
+        : await dataSource.directoryHandle.getFileHandle(
+            dataSource.gedcomFilename,
+          );
       const directoryHandle =
-        dataSource.mode === "directory" ? dataSource.directoryHandle : undefined;
+        dataSource.mode === "directory" ?
+          dataSource.directoryHandle
+        : undefined;
 
       const gedcomFile = await gedcomFileHandle.getFile();
       const gedcomText = await gedcomFile.text();

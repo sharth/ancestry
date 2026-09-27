@@ -35,11 +35,11 @@
           <h5>GEDCOM File Only</h5>
           <p class="text-muted">
             Load a single GEDCOM file from your computer. Multimedia isn't
-            supported with this option, since a GEDCOM file's photo and
-            document references are either relative paths (which this option
-            has no folder to resolve them against) or absolute paths (which a
-            website can't read from your computer). Choose a folder below
-            instead if you want photos and documents to work.
+            supported with this option, since a GEDCOM file's photo and document
+            references are either relative paths (which this option has no
+            folder to resolve them against) or absolute paths (which a website
+            can't read from your computer). Choose a folder below instead if you
+            want photos and documents to work.
           </p>
           @if (dataSource?.mode === "gedcom") {
             <p class="text-success">
@@ -58,10 +58,9 @@
         >
           <h5>Folder <span class="badge text-bg-primary">Recommended</span></h5>
           <p class="text-muted">
-            Load a folder containing your GEDCOM file and its multimedia.
-            We'll look for GEDCOM files in the folder's root, and multimedia
-            referenced by a relative path will be loaded from the same
-            folder.
+            Load a folder containing your GEDCOM file and its multimedia. We'll
+            look for GEDCOM files in the folder's root, and multimedia
+            referenced by a relative path will be loaded from the same folder.
           </p>
           @if (dataSource?.mode === "directory") {
             <p class="text-success">
