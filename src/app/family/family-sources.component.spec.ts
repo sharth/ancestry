@@ -13,6 +13,7 @@ import { FamilySourcesComponent } from "./family-sources.component";
 describe("FamilySourcesComponent", () => {
   let component: FamilySourcesComponent;
   let fixture: ComponentFixture<FamilySourcesComponent>;
+  let element: HTMLElement;
 
   beforeEach(async () => {
     const ancestryDatabase = newGedcomDatabase({
@@ -68,6 +69,7 @@ describe("FamilySourcesComponent", () => {
 
     fixture = renderResult.fixture;
     component = fixture.componentInstance;
+    element = fixture.nativeElement as HTMLElement;
   });
 
   it("should create", () => {

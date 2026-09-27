@@ -22,6 +22,7 @@ import { FamilyComponent } from "./family.component";
 describe("FamilyComponent", () => {
   let component: FamilyComponent;
   let fixture: ComponentFixture<FamilyComponent>;
+  let element: HTMLElement;
 
   const ancestryDatabase = signal(
     newGedcomDatabase({
@@ -128,6 +129,7 @@ describe("FamilyComponent", () => {
 
     fixture = renderResult.fixture;
     component = fixture.componentInstance;
+    element = fixture.nativeElement as HTMLElement;
 
     await TestBed.inject(Router).navigateByUrl("/");
     await fixture.whenStable();

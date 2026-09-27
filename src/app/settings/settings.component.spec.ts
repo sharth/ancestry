@@ -7,6 +7,7 @@ import { SettingsComponent } from "./settings.component";
 describe("SettingsComponent", () => {
   let component: SettingsComponent;
   let fixture: ComponentFixture<SettingsComponent>;
+  let element: HTMLElement;
   let ancestryService: AncestryService;
 
   let gedcomFileHandle: FileSystemFileHandle;
@@ -19,6 +20,7 @@ describe("SettingsComponent", () => {
     ancestryService = TestBed.inject(AncestryService);
     fixture = renderResult.fixture;
     component = fixture.componentInstance;
+    element = fixture.nativeElement as HTMLElement;
   });
 
   beforeEach(async () => {
