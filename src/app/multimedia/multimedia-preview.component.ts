@@ -29,34 +29,14 @@ export class MultimediaPreviewComponent {
         return { fileUrl: undefined, mediaType: undefined };
       }
 
-      const gedcomResourceValue = this.ancestryService.gedcomResource.value();
-      let directoryHandle = gedcomResourceValue?.directoryHandle;
-
-      if (!directoryHandle) {
-        return { fileUrl: undefined, mediaType: undefined };
-      }
-
       try {
-        // Split the path by both forward and backward slashes
-        const pathParts = params.filePath
-          .split(/[/\\]/)
-          .filter((part) => part.length > 0);
-
-        if (pathParts.length === 0) {
-          throw new Error("Invalid file path");
+        const fileHandle = await this.ancestryService.getMultimediaFileHandle(
+          params.filePath,
+        );
+        if (!fileHandle) {
+          return { fileUrl: undefined, mediaType: undefined };
         }
 
-        // Navigate through subdirectories
-        for (const part of pathParts.slice(0, -1)) {
-          directoryHandle = await directoryHandle.getDirectoryHandle(part);
-        }
-
-        // Get the file from the final directory
-        const fileName = pathParts[pathParts.length - 1];
-        if (!fileName) {
-          throw new Error("Invalid file path");
-        }
-        const fileHandle = await directoryHandle.getFileHandle(fileName);
         const file = await fileHandle.getFile();
         const fileUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
           URL.createObjectURL(file),
