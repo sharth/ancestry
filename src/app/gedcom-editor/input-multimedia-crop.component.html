@@ -1,0 +1,26 @@
+@if (fileResource.value(); as fileUrl) {
+  <div
+    class="crop-container"
+    (pointerdown)="startDrag($event)"
+    (pointermove)="continueDrag($event)"
+    (pointerup)="endDrag()"
+    (pointerleave)="endDrag()"
+  >
+    <img [src]="fileUrl" alt="" (load)="onImageLoad($event)" draggable="false" />
+    @if (cropStyle(); as cropStyle) {
+      <div class="crop-rect" [style]="cropStyle"></div>
+    }
+  </div>
+  <button
+    type="button"
+    class="btn btn-sm btn-outline-secondary mt-1"
+    (click)="clearCrop()"
+    [disabled]="!value()"
+  >
+    Clear crop
+  </button>
+} @else if (fileResource.isLoading()) {
+  <p>Loading image…</p>
+} @else {
+  <p>No image available to crop.</p>
+}
