@@ -1,8 +1,8 @@
 // Serves a built Angular app (SPA, path-based routing) and screenshots one route.
 // Usage: node screenshot-page.mjs <distDir> <route> <outputFile> [port]
-import { createReadStream, existsSync } from "node:fs";
+import { createReadStream, readdirSync } from "node:fs";
 import http from "node:http";
-import { extname, isAbsolute, relative, resolve } from "node:path";
+import { extname, join, resolve } from "node:path";
 import { chromium } from "playwright";
 
 const [distDir, route, outputFile, portArg] = process.argv.slice(2);
@@ -24,23 +24,34 @@ const contentTypes = {
   ".woff2": "font/woff2",
 };
 
-// Angular's build uses path-based routing (no hash), so any unmatched path
-// falls back to index.html, same as a production SPA host would configure.
 const distRoot = resolve(distDir);
 const indexPath = resolve(distRoot, "index.html");
+
+// Build a fixed allowlist of every file actually present in the build output,
+// so a request path is never used to touch the filesystem directly: it can
+// only select one of these known-safe, precomputed paths.
+function listFiles(dir) {
+  const files = new Set();
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const entryPath = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      for (const file of listFiles(entryPath)) files.add(file);
+    } else {
+      files.add(entryPath);
+    }
+  }
+  return files;
+}
+const servableFiles = listFiles(distRoot);
+
+// Angular's build uses path-based routing (no hash), so any unmatched path
+// falls back to index.html, same as a production SPA host would configure.
 const server = http.createServer((req, res) => {
   const requestedPath = resolve(
     distRoot,
     "." + decodeURIComponent(req.url.split("?")[0]),
   );
-  // Reject any request that escapes distRoot (e.g. via `..` segments)
-  // before touching the filesystem.
-  const relativePath = relative(distRoot, requestedPath);
-  const isWithinDistRoot =
-    relativePath === "" ||
-    (!relativePath.startsWith("..") && !isAbsolute(relativePath));
-  const filePath =
-    isWithinDistRoot && existsSync(requestedPath) ? requestedPath : indexPath;
+  const filePath = servableFiles.has(requestedPath) ? requestedPath : indexPath;
   res.setHeader(
     "Content-Type",
     contentTypes[extname(filePath)] ?? "application/octet-stream",
@@ -48,7 +59,7 @@ const server = http.createServer((req, res) => {
   createReadStream(filePath).pipe(res);
 });
 
-await new Promise((resolve) => server.listen(port, resolve));
+await new Promise((resolveListen) => server.listen(port, resolveListen));
 
 const browser = await chromium.launch(
   process.env.CHROME_BIN ? { executablePath: process.env.CHROME_BIN } : {},
