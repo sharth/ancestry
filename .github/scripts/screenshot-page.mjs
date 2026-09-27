@@ -2,7 +2,7 @@
 // Usage: node screenshot-page.mjs <distDir> <route> <outputFile> [port]
 import { createReadStream, existsSync } from "node:fs";
 import http from "node:http";
-import { extname, join } from "node:path";
+import { extname, resolve, sep } from "node:path";
 import { chromium } from "playwright";
 
 const [distDir, route, outputFile, portArg] = process.argv.slice(2);
@@ -26,15 +26,19 @@ const contentTypes = {
 
 // Angular's build uses path-based routing (no hash), so any unmatched path
 // falls back to index.html, same as a production SPA host would configure.
+const distRoot = resolve(distDir);
+const indexPath = resolve(distRoot, "index.html");
 const server = http.createServer((req, res) => {
-  const requestedPath = join(
-    distDir,
-    decodeURIComponent(req.url.split("?")[0]),
+  const requestedPath = resolve(
+    distRoot,
+    "." + decodeURIComponent(req.url.split("?")[0]),
   );
+  // Reject any request that escapes distRoot (e.g. via `..` segments)
+  // before touching the filesystem.
+  const isWithinDistRoot =
+    requestedPath === distRoot || requestedPath.startsWith(distRoot + sep);
   const filePath =
-    existsSync(requestedPath) && requestedPath.includes(distDir) ?
-      requestedPath
-    : join(distDir, "index.html");
+    isWithinDistRoot && existsSync(requestedPath) ? requestedPath : indexPath;
   res.setHeader(
     "Content-Type",
     contentTypes[extname(filePath)] ?? "application/octet-stream",
