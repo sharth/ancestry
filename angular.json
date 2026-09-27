@@ -63,7 +63,8 @@
           "options": {
             "runnerConfig": "vitest.config.ts",
             "tsConfig": "tsconfig.spec.json",
-            "browsers": ["ChromiumHeadless"]
+            "browsers": ["ChromiumHeadless"],
+            "isolate": true
           }
         },
         "lint": {
