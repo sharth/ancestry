@@ -18,7 +18,25 @@ jobs:
       - run: npm clean-install
       - run: npx playwright install chromium --with-deps
       - run: npx @angular/cli build
-      - run: npx @angular/cli test --no-progress --no-watch
+      - run: |
+          echo "--- cpu/mem ---"
+          nproc
+          free -h
+          echo "--- apparmor userns restriction (if present) ---"
+          cat /proc/sys/kernel/apparmor_restrict_unprivileged_userns 2>&1 || true
+          echo "--- unprivileged userns sysctl (if present) ---"
+          cat /proc/sys/kernel/unprivileged_userns_clone 2>&1 || true
+          echo "--- /dev/shm ---"
+          df -h /dev/shm
+      - name: Run tests (repeated to catch the intermittent disconnect)
+        run: |
+          for i in 1 2 3 4 5; do
+            echo "=== attempt $i ==="
+            npx @angular/cli test --no-progress --no-watch || { echo "FAILED on attempt $i"; break; }
+          done
+      - name: Kernel log after test run
+        if: always()
+        run: sudo dmesg -T | tail -100 || true
   prettier:
     runs-on: ubuntu-latest
     steps:
