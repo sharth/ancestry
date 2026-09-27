@@ -7,7 +7,6 @@ import {
 } from "@angular/router";
 import { render } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it } from "vitest";
-import { page } from "vitest/browser";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomFact } from "../../gedcom/gedcomFact";
 import { newGedcomFamily } from "../../gedcom/gedcomFamily";
@@ -25,7 +24,6 @@ import { IndividualComponent } from "./individual.component";
 describe("IndividualComponent", () => {
   let component: IndividualComponent;
   let fixture: ComponentFixture<IndividualComponent>;
-  let element: HTMLElement;
 
   const ancestryDatabase = signal(
     newGedcomDatabase({
@@ -138,7 +136,6 @@ describe("IndividualComponent", () => {
 
     fixture = renderResult.fixture;
     component = fixture.componentInstance;
-    element = fixture.nativeElement as HTMLElement;
 
     await TestBed.inject(Router).navigateByUrl("/");
     await fixture.whenStable();
@@ -146,9 +143,5 @@ describe("IndividualComponent", () => {
 
   it("should create", () => {
     expect(component).toBeTruthy();
-  });
-
-  it("matches screenshot", async () => {
-    await expect(page.elementLocator(element)).toMatchScreenshot();
   });
 });

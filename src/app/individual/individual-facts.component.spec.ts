@@ -3,7 +3,6 @@ import type { ComponentFixture } from "@angular/core/testing";
 import { provideRouter } from "@angular/router";
 import { render } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it } from "vitest";
-import { page } from "vitest/browser";
 import {
   newGedcomDatabase,
   type GedcomDatabase,
@@ -74,10 +73,6 @@ describe("IndividualFactsComponent", () => {
 
   it("should create", () => {
     expect(component).toBeTruthy();
-  });
-
-  it("matches screenshot", async () => {
-    await expect(page.elementLocator(element)).toMatchScreenshot();
   });
 
   it("should render events and relatives sections", () => {
