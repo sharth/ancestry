@@ -18,20 +18,11 @@ jobs:
       - run: npm clean-install
       - run: npx playwright install chromium --with-deps
       - run: npx @angular/cli build
-      - name: "Run tests (temporary: sharded into small groups, each its own process, to check whether limiting page/browser reuse eliminates VITEST_BROWSER_CONNECTION_CLOSED)"
+      - name: "Run tests (temporary: settings.component.spec.ts alone, repeated, to check whether it crashes in complete isolation)"
         run: |
-          mapfile -t ALL_SPECS < <(npx @angular/cli test --list-tests | grep 'spec\.ts$' | sed 's/^[[:space:]]*//')
-          echo "Discovered ${#ALL_SPECS[@]} spec files"
-          shard_size=10
-          total=${#ALL_SPECS[@]}
-          for ((i = 0; i < total; i += shard_size)); do
-            shard=("${ALL_SPECS[@]:i:shard_size}")
-            args=()
-            for f in "${shard[@]}"; do
-              args+=(--include "$f")
-            done
-            echo "=== shard starting at index $i (${#shard[@]} files) ==="
-            npx @angular/cli test --no-progress --no-watch "${args[@]}"
+          for i in 1 2 3 4 5; do
+            echo "=== attempt $i ==="
+            npx @angular/cli test --no-progress --no-watch --include "src/app/settings/settings.component.spec.ts" || exit 1
           done
   prettier:
     runs-on: ubuntu-latest
