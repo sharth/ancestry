@@ -18,7 +18,12 @@ jobs:
       - run: npm clean-install
       - run: npx playwright install chromium --with-deps
       - run: npx @angular/cli build
-      - run: npx @angular/cli test --no-progress --no-watch
+      - name: Run tests (repeated, temporarily, to validate the Dexie-listener-leak fix)
+        run: |
+          for i in $(seq 1 10); do
+            echo "=== attempt $i ==="
+            npx @angular/cli test --no-progress --no-watch || { echo "FAILED on attempt $i"; exit 1; }
+          done
   prettier:
     runs-on: ubuntu-latest
     steps:
