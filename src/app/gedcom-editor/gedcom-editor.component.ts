@@ -322,6 +322,10 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     }
   }
 
+  hasUnsavedChanges(): boolean {
+    return this.differences().length > 0;
+  }
+
   async submitForm() {
     await this.ancestryService.updateGedcomDatabase(this.workingDatabase());
     await this.router.navigate([], {
