@@ -18,21 +18,20 @@ jobs:
       - run: npm clean-install
       - run: npx playwright install chromium --with-deps
       - run: npx @angular/cli build
-      - name: "Wrap chromium with --disable-gpu (temporary, diagnostic)"
+      - name: "Run tests (temporary: sharded into small groups, each its own process, to check whether limiting page/browser reuse eliminates VITEST_BROWSER_CONNECTION_CLOSED)"
         run: |
-          REAL_CHROME="$(node -e "console.log(require('playwright-core').chromium.executablePath())")"
-          WRAPPER="$RUNNER_TEMP/chromium-disable-gpu.sh"
-          cat > "$WRAPPER" <<SCRIPT
-          #!/bin/sh
-          exec "$REAL_CHROME" --disable-gpu "\$@"
-          SCRIPT
-          chmod +x "$WRAPPER"
-          echo "CHROME_BIN=$WRAPPER" >> "$GITHUB_ENV"
-      - name: "Run tests (temporary: repeated, with --disable-gpu, to check whether it eliminates VITEST_BROWSER_CONNECTION_CLOSED)"
-        run: |
-          for i in 1 2 3 4 5; do
-            echo "=== attempt $i ==="
-            npx @angular/cli test --no-progress --no-watch || exit 1
+          mapfile -t ALL_SPECS < <(npx @angular/cli test --list-tests | grep 'spec\.ts$' | sed 's/^[[:space:]]*//')
+          echo "Discovered ${#ALL_SPECS[@]} spec files"
+          shard_size=10
+          total=${#ALL_SPECS[@]}
+          for ((i = 0; i < total; i += shard_size)); do
+            shard=("${ALL_SPECS[@]:i:shard_size}")
+            args=()
+            for f in "${shard[@]}"; do
+              args+=(--include "$f")
+            done
+            echo "=== shard starting at index $i (${#shard[@]} files) ==="
+            npx @angular/cli test --no-progress --no-watch "${args[@]}"
           done
   prettier:
     runs-on: ubuntu-latest
