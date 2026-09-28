@@ -2,7 +2,7 @@ import { DestroyRef, Service, computed, inject, resource } from "@angular/core";
 import { toObservable, toSignal } from "@angular/core/rxjs-interop";
 import { RedirectCommand, Router, type ResolveFn } from "@angular/router";
 import Dexie, { liveQuery } from "dexie";
-import { filter, firstValueFrom, from } from "rxjs";
+import { filter, firstValueFrom, from, map, shareReplay } from "rxjs";
 import {
   compareGedcomDatabase,
   parseGedcomDatabase,
@@ -89,10 +89,27 @@ export class AncestryService {
   // changes made by this service's own writes, since Dexie's liveQuery
   // tracks exactly which tables/queries a write affects and re-queries
   // automatically, without needing every writer to manually signal that
-  // something changed.
-  private readonly metadata = toSignal(
-    from(liveQuery(() => this.dexieDatabase.metadata.get(1))),
-    { initialValue: undefined },
+  // something changed. Shared so `metadata` and `metadataLoaded` below
+  // observe the exact same emissions rather than each running their own
+  // separate IndexedDB read.
+  private readonly metadata$ = from(
+    liveQuery(() => this.dexieDatabase.metadata.get(1)),
+  ).pipe(shareReplay(1));
+
+  private readonly metadata = toSignal(this.metadata$, {
+    initialValue: undefined,
+  });
+
+  // `liveQuery` (and therefore `metadata` above) is always asynchronous,
+  // even for an already-cached read, so `metadata` starts out `undefined`
+  // for a brief moment on every load -- indistinguishable from "read the
+  // row, and there's genuinely no data source configured". `gedcomResource`
+  // needs to tell those two states apart so it doesn't briefly report "no
+  // data source" (and have the resolver redirect to /settings) before the
+  // real IndexedDB read comes back.
+  private readonly metadataLoaded = toSignal(
+    this.metadata$.pipe(map(() => true)),
+    { initialValue: false },
   );
 
   constructor() {
@@ -108,8 +125,22 @@ export class AncestryService {
   readonly gedcomResource = resource({
     params: () => ({
       metadata: this.metadata(),
+      metadataLoaded: this.metadataLoaded(),
     }),
-    loader: async ({ params }) => {
+    loader: async ({ params, abortSignal }) => {
+      if (!params.metadataLoaded) {
+        // The real metadata row hasn't come back from IndexedDB yet -- stay
+        // "loading" rather than reporting "no data source", so callers
+        // (like ancestryDatabaseResolver) don't act on that as if it were
+        // final. Once the liveQuery emits, `metadataLoaded` and `metadata`
+        // both change, `params` changes, and Angular aborts this call and
+        // reruns the loader with the real value.
+        return await new Promise<never>((_resolve, reject) => {
+          abortSignal.addEventListener("abort", () => { reject(new DOMException("Superseded by new metadata", "AbortError")); },
+          );
+        });
+      }
+
       const dataSource = params.metadata?.dataSource;
 
       if (dataSource === undefined) {
