@@ -18,11 +18,34 @@ jobs:
       - run: npm clean-install
       - run: npx playwright install chromium --with-deps
       - run: npx @angular/cli build
-      - name: Run tests (repeated, temporarily, to validate the Dexie-listener-leak fix)
+      - name: Run tests (repeated, temporarily, narrowed to the exact 16-file subset that preceded the crash in CI runs 108744892225/108745804132, to check whether this subset reproduces it on its own)
         run: |
+          FILES=(
+            "src/gedcom/gedcomIndividual.spec.ts"
+            "src/gedcom/gedcomDateSort.spec.ts"
+            "src/app/gedcom-editor/gedcom-editor.component.spec.ts"
+            "src/app/events-timeline/events-timeline.component.spec.ts"
+            "src/app/individual/individual.component.spec.ts"
+            "src/gedcom/gedcomMultimedia.spec.ts"
+            "src/app/individual/individual-facts.component.spec.ts"
+            "src/app/family/family.component.spec.ts"
+            "src/gedcom/gedcomFamily.spec.ts"
+            "src/app/individual/individual-ancestors.component.spec.ts"
+            "src/app/individual/individual-sources.component.spec.ts"
+            "src/util/next-xref.spec.ts"
+            "src/app/gedcom-editor/input-repository-links.component.spec.ts"
+            "src/app/settings/settings.component.spec.ts"
+            "src/app/family/family-facts.component.spec.ts"
+            "src/app/family/family-sources.component.spec.ts"
+            "src/app/individual/individual-gedcom.component.spec.ts"
+          )
+          INCLUDE_ARGS=()
+          for f in "${FILES[@]}"; do
+            INCLUDE_ARGS+=("--include" "$f")
+          done
           for i in $(seq 1 10); do
             echo "=== attempt $i ==="
-            npx @angular/cli test --no-progress --no-watch || { echo "FAILED on attempt $i"; exit 1; }
+            npx @angular/cli test --no-progress --no-watch "${INCLUDE_ARGS[@]}" || { echo "FAILED on attempt $i"; exit 1; }
           done
   prettier:
     runs-on: ubuntu-latest
