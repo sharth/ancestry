@@ -1,10 +1,9 @@
 import { Component, computed, input } from "@angular/core";
-import { RouterLink } from "@angular/router";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 
 @Component({
   selector: "app-index",
-  imports: [RouterLink],
+  imports: [],
   templateUrl: "./index.component.html",
   styleUrl: "./index.component.css",
 })
