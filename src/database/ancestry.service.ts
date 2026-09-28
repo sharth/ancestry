@@ -44,18 +44,7 @@ export class AncestryService {
   readonly ancestryChanges = signal(0);
 
   constructor() {
-    // Dexie.on("storagemutated") is a global event bus shared by every Dexie
-    // database in the page, not scoped to this service instance, so the
-    // listener must be removed when this service is destroyed. Otherwise
-    // each new AncestryService (e.g. one per unit test) leaves its listener
-    // registered forever, and they all keep firing (and updating a signal on
-    // a destroyed component) for the lifetime of the page.
-    const onStorageMutated = () => {
-      this.ancestryChanges.update((value) => value + 1);
-    };
-    Dexie.on("storagemutated", onStorageMutated);
     inject(DestroyRef).onDestroy(() => {
-      Dexie.on("storagemutated").unsubscribe(onStorageMutated);
       // Dexie opens its IndexedDB connection lazily and never closes it on
       // its own. Without this, every AncestryService instance (e.g. one per
       // unit test) leaves its IndexedDB connection open indefinitely, and
@@ -150,6 +139,7 @@ export class AncestryService {
       },
     );
     console.log("Parsing complete");
+    this.ancestryChanges.update((value) => value + 1);
   }
 
   async openMultimedia(directoryHandle: FileSystemDirectoryHandle) {
@@ -164,6 +154,7 @@ export class AncestryService {
         await this.dexieDatabase.metadata.put(metadata);
       },
     );
+    this.ancestryChanges.update((value) => value + 1);
   }
 
   async clearDatabase() {
@@ -174,6 +165,7 @@ export class AncestryService {
         await this.dexieDatabase.metadata.clear();
       },
     );
+    this.ancestryChanges.update((value) => value + 1);
   }
 
   async requestPermissions() {
