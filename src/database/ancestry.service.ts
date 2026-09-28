@@ -1,4 +1,11 @@
-import { Service, computed, inject, resource, signal } from "@angular/core";
+import {
+  DestroyRef,
+  Service,
+  computed,
+  inject,
+  resource,
+  signal,
+} from "@angular/core";
 import { toObservable } from "@angular/core/rxjs-interop";
 import { RedirectCommand, Router, type ResolveFn } from "@angular/router";
 import Dexie from "dexie";
@@ -90,9 +97,18 @@ export class AncestryService {
   readonly ancestryChanges = signal(0);
 
   constructor() {
-    Dexie.on("storagemutated", () => {
-      console.log("Dexie database mutated");
+    // Dexie.on("storagemutated") is a global event bus shared by every Dexie
+    // database in the page, not scoped to this service instance, so the
+    // listener must be removed when this service is destroyed. Otherwise
+    // each new AncestryService (e.g. one per unit test) leaves its listener
+    // registered forever, and they all keep firing (and updating a signal on
+    // a destroyed component) for the lifetime of the page.
+    const onStorageMutated = () => {
       this.ancestryChanges.update((value) => value + 1);
+    };
+    Dexie.on("storagemutated", onStorageMutated);
+    inject(DestroyRef).onDestroy(() => {
+      Dexie.on("storagemutated").unsubscribe(onStorageMutated);
     });
   }
 
