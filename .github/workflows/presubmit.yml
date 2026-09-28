@@ -18,7 +18,7 @@ jobs:
       - run: npm clean-install
       - run: npx playwright install chromium --with-deps
       - run: npx @angular/cli build
-      - name: "Run tests (repeated, temporarily, diagnostic: settings.component.spec.ts with OPFS file-creation beforeEach re-enabled but the 2 resource-loading tests still disabled, to check whether OPFS creation alone -- vs actually loading a GEDCOM file -- is the trigger)"
+      - name: "Run tests (repeated, temporarily, diagnostic: settings.component.spec.ts with the openGedcom test (real OPFS file read, no network fetch) re-enabled, builtin test (real fetch) still disabled, to isolate OPFS read vs network fetch as the trigger)"
         run: |
           FILES=(
             "src/gedcom/gedcomIndividual.spec.ts"

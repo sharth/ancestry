@@ -74,20 +74,24 @@ describe("SettingsComponent", () => {
   //     ancestryService.gedcomResource.value()?.gedcomRecords.length,
   //   ).toBeGreaterThan(0);
   // });
-  //
-  // it("should call openGedcom when the GEDCOM file button is clicked", async () => {
-  //   const componentElement = fixture.nativeElement as HTMLElement;
-  //   const button = Array.from(
-  //     componentElement.querySelectorAll<HTMLButtonElement>("button"),
-  //   ).find((b) => b.textContent.includes("Choose GEDCOM File"));
-  //   assert.isOk(button);
-  //   button.click();
-  //
-  //   await vi.waitFor(async () => {
-  //     await fixture.whenStable();
-  //     expect(ancestryService.gedcomResource.value()?.dataSource?.mode).toBe(
-  //       "gedcom",
-  //     );
-  //   });
-  // });
+
+  // DIAGNOSTIC (temporary): re-enabled -- this test does a real OPFS file
+  // read (getFile()/.text()) via the resource loader, but no network fetch,
+  // to check whether a real OPFS read alone (vs. the builtin test's real
+  // fetch()) is the trigger.
+  it("should call openGedcom when the GEDCOM file button is clicked", async () => {
+    const componentElement = fixture.nativeElement as HTMLElement;
+    const button = Array.from(
+      componentElement.querySelectorAll<HTMLButtonElement>("button"),
+    ).find((b) => b.textContent.includes("Choose GEDCOM File"));
+    assert.isOk(button);
+    button.click();
+
+    await vi.waitFor(async () => {
+      await fixture.whenStable();
+      expect(ancestryService.gedcomResource.value()?.dataSource?.mode).toBe(
+        "gedcom",
+      );
+    });
+  });
 });
