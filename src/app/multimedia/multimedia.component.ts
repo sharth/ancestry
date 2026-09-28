@@ -1,10 +1,4 @@
-import {
-  Component,
-  computed,
-  inject,
-  input,
-  viewChild,
-} from "@angular/core";
+import { Component, computed, inject, input, viewChild } from "@angular/core";
 import { RouterModule } from "@angular/router";
 
 import { AncestryService } from "../../database/ancestry.service";
