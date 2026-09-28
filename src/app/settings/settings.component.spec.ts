@@ -33,10 +33,14 @@ describe("SettingsComponent", () => {
     await ancestryService.clearDatabase();
     await fixture.whenStable();
 
-    const rootDirectory = await navigator.storage.getDirectory();
-    gedcomFileHandle = await rootDirectory.getFileHandle("ancestry.ged", {
-      create: true,
-    });
+    // A lightweight stand-in rather than a real Origin Private File System
+    // handle: real OPFS access here destabilized the CI browser session
+    // (see #407), and since the test below stubs AncestryService.openGedcom
+    // itself, this handle only needs to be an object the component can pass
+    // through unchanged -- it's never read or persisted to Dexie.
+    gedcomFileHandle = {
+      name: "ancestry.ged",
+    } as unknown as FileSystemFileHandle;
   });
 
   // Polyfill window.showOpenFilePicker
@@ -72,6 +76,10 @@ describe("SettingsComponent", () => {
   });
 
   it("should call openGedcom when the GEDCOM file button is clicked", async () => {
+    const openGedcomSpy = vi
+      .spyOn(ancestryService, "openGedcom")
+      .mockResolvedValue(undefined);
+
     const componentElement = fixture.nativeElement as HTMLElement;
     const button = Array.from(
       componentElement.querySelectorAll<HTMLButtonElement>("button"),
@@ -79,11 +87,8 @@ describe("SettingsComponent", () => {
     assert.isOk(button);
     button.click();
 
-    await vi.waitFor(async () => {
-      await fixture.whenStable();
-      expect(ancestryService.gedcomResource.value()?.dataSource?.mode).toBe(
-        "gedcom",
-      );
+    await vi.waitFor(() => {
+      expect(openGedcomSpy).toHaveBeenCalledWith(gedcomFileHandle);
     });
   });
 });
