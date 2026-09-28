@@ -7,7 +7,6 @@ import { AppComponent } from "./app.component";
 describe("AppComponent", () => {
   let component: AppComponent;
   let fixture: ComponentFixture<AppComponent>;
-  let element: HTMLElement;
 
   beforeEach(async () => {
     const renderResult = await render(AppComponent, {
@@ -17,7 +16,6 @@ describe("AppComponent", () => {
 
     fixture = renderResult.fixture;
     component = fixture.componentInstance;
-    element = fixture.nativeElement as HTMLElement;
   });
 
   it("should create", () => {

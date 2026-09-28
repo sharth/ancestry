@@ -13,7 +13,6 @@ import { IndividualAncestorsComponent } from "./individual-ancestors.component";
 describe("IndividualAncestorsComponent", () => {
   let component: IndividualAncestorsComponent;
   let fixture: ComponentFixture<IndividualAncestorsComponent>;
-  let element: HTMLElement;
 
   beforeEach(async () => {
     const ancestryDatabase = newGedcomDatabase({
@@ -96,7 +95,6 @@ describe("IndividualAncestorsComponent", () => {
 
     fixture = renderResult.fixture;
     component = fixture.componentInstance;
-    element = fixture.nativeElement as HTMLElement;
   });
 
   it("should create", () => {

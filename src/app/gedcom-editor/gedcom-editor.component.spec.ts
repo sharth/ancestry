@@ -1,10 +1,8 @@
-import { TestBed, type ComponentFixture } from "@angular/core/testing";
+import type { ComponentFixture } from "@angular/core/testing";
 import { provideRouter } from "@angular/router";
 import { render } from "@testing-library/angular/zoneless";
-import { userEvent } from "@testing-library/user-event";
 import { produce } from "immer";
 import { beforeEach, describe, expect, it } from "vitest";
-import { AncestryService } from "../../database/ancestry.service";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomDate } from "../../gedcom/gedcomDate";
 import { newGedcomFact } from "../../gedcom/gedcomFact";
@@ -18,7 +16,6 @@ import { GedcomEditorComponent } from "./gedcom-editor.component";
 describe("GedcomEditorComponent Integration", () => {
   let component: GedcomEditorComponent;
   let fixture: ComponentFixture<GedcomEditorComponent>;
-  let ancestryService: AncestryService;
 
   const initialDatabase = newGedcomDatabase({
     individuals: {
@@ -37,22 +34,6 @@ describe("GedcomEditorComponent Integration", () => {
     },
   });
 
-  async function openDetails(details: HTMLDetailsElement) {
-    details.open = true;
-    details.dispatchEvent(new Event("toggle"));
-    await fixture.whenStable();
-  }
-
-  function activePanel(editorComponent: HTMLElement): HTMLElement {
-    const panel = editorComponent.querySelector<HTMLElement>(
-      "div:not([hidden]) > app-gedcom-editor-individual, " +
-        "div:not([hidden]) > app-gedcom-editor-source, " +
-        "div:not([hidden]) > app-gedcom-editor-multimedia, " +
-        "div:not([hidden]) > app-gedcom-editor-repository",
-    )?.parentElement;
-    return panel ?? editorComponent;
-  }
-
   beforeEach(async () => {
     const renderResult = await render(GedcomEditorComponent, {
       providers: [provideRouter([])],
@@ -61,7 +42,6 @@ describe("GedcomEditorComponent Integration", () => {
 
     fixture = renderResult.fixture;
     component = fixture.componentInstance;
-    ancestryService = TestBed.inject(AncestryService);
 
     fixture.componentRef.setInput("type", "INDI");
     fixture.componentRef.setInput("ancestryDatabase", initialDatabase);
