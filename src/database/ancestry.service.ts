@@ -109,6 +109,11 @@ export class AncestryService {
     Dexie.on("storagemutated", onStorageMutated);
     inject(DestroyRef).onDestroy(() => {
       Dexie.on("storagemutated").unsubscribe(onStorageMutated);
+      // Dexie opens its IndexedDB connection lazily and never closes it on
+      // its own. Without this, every AncestryService instance (e.g. one per
+      // unit test) leaves its IndexedDB connection open indefinitely, and
+      // they accumulate for the life of the page.
+      this.dexieDatabase.close();
     });
   }
 
