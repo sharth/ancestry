@@ -1,8 +1,8 @@
-import { Service, computed, inject, resource, signal } from "@angular/core";
-import { toObservable } from "@angular/core/rxjs-interop";
+import { DestroyRef, Service, computed, inject, resource } from "@angular/core";
+import { toObservable, toSignal } from "@angular/core/rxjs-interop";
 import { RedirectCommand, Router, type ResolveFn } from "@angular/router";
-import Dexie from "dexie";
-import { filter, firstValueFrom } from "rxjs";
+import Dexie, { liveQuery } from "dexie";
+import { filter, firstValueFrom, from } from "rxjs";
 import {
   compareGedcomDatabase,
   parseGedcomDatabase,
@@ -32,23 +32,32 @@ class DexieDatabase extends Dexie {
 export class AncestryService {
   readonly dexieDatabase = new DexieDatabase();
 
-  // A signal that increments every time the Dexie / IndexedDB database changes.
-  // This can be used in the request field for an Angular Resource.
-  readonly ancestryChanges = signal(0);
+  // Reactively re-runs whenever the metadata row changes -- including
+  // changes made by this service's own writes, since Dexie's liveQuery
+  // tracks exactly which tables/queries a write affects and re-queries
+  // automatically, without needing every writer to manually signal that
+  // something changed.
+  private readonly metadata = toSignal(
+    from(liveQuery(() => this.dexieDatabase.metadata.get(1))),
+    { initialValue: undefined },
+  );
 
   constructor() {
-    Dexie.on("storagemutated", () => {
-      console.log("Dexie database mutated");
-      this.ancestryChanges.update((value) => value + 1);
+    inject(DestroyRef).onDestroy(() => {
+      // Dexie opens its IndexedDB connection lazily and never closes it on
+      // its own. Without this, every AncestryService instance (e.g. one per
+      // unit test) leaves its IndexedDB connection open indefinitely, and
+      // they accumulate for the life of the page.
+      this.dexieDatabase.close();
     });
   }
 
   readonly gedcomResource = resource({
     params: () => ({
-      changeCount: this.ancestryChanges(),
+      metadata: this.metadata(),
     }),
-    loader: async () => {
-      const metadata = await this.dexieDatabase.metadata.get(1);
+    loader: async ({ params }) => {
+      const metadata = params.metadata;
       const gedcomFileHandle = metadata?.gedcomHandle;
       const directoryHandle = metadata?.multimediaHandle;
 
