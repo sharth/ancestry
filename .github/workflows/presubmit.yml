@@ -18,7 +18,17 @@ jobs:
       - run: npm clean-install
       - run: npx playwright install chromium --with-deps
       - run: npx @angular/cli build
-      - run: npx @angular/cli test --no-progress --no-watch
+      - name: Run tests
+        run: |
+          # A real File System Access (OPFS) file read in
+          # settings.component.spec.ts intermittently destabilizes the
+          # Vitest/Playwright browser session, surfacing several files later
+          # as a fatal VITEST_BROWSER_CONNECTION_CLOSED crash rather than a
+          # normal test failure -- see the investigation in PR #407. It
+          # doesn't reproduce locally and isn't caused by a specific bug in
+          # this app's code, so retry the whole run once before failing the
+          # job.
+          npx @angular/cli test --no-progress --no-watch || npx @angular/cli test --no-progress --no-watch
   prettier:
     runs-on: ubuntu-latest
     steps:
