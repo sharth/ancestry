@@ -14,7 +14,13 @@ class StubComponent {}
 // stub below) since a "builtin" data source is a plain, structured-clonable
 // object Dexie can store directly -- unlike a FileSystemFileHandle, which a
 // fake object can't stand in for once IndexedDB tries to clone it.
-const MINIMAL_GEDCOM_TEXT = ["0 HEAD", "0 @I1@ INDI", "1 NAME John /Doe/", "0 TRLR", ""].join("\n");
+const MINIMAL_GEDCOM_TEXT = [
+  "0 HEAD",
+  "0 @I1@ INDI",
+  "1 NAME John /Doe/",
+  "0 TRLR",
+  "",
+].join("\n");
 
 describe("ancestryDatabaseResolver", () => {
   let ancestryService: AncestryService;
@@ -77,7 +83,9 @@ describe("ancestryDatabaseResolver", () => {
     // the transaction promise clearDatabase() awaits, so give it a moment to
     // actually reach gedcomResource before navigating again.
     await vi.waitFor(() => {
-      expect(ancestryService.gedcomResource.value()?.dataSource).toBeUndefined();
+      expect(
+        ancestryService.gedcomResource.value()?.dataSource,
+      ).toBeUndefined();
     });
     await router.navigateByUrl("/", { onSameUrlNavigation: "reload" });
 

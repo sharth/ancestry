@@ -136,8 +136,11 @@ export class AncestryService {
         // both change, `params` changes, and Angular aborts this call and
         // reruns the loader with the real value.
         return await new Promise<never>((_resolve, reject) => {
-          abortSignal.addEventListener("abort", () => { reject(new DOMException("Superseded by new metadata", "AbortError")); },
-          );
+          abortSignal.addEventListener("abort", () => {
+            reject(
+              new DOMException("Superseded by new metadata", "AbortError"),
+            );
+          });
         });
       }
 
