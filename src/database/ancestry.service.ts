@@ -1,15 +1,8 @@
-import {
-  DestroyRef,
-  Service,
-  computed,
-  inject,
-  resource,
-  signal,
-} from "@angular/core";
-import { toObservable } from "@angular/core/rxjs-interop";
+import { DestroyRef, Service, computed, inject, resource } from "@angular/core";
+import { toObservable, toSignal } from "@angular/core/rxjs-interop";
 import { RedirectCommand, Router, type ResolveFn } from "@angular/router";
-import Dexie from "dexie";
-import { filter, firstValueFrom } from "rxjs";
+import Dexie, { liveQuery } from "dexie";
+import { filter, firstValueFrom, from } from "rxjs";
 import {
   compareGedcomDatabase,
   parseGedcomDatabase,
@@ -39,9 +32,15 @@ class DexieDatabase extends Dexie {
 export class AncestryService {
   readonly dexieDatabase = new DexieDatabase();
 
-  // A signal that increments every time the Dexie / IndexedDB database changes.
-  // This can be used in the request field for an Angular Resource.
-  readonly ancestryChanges = signal(0);
+  // Reactively re-runs whenever the metadata row changes -- including
+  // changes made by this service's own writes, since Dexie's liveQuery
+  // tracks exactly which tables/queries a write affects and re-queries
+  // automatically, without needing every writer to manually signal that
+  // something changed.
+  private readonly metadata = toSignal(
+    from(liveQuery(() => this.dexieDatabase.metadata.get(1))),
+    { initialValue: undefined },
+  );
 
   constructor() {
     inject(DestroyRef).onDestroy(() => {
@@ -55,10 +54,10 @@ export class AncestryService {
 
   readonly gedcomResource = resource({
     params: () => ({
-      changeCount: this.ancestryChanges(),
+      metadata: this.metadata(),
     }),
-    loader: async () => {
-      const metadata = await this.dexieDatabase.metadata.get(1);
+    loader: async ({ params }) => {
+      const metadata = params.metadata;
       const gedcomFileHandle = metadata?.gedcomHandle;
       const directoryHandle = metadata?.multimediaHandle;
 
@@ -139,7 +138,6 @@ export class AncestryService {
       },
     );
     console.log("Parsing complete");
-    this.ancestryChanges.update((value) => value + 1);
   }
 
   async openMultimedia(directoryHandle: FileSystemDirectoryHandle) {
@@ -154,7 +152,6 @@ export class AncestryService {
         await this.dexieDatabase.metadata.put(metadata);
       },
     );
-    this.ancestryChanges.update((value) => value + 1);
   }
 
   async clearDatabase() {
@@ -165,7 +162,6 @@ export class AncestryService {
         await this.dexieDatabase.metadata.clear();
       },
     );
-    this.ancestryChanges.update((value) => value + 1);
   }
 
   async requestPermissions() {

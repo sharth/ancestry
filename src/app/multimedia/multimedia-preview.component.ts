@@ -21,7 +21,7 @@ export class MultimediaPreviewComponent {
       }
       return {
         filePath,
-        changeCount: this.ancestryService.ancestryChanges(),
+        gedcomResourceValue: this.ancestryService.gedcomResource.value(),
       };
     },
     loader: async ({ params }) => {
@@ -29,8 +29,7 @@ export class MultimediaPreviewComponent {
         return { fileUrl: undefined, mediaType: undefined };
       }
 
-      const gedcomResourceValue = this.ancestryService.gedcomResource.value();
-      let directoryHandle = gedcomResourceValue?.directoryHandle;
+      let directoryHandle = params.gedcomResourceValue?.directoryHandle;
 
       if (!directoryHandle) {
         return { fileUrl: undefined, mediaType: undefined };
