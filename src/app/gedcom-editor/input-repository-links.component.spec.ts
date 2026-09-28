@@ -4,12 +4,11 @@ import {
   type ComponentFixture,
 } from "@angular/core/testing";
 import { provideRouter } from "@angular/router";
-import { render, screen } from "@testing-library/angular/zoneless";
+import { render } from "@testing-library/angular/zoneless";
 import { userEvent } from "@testing-library/user-event";
-import { assert, beforeEach, describe, expect, it, vi } from "vitest";
+import { assert, beforeEach, describe, expect, it } from "vitest";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { InputRepositoryLinksComponent } from "./input-repository-links.component";
-import { InputRepositoryXrefComponent } from "./input-repository-xref.component";
 
 describe("InputRepositoryLinksComponent", () => {
   let fixture: ComponentFixture<InputRepositoryLinksComponent>;

@@ -11,7 +11,6 @@ import { FamilyGedcomComponent } from "./family-gedcom.component";
 describe("FamilyGedcomComponent", () => {
   let component: FamilyGedcomComponent;
   let fixture: ComponentFixture<FamilyGedcomComponent>;
-  let element: HTMLElement;
 
   beforeEach(async () => {
     const renderResult = await render(FamilyGedcomComponent, {
@@ -46,7 +45,6 @@ describe("FamilyGedcomComponent", () => {
 
     fixture = renderResult.fixture;
     component = fixture.componentInstance;
-    element = fixture.nativeElement as HTMLElement;
   });
 
   it("should create", () => {

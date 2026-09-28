@@ -24,7 +24,6 @@ import { IndividualComponent } from "./individual.component";
 describe("IndividualComponent", () => {
   let component: IndividualComponent;
   let fixture: ComponentFixture<IndividualComponent>;
-  let element: HTMLElement;
 
   const ancestryDatabase = signal(
     newGedcomDatabase({
@@ -137,7 +136,6 @@ describe("IndividualComponent", () => {
 
     fixture = renderResult.fixture;
     component = fixture.componentInstance;
-    element = fixture.nativeElement as HTMLElement;
 
     await TestBed.inject(Router).navigateByUrl("/");
     await fixture.whenStable();

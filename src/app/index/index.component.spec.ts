@@ -9,7 +9,6 @@ import { IndexComponent } from "./index.component";
 describe("IndexComponent", () => {
   let component: IndexComponent;
   let fixture: ComponentFixture<IndexComponent>;
-  let element: HTMLElement;
 
   beforeEach(async () => {
     const renderResult = await render(IndexComponent, {
@@ -20,7 +19,6 @@ describe("IndexComponent", () => {
 
     fixture = renderResult.fixture;
     component = fixture.componentInstance;
-    element = fixture.nativeElement as HTMLElement;
   });
 
   it("should create", () => {
