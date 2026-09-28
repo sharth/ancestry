@@ -18,17 +18,20 @@ jobs:
       - run: npm clean-install
       - run: npx playwright install chromium --with-deps
       - run: npx @angular/cli build
-      - name: Run tests
+      - name: "Run tests (temporary: with a background memory/process monitor to check whether a resource ceiling, not app code, is causing VITEST_BROWSER_CONNECTION_CLOSED)"
         run: |
-          # A real File System Access (OPFS) file read in
-          # settings.component.spec.ts intermittently destabilizes the
-          # Vitest/Playwright browser session, surfacing several files later
-          # as a fatal VITEST_BROWSER_CONNECTION_CLOSED crash rather than a
-          # normal test failure -- see the investigation in PR #407. It
-          # doesn't reproduce locally and isn't caused by a specific bug in
-          # this app's code, so retry the whole run once before failing the
-          # job.
-          npx @angular/cli test --no-progress --no-watch || npx @angular/cli test --no-progress --no-watch
+          ( while true; do
+              echo "=== $(date +%T.%N) ==="
+              free -m
+              echo "-- chrome process count / total RSS (MB) --"
+              ps -eo pid,rss,comm | grep -i chrom | awk '{sum+=$2; n++} END {print n" processes, "sum/1024" MB"}'
+              sleep 1
+            done ) &
+          MONITOR_PID=$!
+          npx @angular/cli test --no-progress --no-watch
+          TEST_EXIT=$?
+          kill "$MONITOR_PID" 2>/dev/null || true
+          exit "$TEST_EXIT"
   prettier:
     runs-on: ubuntu-latest
     steps:
