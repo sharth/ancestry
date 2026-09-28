@@ -39,7 +39,7 @@ export class InputMultimediaCropComponent {
   readonly fileResource = resource({
     params: () => ({
       filePath: this.filePath(),
-      changeCount: this.ancestryService.ancestryChanges(),
+      gedcomResourceValue: this.ancestryService.gedcomResource.value(),
     }),
     loader: async ({ params }) => {
       const fileHandle = await this.ancestryService.getMultimediaFileHandle(
