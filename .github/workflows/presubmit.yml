@@ -18,9 +18,10 @@ jobs:
       - run: npm clean-install
       - run: npx playwright install chromium --with-deps
       - run: npx @angular/cli build
-      - name: Run tests (repeated, temporarily, narrowed to the exact 16-file subset that preceded the crash in CI runs 108744892225/108745804132, to check whether this subset reproduces it on its own)
+      - name: "Run tests (repeated, temporarily, diagnostic: same subset with individual-gedcom.component.spec.ts moved FIRST and settings.component.spec.ts dropped, to test whether the crash follows the file or the position)"
         run: |
           FILES=(
+            "src/app/individual/individual-gedcom.component.spec.ts"
             "src/gedcom/gedcomIndividual.spec.ts"
             "src/gedcom/gedcomDateSort.spec.ts"
             "src/app/gedcom-editor/gedcom-editor.component.spec.ts"
@@ -34,10 +35,8 @@ jobs:
             "src/app/individual/individual-sources.component.spec.ts"
             "src/util/next-xref.spec.ts"
             "src/app/gedcom-editor/input-repository-links.component.spec.ts"
-            "src/app/settings/settings.component.spec.ts"
             "src/app/family/family-facts.component.spec.ts"
             "src/app/family/family-sources.component.spec.ts"
-            "src/app/individual/individual-gedcom.component.spec.ts"
           )
           INCLUDE_ARGS=()
           for f in "${FILES[@]}"; do
