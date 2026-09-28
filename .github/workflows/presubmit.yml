@@ -18,7 +18,7 @@ jobs:
       - run: npm clean-install
       - run: npx playwright install chromium --with-deps
       - run: npx @angular/cli build
-      - name: "Run tests (repeated, temporarily, diagnostic: original order/position restored (individual-gedcom.component.spec.ts LAST again), only settings.component.spec.ts removed, to isolate whether dropping settings alone -- vs. the earlier reordering -- was what fixed it)"
+      - name: "Run tests (repeated, temporarily, diagnostic: settings.component.spec.ts restored to its original position, but with its OPFS setup and 2 heaviest tests commented out -- only 'should create' remains -- to check whether OPFS/resource-loading is what corrupts a later file's connection)"
         run: |
           FILES=(
             "src/gedcom/gedcomIndividual.spec.ts"
@@ -34,6 +34,7 @@ jobs:
             "src/app/individual/individual-sources.component.spec.ts"
             "src/util/next-xref.spec.ts"
             "src/app/gedcom-editor/input-repository-links.component.spec.ts"
+            "src/app/settings/settings.component.spec.ts"
             "src/app/family/family-facts.component.spec.ts"
             "src/app/family/family-sources.component.spec.ts"
             "src/app/individual/individual-gedcom.component.spec.ts"
