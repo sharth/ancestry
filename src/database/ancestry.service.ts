@@ -1,8 +1,8 @@
-import { DestroyRef, Service, computed, inject, resource } from "@angular/core";
-import { toObservable, toSignal } from "@angular/core/rxjs-interop";
+import { DestroyRef, Service, computed, inject } from "@angular/core";
+import { rxResource, toObservable } from "@angular/core/rxjs-interop";
 import { RedirectCommand, Router, type ResolveFn } from "@angular/router";
 import Dexie, { liveQuery } from "dexie";
-import { filter, firstValueFrom, from, map, shareReplay } from "rxjs";
+import { filter, firstValueFrom, from, switchMap } from "rxjs";
 import {
   compareGedcomDatabase,
   parseGedcomDatabase,
@@ -69,6 +69,64 @@ class DexieDatabase extends Dexie {
   }
 }
 
+interface GedcomResourceValue {
+  dataSource: DataSource | undefined;
+  gedcomFileHandle: FileSystemFileHandle | undefined;
+  gedcomFile: File | undefined;
+  gedcomText: string | undefined;
+  gedcomRecords: GedcomRecord[];
+  directoryHandle: FileSystemDirectoryHandle | undefined;
+}
+
+async function loadGedcom(
+  dataSource: DataSource | undefined,
+): Promise<GedcomResourceValue> {
+  if (dataSource === undefined) {
+    return {
+      dataSource: undefined,
+      gedcomFileHandle: undefined,
+      gedcomFile: undefined,
+      gedcomText: undefined,
+      gedcomRecords: [],
+      directoryHandle: undefined,
+    };
+  }
+
+  if (dataSource.mode === "builtin") {
+    const response = await fetch(BUILTIN_GEDCOM_URL);
+    const gedcomText = await response.text();
+    const gedcomRecords = parseGedcomRecords(gedcomText);
+    return {
+      dataSource,
+      gedcomFileHandle: undefined,
+      gedcomFile: undefined,
+      gedcomText,
+      gedcomRecords,
+      directoryHandle: undefined,
+    };
+  }
+
+  const gedcomFileHandle =
+    dataSource.mode === "gedcom" ?
+      dataSource.gedcomHandle
+    : await dataSource.directoryHandle.getFileHandle(dataSource.gedcomFilename);
+  const directoryHandle =
+    dataSource.mode === "directory" ? dataSource.directoryHandle : undefined;
+
+  const gedcomFile = await gedcomFileHandle.getFile();
+  const gedcomText = await gedcomFile.text();
+  const gedcomRecords = parseGedcomRecords(gedcomText);
+
+  return {
+    dataSource,
+    gedcomFileHandle,
+    gedcomFile,
+    gedcomText,
+    gedcomRecords,
+    directoryHandle,
+  };
+}
+
 export async function findGedcomFilenames(
   directoryHandle: FileSystemDirectoryHandle,
 ): Promise<string[]> {
@@ -85,33 +143,6 @@ export async function findGedcomFilenames(
 export class AncestryService {
   readonly dexieDatabase = new DexieDatabase();
 
-  // Reactively re-runs whenever the metadata row changes -- including
-  // changes made by this service's own writes, since Dexie's liveQuery
-  // tracks exactly which tables/queries a write affects and re-queries
-  // automatically, without needing every writer to manually signal that
-  // something changed. Shared so `metadata` and `metadataLoaded` below
-  // observe the exact same emissions rather than each running their own
-  // separate IndexedDB read.
-  private readonly metadata$ = from(
-    liveQuery(() => this.dexieDatabase.metadata.get(1)),
-  ).pipe(shareReplay(1));
-
-  private readonly metadata = toSignal(this.metadata$, {
-    initialValue: undefined,
-  });
-
-  // `liveQuery` (and therefore `metadata` above) is always asynchronous,
-  // even for an already-cached read, so `metadata` starts out `undefined`
-  // for a brief moment on every load -- indistinguishable from "read the
-  // row, and there's genuinely no data source configured". `gedcomResource`
-  // needs to tell those two states apart so it doesn't briefly report "no
-  // data source" (and have the resolver redirect to /settings) before the
-  // real IndexedDB read comes back.
-  private readonly metadataLoaded = toSignal(
-    this.metadata$.pipe(map(() => true)),
-    { initialValue: false },
-  );
-
   constructor() {
     inject(DestroyRef).onDestroy(() => {
       // Dexie opens its IndexedDB connection lazily and never closes it on
@@ -122,79 +153,23 @@ export class AncestryService {
     });
   }
 
-  readonly gedcomResource = resource({
-    params: () => ({
-      metadata: this.metadata(),
-      metadataLoaded: this.metadataLoaded(),
-    }),
-    loader: async ({ params, abortSignal }) => {
-      if (!params.metadataLoaded) {
-        // The real metadata row hasn't come back from IndexedDB yet -- stay
-        // "loading" rather than reporting "no data source", so callers
-        // (like ancestryDatabaseResolver) don't act on that as if it were
-        // final. Once the liveQuery emits, `metadataLoaded` and `metadata`
-        // both change, `params` changes, and Angular aborts this call and
-        // reruns the loader with the real value.
-        return await new Promise<never>((_resolve, reject) => {
-          abortSignal.addEventListener("abort", () => {
-            reject(
-              new DOMException("Superseded by new metadata", "AbortError"),
-            );
-          });
-        });
-      }
-
-      const dataSource = params.metadata?.dataSource;
-
-      if (dataSource === undefined) {
-        return {
-          dataSource: undefined,
-          gedcomFileHandle: undefined,
-          gedcomFile: undefined,
-          gedcomText: undefined,
-          gedcomRecords: [],
-          directoryHandle: undefined,
-        };
-      }
-
-      if (dataSource.mode === "builtin") {
-        const response = await fetch(BUILTIN_GEDCOM_URL);
-        const gedcomText = await response.text();
-        const gedcomRecords = parseGedcomRecords(gedcomText);
-        return {
-          dataSource,
-          gedcomFileHandle: undefined,
-          gedcomFile: undefined,
-          gedcomText,
-          gedcomRecords,
-          directoryHandle: undefined,
-        };
-      }
-
-      const gedcomFileHandle =
-        dataSource.mode === "gedcom" ?
-          dataSource.gedcomHandle
-        : await dataSource.directoryHandle.getFileHandle(
-            dataSource.gedcomFilename,
-          );
-      const directoryHandle =
-        dataSource.mode === "directory" ?
-          dataSource.directoryHandle
-        : undefined;
-
-      const gedcomFile = await gedcomFileHandle.getFile();
-      const gedcomText = await gedcomFile.text();
-      const gedcomRecords = parseGedcomRecords(gedcomText);
-
-      return {
-        dataSource,
-        gedcomFileHandle,
-        gedcomFile,
-        gedcomText,
-        gedcomRecords,
-        directoryHandle,
-      };
-    },
+  // Reloads whenever the metadata row changes -- including changes made by
+  // this service's own writes, since Dexie's liveQuery tracks exactly which
+  // tables/queries a write affects and re-queries automatically, without
+  // needing every writer to manually signal that something changed.
+  //
+  // Built from the liveQuery observable directly (via switchMap) rather
+  // than a signal, since a signal needs a synchronous initial value and
+  // liveQuery's first emission is always asynchronous -- there's no
+  // meaningful placeholder to give it that isn't indistinguishable from
+  // "read IndexedDB, and there's genuinely no data source configured".
+  // Driving the resource straight off the observable means it just stays
+  // loading, correctly, until that first real read comes back.
+  readonly gedcomResource = rxResource({
+    stream: () =>
+      from(liveQuery(() => this.dexieDatabase.metadata.get(1))).pipe(
+        switchMap((metadata) => loadGedcom(metadata?.dataSource)),
+      ),
   });
 
   readonly ancestryDatabase = computed<GedcomDatabase | undefined>(() => {
