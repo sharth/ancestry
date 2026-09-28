@@ -18,7 +18,17 @@ jobs:
       - run: npm clean-install
       - run: npx playwright install chromium --with-deps
       - run: npx @angular/cli build
-      - name: "Run tests (temporary: repeated to check whether removing the Dexie version(6) migration eliminates VITEST_BROWSER_CONNECTION_CLOSED)"
+      - name: "Wrap chromium with --disable-gpu (temporary, diagnostic)"
+        run: |
+          REAL_CHROME="$(node -e "console.log(require('playwright-core').chromium.executablePath())")"
+          WRAPPER="$RUNNER_TEMP/chromium-disable-gpu.sh"
+          cat > "$WRAPPER" <<SCRIPT
+          #!/bin/sh
+          exec "$REAL_CHROME" --disable-gpu "\$@"
+          SCRIPT
+          chmod +x "$WRAPPER"
+          echo "CHROME_BIN=$WRAPPER" >> "$GITHUB_ENV"
+      - name: "Run tests (temporary: repeated, with --disable-gpu, to check whether it eliminates VITEST_BROWSER_CONNECTION_CLOSED)"
         run: |
           for i in 1 2 3 4 5; do
             echo "=== attempt $i ==="

@@ -50,14 +50,29 @@ class DexieDatabase extends Dexie {
 
   constructor() {
     super("AncestryDatabase");
-    // DIAGNOSTIC ONLY: version(6)'s upgrade migration is temporarily removed
-    // to test whether the extra versionchange transaction it forces on every
-    // fresh DexieDatabase open is destabilizing the browser during CI test
-    // runs (tests delete+recreate this DB per-test). Not a real fix — this
-    // drops the legacy gedcomHandle/multimediaHandle migration entirely.
     this.version(5).stores({
       metadata: "++id",
     });
+    this.version(6)
+      .stores({
+        metadata: "++id",
+      })
+      .upgrade(async (transaction) => {
+        await transaction
+          .table<LegacyDatabaseState, number>("metadata")
+          .toCollection()
+          .modify((state) => {
+            const legacy = state as DatabaseState & LegacyDatabaseState;
+            if (legacy.gedcomHandle !== undefined) {
+              legacy.dataSource = {
+                mode: "gedcom",
+                gedcomHandle: legacy.gedcomHandle,
+              };
+            }
+            delete legacy.gedcomHandle;
+            delete legacy.multimediaHandle;
+          });
+      });
   }
 }
 
