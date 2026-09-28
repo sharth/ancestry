@@ -18,7 +18,7 @@ jobs:
       - run: npm clean-install
       - run: npx playwright install chromium --with-deps
       - run: npx @angular/cli build
-      - name: "Run tests (repeated, temporarily, diagnostic: settings.component.spec.ts restored to its original position, but with its OPFS setup and 2 heaviest tests commented out -- only 'should create' remains -- to check whether OPFS/resource-loading is what corrupts a later file's connection)"
+      - name: "Run tests (repeated, temporarily, diagnostic: settings.component.spec.ts with OPFS file-creation beforeEach re-enabled but the 2 resource-loading tests still disabled, to check whether OPFS creation alone -- vs actually loading a GEDCOM file -- is the trigger)"
         run: |
           FILES=(
             "src/gedcom/gedcomIndividual.spec.ts"

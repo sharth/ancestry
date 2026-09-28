@@ -29,28 +29,28 @@ describe("SettingsComponent", () => {
     component = fixture.componentInstance;
   });
 
-  // DIAGNOSTIC (temporary): OPFS setup and the two OPFS/resource-loading
-  // tests are disabled below to check whether they -- vs. just rendering
-  // SettingsComponent at all -- are what corrupts a later test file's
-  // browser connection.
-  // beforeEach(async () => {
-  //   await ancestryService.clearDatabase();
-  //   await fixture.whenStable();
-  //
-  //   const rootDirectory = await navigator.storage.getDirectory();
-  //   gedcomFileHandle = await rootDirectory.getFileHandle("ancestry.ged", {
-  //     create: true,
-  //   });
-  // });
-  //
-  // // Polyfill window.showOpenFilePicker
-  // aroundEach(async (runTest) => {
-  //   const original = window.showOpenFilePicker;
-  //   // eslint-disable-next-line @typescript-eslint/require-await
-  //   window.showOpenFilePicker = async () => [gedcomFileHandle];
-  //   await runTest();
-  //   window.showOpenFilePicker = original;
-  // });
+  // DIAGNOSTIC (temporary): the two resource-loading tests are disabled
+  // below (OPFS file creation is re-enabled) to check whether mere OPFS
+  // file creation -- vs. actually loading a GEDCOM file through the
+  // resource -- is what corrupts a later test file's browser connection.
+  beforeEach(async () => {
+    await ancestryService.clearDatabase();
+    await fixture.whenStable();
+
+    const rootDirectory = await navigator.storage.getDirectory();
+    gedcomFileHandle = await rootDirectory.getFileHandle("ancestry.ged", {
+      create: true,
+    });
+  });
+
+  // Polyfill window.showOpenFilePicker
+  aroundEach(async (runTest) => {
+    const original = window.showOpenFilePicker;
+    // eslint-disable-next-line @typescript-eslint/require-await
+    window.showOpenFilePicker = async () => [gedcomFileHandle];
+    await runTest();
+    window.showOpenFilePicker = original;
+  });
 
   it("should create", () => {
     expect(component).toBeTruthy();
