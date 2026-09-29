@@ -181,7 +181,8 @@ export class AncestryService {
   // is only ever computed once and both the database and the error stay in
   // sync with each other.
   private readonly ancestryDatabaseResult = computed<
-    { database: GedcomDatabase; error: undefined } | { database: undefined; error: Error | undefined }
+    | { database: GedcomDatabase; error: undefined }
+    | { database: undefined; error: Error | undefined }
   >(() => {
     const gedcomResourceValue = this.gedcomResource.value();
     if (

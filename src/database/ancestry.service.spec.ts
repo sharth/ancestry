@@ -153,8 +153,6 @@ describe("AncestryService.ancestryDatabaseError", () => {
 
     expect(router.url).toBe("/settings");
     expect(ancestryService.ancestryDatabase()).toBeUndefined();
-    expect(ancestryService.ancestryDatabaseError()?.message).toContain(
-      "@F1@",
-    );
+    expect(ancestryService.ancestryDatabaseError()?.message).toContain("@F1@");
   });
 });
