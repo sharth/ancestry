@@ -76,6 +76,45 @@ describe("SettingsComponent", () => {
     ).toBeGreaterThan(0);
   });
 
+  it("shows an error and hides Enter Application when the GEDCOM file fails to parse", async () => {
+    // A dangling FAM->INDI reference, the same shape of problem the bundled
+    // royal-family.ged sample once had (see gedcom/royal-family-sample.spec.ts).
+    const fetchStub = vi.fn(() =>
+      Promise.resolve(
+        new Response(
+          ["0 HEAD", "0 @F1@ FAM", "1 CHIL @I404@", "0 TRLR", ""].join("\n"),
+        ),
+      ),
+    );
+    vi.stubGlobal("fetch", fetchStub);
+
+    try {
+      const componentElement = fixture.nativeElement as HTMLElement;
+      const button = Array.from(
+        componentElement.querySelectorAll<HTMLButtonElement>("button"),
+      ).find((b) => b.textContent.includes("Use Example Data"));
+      assert.isOk(button);
+      button.click();
+
+      await vi.waitFor(async () => {
+        await fixture.whenStable();
+        expect(ancestryService.ancestryDatabaseError()).toBeDefined();
+      });
+
+      expect(componentElement.textContent).toContain(
+        "This GEDCOM file couldn't be loaded.",
+      );
+      expect(componentElement.textContent).toContain("@F1@");
+      expect(
+        Array.from(
+          componentElement.querySelectorAll<HTMLButtonElement>("button"),
+        ).find((b) => b.textContent.includes("Enter Application")),
+      ).toBeUndefined();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
   it("should call openGedcom when the GEDCOM file button is clicked", async () => {
     const openGedcomSpy = vi
       .spyOn(ancestryService, "openGedcom")

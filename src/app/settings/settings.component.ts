@@ -17,6 +17,8 @@ export class SettingsComponent {
   private readonly router = inject(Router);
 
   readonly gedcomResource = this.ancestryService.gedcomResource;
+  readonly ancestryDatabase = this.ancestryService.ancestryDatabase;
+  readonly ancestryDatabaseError = this.ancestryService.ancestryDatabaseError;
 
   // Set while a chosen directory contains more than one GEDCOM file at its
   // root, so the user needs to pick which one to use.

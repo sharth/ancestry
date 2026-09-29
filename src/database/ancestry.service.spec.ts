@@ -93,3 +93,68 @@ describe("ancestryDatabaseResolver", () => {
     expect(router.url).toBe("/settings");
   });
 });
+
+// A GEDCOM file where a FAM's CHIL points at an INDI xref that doesn't
+// exist -- the same shape of problem the bundled royal-family.ged sample
+// had (see gedcom/royal-family-sample.spec.ts). parseGedcomDatabase treats
+// this as a hard error.
+const GEDCOM_WITH_DANGLING_REFERENCE_TEXT = [
+  "0 HEAD",
+  "0 @F1@ FAM",
+  "1 CHIL @I404@",
+  "0 TRLR",
+  "",
+].join("\n");
+
+describe("AncestryService.ancestryDatabaseError", () => {
+  let ancestryService: AncestryService;
+  let router: Router;
+
+  beforeEach(async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() =>
+        Promise.resolve(new Response(GEDCOM_WITH_DANGLING_REFERENCE_TEXT)),
+      ),
+    );
+
+    await render(StubComponent, {
+      providers: [
+        provideRouter([
+          {
+            path: "",
+            component: StubComponent,
+            resolve: { ancestryDatabase: ancestryDatabaseResolver },
+            runGuardsAndResolvers: "always",
+          },
+          { path: "settings", component: StubComponent },
+        ]),
+      ],
+      waitForStableOnRender: true,
+    });
+
+    ancestryService = TestBed.inject(AncestryService);
+    router = TestBed.inject(Router);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("is set, and the resolver redirects instead of throwing, when the GEDCOM file fails to parse", async () => {
+    await ancestryService.openBuiltin();
+
+    // This is the regression case for the bug this test guards: before,
+    // ancestryDatabaseResolver read AncestryService.ancestryDatabase()
+    // directly, so a parse failure threw out of the resolver uncaught and
+    // silently aborted the navigation (the user stayed on whatever page
+    // they navigated from, with no indication why).
+    await router.navigateByUrl("/");
+
+    expect(router.url).toBe("/settings");
+    expect(ancestryService.ancestryDatabase()).toBeUndefined();
+    expect(ancestryService.ancestryDatabaseError()?.message).toContain(
+      "@F1@",
+    );
+  });
+});

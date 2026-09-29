@@ -6,6 +6,13 @@
     <div class="card-body">
       <p class="lead">Choose where your family tree data comes from.</p>
 
+      @if (ancestryDatabaseError(); as error) {
+        <div class="alert alert-danger" role="alert">
+          <strong>This GEDCOM file couldn't be loaded.</strong>
+          <p class="mb-0">{{ error.message }}</p>
+        </div>
+      }
+
       @let dataSource = gedcomResource.value()?.dataSource;
 
       <div class="d-grid gap-3">
@@ -90,7 +97,7 @@
           </button>
         </div>
 
-        @if (gedcomResource.value()?.gedcomRecords?.length) {
+        @if (ancestryDatabase()) {
           <hr />
           <button class="btn btn-success btn-lg" (click)="enterApp()">
             Enter Application
