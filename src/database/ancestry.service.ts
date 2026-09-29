@@ -282,6 +282,26 @@ export class AncestryService {
 
     this.gedcomResource.reload();
   }
+
+  // Upgrades to write access on the loaded GEDCOM file, prompting the user
+  // if needed. Settings only ever requests read access, so this is called
+  // when the user actually starts editing (opening the GEDCOM editor
+  // dialog) rather than up front. Returns whether write access is granted;
+  // there's nothing to upgrade in "builtin" mode, since that data isn't
+  // backed by a real file.
+  async requestWritePermission(): Promise<boolean> {
+    const dataSource = (await this.dexieDatabase.metadata.get(1))?.dataSource;
+    const handle =
+      dataSource?.mode === "gedcom" ? dataSource.gedcomHandle
+      : dataSource?.mode === "directory" ? dataSource.directoryHandle
+      : undefined;
+    if (handle === undefined) {
+      return false;
+    }
+
+    const permission = await handle.requestPermission({ mode: "readwrite" });
+    return permission === "granted";
+  }
 }
 
 export const ancestryDatabaseResolver: ResolveFn<

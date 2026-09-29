@@ -6,6 +6,7 @@ import {
   viewChild,
   type ElementRef,
 } from "@angular/core";
+import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { GedcomEditorComponent } from "../gedcom-editor/gedcom-editor.component";
 
@@ -17,6 +18,7 @@ import { GedcomEditorComponent } from "../gedcom-editor/gedcom-editor.component"
 })
 export class GedcomEditorDialogComponent {
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly ancestryService = inject(AncestryService);
 
   readonly xref = input<string>();
   readonly type = input.required<"INDI" | "SOUR" | "OBJE" | "REPO">();
@@ -25,7 +27,10 @@ export class GedcomEditorDialogComponent {
   readonly editDialog =
     viewChild.required<ElementRef<HTMLDialogElement>>("editDialog");
 
-  showModal() {
+  async showModal() {
+    // Settings only ever requests read access; upgrade to write access now
+    // that the user is actually about to edit, prompting them if needed.
+    await this.ancestryService.requestWritePermission();
     this.editDialog().nativeElement.showModal();
     this.cdr.detectChanges();
   }
