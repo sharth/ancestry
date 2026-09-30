@@ -65,12 +65,8 @@ export function parseGedcomRecords(text: string): GedcomRecord[] {
       ladder = [record];
       records.push(record);
     } else if (level <= ladder.length) {
-      const parent = ladder[level - 1];
-      if (parent === undefined) {
-        throw new Error(
-          `Missing parent for level ${level} on line number ${lineNumber + 1}: ${line}`,
-        );
-      }
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const parent = ladder[level - 1]!;
       if (record.tag == "CONC") {
         parent.value += record.value;
       } else if (record.tag == "CONT") {
