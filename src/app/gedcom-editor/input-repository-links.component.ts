@@ -53,6 +53,7 @@ export class InputRepositoryLinksComponent implements FormValueControl<
       ...repositoryLinks,
       newGedcomRepositoryLink(),
     ]);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const newControl = this.form[this.form.length - 1]!;
     this.newControls.add(newControl);
     afterNextRender(

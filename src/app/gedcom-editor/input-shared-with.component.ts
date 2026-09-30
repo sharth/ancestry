@@ -37,6 +37,7 @@ export class InputSharedWithComponent implements FormValueControl<
 
   appendSharedEvent() {
     this.value.update((sharedWith) => [...sharedWith, { xref: "", role: "" }]);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.newControls.add(this.form[-1]!);
     setTimeout(() => {
       this.focusTargets.last.focus();

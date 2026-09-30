@@ -48,8 +48,13 @@ export function parseGedcomRecords(text: string): GedcomRecord[] {
     if (match == null) {
       throw new Error(`Failed to parse line number ${lineNumber + 1}: ${line}`);
     }
-    const level = parseInt(match[1]!, 10);
-    const [xref, tag, value] = match.slice(2) as [string, string, string];
+    const [levelString, xref, tag, value] = match.slice(1) as [
+      string,
+      string,
+      string,
+      string,
+    ];
+    const level = parseInt(levelString, 10);
     const abstag = [
       ...ladder.slice(0, level).map((record) => record.tag),
       tag,
@@ -60,7 +65,8 @@ export function parseGedcomRecords(text: string): GedcomRecord[] {
       ladder = [record];
       records.push(record);
     } else if (level <= ladder.length) {
-      const parent: GedcomRecord = ladder[level - 1]!;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const parent = ladder[level - 1]!;
       if (record.tag == "CONC") {
         parent.value += record.value;
       } else if (record.tag == "CONT") {

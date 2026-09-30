@@ -47,6 +47,7 @@ export class InputIndividualNamesComponent implements FormValueControl<
 
   appendName() {
     this.value.update((names) => [...names, newGedcomName()]);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.newControls.add(this.form[this.form.length - 1]!);
     afterNextRender(
       {
