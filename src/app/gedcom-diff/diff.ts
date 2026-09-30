@@ -162,10 +162,9 @@ function diffArrayViews(
   const jaggedArray: JaggedEntry[][] = [];
   for (const [lhsIndex, rhsIndex] of commonStrings.values()) {
     let i = 0;
-    let last = jaggedArray[i]?.at(-1);
-    while (last !== undefined && last.rhsIndex < rhsIndex) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    while (jaggedArray[i] && jaggedArray[i]!.at(-1)!.rhsIndex < rhsIndex) {
       i += 1;
-      last = jaggedArray[i]?.at(-1);
     }
     let bucket = jaggedArray[i];
     if (bucket === undefined) {
