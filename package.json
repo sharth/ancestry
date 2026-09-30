@@ -62,5 +62,9 @@
     "plugins": [
       "@ianvs/prettier-plugin-sort-imports"
     ]
+  },
+  "devDependencies": {
+    "@vitest/eslint-plugin": "^1.6.27",
+    "eslint-plugin-testing-library": "^7.16.2"
   }
 }
