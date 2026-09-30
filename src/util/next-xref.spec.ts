@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { newGedcomDatabase } from "../gedcom/gedcomDatabase";
 import { newGedcomIndividual } from "../gedcom/gedcomIndividual";
 import { newGedcomMultimedia } from "../gedcom/gedcomMultimedia";

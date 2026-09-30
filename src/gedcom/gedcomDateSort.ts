@@ -133,9 +133,11 @@ function parseTokens(tokens: string[]): ParsedGedcomDate | undefined {
     } else if (shift === "after") {
       // The day after the last day the date covers.
       sortKey =
-        month === undefined ? year + 1
-        : day === undefined ? toFractionalYear(year, month + 1, 1)
-        : toFractionalYear(year, month, day + 1);
+        month === undefined
+          ? year + 1
+          : day === undefined
+            ? toFractionalYear(year, month + 1, 1)
+            : toFractionalYear(year, month, day + 1);
     }
 
     return { year, sortKey };

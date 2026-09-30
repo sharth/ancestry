@@ -1,5 +1,6 @@
 import { Component, computed, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
+
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { getFamilyMultimediaCitations } from "../../gedcom/gedcomFamily";
 import { getIndividualMultimediaCitations } from "../../gedcom/gedcomIndividual";

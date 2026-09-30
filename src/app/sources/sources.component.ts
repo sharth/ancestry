@@ -1,5 +1,6 @@
 import { Component, computed, input } from "@angular/core";
 import { RouterLink } from "@angular/router";
+
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
 

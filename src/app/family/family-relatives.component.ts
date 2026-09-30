@@ -1,4 +1,5 @@
 import { Component, computed, input } from "@angular/core";
+
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import type { GedcomFamily } from "../../gedcom/gedcomFamily";
 import { IndividualLinkComponent } from "../individual-link/individual-link.component";
@@ -18,9 +19,8 @@ export class FamilyRelativesComponent {
     const family = this.family();
 
     return {
-      husband:
-        family.husbandXref ?
-          ancestry.individuals[family.husbandXref]
+      husband: family.husbandXref
+        ? ancestry.individuals[family.husbandXref]
         : undefined,
       wife: family.wifeXref ? ancestry.individuals[family.wifeXref] : undefined,
       children: family.childXrefs

@@ -5,6 +5,7 @@ import {
 } from "@angular/core/testing";
 import { render } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it } from "vitest";
+
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { InputIndividualSexComponent } from "./input-individual-sex.component";
 

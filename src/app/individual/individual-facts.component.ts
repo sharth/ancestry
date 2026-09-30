@@ -1,4 +1,5 @@
 import { Component, computed, input } from "@angular/core";
+
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import {
   EventsTimelineComponent,
@@ -34,9 +35,9 @@ export class IndividualFactsComponent {
         const family = ancestryDatabase.families[familyXref];
         if (family == undefined) return [];
         const spouseXref =
-          family.husbandXref === individual.xref ?
-            family.wifeXref
-          : family.husbandXref;
+          family.husbandXref === individual.xref
+            ? family.wifeXref
+            : family.husbandXref;
         return family.facts.map((fact): TimelineEvent => ({
           fact,
           owner: "family",

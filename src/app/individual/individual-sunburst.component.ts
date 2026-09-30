@@ -8,6 +8,7 @@ import {
 } from "@angular/core";
 import { RouterLink } from "@angular/router";
 import * as d3 from "d3";
+
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { fullname, type GedcomIndividual } from "../../gedcom/gedcomIndividual";
 

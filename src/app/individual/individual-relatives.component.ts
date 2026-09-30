@@ -1,4 +1,5 @@
 import { Component, computed, input } from "@angular/core";
+
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import type { GedcomIndividual } from "../../gedcom/gedcomIndividual";
 import { IndividualLinkComponent } from "../individual-link/individual-link.component";
@@ -49,11 +50,12 @@ export class IndividualRelativesComponent {
         .filter((family) => family !== undefined)
         .map((family) => {
           const spouseXref =
-            family.husbandXref != individual.xref ?
-              family.husbandXref
-            : family.wifeXref;
-          const spouse =
-            spouseXref ? ancestry.individuals[spouseXref] : undefined;
+            family.husbandXref != individual.xref
+              ? family.husbandXref
+              : family.wifeXref;
+          const spouse = spouseXref
+            ? ancestry.individuals[spouseXref]
+            : undefined;
           const children = family.childXrefs
             .map((childXref) => ancestry.individuals[childXref])
             .filter((child) => child !== undefined);

@@ -3,6 +3,7 @@ import type { ComponentFixture } from "@angular/core/testing";
 import { render } from "@testing-library/angular/zoneless";
 import { userEvent } from "@testing-library/user-event";
 import { assert, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { InputIndividualFactComponent } from "./input-individual-fact.component";
 import { InputIndividualFactsComponent } from "./input-individual-facts.component";

@@ -11,6 +11,7 @@ import {
   type FieldTree,
   type FormValueControl,
 } from "@angular/forms/signals";
+
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import type { GedcomFactSharedWith } from "../../gedcom/gedcomFact";
 import { InputIndividualXrefComponent } from "./input-individual-xref.component";
