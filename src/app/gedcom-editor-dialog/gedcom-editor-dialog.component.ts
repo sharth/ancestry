@@ -6,6 +6,7 @@ import {
   viewChild,
   type ElementRef,
 } from "@angular/core";
+
 import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { GedcomEditorComponent } from "../gedcom-editor/gedcom-editor.component";

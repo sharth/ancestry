@@ -1,4 +1,5 @@
 import { Component, computed, input } from "@angular/core";
+
 import {
   serializeGedcomRecordToText,
   type GedcomRecord,

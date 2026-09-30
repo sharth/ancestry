@@ -1,4 +1,5 @@
 import { assert, describe, expect, it } from "vitest";
+
 import { newGedcomFact } from "./gedcomFact";
 import {
   newGedcomFamily,

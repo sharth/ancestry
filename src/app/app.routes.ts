@@ -1,4 +1,5 @@
 import type { Routes } from "@angular/router";
+
 import { ancestryDatabaseResolver } from "../database/ancestry.service";
 import { FamiliesComponent } from "./families/families.component";
 import { FamilyFactsComponent } from "./family/family-facts.component";

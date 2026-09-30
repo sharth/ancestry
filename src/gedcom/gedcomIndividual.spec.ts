@@ -1,4 +1,5 @@
 import { assert, describe, expect, it } from "vitest";
+
 import { newGedcomChangeDate } from "./gedcomChangeDate";
 import { newGedcomDate } from "./gedcomDate";
 import { newGedcomFact } from "./gedcomFact";

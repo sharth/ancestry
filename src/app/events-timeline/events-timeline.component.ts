@@ -1,5 +1,6 @@
 import { Component, computed, inject, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
+
 import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomDate } from "../../gedcom/gedcomDate";
 import {
@@ -56,9 +57,9 @@ export class EventsTimelineComponent {
       (event) => {
         const fact = event.fact;
         const metadata =
-          event.owner === "individual" ?
-            individualMetadata[fact.tag]
-          : familyMetadata[fact.tag];
+          event.owner === "individual"
+            ? individualMetadata[fact.tag]
+            : familyMetadata[fact.tag];
         const description = metadata?.humanReadableDescription ?? fact.tag;
         // Generic events and facts are best described by their type.
         const typeIsTitle =
@@ -73,14 +74,12 @@ export class EventsTimelineComponent {
           year: year !== undefined ? formatYear(year) : "",
           // Like ancestry.com, the age is the difference in years.
           age:
-            (
-              birthYear !== undefined &&
-              year !== undefined &&
-              year >= birthYear &&
-              !isBirth
-            ) ?
-              year - birthYear
-            : undefined,
+            birthYear !== undefined &&
+            year !== undefined &&
+            year >= birthYear &&
+            !isBirth
+              ? year - birthYear
+              : undefined,
           isBirth,
           date: formatGedcomDateValue(fact.date.value),
           details: [

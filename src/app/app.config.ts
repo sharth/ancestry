@@ -5,6 +5,7 @@ import {
   withHashLocation,
   withInMemoryScrolling,
 } from "@angular/router";
+
 import { routes } from "./app.routes";
 
 declare const USE_HASH_LOCATION: boolean;

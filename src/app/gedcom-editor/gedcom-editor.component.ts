@@ -9,6 +9,7 @@ import {
 import { FormField, form } from "@angular/forms/signals";
 import { ActivatedRoute, Router } from "@angular/router";
 import { produce } from "immer";
+
 import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomFamily } from "../../gedcom/gedcomFamily";
@@ -293,8 +294,8 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     switch (tabInformation.type) {
       case "INDI": {
         const individual = database.individuals[xref];
-        return individual?.names[0] ?
-            displayGedcomName(individual.names[0])
+        return individual?.names[0]
+          ? displayGedcomName(individual.names[0])
           : `Individual ${xref}`;
       }
       case "FAM": {

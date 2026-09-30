@@ -1,5 +1,6 @@
 import { Component, computed, inject, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
+
 import { AncestryService } from "../../database/ancestry.service";
 import { IndividualLinkComponent } from "../individual-link/individual-link.component";
 

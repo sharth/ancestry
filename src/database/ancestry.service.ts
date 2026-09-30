@@ -3,6 +3,7 @@ import { rxResource, toObservable } from "@angular/core/rxjs-interop";
 import { RedirectCommand, Router, type ResolveFn } from "@angular/router";
 import Dexie, { liveQuery } from "dexie";
 import { filter, firstValueFrom, from, switchMap } from "rxjs";
+
 import {
   compareGedcomDatabase,
   parseGedcomDatabase,
@@ -107,9 +108,11 @@ async function loadGedcom(
   }
 
   const gedcomFileHandle =
-    dataSource.mode === "gedcom" ?
-      dataSource.gedcomHandle
-    : await dataSource.directoryHandle.getFileHandle(dataSource.gedcomFilename);
+    dataSource.mode === "gedcom"
+      ? dataSource.gedcomHandle
+      : await dataSource.directoryHandle.getFileHandle(
+          dataSource.gedcomFilename,
+        );
   const directoryHandle =
     dataSource.mode === "directory" ? dataSource.directoryHandle : undefined;
 
@@ -301,9 +304,11 @@ export class AncestryService {
   async requestWritePermission(): Promise<boolean> {
     const dataSource = (await this.dexieDatabase.metadata.get(1))?.dataSource;
     const handle =
-      dataSource?.mode === "gedcom" ? dataSource.gedcomHandle
-      : dataSource?.mode === "directory" ? dataSource.directoryHandle
-      : undefined;
+      dataSource?.mode === "gedcom"
+        ? dataSource.gedcomHandle
+        : dataSource?.mode === "directory"
+          ? dataSource.directoryHandle
+          : undefined;
     if (handle === undefined) {
       return false;
     }

@@ -1,5 +1,6 @@
 import { Component, computed, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
+
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { getFamilySourceCitations } from "../../gedcom/gedcomFamily";
 import { getIndividualSourceCitations } from "../../gedcom/gedcomIndividual";
@@ -35,9 +36,9 @@ export class IndividualSourcesComponent {
         const family = ancestryDatabase.families[familyXref];
         if (family == undefined) return [];
         const spouseXref =
-          family.husbandXref === individual.xref ?
-            family.wifeXref
-          : family.husbandXref;
+          family.husbandXref === individual.xref
+            ? family.wifeXref
+            : family.husbandXref;
         return getFamilySourceCitations(family).map((citation) => ({
           ...citation,
           spouseXref: spouseXref || undefined,

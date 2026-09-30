@@ -1,5 +1,6 @@
 import { Component, computed, inject, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
+
 import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { serializeGedcomMultimedia } from "../../gedcom/gedcomMultimedia";

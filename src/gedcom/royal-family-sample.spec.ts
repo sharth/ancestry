@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { parseGedcomDatabase } from "./gedcomDatabase";
 import { parseGedcomRecords } from "./gedcomRecord";
 

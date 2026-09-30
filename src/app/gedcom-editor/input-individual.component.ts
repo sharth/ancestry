@@ -1,5 +1,6 @@
 import { Component, input, model } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
+
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import {
   newGedcomIndividual,
