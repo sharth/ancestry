@@ -218,15 +218,12 @@ function diffArrayViews(
       { lhsIndex: lhs.length, rhsIndex: rhs.length },
     ];
     for (let i = 1; i < chunks.length; i++) {
-      const previousChunk = chunks[i - 1];
-      const currentChunk = chunks[i];
-      if (previousChunk === undefined || currentChunk === undefined) {
-        continue;
-      }
       differences.push(
         ...diffArrayViews(
-          lhs.slice(previousChunk.lhsIndex, currentChunk.lhsIndex - 1),
-          rhs.slice(previousChunk.rhsIndex, currentChunk.rhsIndex - 1),
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          lhs.slice(chunks[i - 1]!.lhsIndex, chunks[i]!.lhsIndex - 1),
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          rhs.slice(chunks[i - 1]!.rhsIndex, chunks[i]!.rhsIndex - 1),
         ),
       );
     }
