@@ -86,6 +86,7 @@ class ArrayView<T> {
     callback: (element: T, index: number, arrayView: ArrayView<T>) => void,
   ): void {
     for (let i = 0; i < this._length; i++) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- index is within [_offset, _offset + _length), which is always in bounds
       callback(this._arr[this._offset + i]!, i, this);
     }
   }
@@ -161,29 +162,32 @@ function diffArrayViews(
   const jaggedArray: JaggedEntry[][] = [];
   for (const [lhsIndex, rhsIndex] of commonStrings.values()) {
     let i = 0;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     while (jaggedArray[i] && jaggedArray[i]!.at(-1)!.rhsIndex < rhsIndex) {
       i += 1;
     }
-    if (i == jaggedArray.length) {
-      jaggedArray.push([]);
+    let bucket = jaggedArray[i];
+    if (bucket === undefined) {
+      bucket = [];
+      jaggedArray.push(bucket);
     }
-    jaggedArray[i]!.push({
+    const previousBucket = i == 0 ? undefined : jaggedArray[i - 1];
+    bucket.push({
       lhsIndex,
       rhsIndex,
-      previousEntry: i == 0 ? undefined : jaggedArray[i - 1]!.at(-1)!,
+      previousEntry: previousBucket?.at(-1),
     });
   }
 
   // Construct a longest common subsequence.
   const lcs: JaggedEntry[] = [];
-  if (jaggedArray.length) {
-    lcs.push(jaggedArray.at(-1)!.at(-1)!);
-    while (true) {
-      const previousEntry = lcs.at(-1)!.previousEntry;
-      if (previousEntry == undefined) {
-        break;
-      }
-      lcs.push(previousEntry);
+  const firstEntry = jaggedArray.at(-1)?.at(-1);
+  if (firstEntry !== undefined) {
+    lcs.push(firstEntry);
+    let current = firstEntry;
+    while (current.previousEntry !== undefined) {
+      current = current.previousEntry;
+      lcs.push(current);
     }
     lcs.reverse();
   }
@@ -216,7 +220,9 @@ function diffArrayViews(
     for (let i = 1; i < chunks.length; i++) {
       differences.push(
         ...diffArrayViews(
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           lhs.slice(chunks[i - 1]!.lhsIndex, chunks[i]!.lhsIndex - 1),
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           rhs.slice(chunks[i - 1]!.rhsIndex, chunks[i]!.rhsIndex - 1),
         ),
       );
