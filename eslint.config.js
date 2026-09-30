@@ -1,6 +1,8 @@
 import eslint from "@eslint/js";
 import markdown from "@eslint/markdown";
+import vitest from "@vitest/eslint-plugin";
 import angular from "angular-eslint";
+import testingLibrary from "eslint-plugin-testing-library";
 import { defineConfig } from "eslint/config";
 import tseslint from "typescript-eslint";
 
@@ -48,6 +50,22 @@ export default defineConfig([
         { type: "element", prefix: "app", style: "kebab-case" },
       ],
       "@angular-eslint/prefer-on-push-component-change-detection": "error",
+    },
+  },
+  {
+    files: ["**/*.spec.ts"],
+    extends: [
+      vitest.configs.recommended,
+      testingLibrary.configs["flat/angular"],
+    ],
+    rules: {
+      // Conflicts with this codebase's established pattern of calling render()
+      // in beforeEach and storing the result for use across it()s.
+      "testing-library/no-render-in-lifecycle": "off",
+      "testing-library/render-result-naming-convention": "off",
+      // Conflicts with this codebase's established pattern of querying the
+      // rendered DOM directly (see #402).
+      "testing-library/no-node-access": "off",
     },
   },
   {
