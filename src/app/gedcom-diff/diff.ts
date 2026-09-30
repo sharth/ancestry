@@ -171,10 +171,11 @@ function diffArrayViews(
       bucket = [];
       jaggedArray.push(bucket);
     }
+    const previousBucket = i == 0 ? undefined : jaggedArray[i - 1];
     bucket.push({
       lhsIndex,
       rhsIndex,
-      previousEntry: i == 0 ? undefined : jaggedArray[i - 1]?.at(-1),
+      previousEntry: previousBucket?.at(-1),
     });
   }
 
