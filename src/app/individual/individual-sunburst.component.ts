@@ -138,11 +138,11 @@ export class IndividualSunburstComponent {
     const zoom = d3
       .zoom<SVGSVGElement, unknown>()
       .scaleExtent([0.1, 10])
-      .on("zoom", (event) => {
-        d3.select(gEl).attr("transform", event.transform);
+      .on("zoom", (event: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
+        d3.select(gEl).attr("transform", event.transform.toString());
       });
 
-    d3.select(svgEl).call(zoom as any);
+    d3.select(svgEl).call(zoom);
 
     onCleanup(() => {
       d3.select(svgEl).on(".zoom", null);
