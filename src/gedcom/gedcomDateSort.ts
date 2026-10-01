@@ -62,12 +62,19 @@ function toFractionalYear(year: number, month: number, day: number): number {
   return year + (daysBeforeMonth + day - 1) / DAYS_PER_YEAR;
 }
 
+// A bare hyphen or dash between two dates is a common, non-standard stand-in
+// for "BET x AND y" (e.g. "1894-1895", "1894–1895", "1894—1895").
+// It's split out here, before the generic punctuation strip below would
+// otherwise delete it and fuse the two years into one token.
+const RANGE_DASHES = /\s*[-‐‑‒–—]\s*/g;
+
 function tokenize(value: string): string[] {
   return value
     .toUpperCase()
     .replace(/@#D[^@]*@/g, " ")
     .replace(/\bB\.\s*C\.\s*(E\.)?/g, " BC ")
     .replace(/[.?,]/g, " ")
+    .replace(RANGE_DASHES, " ")
     .split(/\s+/)
     .map((token) => token.replace(/[^A-Z0-9/]/g, ""))
     .filter((token) => token !== "");
