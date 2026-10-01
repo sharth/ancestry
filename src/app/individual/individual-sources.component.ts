@@ -3,21 +3,13 @@ import { RouterModule } from "@angular/router";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import {
-  gedcomFamilyAttributes,
-  gedcomFamilyEvents,
-  gedcomIndividualAttributes,
-  gedcomIndividualEvents,
+  gedcomFamilyFacts,
+  gedcomIndividualFacts,
 } from "../../gedcom/gedcomFactMetadata";
 import { getFamilySourceCitations } from "../../gedcom/gedcomFamily";
 import { getIndividualSourceCitations } from "../../gedcom/gedcomIndividual";
 import type { GedcomSourceCitation } from "../../gedcom/gedcomSourceCitation";
 import { IndividualLinkComponent } from "../individual-link/individual-link.component";
-
-const individualMetadata = {
-  ...gedcomIndividualAttributes,
-  ...gedcomIndividualEvents,
-};
-const familyMetadata = { ...gedcomFamilyAttributes, ...gedcomFamilyEvents };
 
 interface SourceCitationRow {
   event: string;
@@ -47,7 +39,7 @@ export class IndividualSourcesComponent {
       ...getIndividualSourceCitations(individual).map((citation) => ({
         ...citation,
         eventDescription:
-          individualMetadata[citation.event]?.humanReadableDescription ??
+          gedcomIndividualFacts[citation.event]?.humanReadableDescription ??
           citation.event,
       })),
       ...individual.parentOfFamilyXrefs.flatMap((familyXref) => {
@@ -60,7 +52,7 @@ export class IndividualSourcesComponent {
         return getFamilySourceCitations(family).map((citation) => ({
           ...citation,
           eventDescription:
-            familyMetadata[citation.event]?.humanReadableDescription ??
+            gedcomFamilyFacts[citation.event]?.humanReadableDescription ??
             citation.event,
           spouseXref: spouseXref || undefined,
         }));
