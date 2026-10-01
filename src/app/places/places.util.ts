@@ -154,3 +154,15 @@ export function buildPlaceTree(database: GedcomDatabase): PlaceTreeNode {
 export function placeNodeSlugs(node: PlaceTreeNode): string[] {
   return node.path.map(placeSlug);
 }
+
+/** Every place with recorded events at or under `node`, e.g. visiting
+ * Maryland also surfaces events recorded at "Baltimore, Maryland, United
+ * States". Sorted alphabetically by name. */
+export function collectPlaceGroups(node: PlaceTreeNode): PlaceGroup[] {
+  const groups: PlaceGroup[] = [];
+  if (node.place) groups.push(node.place);
+  for (const child of node.children.values()) {
+    groups.push(...collectPlaceGroups(child));
+  }
+  return groups.sort((a, b) => a.name.localeCompare(b.name));
+}

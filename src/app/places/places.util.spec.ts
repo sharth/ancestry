@@ -6,6 +6,7 @@ import { newGedcomFamily } from "../../gedcom/gedcomFamily";
 import { newGedcomIndividual } from "../../gedcom/gedcomIndividual";
 import {
   buildPlaceTree,
+  collectPlaceGroups,
   computePlaceGroups,
   placeHierarchy,
   placeNodeSlugs,
@@ -123,6 +124,49 @@ describe("buildPlaceTree", () => {
     const root = buildPlaceTree(database);
 
     expect(root.children.get("nowhere")).toBeUndefined();
+  });
+});
+
+describe("collectPlaceGroups", () => {
+  it("includes events recorded at any depth under the node", () => {
+    const database = databaseWithPlaces(
+      "Elkton, Cecil County, Maryland, United States",
+      "Cecil County, Maryland, United States",
+      "Boston, MA",
+    );
+    const root = buildPlaceTree(database);
+    const maryland = root.children
+      .get("united-states")
+      ?.children.get("maryland");
+    assert.isOk(maryland);
+
+    expect(collectPlaceGroups(maryland).map((p) => p.name)).toEqual([
+      "Cecil County, Maryland, United States",
+      "Elkton, Cecil County, Maryland, United States",
+    ]);
+  });
+
+  it("includes the node's own events alongside its descendants'", () => {
+    const database = databaseWithPlaces(
+      "Elkton, Cecil County, Maryland, United States",
+      "Cecil County, Maryland, United States",
+    );
+    const root = buildPlaceTree(database);
+    const cecilCounty = root.children
+      .get("united-states")
+      ?.children.get("maryland")
+      ?.children.get("cecil-county");
+    assert.isOk(cecilCounty);
+
+    expect(collectPlaceGroups(cecilCounty).map((p) => p.name)).toEqual([
+      "Cecil County, Maryland, United States",
+      "Elkton, Cecil County, Maryland, United States",
+    ]);
+  });
+
+  it("returns nothing for a region with no recorded events anywhere under it", () => {
+    const root = buildPlaceTree(newGedcomDatabase({}));
+    expect(collectPlaceGroups(root)).toEqual([]);
   });
 });
 

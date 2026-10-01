@@ -25,45 +25,51 @@
     </ul>
   }
 
-  @if (node.place; as place) {
-    @for (address of place.addresses; track address.name) {
-      <div class="card my-3">
-        <div class="card-header bg-light">
-          <h5 class="mb-0">{{ address.name }}</h5>
-        </div>
-        <div class="table-responsive">
-          <table class="table table-sm table-striped mb-0">
-            <thead>
-              <tr>
-                <th>Event</th>
-                <th>Date</th>
-                <th>Person / Family</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (event of address.events; track $index) {
+  @if (placeGroups().length) {
+    <h4>Events</h4>
+    @for (place of placeGroups(); track place.name) {
+      @if (placeGroups().length > 1) {
+        <h5>{{ place.name }}</h5>
+      }
+      @for (address of place.addresses; track address.name) {
+        <div class="card my-3">
+          <div class="card-header bg-light">
+            <h6 class="mb-0">{{ address.name }}</h6>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-sm table-striped mb-0">
+              <thead>
                 <tr>
-                  <td>{{ event.eventType }}</td>
-                  <td>{{ event.date }}</td>
-                  <td>
-                    @if (event.isFamily) {
-                      <a [routerLink]="['/family', event.linkXref]">{{
-                        event.linkName
-                      }}</a>
-                    } @else {
-                      <a [routerLink]="['/individual', event.linkXref]">{{
-                        event.linkName
-                      }}</a>
-                    }
-                  </td>
+                  <th>Event</th>
+                  <th>Date</th>
+                  <th>Person / Family</th>
                 </tr>
-              }
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                @for (event of address.events; track $index) {
+                  <tr>
+                    <td>{{ event.eventType }}</td>
+                    <td>{{ event.date }}</td>
+                    <td>
+                      @if (event.isFamily) {
+                        <a [routerLink]="['/family', event.linkXref]">{{
+                          event.linkName
+                        }}</a>
+                      } @else {
+                        <a [routerLink]="['/individual', event.linkXref]">{{
+                          event.linkName
+                        }}</a>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      }
     }
-  } @else if (!children().length) {
+  } @else {
     <p>No events recorded for this place.</p>
   }
 } @else {

@@ -50,21 +50,33 @@ describe("PlaceComponent", () => {
     component = fixture.componentInstance;
   }
 
-  it("shows the regions directly under a broad path", async () => {
+  it("shows the regions directly under a broad path, plus every nested place's events", async () => {
     await renderPlace(["united-states", "maryland"]);
 
     expect(component.node()?.name).toBe("Maryland");
     expect(component.children().map((c) => c.name)).toEqual(["Cecil County"]);
     expect(screen.getByText("Cecil County")).toBeTruthy();
+
+    // Maryland itself has no events recorded directly, but its descendants
+    // (Cecil County and Elkton within it) do, and both should show up here.
+    expect(component.placeGroups().map((p) => p.name)).toEqual([
+      "Cecil County, Maryland, United States",
+      "Elkton, Cecil County, Maryland, United States",
+    ]);
+    expect(screen.getByText(/Elkton, Cecil County/)).toBeTruthy();
   });
 
-  it("shows both a place's own events and its sub-regions", async () => {
+  it("shows both a place's own events and its sub-regions' events", async () => {
     await renderPlace(["united-states", "maryland", "cecil-county"]);
 
     expect(component.node()?.place?.name).toBe(
       "Cecil County, Maryland, United States",
     );
     expect(component.children().map((c) => c.name)).toEqual(["Elkton"]);
+    expect(component.placeGroups().map((p) => p.name)).toEqual([
+      "Cecil County, Maryland, United States",
+      "Elkton, Cecil County, Maryland, United States",
+    ]);
   });
 
   it("renders a leaf place's events with no sub-regions", async () => {

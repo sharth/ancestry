@@ -3,7 +3,11 @@ import { RouterLink } from "@angular/router";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import type { PlaceTreeNode } from "../places/places.util";
-import { buildPlaceTree, placeNodeSlugs } from "../places/places.util";
+import {
+  buildPlaceTree,
+  collectPlaceGroups,
+  placeNodeSlugs,
+} from "../places/places.util";
 
 @Component({
   selector: "app-place",
@@ -40,6 +44,13 @@ export class PlaceComponent {
     return Array.from(node.children.values()).sort((a, b) =>
       a.name.localeCompare(b.name),
     );
+  });
+
+  /** Events recorded anywhere under this place, e.g. visiting Maryland also
+   * shows events recorded at "Baltimore, Maryland, United States". */
+  readonly placeGroups = computed(() => {
+    const node = this.node();
+    return node ? collectPlaceGroups(node) : [];
   });
 
   readonly placeNodeSlugs = placeNodeSlugs;
