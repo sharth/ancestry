@@ -1,9 +1,4 @@
-import type {
-  ResolveFn,
-  Routes,
-  UrlMatcher,
-  UrlSegment,
-} from "@angular/router";
+import type { ActivatedRouteSnapshot, Routes } from "@angular/router";
 
 import { ancestryDatabaseResolver } from "../database/ancestry.service";
 import { FamiliesComponent } from "./families/families.component";
@@ -29,19 +24,6 @@ import { SettingsComponent } from "./settings/settings.component";
 import { SourceComponent } from "./source/source.component";
 import { SourcesComponent } from "./sources/sources.component";
 import { ValidationComponent } from "./validation/validation.component";
-
-/** Matches any number of remaining segments under `place/`, so a region at
- * any depth of the place hierarchy (e.g. "united-states/maryland") gets its
- * own URL. */
-export const placePathMatcher: UrlMatcher = (segments: UrlSegment[]) => {
-  if (segments.length === 0) return null;
-  return { consumed: segments };
-};
-
-/** The matched `place/...` segments as plain strings, e.g.
- * ["united-states", "maryland"]. */
-export const placePathResolver: ResolveFn<string[]> = (route) =>
-  route.url.map((segment) => segment.path);
 
 export const routes: Routes = [
   {
@@ -122,14 +104,21 @@ export const routes: Routes = [
     runGuardsAndResolvers: "always",
   },
   {
+    // Matches any number of remaining segments under `place/`, so a region
+    // at any depth of the place hierarchy (e.g. "united-states/maryland")
+    // gets its own URL.
     path: "place",
     children: [
       {
-        matcher: placePathMatcher,
+        matcher: (segments) =>
+          segments.length === 0 ? null : { consumed: segments },
         component: PlaceComponent,
         resolve: {
           ancestryDatabase: ancestryDatabaseResolver,
-          path: placePathResolver,
+          // The matched `place/...` segments as plain strings, e.g.
+          // ["united-states", "maryland"].
+          path: (route: ActivatedRouteSnapshot) =>
+            route.url.map((segment) => segment.path),
         },
         runGuardsAndResolvers: "always",
       },

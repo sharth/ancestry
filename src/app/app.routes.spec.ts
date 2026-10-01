@@ -1,40 +1,20 @@
 import { Component, input } from "@angular/core";
 import { TestBed } from "@angular/core/testing";
+import type { ActivatedRouteSnapshot } from "@angular/router";
 import {
   Router,
-  UrlSegment,
   provideRouter,
   withComponentInputBinding,
 } from "@angular/router";
 import { describe, expect, it } from "vitest";
-
-import { placePathMatcher, placePathResolver } from "./app.routes";
-
-describe("placePathMatcher", () => {
-  it("consumes every remaining segment", () => {
-    const segments = [
-      new UrlSegment("united-states", {}),
-      new UrlSegment("maryland", {}),
-      new UrlSegment("cecil-county", {}),
-    ];
-
-    const result = placePathMatcher(segments, {} as never, {});
-
-    expect(result?.consumed).toBe(segments);
-  });
-
-  it("does not match when there are no segments", () => {
-    expect(placePathMatcher([], {} as never, {})).toBeNull();
-  });
-});
 
 @Component({ selector: "app-test-leaf", template: "{{ path().join('/') }}" })
 class TestLeafComponent {
   readonly path = input.required<string[]>();
 }
 
-describe("place route wiring", () => {
-  it("resolves every matched segment into the leaf component's path input", async () => {
+describe("a matcher + resolver route like place/...", () => {
+  function configure() {
     TestBed.configureTestingModule({
       providers: [
         provideRouter(
@@ -43,9 +23,13 @@ describe("place route wiring", () => {
               path: "place",
               children: [
                 {
-                  matcher: placePathMatcher,
+                  matcher: (segments) =>
+                    segments.length === 0 ? null : { consumed: segments },
                   component: TestLeafComponent,
-                  resolve: { path: placePathResolver },
+                  resolve: {
+                    path: (route: ActivatedRouteSnapshot) =>
+                      route.url.map((segment) => segment.path),
+                  },
                 },
               ],
             },
@@ -54,8 +38,11 @@ describe("place route wiring", () => {
         ),
       ],
     });
+    return TestBed.inject(Router);
+  }
 
-    const router = TestBed.inject(Router);
+  it("resolves every matched segment into the leaf component's path input", async () => {
+    const router = configure();
     await router.navigateByUrl("/place/united-states/maryland/cecil-county");
 
     const route = router.routerState.snapshot.root.firstChild?.firstChild;
@@ -64,5 +51,12 @@ describe("place route wiring", () => {
       "maryland",
       "cecil-county",
     ]);
+  });
+
+  it("does not match with no further segments", async () => {
+    const router = configure();
+    await router.navigateByUrl("/place");
+
+    expect(router.routerState.snapshot.root.firstChild?.firstChild).toBeFalsy();
   });
 });
