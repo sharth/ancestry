@@ -110,15 +110,14 @@ export const routes: Routes = [
     path: "place",
     children: [
       {
-        matcher: (segments) =>
-          segments.length === 0 ? null : { consumed: segments },
+        matcher: (segments) => ({ consumed: segments }),
         component: PlaceComponent,
         resolve: {
           ancestryDatabase: ancestryDatabaseResolver,
-          // The matched `place/...` segments as plain strings, e.g.
-          // ["united-states", "maryland"].
+          // The matched `place/...` segments as plain, lowercased strings,
+          // e.g. ["united-states", "maryland"].
           path: (route: ActivatedRouteSnapshot) =>
-            route.url.map((segment) => segment.path),
+            route.url.map((segment) => segment.path.toLowerCase()),
         },
         runGuardsAndResolvers: "always",
       },

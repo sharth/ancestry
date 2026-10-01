@@ -7,7 +7,6 @@ import { newGedcomIndividual } from "../../gedcom/gedcomIndividual";
 import {
   buildPlaceTree,
   computePlaceGroups,
-  findPlaceNode,
   placeHierarchy,
   placeNodeSlugs,
   placeSlug,
@@ -94,7 +93,7 @@ describe("computePlaceGroups", () => {
   });
 });
 
-describe("buildPlaceTree / findPlaceNode", () => {
+describe("buildPlaceTree", () => {
   it("nests places under their region hierarchy", () => {
     const database = databaseWithPlaces(
       "Elkton, Cecil County, Maryland, United States",
@@ -102,18 +101,14 @@ describe("buildPlaceTree / findPlaceNode", () => {
     );
     const root = buildPlaceTree(database);
 
-    const unitedStates = findPlaceNode(root, ["united-states"]);
+    const unitedStates = root.children.get("united-states");
     expect(unitedStates?.name).toBe("United States");
     expect(unitedStates?.place).toBeUndefined();
 
-    const maryland = findPlaceNode(root, ["united-states", "maryland"]);
+    const maryland = unitedStates?.children.get("maryland");
     expect(maryland?.name).toBe("Maryland");
 
-    const cecilCounty = findPlaceNode(root, [
-      "united-states",
-      "maryland",
-      "cecil-county",
-    ]);
+    const cecilCounty = maryland?.children.get("cecil-county");
     expect(cecilCounty?.name).toBe("Cecil County");
     // "Cecil County, Maryland, United States" is itself a place with events,
     // and also the parent region of Elkton.
@@ -123,11 +118,11 @@ describe("buildPlaceTree / findPlaceNode", () => {
     expect(Array.from(cecilCounty?.children.keys() ?? [])).toEqual(["elkton"]);
   });
 
-  it("returns undefined for a path with no matching place", () => {
+  it("has no entry for a place that was never seen", () => {
     const database = databaseWithPlaces("Boston, MA");
     const root = buildPlaceTree(database);
 
-    expect(findPlaceNode(root, ["nowhere"])).toBeUndefined();
+    expect(root.children.get("nowhere")).toBeUndefined();
   });
 });
 
@@ -135,7 +130,7 @@ describe("placeNodeSlugs", () => {
   it("slugs every segment of a node's path", () => {
     const database = databaseWithPlaces("Elkton, Maryland");
     const root = buildPlaceTree(database);
-    const maryland = findPlaceNode(root, ["maryland"]);
+    const maryland = root.children.get("maryland");
     expect(maryland && placeNodeSlugs(maryland)).toEqual(["maryland"]);
   });
 });

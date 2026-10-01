@@ -2,11 +2,8 @@ import { Component, computed, input } from "@angular/core";
 import { RouterLink } from "@angular/router";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
-import {
-  buildPlaceTree,
-  findPlaceNode,
-  placeNodeSlugs,
-} from "../places/places.util";
+import type { PlaceTreeNode } from "../places/places.util";
+import { buildPlaceTree, placeNodeSlugs } from "../places/places.util";
 
 @Component({
   selector: "app-place",
@@ -17,10 +14,12 @@ export class PlaceComponent {
   readonly ancestryDatabase = input.required<GedcomDatabase>();
   readonly path = input.required<string[]>();
 
-  readonly node = computed(() => {
-    const database = this.ancestryDatabase();
-    const slugs = this.path().map((segment) => segment.toLowerCase());
-    return findPlaceNode(buildPlaceTree(database), slugs);
+  readonly node = computed<PlaceTreeNode | undefined>(() => {
+    const tree = buildPlaceTree(this.ancestryDatabase());
+    return this.path().reduce<PlaceTreeNode | undefined>(
+      (node, slug) => node?.children.get(slug),
+      tree,
+    );
   });
 
   readonly breadcrumbs = computed(() => {

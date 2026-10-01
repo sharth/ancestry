@@ -154,21 +154,6 @@ export function buildPlaceTree(database: GedcomDatabase): PlaceTreeNode {
   return root;
 }
 
-/** Walks `root` following each already-slugged segment in `slugs`, or
- * returns undefined if no place's hierarchy has a matching prefix. */
-export function findPlaceNode(
-  root: PlaceTreeNode,
-  slugs: readonly string[],
-): PlaceTreeNode | undefined {
-  let node = root;
-  for (const slug of slugs) {
-    const child = node.children.get(slug);
-    if (!child) return undefined;
-    node = child;
-  }
-  return node;
-}
-
 /** The `/place/...` route segments for a node, e.g. ["united-states",
  * "maryland"]. */
 export function placeNodeSlugs(node: PlaceTreeNode): string[] {

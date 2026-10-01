@@ -23,12 +23,11 @@ describe("a matcher + resolver route like place/...", () => {
               path: "place",
               children: [
                 {
-                  matcher: (segments) =>
-                    segments.length === 0 ? null : { consumed: segments },
+                  matcher: (segments) => ({ consumed: segments }),
                   component: TestLeafComponent,
                   resolve: {
                     path: (route: ActivatedRouteSnapshot) =>
-                      route.url.map((segment) => segment.path),
+                      route.url.map((segment) => segment.path.toLowerCase()),
                   },
                 },
               ],
@@ -41,9 +40,9 @@ describe("a matcher + resolver route like place/...", () => {
     return TestBed.inject(Router);
   }
 
-  it("resolves every matched segment into the leaf component's path input", async () => {
+  it("resolves every matched segment, lowercased, into the leaf component's path input", async () => {
     const router = configure();
-    await router.navigateByUrl("/place/united-states/maryland/cecil-county");
+    await router.navigateByUrl("/place/United-States/Maryland/Cecil-County");
 
     const route = router.routerState.snapshot.root.firstChild?.firstChild;
     expect(route?.data["path"]).toEqual([
@@ -53,10 +52,11 @@ describe("a matcher + resolver route like place/...", () => {
     ]);
   });
 
-  it("does not match with no further segments", async () => {
+  it("matches with no further segments", async () => {
     const router = configure();
     await router.navigateByUrl("/place");
 
-    expect(router.routerState.snapshot.root.firstChild?.firstChild).toBeFalsy();
+    const route = router.routerState.snapshot.root.firstChild?.firstChild;
+    expect(route?.data["path"]).toEqual([]);
   });
 });
