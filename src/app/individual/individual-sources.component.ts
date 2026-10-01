@@ -2,13 +2,26 @@ import { Component, computed, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
+import {
+  gedcomFamilyAttributes,
+  gedcomFamilyEvents,
+  gedcomIndividualAttributes,
+  gedcomIndividualEvents,
+} from "../../gedcom/gedcomFactMetadata";
 import { getFamilySourceCitations } from "../../gedcom/gedcomFamily";
 import { getIndividualSourceCitations } from "../../gedcom/gedcomIndividual";
 import type { GedcomSourceCitation } from "../../gedcom/gedcomSourceCitation";
 import { IndividualLinkComponent } from "../individual-link/individual-link.component";
 
+const individualMetadata = {
+  ...gedcomIndividualAttributes,
+  ...gedcomIndividualEvents,
+};
+const familyMetadata = { ...gedcomFamilyAttributes, ...gedcomFamilyEvents };
+
 interface SourceCitationRow {
   event: string;
+  eventDescription: string;
   spouseXref?: string;
   citation: GedcomSourceCitation;
 }
@@ -31,7 +44,12 @@ export class IndividualSourcesComponent {
     }
 
     const citations: SourceCitationRow[] = [
-      ...getIndividualSourceCitations(individual),
+      ...getIndividualSourceCitations(individual).map((citation) => ({
+        ...citation,
+        eventDescription:
+          individualMetadata[citation.event]?.humanReadableDescription ??
+          citation.event,
+      })),
       ...individual.parentOfFamilyXrefs.flatMap((familyXref) => {
         const family = ancestryDatabase.families[familyXref];
         if (family == undefined) return [];
@@ -41,6 +59,9 @@ export class IndividualSourcesComponent {
             : family.husbandXref;
         return getFamilySourceCitations(family).map((citation) => ({
           ...citation,
+          eventDescription:
+            familyMetadata[citation.event]?.humanReadableDescription ??
+            citation.event,
           spouseXref: spouseXref || undefined,
         }));
       }),
