@@ -1,9 +1,7 @@
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import {
-  gedcomFamilyAttributes,
-  gedcomFamilyEvents,
-  gedcomIndividualAttributes,
-  gedcomIndividualEvents,
+  gedcomFamilyFacts,
+  gedcomIndividualFacts,
 } from "../../gedcom/gedcomFactMetadata";
 import { fullname } from "../../gedcom/gedcomIndividual";
 
@@ -55,8 +53,7 @@ export function computePlaceGroups(database: GedcomDatabase): PlaceGroup[] {
       if (event.place || event.address) {
         addEvent(event.place, event.address, {
           eventType:
-            gedcomIndividualAttributes[event.tag]?.humanReadableDescription ??
-            gedcomIndividualEvents[event.tag]?.humanReadableDescription ??
+            gedcomIndividualFacts[event.tag]?.humanReadableDescription ??
             event.tag,
           date: event.date.value,
           linkXref: individual.xref,
@@ -72,9 +69,7 @@ export function computePlaceGroups(database: GedcomDatabase): PlaceGroup[] {
       if (event.place || event.address) {
         addEvent(event.place, event.address, {
           eventType:
-            gedcomFamilyAttributes[event.tag]?.humanReadableDescription ??
-            gedcomFamilyEvents[event.tag]?.humanReadableDescription ??
-            event.tag,
+            gedcomFamilyFacts[event.tag]?.humanReadableDescription ?? event.tag,
           date: event.date.value,
           linkXref: family.xref,
           linkName: `Family ${family.xref}`,
