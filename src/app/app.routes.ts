@@ -1,4 +1,5 @@
-import type { Routes } from "@angular/router";
+import type { Routes, UrlMatcher } from "@angular/router";
+import { UrlSegment } from "@angular/router";
 
 import { ancestryDatabaseResolver } from "../database/ancestry.service";
 import { FamiliesComponent } from "./families/families.component";
@@ -17,7 +18,6 @@ import { MultimediaComponent } from "./multimedia/multimedia.component";
 import { MultimediasComponent } from "./multimedias/multimedias.component";
 import { PageNotFoundComponent } from "./page-not-found/page-not-found.component";
 import { PlaceComponent } from "./place/place.component";
-import { placePathMatcher } from "./place/place.matcher";
 import { PlacesComponent } from "./places/places.component";
 import { RepositoriesComponent } from "./repositories/repositories.component";
 import { RepositoryComponent } from "./repository/repository.component";
@@ -25,6 +25,22 @@ import { SettingsComponent } from "./settings/settings.component";
 import { SourceComponent } from "./source/source.component";
 import { SourcesComponent } from "./sources/sources.component";
 import { ValidationComponent } from "./validation/validation.component";
+
+/** Matches any number of remaining segments under `place/`, joining them
+ * into a single `path` param (e.g. "united-states/maryland") so a region at
+ * any depth of the place hierarchy gets its own URL. */
+export const placePathMatcher: UrlMatcher = (segments) => {
+  if (segments.length === 0) return null;
+  return {
+    consumed: segments,
+    posParams: {
+      path: new UrlSegment(
+        segments.map((segment) => segment.path).join("/"),
+        {},
+      ),
+    },
+  };
+};
 
 export const routes: Routes = [
   {
