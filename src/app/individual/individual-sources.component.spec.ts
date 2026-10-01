@@ -104,4 +104,13 @@ describe("IndividualSourcesComponent", () => {
   it("should create", () => {
     expect(component).toBeTruthy();
   });
+
+  it("shows human-readable event labels instead of raw GEDCOM tags", () => {
+    const element = fixture.nativeElement as HTMLElement;
+    const text = element.textContent;
+    expect(text).toContain("Birth");
+    expect(text).toContain("Marriage");
+    expect(text).not.toContain("BIRT");
+    expect(text).not.toContain("MARR");
+  });
 });
