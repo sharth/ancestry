@@ -60,6 +60,13 @@ describe("gedcomDateYear", () => {
     expect(year("1850?")).toBe(1850);
     expect(year("1850 AD")).toBe(1850);
   });
+
+  it("parses hyphen and dash date ranges as the first date, like BET/AND", () => {
+    expect(year("1894-1895")).toBe(1894);
+    expect(year("1894–1895")).toBe(1894);
+    expect(year("1894—1895")).toBe(1894);
+    expect(year("1894 - 1895")).toBe(1894);
+  });
 });
 
 describe("gedcomDateSortKey", () => {
