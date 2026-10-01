@@ -31,20 +31,19 @@ export function computePlaceGroups(database: GedcomDatabase): PlaceGroup[] {
   const placeMap = new Map<string, Map<string, EventItem[]>>();
 
   const addEvent = (place: string, address: string, event: EventItem) => {
-    // If both are empty, we might not want to include them, but the loop checks for this.
-    const p = place !== "" ? place : "[Unknown Place]";
-    const a = address !== "" ? address : "[Unknown Address]";
+    place ||= "[Unknown Place]";
+    address ||= "[Unknown Address]";
 
-    let pMap = placeMap.get(p);
+    let pMap = placeMap.get(place);
     if (!pMap) {
       pMap = new Map();
-      placeMap.set(p, pMap);
+      placeMap.set(place, pMap);
     }
 
-    let aMap = pMap.get(a);
+    let aMap = pMap.get(address);
     if (!aMap) {
       aMap = [];
-      pMap.set(a, aMap);
+      pMap.set(address, aMap);
     }
 
     aMap.push(event);

@@ -47,7 +47,9 @@
                   <td>{{ event.date }}</td>
                   <td>
                     @if (event.isFamily) {
-                      <span>{{ event.linkName }}</span>
+                      <a [routerLink]="['/family', event.linkXref]">{{
+                        event.linkName
+                      }}</a>
                     } @else {
                       <a [routerLink]="['/individual', event.linkXref]">{{
                         event.linkName
