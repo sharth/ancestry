@@ -2,7 +2,7 @@ import { Component, computed, inject } from "@angular/core";
 import { RouterLink } from "@angular/router";
 
 import { AncestryService } from "../../database/ancestry.service";
-import { computePlaceGroups, placeSlug } from "./places.util";
+import { buildPlaceTree, placeNodeSlugs } from "./places.util";
 
 @Component({
   selector: "app-places",
@@ -12,11 +12,14 @@ import { computePlaceGroups, placeSlug } from "./places.util";
 })
 export class PlacesComponent {
   readonly ancestryService = inject(AncestryService);
-  readonly placeSlug = placeSlug;
+  readonly placeNodeSlugs = placeNodeSlugs;
 
-  readonly places = computed(() => {
+  readonly topLevelPlaces = computed(() => {
     const database = this.ancestryService.ancestryDatabase();
     if (!database) return [];
-    return computePlaceGroups(database);
+    const root = buildPlaceTree(database);
+    return Array.from(root.children.values()).sort((a, b) =>
+      a.name.localeCompare(b.name),
+    );
   });
 }

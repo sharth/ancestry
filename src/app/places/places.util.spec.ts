@@ -3,15 +3,48 @@ import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomFact } from "../../gedcom/gedcomFact";
 import { newGedcomFamily } from "../../gedcom/gedcomFamily";
 import { newGedcomIndividual } from "../../gedcom/gedcomIndividual";
-import { computePlaceGroups, placeSlug } from "./places.util";
+import {
+  buildPlaceTree,
+  computePlaceGroups,
+  findPlaceNode,
+  placeHierarchy,
+  placeNodeSlugs,
+  placeSlug,
+} from "./places.util";
+
+function databaseWithPlaces(...places: string[]) {
+  return newGedcomDatabase({
+    individuals: Object.fromEntries(
+      places.map((place, i) => [
+        `I${i}`,
+        newGedcomIndividual({
+          xref: `I${i}`,
+          facts: [newGedcomFact({ tag: "BIRT", place })],
+        }),
+      ]),
+    ),
+  });
+}
 
 describe("placeSlug", () => {
   it("lowercases and dashes non-alphanumeric characters", () => {
-    expect(placeSlug("Boston, MA, USA")).toBe("place-boston-ma-usa");
+    expect(placeSlug("Cecil County")).toBe("cecil-county");
   });
 
   it("produces the same slug for the same name", () => {
-    expect(placeSlug("Paris, France")).toBe(placeSlug("Paris, France"));
+    expect(placeSlug("Maryland")).toBe(placeSlug("Maryland"));
+  });
+});
+
+describe("placeHierarchy", () => {
+  it("splits on commas, broadest region first", () => {
+    expect(
+      placeHierarchy("Elkton, Cecil County, Maryland, United States"),
+    ).toEqual(["United States", "Maryland", "Cecil County", "Elkton"]);
+  });
+
+  it("trims whitespace and drops empty segments", () => {
+    expect(placeHierarchy("Boston,  , MA")).toEqual(["MA", "Boston"]);
   });
 });
 
@@ -57,5 +90,51 @@ describe("computePlaceGroups", () => {
     });
 
     expect(computePlaceGroups(database)).toEqual([]);
+  });
+});
+
+describe("buildPlaceTree / findPlaceNode", () => {
+  it("nests places under their region hierarchy", () => {
+    const database = databaseWithPlaces(
+      "Elkton, Cecil County, Maryland, United States",
+      "Cecil County, Maryland, United States",
+    );
+    const root = buildPlaceTree(database);
+
+    const unitedStates = findPlaceNode(root, ["united-states"]);
+    expect(unitedStates?.name).toBe("United States");
+    expect(unitedStates?.place).toBeUndefined();
+
+    const maryland = findPlaceNode(root, ["united-states", "maryland"]);
+    expect(maryland?.name).toBe("Maryland");
+
+    const cecilCounty = findPlaceNode(root, [
+      "united-states",
+      "maryland",
+      "cecil-county",
+    ]);
+    expect(cecilCounty?.name).toBe("Cecil County");
+    // "Cecil County, Maryland, United States" is itself a place with events,
+    // and also the parent region of Elkton.
+    expect(cecilCounty?.place?.name).toBe(
+      "Cecil County, Maryland, United States",
+    );
+    expect(Array.from(cecilCounty?.children.keys() ?? [])).toEqual(["elkton"]);
+  });
+
+  it("returns undefined for a path with no matching place", () => {
+    const database = databaseWithPlaces("Boston, MA");
+    const root = buildPlaceTree(database);
+
+    expect(findPlaceNode(root, ["nowhere"])).toBeUndefined();
+  });
+});
+
+describe("placeNodeSlugs", () => {
+  it("slugs every segment of a node's path", () => {
+    const database = databaseWithPlaces("Elkton, Maryland");
+    const root = buildPlaceTree(database);
+    const maryland = findPlaceNode(root, ["maryland"]);
+    expect(maryland && placeNodeSlugs(maryland)).toEqual(["maryland"]);
   });
 });

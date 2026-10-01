@@ -25,17 +25,6 @@ export interface PlaceGroup {
   addresses: AddressGroup[];
 }
 
-/** Deterministic, URL-safe anchor/route id for a place name. */
-export function placeSlug(placeName: string): string {
-  return (
-    "place-" +
-    placeName
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "")
-  );
-}
-
 /** Every individual/family event that has a place or address, grouped by
  * place name and then by address, sorted alphabetically at both levels. */
 export function computePlaceGroups(database: GedcomDatabase): PlaceGroup[] {
@@ -107,4 +96,82 @@ export function computePlaceGroups(database: GedcomDatabase): PlaceGroup[] {
         }));
       return { name: placeName, addresses: sortedAddresses };
     });
+}
+
+/** URL-safe slug for a single hierarchy segment, e.g. "Cecil County" ->
+ * "cecil-county". */
+export function placeSlug(segment: string): string {
+  return segment
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+/** Splits a raw GEDCOM place string on commas into its region hierarchy,
+ * broadest region first: GEDCOM lists places most-specific-first, e.g.
+ * "Elkton, Cecil County, Maryland, United States" becomes
+ * ["United States", "Maryland", "Cecil County", "Elkton"]. */
+export function placeHierarchy(placeName: string): string[] {
+  return placeName
+    .split(",")
+    .map((part) => part.trim())
+    .filter((part) => part !== "")
+    .reverse();
+}
+
+export interface PlaceTreeNode {
+  /** Raw (unslugged) name of this node, e.g. "Maryland". Empty at the root. */
+  name: string;
+  /** Path from the root to this node, raw names, broadest first. */
+  path: string[];
+  children: Map<string, PlaceTreeNode>;
+  /** Set when this exact path is itself a place referenced by events. */
+  place?: PlaceGroup;
+}
+
+/** Builds the region hierarchy tree for every place in the database, so a
+ * region (e.g. "Maryland, United States") can be browsed down to the
+ * specific places (counties, cities) within it. */
+export function buildPlaceTree(database: GedcomDatabase): PlaceTreeNode {
+  const root: PlaceTreeNode = { name: "", path: [], children: new Map() };
+
+  for (const placeGroup of computePlaceGroups(database)) {
+    let node = root;
+    const path: string[] = [];
+    for (const name of placeHierarchy(placeGroup.name)) {
+      path.push(name);
+      const slug = placeSlug(name);
+      let child = node.children.get(slug);
+      if (!child) {
+        child = { name, path: [...path], children: new Map() };
+        node.children.set(slug, child);
+      }
+      node = child;
+    }
+    node.place = placeGroup;
+  }
+
+  return root;
+}
+
+/** Walks `root` following each already-slugged segment in `slugs`, or
+ * returns undefined if no place's hierarchy has a matching prefix. */
+export function findPlaceNode(
+  root: PlaceTreeNode,
+  slugs: readonly string[],
+): PlaceTreeNode | undefined {
+  let node = root;
+  for (const slug of slugs) {
+    const child = node.children.get(slug);
+    if (!child) return undefined;
+    node = child;
+  }
+  return node;
+}
+
+/** The `/place/...` route segments for a node, e.g. ["united-states",
+ * "maryland"]. */
+export function placeNodeSlugs(node: PlaceTreeNode): string[] {
+  return node.path.map(placeSlug);
 }

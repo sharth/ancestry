@@ -1,7 +1,11 @@
 import { Component, computed, input } from "@angular/core";
 import { RouterLink } from "@angular/router";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
-import { computePlaceGroups, placeSlug } from "../places/places.util";
+import {
+  buildPlaceTree,
+  findPlaceNode,
+  placeNodeSlugs,
+} from "../places/places.util";
 
 @Component({
   selector: "app-place",
@@ -10,13 +14,33 @@ import { computePlaceGroups, placeSlug } from "../places/places.util";
 })
 export class PlaceComponent {
   readonly ancestryDatabase = input.required<GedcomDatabase>();
-  readonly slug = input.required<string>();
+  readonly path = input.required<string>();
 
-  readonly place = computed(() => {
+  readonly node = computed(() => {
     const database = this.ancestryDatabase();
-    const slug = this.slug();
-    return computePlaceGroups(database).find(
-      (place) => placeSlug(place.name) === slug,
+    const slugs = this.path()
+      .toLowerCase()
+      .split("/")
+      .filter((segment) => segment !== "");
+    return findPlaceNode(buildPlaceTree(database), slugs);
+  });
+
+  readonly breadcrumbs = computed(() => {
+    const node = this.node();
+    if (!node) return [];
+    return node.path.map((name, index) => ({
+      name,
+      slugs: placeNodeSlugs(node).slice(0, index + 1),
+    }));
+  });
+
+  readonly children = computed(() => {
+    const node = this.node();
+    if (!node) return [];
+    return Array.from(node.children.values()).sort((a, b) =>
+      a.name.localeCompare(b.name),
     );
   });
+
+  readonly placeNodeSlugs = placeNodeSlugs;
 }

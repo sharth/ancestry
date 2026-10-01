@@ -4,15 +4,11 @@
       <h2>Places</h2>
 
       <ul class="list-group">
-        @for (place of places(); track place.name) {
-          <li class="list-group-item d-flex justify-content-between">
-            <a [routerLink]="['/place', placeSlug(place.name)]">{{
+        @for (place of topLevelPlaces(); track place.name) {
+          <li class="list-group-item">
+            <a [routerLink]="['/place', ...placeNodeSlugs(place)]">{{
               place.name
             }}</a>
-            <span class="text-muted">
-              {{ place.addresses.length }}
-              {{ place.addresses.length === 1 ? "address" : "addresses" }}
-            </span>
           </li>
         } @empty {
           <p>No places found.</p>

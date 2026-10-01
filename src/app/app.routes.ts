@@ -17,6 +17,7 @@ import { MultimediaComponent } from "./multimedia/multimedia.component";
 import { MultimediasComponent } from "./multimedias/multimedias.component";
 import { PageNotFoundComponent } from "./page-not-found/page-not-found.component";
 import { PlaceComponent } from "./place/place.component";
+import { placePathMatcher } from "./place/place.matcher";
 import { PlacesComponent } from "./places/places.component";
 import { RepositoriesComponent } from "./repositories/repositories.component";
 import { RepositoryComponent } from "./repository/repository.component";
@@ -104,10 +105,15 @@ export const routes: Routes = [
     runGuardsAndResolvers: "always",
   },
   {
-    path: "place/:slug",
-    component: PlaceComponent,
-    resolve: { ancestryDatabase: ancestryDatabaseResolver },
-    runGuardsAndResolvers: "always",
+    path: "place",
+    children: [
+      {
+        matcher: placePathMatcher,
+        component: PlaceComponent,
+        resolve: { ancestryDatabase: ancestryDatabaseResolver },
+        runGuardsAndResolvers: "always",
+      },
+    ],
   },
   {
     path: "multimedias",

@@ -6,7 +6,6 @@ import { describe, expect, it } from "vitest";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomFact } from "../../gedcom/gedcomFact";
 import { newGedcomIndividual } from "../../gedcom/gedcomIndividual";
-import { placeSlug } from "../places/places.util";
 import { PlaceComponent } from "./place.component";
 
 describe("PlaceComponent", () => {
@@ -17,17 +16,31 @@ describe("PlaceComponent", () => {
     individuals: {
       I1: newGedcomIndividual({
         xref: "I1",
-        facts: [newGedcomFact({ tag: "BIRT", place: "Boston, MA" })],
+        facts: [
+          newGedcomFact({
+            tag: "BIRT",
+            place: "Elkton, Cecil County, Maryland, United States",
+          }),
+        ],
+      }),
+      I2: newGedcomIndividual({
+        xref: "I2",
+        facts: [
+          newGedcomFact({
+            tag: "BIRT",
+            place: "Cecil County, Maryland, United States",
+          }),
+        ],
       }),
     },
   });
 
-  async function renderPlace(slug: string) {
+  async function renderPlace(path: string) {
     const renderResult = await render(PlaceComponent, {
       providers: [provideRouter([])],
       bindings: [
         inputBinding("ancestryDatabase", signal(database)),
-        inputBinding("slug", signal(slug)),
+        inputBinding("path", signal(path)),
       ],
       waitForStableOnRender: true,
     });
@@ -36,17 +49,36 @@ describe("PlaceComponent", () => {
     component = fixture.componentInstance;
   }
 
-  it("renders the matching place's events", async () => {
-    await renderPlace(placeSlug("Boston, MA"));
+  it("shows the regions directly under a broad path", async () => {
+    await renderPlace("united-states/maryland");
 
-    expect(component.place()?.name).toBe("Boston, MA");
-    expect(screen.getByText("Boston, MA")).toBeTruthy();
+    expect(component.node()?.name).toBe("Maryland");
+    expect(component.children().map((c) => c.name)).toEqual(["Cecil County"]);
+    expect(screen.getByText("Cecil County")).toBeTruthy();
   });
 
-  it("shows a not-found message for an unknown slug", async () => {
-    await renderPlace("place-nowhere");
+  it("is case-insensitive and shows both a place's own events and its sub-regions", async () => {
+    await renderPlace("United-States/Maryland/Cecil-County");
 
-    expect(component.place()).toBeUndefined();
+    expect(component.node()?.place?.name).toBe(
+      "Cecil County, Maryland, United States",
+    );
+    expect(component.children().map((c) => c.name)).toEqual(["Elkton"]);
+  });
+
+  it("renders a leaf place's events with no sub-regions", async () => {
+    await renderPlace("united-states/maryland/cecil-county/elkton");
+
+    expect(component.children()).toEqual([]);
+    expect(component.node()?.place?.name).toBe(
+      "Elkton, Cecil County, Maryland, United States",
+    );
+  });
+
+  it("shows a not-found message for an unknown path", async () => {
+    await renderPlace("nowhere");
+
+    expect(component.node()).toBeUndefined();
     expect(screen.getByText(/not found/i)).toBeTruthy();
   });
 });
