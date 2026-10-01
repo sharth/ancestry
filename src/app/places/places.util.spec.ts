@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { assert, describe, expect, it } from "vitest";
 
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomFact } from "../../gedcom/gedcomFact";
@@ -131,6 +131,7 @@ describe("placeNodeSlugs", () => {
     const database = databaseWithPlaces("Elkton, Maryland");
     const root = buildPlaceTree(database);
     const maryland = root.children.get("maryland");
-    expect(maryland && placeNodeSlugs(maryland)).toEqual(["maryland"]);
+    assert.isOk(maryland);
+    expect(placeNodeSlugs(maryland)).toEqual(["maryland"]);
   });
 });
