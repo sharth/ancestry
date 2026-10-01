@@ -6,6 +6,7 @@ import {
   withComponentInputBinding,
 } from "@angular/router";
 import { describe, expect, it } from "vitest";
+
 import { placePathMatcher } from "./place.matcher";
 
 @Component({ selector: "app-test-leaf", template: "{{ path() }}" })
