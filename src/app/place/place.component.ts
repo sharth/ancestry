@@ -15,14 +15,11 @@ import {
 })
 export class PlaceComponent {
   readonly ancestryDatabase = input.required<GedcomDatabase>();
-  readonly path = input.required<string>();
+  readonly path = input.required<string[]>();
 
   readonly node = computed(() => {
     const database = this.ancestryDatabase();
-    const slugs = this.path()
-      .toLowerCase()
-      .split("/")
-      .filter((segment) => segment !== "");
+    const slugs = this.path().map((segment) => segment.toLowerCase());
     return findPlaceNode(buildPlaceTree(database), slugs);
   });
 

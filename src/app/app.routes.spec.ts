@@ -8,10 +8,10 @@ import {
 } from "@angular/router";
 import { describe, expect, it } from "vitest";
 
-import { placePathMatcher } from "./app.routes";
+import { placePathMatcher, placePathResolver } from "./app.routes";
 
 describe("placePathMatcher", () => {
-  it("joins every remaining segment into a single path param", () => {
+  it("consumes every remaining segment", () => {
     const segments = [
       new UrlSegment("united-states", {}),
       new UrlSegment("maryland", {}),
@@ -21,9 +21,6 @@ describe("placePathMatcher", () => {
     const result = placePathMatcher(segments, {} as never, {});
 
     expect(result?.consumed).toBe(segments);
-    expect(result?.posParams?.["path"]?.path).toBe(
-      "united-states/maryland/cecil-county",
-    );
   });
 
   it("does not match when there are no segments", () => {
@@ -31,13 +28,13 @@ describe("placePathMatcher", () => {
   });
 });
 
-@Component({ selector: "app-test-leaf", template: "{{ path() }}" })
+@Component({ selector: "app-test-leaf", template: "{{ path().join('/') }}" })
 class TestLeafComponent {
-  readonly path = input.required<string>();
+  readonly path = input.required<string[]>();
 }
 
 describe("place route wiring", () => {
-  it("joins every matched segment into the leaf component's path input", async () => {
+  it("resolves every matched segment into the leaf component's path input", async () => {
     TestBed.configureTestingModule({
       providers: [
         provideRouter(
@@ -45,7 +42,11 @@ describe("place route wiring", () => {
             {
               path: "place",
               children: [
-                { matcher: placePathMatcher, component: TestLeafComponent },
+                {
+                  matcher: placePathMatcher,
+                  component: TestLeafComponent,
+                  resolve: { path: placePathResolver },
+                },
               ],
             },
           ],
@@ -58,6 +59,10 @@ describe("place route wiring", () => {
     await router.navigateByUrl("/place/united-states/maryland/cecil-county");
 
     const route = router.routerState.snapshot.root.firstChild?.firstChild;
-    expect(route?.params["path"]).toBe("united-states/maryland/cecil-county");
+    expect(route?.data["path"]).toEqual([
+      "united-states",
+      "maryland",
+      "cecil-county",
+    ]);
   });
 });

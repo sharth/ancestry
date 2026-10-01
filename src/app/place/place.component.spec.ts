@@ -36,7 +36,7 @@ describe("PlaceComponent", () => {
     },
   });
 
-  async function renderPlace(path: string) {
+  async function renderPlace(path: string[]) {
     const renderResult = await render(PlaceComponent, {
       providers: [provideRouter([])],
       bindings: [
@@ -51,7 +51,7 @@ describe("PlaceComponent", () => {
   }
 
   it("shows the regions directly under a broad path", async () => {
-    await renderPlace("united-states/maryland");
+    await renderPlace(["united-states", "maryland"]);
 
     expect(component.node()?.name).toBe("Maryland");
     expect(component.children().map((c) => c.name)).toEqual(["Cecil County"]);
@@ -59,7 +59,7 @@ describe("PlaceComponent", () => {
   });
 
   it("is case-insensitive and shows both a place's own events and its sub-regions", async () => {
-    await renderPlace("United-States/Maryland/Cecil-County");
+    await renderPlace(["United-States", "Maryland", "Cecil-County"]);
 
     expect(component.node()?.place?.name).toBe(
       "Cecil County, Maryland, United States",
@@ -68,7 +68,7 @@ describe("PlaceComponent", () => {
   });
 
   it("renders a leaf place's events with no sub-regions", async () => {
-    await renderPlace("united-states/maryland/cecil-county/elkton");
+    await renderPlace(["united-states", "maryland", "cecil-county", "elkton"]);
 
     expect(component.children()).toEqual([]);
     expect(component.node()?.place?.name).toBe(
@@ -77,7 +77,7 @@ describe("PlaceComponent", () => {
   });
 
   it("shows a not-found message for an unknown path", async () => {
-    await renderPlace("nowhere");
+    await renderPlace(["nowhere"]);
 
     expect(component.node()).toBeUndefined();
     expect(screen.getByText(/not found/i)).toBeTruthy();

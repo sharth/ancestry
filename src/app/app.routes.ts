@@ -1,5 +1,9 @@
-import type { Routes, UrlMatcher } from "@angular/router";
-import { UrlSegment } from "@angular/router";
+import type {
+  ResolveFn,
+  Routes,
+  UrlMatcher,
+  UrlSegment,
+} from "@angular/router";
 
 import { ancestryDatabaseResolver } from "../database/ancestry.service";
 import { FamiliesComponent } from "./families/families.component";
@@ -26,21 +30,18 @@ import { SourceComponent } from "./source/source.component";
 import { SourcesComponent } from "./sources/sources.component";
 import { ValidationComponent } from "./validation/validation.component";
 
-/** Matches any number of remaining segments under `place/`, joining them
- * into a single `path` param (e.g. "united-states/maryland") so a region at
- * any depth of the place hierarchy gets its own URL. */
-export const placePathMatcher: UrlMatcher = (segments) => {
+/** Matches any number of remaining segments under `place/`, so a region at
+ * any depth of the place hierarchy (e.g. "united-states/maryland") gets its
+ * own URL. */
+export const placePathMatcher: UrlMatcher = (segments: UrlSegment[]) => {
   if (segments.length === 0) return null;
-  return {
-    consumed: segments,
-    posParams: {
-      path: new UrlSegment(
-        segments.map((segment) => segment.path).join("/"),
-        {},
-      ),
-    },
-  };
+  return { consumed: segments };
 };
+
+/** The matched `place/...` segments as plain strings, e.g.
+ * ["united-states", "maryland"]. */
+export const placePathResolver: ResolveFn<string[]> = (route) =>
+  route.url.map((segment) => segment.path);
 
 export const routes: Routes = [
   {
@@ -126,7 +127,10 @@ export const routes: Routes = [
       {
         matcher: placePathMatcher,
         component: PlaceComponent,
-        resolve: { ancestryDatabase: ancestryDatabaseResolver },
+        resolve: {
+          ancestryDatabase: ancestryDatabaseResolver,
+          path: placePathResolver,
+        },
         runGuardsAndResolvers: "always",
       },
     ],
