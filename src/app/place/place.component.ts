@@ -25,6 +25,9 @@ export class PlaceComponent {
   readonly breadcrumbs = computed(() => {
     const node = this.node();
     if (!node) return [];
+    // node.path, not this.path(): these are the names as originally
+    // recorded (casing, punctuation and all), not the lowercased route
+    // slugs used to look the node up.
     return node.path.map((name, index) => ({
       name,
       slugs: placeNodeSlugs(node).slice(0, index + 1),
