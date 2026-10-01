@@ -1,47 +1,55 @@
-import { Component, input } from "@angular/core";
+import { Component } from "@angular/core";
 import { TestBed } from "@angular/core/testing";
-import type { ActivatedRouteSnapshot } from "@angular/router";
 import {
   Router,
   provideRouter,
   withComponentInputBinding,
 } from "@angular/router";
-import { describe, expect, it } from "vitest";
+import { render } from "@testing-library/angular/zoneless";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-@Component({ selector: "app-test-leaf", template: "{{ path().join('/') }}" })
-class TestLeafComponent {
-  readonly path = input.required<string[]>();
-}
+import { AncestryService } from "../database/ancestry.service";
+import { routes } from "./app.routes";
 
-describe("a matcher + resolver route like place/...", () => {
-  function configure() {
-    TestBed.configureTestingModule({
-      providers: [
-        provideRouter(
-          [
-            {
-              path: "place",
-              children: [
-                {
-                  matcher: (segments) => ({ consumed: segments }),
-                  component: TestLeafComponent,
-                  resolve: {
-                    path: (route: ActivatedRouteSnapshot) =>
-                      route.url.map((segment) => segment.path.toLowerCase()),
-                  },
-                },
-              ],
-            },
-          ],
-          withComponentInputBinding(),
-        ),
-      ],
+// A minimal but valid GEDCOM file, served in place of the real royal-family
+// sample (see ancestry.service.spec.ts for why): just enough for
+// parseGedcomDatabase to accept without throwing.
+const MINIMAL_GEDCOM_TEXT = [
+  "0 HEAD",
+  "0 @I1@ INDI",
+  "1 NAME John /Doe/",
+  "0 TRLR",
+  "",
+].join("\n");
+
+@Component({ selector: "app-stub", template: "" })
+class StubComponent {}
+
+describe("place route", () => {
+  let ancestryService: AncestryService;
+  let router: Router;
+
+  beforeEach(async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() => Promise.resolve(new Response(MINIMAL_GEDCOM_TEXT))),
+    );
+
+    await render(StubComponent, {
+      providers: [provideRouter(routes, withComponentInputBinding())],
+      waitForStableOnRender: true,
     });
-    return TestBed.inject(Router);
-  }
 
-  it("resolves every matched segment, lowercased, into the leaf component's path input", async () => {
-    const router = configure();
+    ancestryService = TestBed.inject(AncestryService);
+    router = TestBed.inject(Router);
+    await ancestryService.openBuiltin();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("resolves every matched segment, lowercased, into a path array", async () => {
     await router.navigateByUrl("/place/United-States/Maryland/Cecil-County");
 
     const route = router.routerState.snapshot.root.firstChild?.firstChild;
@@ -53,7 +61,6 @@ describe("a matcher + resolver route like place/...", () => {
   });
 
   it("matches with no further segments", async () => {
-    const router = configure();
     await router.navigateByUrl("/place");
 
     const route = router.routerState.snapshot.root.firstChild?.firstChild;
