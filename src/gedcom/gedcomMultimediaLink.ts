@@ -107,29 +107,29 @@ export function serializeGedcomMultimediaLink(
     tag: "OBJE",
     value: gedcomMultimediaLink.xref,
     children: filterTrivialGedcomRecords([
-      gedcomMultimediaLink.crop ?
-        newGedcomRecord({
-          tag: "CROP",
-          children: filterTrivialGedcomRecords([
-            newGedcomRecord({
-              tag: "TOP",
-              value: gedcomMultimediaLink.crop.top?.toString() ?? "",
-            }),
-            newGedcomRecord({
-              tag: "LEFT",
-              value: gedcomMultimediaLink.crop.left?.toString() ?? "",
-            }),
-            newGedcomRecord({
-              tag: "HEIGHT",
-              value: gedcomMultimediaLink.crop.height?.toString() ?? "",
-            }),
-            newGedcomRecord({
-              tag: "WIDTH",
-              value: gedcomMultimediaLink.crop.width?.toString() ?? "",
-            }),
-          ]),
-        })
-      : null,
+      gedcomMultimediaLink.crop
+        ? newGedcomRecord({
+            tag: "CROP",
+            children: filterTrivialGedcomRecords([
+              newGedcomRecord({
+                tag: "TOP",
+                value: gedcomMultimediaLink.crop.top?.toString() ?? "",
+              }),
+              newGedcomRecord({
+                tag: "LEFT",
+                value: gedcomMultimediaLink.crop.left?.toString() ?? "",
+              }),
+              newGedcomRecord({
+                tag: "HEIGHT",
+                value: gedcomMultimediaLink.crop.height?.toString() ?? "",
+              }),
+              newGedcomRecord({
+                tag: "WIDTH",
+                value: gedcomMultimediaLink.crop.width?.toString() ?? "",
+              }),
+            ]),
+          })
+        : null,
       newGedcomRecord({ tag: "TITL", value: gedcomMultimediaLink.title }),
     ]),
   });

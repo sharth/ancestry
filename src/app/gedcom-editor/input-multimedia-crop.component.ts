@@ -8,6 +8,7 @@ import {
   signal,
 } from "@angular/core";
 import { DomSanitizer } from "@angular/platform-browser";
+
 import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomMultimediaCrop } from "../../gedcom/gedcomMultimediaLink";
 
