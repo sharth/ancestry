@@ -1,4 +1,5 @@
 import { Component, computed, input, viewChild } from "@angular/core";
+
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import {
   fullname,
