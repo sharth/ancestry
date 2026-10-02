@@ -1,4 +1,4 @@
-import type { Routes } from "@angular/router";
+import type { ActivatedRouteSnapshot, Routes } from "@angular/router";
 
 import { ancestryDatabaseResolver } from "../database/ancestry.service";
 import { FamiliesComponent } from "./families/families.component";
@@ -16,6 +16,7 @@ import { IndividualsComponent } from "./individuals/individuals.component";
 import { MultimediaComponent } from "./multimedia/multimedia.component";
 import { MultimediasComponent } from "./multimedias/multimedias.component";
 import { PageNotFoundComponent } from "./page-not-found/page-not-found.component";
+import { PlaceComponent } from "./place/place.component";
 import { PlacesComponent } from "./places/places.component";
 import { RepositoriesComponent } from "./repositories/repositories.component";
 import { RepositoryComponent } from "./repository/repository.component";
@@ -101,6 +102,26 @@ export const routes: Routes = [
     component: PlacesComponent,
     resolve: { ancestryDatabase: ancestryDatabaseResolver },
     runGuardsAndResolvers: "always",
+  },
+  {
+    // Matches any number of remaining segments under `place/`, so a region
+    // at any depth of the place hierarchy (e.g. "united-states/maryland")
+    // gets its own URL.
+    path: "place",
+    children: [
+      {
+        matcher: (segments) => ({ consumed: segments }),
+        component: PlaceComponent,
+        resolve: {
+          ancestryDatabase: ancestryDatabaseResolver,
+          // The matched `place/...` segments as plain, lowercased strings,
+          // e.g. ["united-states", "maryland"].
+          path: (route: ActivatedRouteSnapshot) =>
+            route.url.map((segment) => segment.path.toLowerCase()),
+        },
+        runGuardsAndResolvers: "always",
+      },
+    ],
   },
   {
     path: "multimedias",
