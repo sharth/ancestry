@@ -72,12 +72,11 @@ export function newGedcomDatabase(
 // say where in the file the problem is.
 function describeParseError(gedcomRecord: GedcomRecord, cause: unknown): Error {
   const reason =
-    cause instanceof Error && cause.message ?
-      cause.message
-    : "malformed record";
-  const identifier =
-    gedcomRecord.xref ?
-      `${gedcomRecord.tag} ${gedcomRecord.xref}`
+    cause instanceof Error && cause.message
+      ? cause.message
+      : "malformed record";
+  const identifier = gedcomRecord.xref
+    ? `${gedcomRecord.tag} ${gedcomRecord.xref}`
     : gedcomRecord.tag;
   return new Error(`Failed to parse ${identifier}: ${reason}`, { cause });
 }
