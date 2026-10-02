@@ -1,4 +1,4 @@
-<dialog #editDialog>
+<dialog #editDialog (cancel)="onDialogCancel($event)">
   @defer (when editDialog.open) {
     <app-gedcom-editor
       [type]="type()"

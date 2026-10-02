@@ -1,10 +1,11 @@
-import { Component, computed, input } from "@angular/core";
+import { Component, computed, input, viewChild } from "@angular/core";
 import { RouterModule } from "@angular/router";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { serializeGedcomSource } from "../../gedcom/gedcomSource";
 import { GedcomDisplayComponent } from "../gedcom-display/gedcom-display.component";
 import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
+import type { ComponentWithUnsavedChanges } from "../unsaved-changes.guard";
 import { SourceCitationsComponent } from "./source-citations.component";
 import { SourceMultimediaComponent } from "./source-multimedia.component";
 import { SourceRepositoriesComponent } from "./source-repositories.component";
@@ -24,9 +25,15 @@ import { SourceUnknownsComponent } from "./source-unknowns.component";
     GedcomDisplayComponent,
   ],
 })
-export class SourceComponent {
+export class SourceComponent implements ComponentWithUnsavedChanges {
   readonly ancestryDatabase = input.required<GedcomDatabase>();
   readonly xref = input.required<string>();
+
+  readonly editDialog = viewChild<GedcomEditorDialogComponent>("editDialog");
+
+  hasUnsavedChanges(): boolean {
+    return this.editDialog()?.hasUnsavedChanges() ?? false;
+  }
 
   readonly vm = computed(() => {
     const ancestryDatabase = this.ancestryDatabase();
