@@ -20,6 +20,7 @@ import { PlaceComponent } from "./place/place.component";
 import { PlacesComponent } from "./places/places.component";
 import { RepositoriesComponent } from "./repositories/repositories.component";
 import { RepositoryComponent } from "./repository/repository.component";
+import { SearchComponent } from "./search/search.component";
 import { SettingsComponent } from "./settings/settings.component";
 import { SourceComponent } from "./source/source.component";
 import { SourcesComponent } from "./sources/sources.component";
@@ -35,6 +36,12 @@ export const routes: Routes = [
   {
     path: "settings",
     component: SettingsComponent,
+  },
+  {
+    path: "search",
+    component: SearchComponent,
+    resolve: { ancestryDatabase: ancestryDatabaseResolver },
+    runGuardsAndResolvers: "always",
   },
   {
     path: "individuals",
