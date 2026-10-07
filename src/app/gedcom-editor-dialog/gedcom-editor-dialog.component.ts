@@ -37,7 +37,9 @@ export class GedcomEditorDialogComponent {
   constructor() {
     const tracker = inject(UnsavedChangesTracker);
     tracker.register(this);
-    inject(DestroyRef).onDestroy(() => { tracker.unregister(this); });
+    inject(DestroyRef).onDestroy(() => {
+      tracker.unregister(this);
+    });
   }
 
   async showModal() {
