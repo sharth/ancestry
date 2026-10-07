@@ -59,14 +59,6 @@ that means different things at different nesting depths. Parsers are intentional
 child tags call `reportUnparsedRecord` (`src/util/record-unparsed-records.ts`, warns once per abstag)
 rather than silently ignoring or guessing.
 
-**Only parse/emit tags that are actually in the spec.** `specifications/gedcom-5.5.1.html` and
-`specifications/gedcom-7.0.18.html` are the local copies of record of what each GEDCOM record type may
-contain. Don't add a field to a `GedcomX` interface (or a tag to its parse/serialize switch) unless that
-tag appears under that record in one of those files — e.g. `REPOSITORY_RECORD` in 5.5.1 only defines
-`NAME`, `ADDRESS_STRUCTURE`, `NOTE_STRUCTURE`, `REFN`, and `RIN`, so a repository has no `WWW`/URL field
-to add. A tag genuinely outside the spec, or one the parser hasn't been taught yet, belongs in
-`unknownRecords` (round-tripped untouched) rather than a new typed field.
-
 `gedcomDatabase.ts` is the top-level entity, indexing individuals/families/sources/repositories/multimedia
 by xref. Saving an edit doesn't re-serialize the whole file: `compareGedcomDatabase` diffs the
 originally-parsed records against the edited in-memory `GedcomDatabase` by `tag xref value` hash, so
