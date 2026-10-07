@@ -32,9 +32,9 @@ export class ValidationComponent {
   );
 
   // Applies a suggested fix for a URL found in a source's text: links the
-  // source to the matched repository (or a newly created one) and removes
-  // the URL from the source's text, since it's now represented as a
-  // repository link instead.
+  // source to the matched repository (or a newly created one), carrying the
+  // URL over as that link's call number, and removes the URL from the
+  // source's text, since it's now represented as a repository link instead.
   async applyUrlSuggestion(
     source: GedcomSource,
     suggestion: UrlRepositorySuggestion,
@@ -52,14 +52,18 @@ export class ValidationComponent {
 
       const draftSource = draft.sources[source.xref];
       if (draftSource === undefined) return;
-      if (
-        !draftSource.repositoryLinks.some(
-          (link) => link.repositoryXref === repositoryXref,
-        )
-      ) {
+      const existingLink = draftSource.repositoryLinks.find(
+        (link) => link.repositoryXref === repositoryXref,
+      );
+      if (existingLink === undefined) {
         draftSource.repositoryLinks.push(
-          newGedcomRepositoryLink({ repositoryXref }),
+          newGedcomRepositoryLink({
+            repositoryXref,
+            callNumber: suggestion.url,
+          }),
         );
+      } else {
+        existingLink.callNumber ||= suggestion.url;
       }
       draftSource.text = draftSource.text.replace(suggestion.url, "").trim();
     });
