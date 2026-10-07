@@ -37,7 +37,14 @@ describe("ValidationComponent", () => {
     expect(component).toBeTruthy();
   });
 
-  it("lists a warning with a suggested fix for a URL found in source text", async () => {
+  it("lists a warning with a button to review the suggested fix", async () => {
     expect(await screen.findByText(/Create repository/)).toBeTruthy();
+  });
+
+  it("shows the before and proposed-after GEDCOM for the suggestion", async () => {
+    await screen.findByText(/Create repository/);
+    const text = (fixture.nativeElement as HTMLElement).textContent;
+    expect(text).toContain("1 TEXT Found at https://example.com/record");
+    expect(text).toContain("1 TEXT Found at\n1 REPO");
   });
 });

@@ -1,27 +1,27 @@
-import { Component, computed, inject, input } from "@angular/core";
-import { ActivatedRoute, Router, RouterModule } from "@angular/router";
-import { produce } from "immer";
+import { Component, computed, input, signal } from "@angular/core";
+import { RouterModule } from "@angular/router";
 
-import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
-import { newGedcomRepository } from "../../gedcom/gedcomRepository";
-import { newGedcomRepositoryLink } from "../../gedcom/gedcomRepositoryLink";
-import type { GedcomSource } from "../../gedcom/gedcomSource";
-import { calculateNextRepositoryXref } from "../../util/next-xref";
-import type { UrlRepositorySuggestion } from "./source-validators";
-import { sourceValidators } from "./source-validators";
+import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
+import { serializeGedcomRepository } from "../../gedcom/gedcomRepository";
+import {
+  serializeGedcomSource,
+  type GedcomSource,
+} from "../../gedcom/gedcomSource";
+import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
+import { applyUrlSuggestion } from "./apply-url-suggestion.util";
+import {
+  sourceValidators,
+  type UrlRepositorySuggestion,
+} from "./source-validators";
 
 @Component({
   selector: "app-validation",
-  imports: [RouterModule],
+  imports: [RouterModule, GedcomEditorDialogComponent],
   templateUrl: "./validation.component.html",
   styleUrl: "./validation.component.css",
 })
 export class ValidationComponent {
-  private readonly ancestryService = inject(AncestryService);
-  private readonly router = inject(Router);
-  private readonly route = inject(ActivatedRoute);
-
   readonly ancestryDatabase = input.required<GedcomDatabase>();
 
   readonly sourceScenarios = computed(() =>
@@ -31,48 +31,81 @@ export class ValidationComponent {
     })),
   );
 
-  // Applies a suggested fix for a URL found in a source's text: links the
-  // source to the matched repository (or a newly created one), carrying the
-  // URL over as that link's call number, and removes the URL from the
-  // source's text, since it's now represented as a repository link instead.
-  async applyUrlSuggestion(
+  // The source currently being reviewed in the GEDCOM editor dialog, if any.
+  readonly reviewXref = signal<string | undefined>(undefined);
+
+  // The database to hand the editor dialog: the suggested fix for
+  // `reviewXref`'s source pre-applied, so the dialog opens already showing
+  // it -- the user can then review it (alongside the editor's own
+  // before/after diff) and keep editing before saving, or cancel.
+  readonly reviewDatabase = computed<GedcomDatabase>(() => {
+    const suggestion = this.reviewSuggestion();
+    if (suggestion === undefined) return this.ancestryDatabase();
+    return applyUrlSuggestion(
+      this.ancestryDatabase(),
+      suggestion.source,
+      suggestion.urlSuggestion,
+    ).database;
+  });
+
+  private readonly reviewSuggestion = computed(() => {
+    const xref = this.reviewXref();
+    if (xref === undefined) return undefined;
+    for (const sourceScenario of this.sourceScenarios()) {
+      if (sourceScenario.source.xref !== xref) continue;
+      for (const warning of sourceScenario.result.warnings) {
+        if (warning.urlSuggestion !== undefined) {
+          return {
+            source: sourceScenario.source,
+            urlSuggestion: warning.urlSuggestion,
+          };
+        }
+      }
+    }
+    return undefined;
+  });
+
+  review(xref: string) {
+    this.reviewXref.set(xref);
+  }
+
+  beforeGedcomText(source: GedcomSource): string {
+    return serializeGedcomRecordToText(serializeGedcomSource(source)).join(
+      "\n",
+    );
+  }
+
+  // The source (and, when one is newly created, the repository) as they'd
+  // look after `suggestion` is applied -- a preview only, computed fresh
+  // each time rather than reusing `reviewDatabase` so it stays correct even
+  // when nothing has been selected for review yet.
+  afterGedcomText(
     source: GedcomSource,
     suggestion: UrlRepositorySuggestion,
-  ) {
-    await this.ancestryService.requestWritePermission();
+  ): string {
+    const { database, repositoryXref } = applyUrlSuggestion(
+      this.ancestryDatabase(),
+      source,
+      suggestion,
+    );
+    const updatedSource = database.sources[source.xref];
+    if (updatedSource === undefined) return "";
 
-    const updatedDatabase = produce(this.ancestryDatabase(), (draft) => {
-      const repositoryXref =
-        suggestion.matchedRepository?.xref ??
-        calculateNextRepositoryXref(draft);
-      draft.repositories[repositoryXref] ??= newGedcomRepository({
-        xref: repositoryXref,
-        name: suggestion.suggestedName,
-      });
-
-      const draftSource = draft.sources[source.xref];
-      if (draftSource === undefined) return;
-      const existingLink = draftSource.repositoryLinks.find(
-        (link) => link.repositoryXref === repositoryXref,
-      );
-      if (existingLink === undefined) {
-        draftSource.repositoryLinks.push(
-          newGedcomRepositoryLink({
-            repositoryXref,
-            callNumber: suggestion.url,
-          }),
+    const blocks = [
+      serializeGedcomRecordToText(serializeGedcomSource(updatedSource)).join(
+        "\n",
+      ),
+    ];
+    if (suggestion.matchedRepository === undefined) {
+      const newRepository = database.repositories[repositoryXref];
+      if (newRepository !== undefined) {
+        blocks.push(
+          serializeGedcomRecordToText(
+            serializeGedcomRepository(newRepository),
+          ).join("\n"),
         );
-      } else {
-        existingLink.callNumber ||= suggestion.url;
       }
-      draftSource.text = draftSource.text.replace(suggestion.url, "").trim();
-    });
-
-    await this.ancestryService.updateGedcomDatabase(updatedDatabase);
-    await this.router.navigate([], {
-      relativeTo: this.route,
-      onSameUrlNavigation: "reload",
-      skipLocationChange: true,
-    });
+    }
+    return blocks.join("\n\n");
   }
 }
