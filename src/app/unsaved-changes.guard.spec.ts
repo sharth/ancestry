@@ -1,3 +1,4 @@
+import { TestBed } from "@angular/core/testing";
 import type {
   ActivatedRouteSnapshot,
   RouterStateSnapshot,
@@ -6,6 +7,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   confirmUnsavedChangesGuard,
+  UnsavedChangesTracker,
   type ComponentWithUnsavedChanges,
 } from "./unsaved-changes.guard";
 
@@ -18,52 +20,62 @@ describe("confirmUnsavedChangesGuard", () => {
     vi.restoreAllMocks();
   });
 
-  it("allows navigation without prompting when there are no unsaved changes", () => {
-    const component: ComponentWithUnsavedChanges = {
-      hasUnsavedChanges: () => false,
-    };
+  function runGuard(): boolean {
+    return TestBed.runInInjectionContext(() =>
+      confirmUnsavedChangesGuard(
+        undefined,
+        currentRoute,
+        currentState,
+        nextState,
+      ),
+    ) as boolean;
+  }
+
+  it("allows navigation without prompting when nothing is registered", () => {
     const confirmSpy = vi.spyOn(window, "confirm");
 
-    const result = confirmUnsavedChangesGuard(
-      component,
-      currentRoute,
-      currentState,
-      nextState,
-    );
-
-    expect(result).toBe(true);
+    expect(runGuard()).toBe(true);
     expect(confirmSpy).not.toHaveBeenCalled();
   });
 
-  it("allows navigation when there are unsaved changes and the user confirms", () => {
+  it("allows navigation without prompting when a registered component has no unsaved changes", () => {
+    const tracker = TestBed.inject(UnsavedChangesTracker);
     const component: ComponentWithUnsavedChanges = {
-      hasUnsavedChanges: () => true,
+      hasUnsavedChanges: () => false,
     };
-    vi.spyOn(window, "confirm").mockReturnValue(true);
+    tracker.register(component);
+    const confirmSpy = vi.spyOn(window, "confirm");
 
-    const result = confirmUnsavedChangesGuard(
-      component,
-      currentRoute,
-      currentState,
-      nextState,
-    );
-
-    expect(result).toBe(true);
+    expect(runGuard()).toBe(true);
+    expect(confirmSpy).not.toHaveBeenCalled();
   });
 
-  it("blocks navigation when there are unsaved changes and the user declines", () => {
+  it("allows navigation when a registered component has unsaved changes and the user confirms", () => {
+    const tracker = TestBed.inject(UnsavedChangesTracker);
+    tracker.register({ hasUnsavedChanges: () => true });
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+
+    expect(runGuard()).toBe(true);
+  });
+
+  it("blocks navigation when a registered component has unsaved changes and the user declines", () => {
+    const tracker = TestBed.inject(UnsavedChangesTracker);
+    tracker.register({ hasUnsavedChanges: () => true });
+    vi.spyOn(window, "confirm").mockReturnValue(false);
+
+    expect(runGuard()).toBe(false);
+  });
+
+  it("ignores a component after it unregisters", () => {
+    const tracker = TestBed.inject(UnsavedChangesTracker);
     const component: ComponentWithUnsavedChanges = {
       hasUnsavedChanges: () => true,
     };
-    vi.spyOn(window, "confirm").mockReturnValue(false);
+    tracker.register(component);
+    tracker.unregister(component);
+    const confirmSpy = vi.spyOn(window, "confirm");
 
-    const result = confirmUnsavedChangesGuard(
-      component,
-      currentRoute,
-      currentState,
-      nextState,
-    );
-
-    expect(result).toBe(false);
+    expect(runGuard()).toBe(true);
+    expect(confirmSpy).not.toHaveBeenCalled();
   });
 });

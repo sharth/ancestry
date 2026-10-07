@@ -7,6 +7,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AncestryService } from "../../database/ancestry.service";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import type { GedcomEditorComponent } from "../gedcom-editor/gedcom-editor.component";
+import { UnsavedChangesTracker } from "../unsaved-changes.guard";
 import { GedcomEditorDialogComponent } from "./gedcom-editor-dialog.component";
 
 describe("GedcomEditorDialogComponent", () => {
@@ -31,6 +32,19 @@ describe("GedcomEditorDialogComponent", () => {
 
   it("should create", () => {
     expect(component).toBeTruthy();
+  });
+
+  it("registers with UnsavedChangesTracker on creation and unregisters on destroy", () => {
+    const tracker = TestBed.inject(UnsavedChangesTracker);
+    const hasUnsavedChangesSpy = vi.spyOn(component, "hasUnsavedChanges");
+
+    tracker.hasUnsavedChanges();
+    expect(hasUnsavedChangesSpy).toHaveBeenCalled();
+
+    hasUnsavedChangesSpy.mockClear();
+    fixture.destroy();
+    tracker.hasUnsavedChanges();
+    expect(hasUnsavedChangesSpy).not.toHaveBeenCalled();
   });
 
   it("requests write permission before showing the dialog", async () => {

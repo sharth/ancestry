@@ -145,8 +145,4 @@ describe("IndividualComponent", () => {
   it("should create", () => {
     expect(component).toBeTruthy();
   });
-
-  it("hasUnsavedChanges delegates to the edit dialog", () => {
-    expect(component.hasUnsavedChanges()).toBe(false);
-  });
 });
