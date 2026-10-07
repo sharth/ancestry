@@ -31,7 +31,6 @@ export class RepositoryComponent {
 
     return {
       name: repository.name,
-      url: repository.url,
       gedcomRecord: serializeGedcomRepository(repository),
     };
   });

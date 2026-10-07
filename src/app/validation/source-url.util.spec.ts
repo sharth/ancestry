@@ -4,7 +4,7 @@ import { newGedcomRepository } from "../../gedcom/gedcomRepository";
 import {
   extractUrl,
   findMatchingRepository,
-  normalizeUrl,
+  urlDomainLabel,
 } from "./source-url.util";
 
 describe("extractUrl", () => {
@@ -25,50 +25,53 @@ describe("extractUrl", () => {
   });
 });
 
-describe("normalizeUrl", () => {
-  it("strips scheme, www, and a trailing slash", () => {
-    expect(normalizeUrl("https://www.Example.com/Foo/")).toBe(
-      "example.com/foo",
+describe("urlDomainLabel", () => {
+  it("extracts the registrable domain label, ignoring www", () => {
+    expect(urlDomainLabel("https://www.familysearch.org/search")).toBe(
+      "familysearch",
     );
   });
 
   it("returns undefined for an invalid URL", () => {
-    expect(normalizeUrl("not a url")).toBeUndefined();
+    expect(urlDomainLabel("not a url")).toBeUndefined();
   });
 });
 
 describe("findMatchingRepository", () => {
-  it("matches a repository with the same URL regardless of scheme or www", () => {
+  it("matches a repository whose name contains the URL's domain label", () => {
     const repositories = {
-      R1: newGedcomRepository({
-        xref: "R1",
-        url: "http://www.example.com/foo",
-      }),
+      R1: newGedcomRepository({ xref: "R1", name: "FamilySearch" }),
     };
     expect(
-      findMatchingRepository("https://example.com/foo/", repositories),
+      findMatchingRepository(
+        "https://www.familysearch.org/record",
+        repositories,
+      ),
     ).toBe(repositories.R1);
   });
 
-  it("falls back to a same-host match when the path differs", () => {
+  it("matches when the domain label contains the repository's (shorter) name", () => {
     const repositories = {
-      R1: newGedcomRepository({ xref: "R1", url: "https://example.com/bar" }),
+      R1: newGedcomRepository({ xref: "R1", name: "Family" }),
     };
     expect(
-      findMatchingRepository("https://example.com/foo", repositories),
+      findMatchingRepository(
+        "https://www.familysearch.org/record",
+        repositories,
+      ),
     ).toBe(repositories.R1);
   });
 
-  it("returns undefined when no repository has a matching host", () => {
+  it("returns undefined when no repository name overlaps the domain", () => {
     const repositories = {
-      R1: newGedcomRepository({ xref: "R1", url: "https://other.com" }),
+      R1: newGedcomRepository({ xref: "R1", name: "Other Archive" }),
     };
     expect(
       findMatchingRepository("https://example.com", repositories),
     ).toBeUndefined();
   });
 
-  it("ignores repositories with no URL recorded", () => {
+  it("ignores repositories with no name", () => {
     const repositories = { R1: newGedcomRepository({ xref: "R1" }) };
     expect(
       findMatchingRepository("https://example.com", repositories),

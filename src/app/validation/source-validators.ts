@@ -1,14 +1,19 @@
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import type { GedcomRepository } from "../../gedcom/gedcomRepository";
 import type { GedcomSource } from "../../gedcom/gedcomSource";
-import { extractUrl, findMatchingRepository } from "./source-url.util";
+import {
+  extractUrl,
+  findMatchingRepository,
+  urlDomainLabel,
+} from "./source-url.util";
 
 /** A suggested fix for a validation finding: replace a URL embedded in a
  * source's free text with a link to a repository, reusing `matchedRepository`
- * when an existing repository's URL already matches, otherwise creating a
- * new one. */
+ * when an existing repository's name looks like it's for the same place,
+ * otherwise creating a new one named `suggestedName`. */
 export interface UrlRepositorySuggestion {
   url: string;
+  suggestedName: string;
   matchedRepository?: GedcomRepository;
 }
 
@@ -36,14 +41,15 @@ export function sourceValidators(
       url,
       database.repositories,
     );
+    const suggestedName = urlDomainLabel(url) ?? url;
     warnings.push({
       fieldName: "text",
       groupName: "Repository",
       message:
         matchedRepository !== undefined
-          ? `Text contains a URL (${url}) that matches the "${matchedRepository.name || matchedRepository.xref}" repository.`
+          ? `Text contains a URL (${url}) that looks like it belongs to the "${matchedRepository.name || matchedRepository.xref}" repository.`
           : `Text contains a URL (${url}) that could become a repository.`,
-      urlSuggestion: { url, matchedRepository },
+      urlSuggestion: { url, suggestedName, matchedRepository },
     });
   }
 

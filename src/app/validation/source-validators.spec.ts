@@ -17,19 +17,19 @@ describe("sourceValidators", () => {
     expect(result.warnings).toHaveLength(1);
     expect(result.warnings[0]?.urlSuggestion).toEqual({
       url: "https://example.com/record",
+      suggestedName: "example",
       matchedRepository: undefined,
     });
   });
 
-  it("suggests the matching repository when one already has that URL", () => {
+  it("suggests the matching repository when its name overlaps the domain", () => {
     const repository = newGedcomRepository({
       xref: "R1",
-      name: "Example Archive",
-      url: "https://example.com",
+      name: "FamilySearch",
     });
     const source = newGedcomSource({
       xref: "S1",
-      text: "See https://example.com/record",
+      text: "See https://www.familysearch.org/record",
     });
     const database = newGedcomDatabase({ repositories: { R1: repository } });
 

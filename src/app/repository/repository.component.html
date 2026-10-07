@@ -1,12 +1,6 @@
 @if (vm(); as vm) {
   <h1>{{ vm.name || xref() }}</h1>
 
-  @if (vm.url) {
-    <div>
-      <a [href]="vm.url" target="_blank" rel="noopener">{{ vm.url }}</a>
-    </div>
-  }
-
   <h2>Sources</h2>
   <app-repository-sources [xref]="xref()" />
 

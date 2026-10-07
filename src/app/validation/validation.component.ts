@@ -32,9 +32,9 @@ export class ValidationComponent {
   );
 
   // Applies a suggested fix for a URL found in a source's text: links the
-  // source to the matched repository (or a newly created one with that URL)
-  // and removes the URL from the source's text, since it's now represented
-  // as a repository link instead.
+  // source to the matched repository (or a newly created one) and removes
+  // the URL from the source's text, since it's now represented as a
+  // repository link instead.
   async applyUrlSuggestion(
     source: GedcomSource,
     suggestion: UrlRepositorySuggestion,
@@ -47,8 +47,7 @@ export class ValidationComponent {
         calculateNextRepositoryXref(draft);
       draft.repositories[repositoryXref] ??= newGedcomRepository({
         xref: repositoryXref,
-        name: suggestion.url,
-        url: suggestion.url,
+        name: suggestion.suggestedName,
       });
 
       const draftSource = draft.sources[source.xref];

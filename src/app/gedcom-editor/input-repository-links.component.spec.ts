@@ -19,7 +19,7 @@ describe("InputRepositoryLinksComponent", () => {
   const workingDatabase = signal(
     newGedcomDatabase({
       repositories: {
-        R1: { xref: "R1", name: "Mock Repository 1", url: "" },
+        R1: { xref: "R1", name: "Mock Repository 1" },
       },
     }),
   );
