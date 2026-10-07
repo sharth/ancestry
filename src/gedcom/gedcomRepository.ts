@@ -8,6 +8,7 @@ import {
 export interface GedcomRepository {
   xref: string;
   name: string;
+  url: string;
 }
 
 export function newGedcomRepository(
@@ -15,6 +16,7 @@ export function newGedcomRepository(
 ): GedcomRepository {
   return {
     name: "",
+    url: "",
     ...fieldsToUpdate,
   };
 }
@@ -39,6 +41,13 @@ export function parseGedcomRepository(
         gedcomRepository.name = childRecord.value;
         break;
 
+      case "WWW":
+        if (childRecord.xref != "") throw new Error();
+        if (childRecord.value == "") throw new Error();
+        if (childRecord.children.length != 0) throw new Error();
+        gedcomRepository.url = childRecord.value;
+        break;
+
       default:
         reportUnparsedRecord(childRecord);
         break;
@@ -59,6 +68,11 @@ export function serializeGedcomRepository(
         tag: "NAME",
         abstag: "REPO.NAME",
         value: gedcomRepository.name,
+      }),
+      newGedcomRecord({
+        tag: "WWW",
+        abstag: "REPO.WWW",
+        value: gedcomRepository.url,
       }),
     ]),
   });
