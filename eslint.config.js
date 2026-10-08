@@ -2,6 +2,7 @@ import eslint from "@eslint/js";
 import markdown from "@eslint/markdown";
 import vitest from "@vitest/eslint-plugin";
 import angular from "angular-eslint";
+import importX from "eslint-plugin-import-x";
 import testingLibrary from "eslint-plugin-testing-library";
 import { defineConfig } from "eslint/config";
 import tseslint from "typescript-eslint";
@@ -14,6 +15,8 @@ export default defineConfig([
       ...tseslint.configs.strictTypeChecked,
       ...tseslint.configs.stylisticTypeChecked,
       angular.configs.tsRecommended,
+      importX.flatConfigs.recommended,
+      importX.flatConfigs.typescript,
     ],
     languageOptions: {
       parserOptions: {
@@ -24,6 +27,7 @@ export default defineConfig([
     rules: {
       "new-cap": "off",
       "require-jsdoc": "off",
+      "import-x/no-cycle": "error",
       "@typescript-eslint/consistent-type-imports": "error",
       "@typescript-eslint/no-import-type-side-effects": "error",
       "@typescript-eslint/restrict-template-expressions": [
