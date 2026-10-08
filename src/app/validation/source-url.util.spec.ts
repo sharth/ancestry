@@ -35,6 +35,14 @@ describe("urlDomainLabel", () => {
   it("returns undefined for an invalid URL", () => {
     expect(urlDomainLabel("not a url")).toBeUndefined();
   });
+
+  it("picks the distinctive label on a multi-level government host, not a short trailing one", () => {
+    expect(
+      urlDomainLabel(
+        "http://www.digitalarchives.state.pa.us/archive.asp?view=ArchivePrint",
+      ),
+    ).toBe("digitalarchives");
+  });
 });
 
 describe("findMatchingRepository", () => {
@@ -75,6 +83,18 @@ describe("findMatchingRepository", () => {
     const repositories = { R1: newGedcomRepository({ xref: "R1" }) };
     expect(
       findMatchingRepository("https://example.com", repositories),
+    ).toBeUndefined();
+  });
+
+  it("doesn't match an unrelated repository by a short trailing domain label", () => {
+    const repositories = {
+      R1: newGedcomRepository({ xref: "R1", name: "newspapers.com" }),
+    };
+    expect(
+      findMatchingRepository(
+        "http://www.digitalarchives.state.pa.us/archive.asp?view=ArchivePrint",
+        repositories,
+      ),
     ).toBeUndefined();
   });
 });
