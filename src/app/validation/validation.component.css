@@ -7,3 +7,18 @@ td,
 th {
   overflow-wrap: break-word;
 }
+
+/* Each warning that has a diff below it gets its own `tbody`, so this only
+   keeps the button row visible while its own diff is scrolling past --
+   it's released once the next warning's `tbody` begins. */
+.sticky-row {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: var(--bs-table-bg, #fff);
+  box-shadow: 0 1px 0 var(--bs-border-color, #dee2e6);
+}
+
+.sticky-row > td {
+  background-color: inherit;
+}
