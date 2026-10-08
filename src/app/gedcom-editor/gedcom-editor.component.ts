@@ -328,12 +328,17 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
 
   async submitForm() {
     await this.ancestryService.updateGedcomDatabase(this.workingDatabase());
+    // Close the dialog before the reload navigation below: the unsaved-changes
+    // guard checks whether the dialog is still open, and the just-saved
+    // database hasn't reached this component's `ancestryDatabase` input yet
+    // (that's what the reload is for), so differences() would still look
+    // unsaved if the guard ran while the dialog is still open.
+    this.finished.emit();
     await this.router.navigate([], {
       relativeTo: this.route,
       onSameUrlNavigation: "reload",
       skipLocationChange: true,
     });
-    this.finished.emit();
   }
 
   cancelForm() {

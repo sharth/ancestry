@@ -1,5 +1,5 @@
 import { TestBed, type ComponentFixture } from "@angular/core/testing";
-import { provideRouter } from "@angular/router";
+import { provideRouter, Router } from "@angular/router";
 import { render } from "@testing-library/angular/zoneless";
 import { produce } from "immer";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -274,6 +274,24 @@ describe("GedcomEditorComponent Integration", () => {
       //     },
       //   }),
       // );
+    });
+  });
+
+  describe("submitForm tests", () => {
+    it("emits finished before navigating, so the dialog is already closed by the time the reload re-checks the unsaved-changes guard", async () => {
+      vi.spyOn(ancestryService, "updateGedcomDatabase").mockResolvedValue(
+        undefined,
+      );
+      const order: string[] = [];
+      component.finished.subscribe(() => order.push("finished"));
+      vi.spyOn(TestBed.inject(Router), "navigate").mockImplementation(() => {
+        order.push("navigate");
+        return Promise.resolve(true);
+      });
+
+      await component.submitForm();
+
+      expect(order).toEqual(["finished", "navigate"]);
     });
   });
 });
