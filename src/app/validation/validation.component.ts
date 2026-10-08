@@ -1,10 +1,14 @@
+import { NgTemplateOutlet } from "@angular/common";
 import {
   Component,
   computed,
+  effect,
+  ElementRef,
   inject,
   input,
   signal,
   viewChild,
+  viewChildren,
 } from "@angular/core";
 import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 
@@ -23,12 +27,25 @@ import type { ComponentWithUnsavedChanges } from "../unsaved-changes.guard";
 import { applyUrlSuggestion } from "./apply-url-suggestion.util";
 import {
   sourceValidators,
+  type SourceValidationResult,
   type UrlRepositorySuggestion,
+  type ValidationFinding,
 } from "./source-validators";
+
+interface DiffWarning {
+  sourceScenario: { source: GedcomSource; result: SourceValidationResult };
+  warning: ValidationFinding;
+  urlSuggestion: UrlRepositorySuggestion;
+}
 
 @Component({
   selector: "app-validation",
-  imports: [RouterModule, GedcomEditorDialogComponent, GedcomDiffComponent],
+  imports: [
+    RouterModule,
+    NgTemplateOutlet,
+    GedcomEditorDialogComponent,
+    GedcomDiffComponent,
+  ],
   templateUrl: "./validation.component.html",
   styleUrl: "./validation.component.css",
 })
@@ -40,6 +57,94 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
   readonly ancestryDatabase = input.required<GedcomDatabase>();
 
   readonly editDialog = viewChild<GedcomEditorDialogComponent>("editDialog");
+
+  // One zero-area-but-for-1px marker row per warning that has a diff,
+  // placed right after that warning's button row -- in the same order as
+  // `diffWarnings` below, since both iterate `sourceScenarios()` the same
+  // way. An IntersectionObserver on these (see the constructor) tells us
+  // which warning's diff the user has scrolled into, so the floating
+  // `.sticky-toolbar` in the template can stand in for its button row.
+  private readonly sentinels = viewChildren<unknown, ElementRef<HTMLElement>>(
+    "sentinel",
+    { read: ElementRef },
+  );
+  private readonly endSentinel = viewChild<unknown, ElementRef<HTMLElement>>(
+    "endSentinel",
+    { read: ElementRef },
+  );
+
+  // The index into `diffWarnings()` of the warning currently being
+  // scrolled through, or undefined when none is (above the first one, or
+  // past the last one's diff).
+  private readonly activeIndex = signal<number | undefined>(undefined);
+
+  readonly diffWarnings = computed<DiffWarning[]>(() => {
+    const entries: DiffWarning[] = [];
+    for (const sourceScenario of this.sourceScenarios()) {
+      for (const warning of sourceScenario.result.warnings) {
+        if (warning.urlSuggestion !== undefined) {
+          entries.push({
+            sourceScenario,
+            warning,
+            urlSuggestion: warning.urlSuggestion,
+          });
+        }
+      }
+    }
+    return entries;
+  });
+
+  readonly activeDiffWarning = computed<DiffWarning | undefined>(
+    () => this.diffWarnings()[this.activeIndex() ?? -1],
+  );
+
+  constructor() {
+    effect((onCleanup) => {
+      const sentinelElements = this.sentinels().map((ref) => ref.nativeElement);
+      const endSentinelElement = this.endSentinel()?.nativeElement;
+      if (sentinelElements.length === 0 || endSentinelElement === undefined) {
+        this.activeIndex.set(undefined);
+        return;
+      }
+
+      // Position relative to the scroll container's own top edge, not the
+      // viewport's -- `main` (the app's scrollable content area) doesn't
+      // start at the top of the page.
+      const relativeTops = new Map<Element, number>();
+
+      const recompute = () => {
+        let active: number | undefined;
+        for (const [index, element] of sentinelElements.entries()) {
+          const top = relativeTops.get(element);
+          if (top !== undefined && top <= 0) active = index;
+        }
+        const endTop = relativeTops.get(endSentinelElement);
+        if (endTop !== undefined && endTop <= 0) active = undefined;
+        this.activeIndex.set(active);
+      };
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            const rootTop = entry.rootBounds?.top ?? 0;
+            relativeTops.set(
+              entry.target,
+              entry.boundingClientRect.top - rootTop,
+            );
+          }
+          recompute();
+        },
+        { root: sentinelElements[0]?.closest("main") ?? null, threshold: 0 },
+      );
+
+      for (const element of sentinelElements) observer.observe(element);
+      observer.observe(endSentinelElement);
+
+      onCleanup(() => {
+        observer.disconnect();
+      });
+    });
+  }
 
   hasUnsavedChanges(): boolean {
     return this.editDialog()?.hasUnsavedChanges() ?? false;
