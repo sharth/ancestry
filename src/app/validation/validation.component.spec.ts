@@ -45,6 +45,7 @@ describe("ValidationComponent", () => {
     await screen.findByText(/Create repository/);
     const text = (fixture.nativeElement as HTMLElement).textContent;
     expect(text).toContain("1 TEXT Found at https://example.com/record");
-    expect(text).toContain("1 TEXT Found at\n1 REPO");
+    expect(text).toContain("1 REPO @R0@");
+    expect(text).toContain("0 @R0@ REPO");
   });
 });

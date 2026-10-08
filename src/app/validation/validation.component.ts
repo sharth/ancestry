@@ -2,12 +2,13 @@ import { Component, computed, input, signal } from "@angular/core";
 import { RouterModule } from "@angular/router";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
-import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
+import type { GedcomRecord } from "../../gedcom/gedcomRecord";
 import { serializeGedcomRepository } from "../../gedcom/gedcomRepository";
 import {
   serializeGedcomSource,
   type GedcomSource,
 } from "../../gedcom/gedcomSource";
+import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
 import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
 import { applyUrlSuggestion } from "./apply-url-suggestion.util";
 import {
@@ -17,7 +18,7 @@ import {
 
 @Component({
   selector: "app-validation",
-  imports: [RouterModule, GedcomEditorDialogComponent],
+  imports: [RouterModule, GedcomEditorDialogComponent, GedcomDiffComponent],
   templateUrl: "./validation.component.html",
   styleUrl: "./validation.component.css",
 })
@@ -69,43 +70,42 @@ export class ValidationComponent {
     this.reviewXref.set(xref);
   }
 
-  beforeGedcomText(source: GedcomSource): string {
-    return serializeGedcomRecordToText(serializeGedcomSource(source)).join(
-      "\n",
-    );
+  beforeSourceRecord(source: GedcomSource): GedcomRecord {
+    return serializeGedcomSource(source);
   }
 
-  // The source (and, when one is newly created, the repository) as they'd
-  // look after `suggestion` is applied -- a preview only, computed fresh
-  // each time rather than reusing `reviewDatabase` so it stays correct even
-  // when nothing has been selected for review yet.
-  afterGedcomText(
+  // The source as it'd look after `suggestion` is applied -- a preview
+  // only, computed fresh each time rather than reusing `reviewDatabase` so
+  // it stays correct even when nothing has been selected for review yet.
+  afterSourceRecord(
     source: GedcomSource,
     suggestion: UrlRepositorySuggestion,
-  ): string {
-    const { database, repositoryXref } = applyUrlSuggestion(
+  ): GedcomRecord | undefined {
+    const { database } = applyUrlSuggestion(
       this.ancestryDatabase(),
       source,
       suggestion,
     );
     const updatedSource = database.sources[source.xref];
-    if (updatedSource === undefined) return "";
+    if (updatedSource === undefined) return undefined;
+    return serializeGedcomSource(updatedSource);
+  }
 
-    const blocks = [
-      serializeGedcomRecordToText(serializeGedcomSource(updatedSource)).join(
-        "\n",
-      ),
-    ];
-    if (suggestion.matchedRepository === undefined) {
-      const newRepository = database.repositories[repositoryXref];
-      if (newRepository !== undefined) {
-        blocks.push(
-          serializeGedcomRecordToText(
-            serializeGedcomRepository(newRepository),
-          ).join("\n"),
-        );
-      }
-    }
-    return blocks.join("\n\n");
+  // The repository a suggestion would create, when it doesn't match an
+  // existing one -- undefined when the suggestion links to an existing
+  // repository instead, since that repository is left unchanged.
+  afterRepositoryRecord(
+    source: GedcomSource,
+    suggestion: UrlRepositorySuggestion,
+  ): GedcomRecord | undefined {
+    if (suggestion.matchedRepository !== undefined) return undefined;
+    const { database, repositoryXref } = applyUrlSuggestion(
+      this.ancestryDatabase(),
+      source,
+      suggestion,
+    );
+    const newRepository = database.repositories[repositoryXref];
+    if (newRepository === undefined) return undefined;
+    return serializeGedcomRepository(newRepository);
   }
 }
