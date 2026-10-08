@@ -65,12 +65,26 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
 
   // `tabs()` with each xref resolved: an empty xref means "create a new
   // record of this type," so we calculate the next available xref for it.
+  // FAM and SUBM tabs aren't creatable this way (no caller does so today),
+  // so their xref is returned unchanged.
   readonly effectiveTabs = computed<TabInformation[]>(() => {
     const database = this.ancestryDatabase();
-    return this.tabs().map((tab) => ({
-      type: tab.type,
-      xref: resolveTabXref(tab, database),
-    }));
+    return this.tabs().map((tab): TabInformation => {
+      if (tab.xref) return tab;
+      switch (tab.type) {
+        case "INDI":
+          return { type: "INDI", xref: calculateNextIndividualXref(database) };
+        case "SOUR":
+          return { type: "SOUR", xref: calculateNextSourceXref(database) };
+        case "OBJE":
+          return { type: "OBJE", xref: calculateNextMultimediaXref(database) };
+        case "REPO":
+          return { type: "REPO", xref: calculateNextRepositoryXref(database) };
+        case "FAM":
+        case "SUBM":
+          return tab;
+      }
+    });
   });
 
   // The GedcomDatabase that the form will be manipulating and editing.
@@ -312,26 +326,6 @@ function filteredProperties<T>(
   }
 
   return result;
-}
-
-// An empty xref on a tab means "create a new record of this type"; resolves
-// it to the next available xref. FAM and SUBM tabs aren't creatable this
-// way (no caller does so today), so their xref is returned unchanged.
-function resolveTabXref(tab: TabInformation, database: GedcomDatabase): string {
-  if (tab.xref) return tab.xref;
-  switch (tab.type) {
-    case "INDI":
-      return calculateNextIndividualXref(database);
-    case "SOUR":
-      return calculateNextSourceXref(database);
-    case "OBJE":
-      return calculateNextMultimediaXref(database);
-    case "REPO":
-      return calculateNextRepositoryXref(database);
-    case "FAM":
-    case "SUBM":
-      return tab.xref;
-  }
 }
 
 function ensureRecordExists(draft: GedcomDatabase, tab: TabInformation) {
