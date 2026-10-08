@@ -21,10 +21,12 @@ import { newGedcomRepository } from "../../gedcom/gedcomRepository";
 import { newGedcomSource } from "../../gedcom/gedcomSource";
 import { newGedcomSubmitter } from "../../gedcom/gedcomSubmitter";
 import {
+  calculateNextFamilyXref,
   calculateNextIndividualXref,
   calculateNextMultimediaXref,
   calculateNextRepositoryXref,
   calculateNextSourceXref,
+  calculateNextSubmitterXref,
 } from "../../util/next-xref";
 import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
 import {
@@ -56,51 +58,64 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
-  readonly xref = input<string>();
-  readonly type = input.required<"INDI" | "SOUR" | "OBJE" | "REPO">();
+  // The tabs to open the editor with. The first is the one shown by
+  // default; an empty xref on any of them means "create a new record of
+  // this type" (its xref is calculated once resolved).
+  readonly tabs = input.required<TabInformation[]>();
   readonly ancestryDatabase = input.required<GedcomDatabase>();
-  // Other records to pre-open as tabs alongside the primary one, e.g. a
-  // repository a caller just created to go with the source being edited.
-  readonly additionalTabs = input<TabInformation[]>([]);
   readonly finished = output();
 
-  // We allow the user to pass an empty string as the xref to this component.
-  // If this happens, we should calculate what the next xref is and use that.
-  readonly effectiveXref = computed<string>(() => {
-    const xref = this.xref();
-    if (xref) return xref;
-
-    switch (this.type()) {
-      case "INDI":
-        return calculateNextIndividualXref(this.ancestryDatabase());
-      case "SOUR":
-        return calculateNextSourceXref(this.ancestryDatabase());
-      case "OBJE":
-        return calculateNextMultimediaXref(this.ancestryDatabase());
-      case "REPO":
-        return calculateNextRepositoryXref(this.ancestryDatabase());
-    }
+  // `tabs()` with each xref resolved: an empty xref means "create a new
+  // record of this type," so we calculate the next available xref for it.
+  readonly effectiveTabs = computed<TabInformation[]>(() => {
+    const database = this.ancestryDatabase();
+    return this.tabs().map((tab): TabInformation => {
+      if (tab.xref) return tab;
+      switch (tab.type) {
+        case "INDI":
+          return { type: "INDI", xref: calculateNextIndividualXref(database) };
+        case "SOUR":
+          return { type: "SOUR", xref: calculateNextSourceXref(database) };
+        case "OBJE":
+          return { type: "OBJE", xref: calculateNextMultimediaXref(database) };
+        case "REPO":
+          return { type: "REPO", xref: calculateNextRepositoryXref(database) };
+        case "FAM":
+          return { type: "FAM", xref: calculateNextFamilyXref(database) };
+        case "SUBM":
+          return { type: "SUBM", xref: calculateNextSubmitterXref(database) };
+      }
+    });
   });
 
   // The GedcomDatabase that the form will be manipulating and editing.
   // When the editor completes successfully, we will persist this instance of the database.
   // If the user provides an xref that is not present in the database (or an empty string), we should instantiate a new object.
   readonly workingDatabase = linkedSignal<GedcomDatabase>(() => {
-    const xref = this.effectiveXref();
+    const tabs = this.effectiveTabs();
     return produce(this.ancestryDatabase(), (draft) => {
-      switch (this.type()) {
-        case "INDI":
-          draft.individuals[xref] ??= newGedcomIndividual({ xref });
-          break;
-        case "SOUR":
-          draft.sources[xref] ??= newGedcomSource({ xref });
-          break;
-        case "OBJE":
-          draft.multimedias[xref] ??= newGedcomMultimedia({ xref });
-          break;
-        case "REPO":
-          draft.repositories[xref] ??= newGedcomRepository({ xref });
-          break;
+      for (const tab of tabs) {
+        const xref = tab.xref;
+        switch (tab.type) {
+          case "INDI":
+            draft.individuals[xref] ??= newGedcomIndividual({ xref });
+            break;
+          case "SOUR":
+            draft.sources[xref] ??= newGedcomSource({ xref });
+            break;
+          case "FAM":
+            draft.families[xref] ??= newGedcomFamily({ xref });
+            break;
+          case "REPO":
+            draft.repositories[xref] ??= newGedcomRepository({ xref });
+            break;
+          case "OBJE":
+            draft.multimedias[xref] ??= newGedcomMultimedia({ xref });
+            break;
+          case "SUBM":
+            draft.submitters[xref] ??= newGedcomSubmitter({ xref });
+            break;
+        }
       }
     });
   });
@@ -109,10 +124,9 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   // - Adding an xref to the set will cause it to be included in the form.
   // - Removing an xref from the set will cause it to be removed from the
   //   form, but any changes made will be maintained in workingDatabase().
-  readonly xrefsIncludedInView = linkedSignal<TabInformation[]>(() => [
-    { type: this.type(), xref: this.effectiveXref() },
-    ...this.additionalTabs(),
-  ]);
+  readonly xrefsIncludedInView = linkedSignal<TabInformation[]>(() =>
+    this.effectiveTabs(),
+  );
 
   // A GedcomDatabase made up of only the xrefs found in `xrefsIncludedInView`.
   // Any changes will be persisted in workingDatabase().
@@ -185,10 +199,9 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
       ),
   );
 
-  readonly activeTab = linkedSignal<TabInformation>(() => ({
-    type: this.type(),
-    xref: this.effectiveXref(),
-  }));
+  readonly activeTab = linkedSignal<TabInformation | undefined>(
+    () => this.effectiveTabs()[0],
+  );
 
   openNewIndividual(): string {
     const xref = calculateNextIndividualXref(this.workingDatabase());
@@ -232,7 +245,7 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
 
   openTab(tabInformation: TabInformation) {
     const xref = tabInformation.xref;
-    // Create a new user in the database if one didn't already exist.
+    // Create a new record in the database if one didn't already exist.
     this.workingDatabase.update((workingDatabase) =>
       produce(workingDatabase, (draft) => {
         switch (tabInformation.type) {

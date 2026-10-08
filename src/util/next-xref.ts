@@ -4,6 +4,7 @@ import type { GedcomIndividual } from "../gedcom/gedcomIndividual";
 import type { GedcomMultimedia } from "../gedcom/gedcomMultimedia";
 import type { GedcomRepository } from "../gedcom/gedcomRepository";
 import type { GedcomSource } from "../gedcom/gedcomSource";
+import type { GedcomSubmitter } from "../gedcom/gedcomSubmitter";
 
 export function calculateNextIndividualXref(gedcomDatabase: GedcomDatabase) {
   return calculateNextXref(gedcomDatabase.individuals, "I");
@@ -21,6 +22,14 @@ export function calculateNextSourceXref(gedcomDatabase: GedcomDatabase) {
   return calculateNextXref(gedcomDatabase.sources, "S");
 }
 
+export function calculateNextFamilyXref(gedcomDatabase: GedcomDatabase) {
+  return calculateNextXref(gedcomDatabase.families, "F");
+}
+
+export function calculateNextSubmitterXref(gedcomDatabase: GedcomDatabase) {
+  return calculateNextXref(gedcomDatabase.submitters, "U");
+}
+
 function calculateNextXref(
   gedcomObjects: Record<
     string,
@@ -29,6 +38,7 @@ function calculateNextXref(
     | GedcomSource
     | GedcomMultimedia
     | GedcomFamily
+    | GedcomSubmitter
   >,
   prefix: string,
 ): string {

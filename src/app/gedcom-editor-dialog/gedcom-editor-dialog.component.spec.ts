@@ -18,7 +18,7 @@ describe("GedcomEditorDialogComponent", () => {
     const renderResult = await render(GedcomEditorDialogComponent, {
       providers: [provideRouter([])],
       bindings: [
-        inputBinding("type", signal<"INDI" | "SOUR" | "OBJE" | "REPO">("INDI")),
+        inputBinding("tabs", signal([{ type: "INDI" as const, xref: "" }])),
         inputBinding("ancestryDatabase", signal(newGedcomDatabase())),
       ],
       waitForStableOnRender: true,

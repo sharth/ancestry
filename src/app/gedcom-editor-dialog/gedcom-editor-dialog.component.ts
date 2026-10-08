@@ -25,10 +25,8 @@ export class GedcomEditorDialogComponent {
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly ancestryService = inject(AncestryService);
 
-  readonly xref = input<string>();
-  readonly type = input.required<"INDI" | "SOUR" | "OBJE" | "REPO">();
+  readonly tabs = input.required<TabInformation[]>();
   readonly ancestryDatabase = input.required<GedcomDatabase>();
-  readonly additionalTabs = input<TabInformation[]>([]);
 
   readonly editDialog =
     viewChild.required<ElementRef<HTMLDialogElement>>("editDialog");
