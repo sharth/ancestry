@@ -21,10 +21,12 @@ import { newGedcomRepository } from "../../gedcom/gedcomRepository";
 import { newGedcomSource } from "../../gedcom/gedcomSource";
 import { newGedcomSubmitter } from "../../gedcom/gedcomSubmitter";
 import {
+  calculateNextFamilyXref,
   calculateNextIndividualXref,
   calculateNextMultimediaXref,
   calculateNextRepositoryXref,
   calculateNextSourceXref,
+  calculateNextSubmitterXref,
 } from "../../util/next-xref";
 import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
 import {
@@ -65,8 +67,6 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
 
   // `tabs()` with each xref resolved: an empty xref means "create a new
   // record of this type," so we calculate the next available xref for it.
-  // FAM and SUBM tabs aren't creatable this way (no caller does so today),
-  // so their xref is returned unchanged.
   readonly effectiveTabs = computed<TabInformation[]>(() => {
     const database = this.ancestryDatabase();
     return this.tabs().map((tab): TabInformation => {
@@ -81,8 +81,9 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
         case "REPO":
           return { type: "REPO", xref: calculateNextRepositoryXref(database) };
         case "FAM":
+          return { type: "FAM", xref: calculateNextFamilyXref(database) };
         case "SUBM":
-          return tab;
+          return { type: "SUBM", xref: calculateNextSubmitterXref(database) };
       }
     });
   });
