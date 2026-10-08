@@ -33,8 +33,7 @@
 
   <app-gedcom-editor-dialog
     #editDialog
-    type="SOUR"
-    [xref]="xref()"
+    [tabs]="[{ type: 'SOUR', xref: xref() }]"
     [ancestryDatabase]="ancestryDatabase()"
   />
 }

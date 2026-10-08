@@ -88,8 +88,6 @@
 
 <app-gedcom-editor-dialog
   #editDialog
-  type="SOUR"
-  [xref]="reviewXref()"
+  [tabs]="reviewTabs()"
   [ancestryDatabase]="reviewDatabase()"
-  [additionalTabs]="reviewAdditionalTabs()"
 />
