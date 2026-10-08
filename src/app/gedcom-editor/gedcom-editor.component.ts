@@ -30,6 +30,7 @@ import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
 import {
   GEDCOM_EDITOR,
   type GedcomEditorInterface,
+  type TabInformation,
 } from "./gedcom-editor-interface";
 import { InputIndividualComponent } from "./input-individual.component";
 import { InputMultimediaComponent } from "./input-multimedia.component";
@@ -58,6 +59,9 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   readonly xref = input<string>();
   readonly type = input.required<"INDI" | "SOUR" | "OBJE" | "REPO">();
   readonly ancestryDatabase = input.required<GedcomDatabase>();
+  // Other records to pre-open as tabs alongside the primary one, e.g. a
+  // repository a caller just created to go with the source being edited.
+  readonly additionalTabs = input<TabInformation[]>([]);
   readonly finished = output();
 
   // We allow the user to pass an empty string as the xref to this component.
@@ -107,6 +111,7 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   //   form, but any changes made will be maintained in workingDatabase().
   readonly xrefsIncludedInView = linkedSignal<TabInformation[]>(() => [
     { type: this.type(), xref: this.effectiveXref() },
+    ...this.additionalTabs(),
   ]);
 
   // A GedcomDatabase made up of only the xrefs found in `xrefsIncludedInView`.
@@ -351,9 +356,4 @@ function filteredProperties<T>(
   }
 
   return result;
-}
-
-interface TabInformation {
-  type: "INDI" | "SOUR" | "FAM" | "REPO" | "OBJE" | "SUBM";
-  xref: string;
 }

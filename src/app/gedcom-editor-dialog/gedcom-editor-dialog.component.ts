@@ -9,6 +9,7 @@ import {
 
 import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
+import type { TabInformation } from "../gedcom-editor/gedcom-editor-interface";
 import { GedcomEditorComponent } from "../gedcom-editor/gedcom-editor.component";
 
 @Component({
@@ -24,6 +25,7 @@ export class GedcomEditorDialogComponent {
   readonly xref = input<string>();
   readonly type = input.required<"INDI" | "SOUR" | "OBJE" | "REPO">();
   readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly additionalTabs = input<TabInformation[]>([]);
 
   readonly editDialog =
     viewChild.required<ElementRef<HTMLDialogElement>>("editDialog");
