@@ -87,3 +87,75 @@ describe("ValidationComponent", () => {
     expect(updateGedcomDatabaseSpy).not.toHaveBeenCalled();
   });
 });
+
+describe("ValidationComponent sticky toolbar", () => {
+  it("shows only one toolbar at a time while scrolling through multiple diffs", async () => {
+    const ancestryDatabase = signal(
+      newGedcomDatabase({
+        sources: {
+          S1: newGedcomSource({
+            xref: "S1",
+            title:
+              "Newfoundland Virtal Records, 1892, Birth of Catherine Cooper https://familysearch.org/ark:/61903/3:1:S3HT-61DS-32F?cc=1790939&wc=M61G-RM3%3A144853601",
+          }),
+          S2: newGedcomSource({
+            xref: "S2",
+            title:
+              "Second Source https://www.ancestry.com/discoveryui-content/view/123456:7890?tid=111&pid=181",
+          }),
+          S3: newGedcomSource({
+            xref: "S3",
+            title:
+              "Jackson Daily News, Obituary, 1910 https://www.newspapers.com/clip/56286648/jackson-daily-news/",
+          }),
+        },
+      }),
+    );
+
+    await render(ValidationComponent, {
+      providers: [provideRouter([])],
+      bindings: [inputBinding("ancestryDatabase", ancestryDatabase)],
+      waitForStableOnRender: true,
+    });
+
+    await screen.findAllByText(/Submit changes as proposed/);
+
+    // Waits for the IntersectionObserver callbacks triggered by a scroll to
+    // settle (the DOM stops changing for a beat), rather than a fixed
+    // delay, so this isn't flaky under a loaded CI machine.
+    async function toolbarCountAfterSettling(): Promise<number> {
+      let lastCount = document.querySelectorAll(".sticky-toolbar").length;
+      let lastChangeAt = Date.now();
+      const deadline = Date.now() + 2000;
+      while (Date.now() < deadline) {
+        await new Promise((resolve) => setTimeout(resolve, 16));
+        const count = document.querySelectorAll(".sticky-toolbar").length;
+        if (count !== lastCount) {
+          lastCount = count;
+          lastChangeAt = Date.now();
+        } else if (Date.now() - lastChangeAt > 150) {
+          break;
+        }
+      }
+      return lastCount;
+    }
+
+    // Scroll the window down through the page in steps, checking at each
+    // one that at most one `.sticky-toolbar` is rendered -- never two
+    // simultaneously, which was the overlap bug this test guards against.
+    const maxScroll = Math.max(
+      0,
+      document.documentElement.scrollHeight - window.innerHeight,
+    );
+    const stepCount = 10;
+    let sawToolbar = false;
+    for (let step = 0; step <= stepCount; step++) {
+      window.scrollTo(0, Math.round((maxScroll * step) / stepCount));
+      window.dispatchEvent(new Event("scroll"));
+      const toolbarCount = await toolbarCountAfterSettling();
+      expect(toolbarCount).toBeLessThanOrEqual(1);
+      if (toolbarCount > 0) sawToolbar = true;
+    }
+    expect(sawToolbar).toBe(true);
+  });
+});

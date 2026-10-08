@@ -7,3 +7,43 @@ td,
 th {
   overflow-wrap: break-word;
 }
+
+/* `section-sentinel` rows mark where a warning's diff begins, so
+   ValidationComponent's IntersectionObserver can tell when it has
+   scrolled past. They're kept to a sliver rather than 0 height: a
+   zero-area element never reports a nonzero intersection ratio, so it
+   would never trigger the observer's threshold-crossing callback. */
+.section-sentinel,
+.section-sentinel > td {
+  height: 1px;
+  padding: 0;
+  border: 0;
+  line-height: 0;
+}
+
+/* A floating copy of the currently-scrolled-through warning's message and
+   fix buttons, shown in place of the table row that scrolled out of view
+   (see ValidationComponent.activeDiffWarning). This is a plain sibling of
+   the table -- not a sticky table row -- since `position: sticky` inside a
+   `<table>` with dynamically-sized rows renders inconsistently across
+   browsers. */
+.sticky-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+  box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
+  margin-bottom: 0.5rem;
+}
+
+.sticky-toolbar span {
+  flex: 1 1 auto;
+  overflow-wrap: break-word;
+}

@@ -1,4 +1,53 @@
 <h1>Validation</h1>
+
+@if (activeDiffWarning(); as active) {
+  <div class="sticky-toolbar">
+    <a [routerLink]="['/source', active.sourceScenario.source.xref]">
+      {{
+        active.sourceScenario.source.abbr || active.sourceScenario.source.xref
+      }}
+    </a>
+    <span>{{ active.warning.message }}</span>
+    <ng-container
+      [ngTemplateOutlet]="fixButtons"
+      [ngTemplateOutletContext]="{
+        sourceScenario: active.sourceScenario,
+        urlSuggestion: active.urlSuggestion,
+      }"
+    />
+  </div>
+}
+
+<ng-template
+  #fixButtons
+  let-sourceScenario="sourceScenario"
+  let-urlSuggestion="urlSuggestion"
+>
+  <div class="btn-group">
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-primary"
+      (click)="review(sourceScenario.source.xref); editDialog.showModal()"
+    >
+      Open editor with proposed changes:
+      {{
+        urlSuggestion.matchedRepository
+          ? "Link to " +
+            (urlSuggestion.matchedRepository.name ||
+              urlSuggestion.matchedRepository.xref)
+          : "Create repository"
+      }}
+    </button>
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-success"
+      (click)="submitProposed(sourceScenario.source.xref)"
+    >
+      Submit changes as proposed
+    </button>
+  </div>
+</ng-template>
+
 <table class="table table-striped align-middle">
   <thead>
     <tr>
@@ -42,35 +91,15 @@
           <td>{{ warning.message }}</td>
           <td>
             @if (warning.urlSuggestion; as urlSuggestion) {
-              <div class="btn-group">
-                <button
-                  type="button"
-                  class="btn btn-sm btn-outline-primary"
-                  (click)="
-                    review(sourceScenario.source.xref); editDialog.showModal()
-                  "
-                >
-                  Open editor with proposed changes:
-                  {{
-                    urlSuggestion.matchedRepository
-                      ? "Link to " +
-                        (urlSuggestion.matchedRepository.name ||
-                          urlSuggestion.matchedRepository.xref)
-                      : "Create repository"
-                  }}
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-sm btn-outline-success"
-                  (click)="submitProposed(sourceScenario.source.xref)"
-                >
-                  Submit changes as proposed
-                </button>
-              </div>
+              <ng-container
+                [ngTemplateOutlet]="fixButtons"
+                [ngTemplateOutletContext]="{ sourceScenario, urlSuggestion }"
+              />
             }
           </td>
         </tr>
         @if (warning.urlSuggestion; as urlSuggestion) {
+          <tr class="section-sentinel" #sentinel></tr>
           <tr>
             <td></td>
             <td colspan="5">
@@ -96,6 +125,7 @@
     }
   </tbody>
 </table>
+<div #endSentinel class="section-sentinel"></div>
 
 <app-gedcom-editor-dialog
   #editDialog
