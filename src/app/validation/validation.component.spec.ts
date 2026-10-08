@@ -1,9 +1,10 @@
 import { inputBinding, signal } from "@angular/core";
-import type { ComponentFixture } from "@angular/core/testing";
+import { TestBed, type ComponentFixture } from "@angular/core/testing";
 import { provideRouter } from "@angular/router";
 import { render, screen } from "@testing-library/angular/zoneless";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { AncestryService } from "../../database/ancestry.service";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomSource } from "../../gedcom/gedcomSource";
 import { ValidationComponent } from "./validation.component";
@@ -11,6 +12,7 @@ import { ValidationComponent } from "./validation.component";
 describe("ValidationComponent", () => {
   let component: ValidationComponent;
   let fixture: ComponentFixture<ValidationComponent>;
+  let ancestryService: AncestryService;
 
   beforeEach(async () => {
     const ancestryDatabase = signal(
@@ -31,6 +33,7 @@ describe("ValidationComponent", () => {
     });
     fixture = renderResult.fixture;
     component = fixture.componentInstance;
+    ancestryService = TestBed.inject(AncestryService);
   });
 
   it("should create", () => {
@@ -51,5 +54,36 @@ describe("ValidationComponent", () => {
     expect(text).toContain("1 TEXT Found at https://example.com/record");
     expect(text).toContain("1 REPO @R0@");
     expect(text).toContain("0 @R0@ REPO");
+  });
+
+  it("also offers a button to submit the suggested fix directly", async () => {
+    expect(await screen.findByText(/Submit changes as proposed/)).toBeTruthy();
+  });
+
+  it("submitProposed applies the suggestion and saves it directly", async () => {
+    vi.spyOn(ancestryService, "requestWritePermission").mockResolvedValue(true);
+    const updateGedcomDatabaseSpy = vi
+      .spyOn(ancestryService, "updateGedcomDatabase")
+      .mockResolvedValue(undefined);
+
+    await component.submitProposed("S1");
+
+    expect(updateGedcomDatabaseSpy).toHaveBeenCalledTimes(1);
+    const savedDatabase = updateGedcomDatabaseSpy.mock.calls[0]?.[0];
+    expect(savedDatabase?.repositories["@R0@"]).toBeDefined();
+  });
+
+  it("submitProposed does nothing when write permission is denied", async () => {
+    vi.spyOn(ancestryService, "requestWritePermission").mockResolvedValue(
+      false,
+    );
+    const updateGedcomDatabaseSpy = vi.spyOn(
+      ancestryService,
+      "updateGedcomDatabase",
+    );
+
+    await component.submitProposed("S1");
+
+    expect(updateGedcomDatabaseSpy).not.toHaveBeenCalled();
   });
 });
