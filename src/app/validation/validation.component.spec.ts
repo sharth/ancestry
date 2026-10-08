@@ -22,6 +22,7 @@ describe("ValidationComponent", () => {
   const urlSuggestion: UrlRepositorySuggestion = {
     fieldName: "text",
     url: "https://example.com/record",
+    standalone: false,
     suggestedName: "example",
     matchedRepository: undefined,
   };

@@ -2,10 +2,28 @@ import type { GedcomRepository } from "../../gedcom/gedcomRepository";
 
 const URL_PATTERN = /\bhttps?:\/\/[^\s<>"')\]]+/gi;
 
+export interface ExtractedUrl {
+  url: string;
+  /** Whether `url` occupies its own line (after trimming whitespace) --
+   * `false` when it's embedded alongside other text on the same line, e.g.
+   * as part of a citation or footnote. A standalone URL can be safely
+   * stripped out of the field when a fix is applied; an embedded one is
+   * left in place since removing just the URL would mangle the surrounding
+   * sentence. */
+  standalone: boolean;
+}
+
 /** Every http(s) URL found in `text`, in order, or an empty array if there
  * isn't one. */
-export function extractUrls(text: string): string[] {
-  return [...text.matchAll(URL_PATTERN)].map((match) => match[0]);
+export function extractUrls(text: string): ExtractedUrl[] {
+  const urls: ExtractedUrl[] = [];
+  for (const rawLine of text.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    for (const match of line.matchAll(URL_PATTERN)) {
+      urls.push({ url: match[0], standalone: match[0] === line });
+    }
+  }
+  return urls;
 }
 
 /** The registrable domain label of a URL, e.g. "familysearch" for

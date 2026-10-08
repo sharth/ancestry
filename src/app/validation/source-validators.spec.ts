@@ -2,14 +2,15 @@ import { describe, expect, it } from "vitest";
 
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomRepository } from "../../gedcom/gedcomRepository";
+import { newGedcomRepositoryLink } from "../../gedcom/gedcomRepositoryLink";
 import { newGedcomSource } from "../../gedcom/gedcomSource";
 import { sourceValidators } from "./source-validators";
 
 describe("sourceValidators", () => {
-  it("warns when a source's text contains a URL", () => {
+  it("warns when a source's text contains a URL on a line by itself", () => {
     const source = newGedcomSource({
       xref: "S1",
-      text: "Record found at https://example.com/record",
+      text: "https://example.com/record",
     });
     const result = sourceValidators(source, newGedcomDatabase());
 
@@ -18,9 +19,21 @@ describe("sourceValidators", () => {
     expect(result.warnings[0]?.urlSuggestion).toEqual({
       fieldName: "text",
       url: "https://example.com/record",
+      standalone: true,
       suggestedName: "example",
       matchedRepository: undefined,
     });
+  });
+
+  it("also warns when a URL is embedded alongside other text, but marks it not standalone", () => {
+    const source = newGedcomSource({
+      xref: "S1",
+      text: "Record found at https://example.com/record",
+    });
+    const result = sourceValidators(source, newGedcomDatabase());
+
+    expect(result.warnings).toHaveLength(1);
+    expect(result.warnings[0]?.urlSuggestion?.standalone).toBe(false);
   });
 
   it("warns when a source's abbreviation or title contains a URL", () => {
@@ -47,7 +60,7 @@ describe("sourceValidators", () => {
   it("warns separately for each URL when a field has more than one", () => {
     const source = newGedcomSource({
       xref: "S1",
-      text: "See https://example.com/foo and https://example.org/bar",
+      text: "https://example.com/foo\nhttps://example.org/bar",
     });
     const result = sourceValidators(source, newGedcomDatabase());
 
@@ -64,7 +77,7 @@ describe("sourceValidators", () => {
     });
     const source = newGedcomSource({
       xref: "S1",
-      text: "See https://www.familysearch.org/record",
+      text: "https://www.familysearch.org/record",
     });
     const database = newGedcomDatabase({ repositories: { R1: repository } });
 
@@ -73,6 +86,22 @@ describe("sourceValidators", () => {
     expect(result.warnings[0]?.urlSuggestion?.matchedRepository).toBe(
       repository,
     );
+  });
+
+  it("doesn't suggest a change when the URL is already linked as a call number", () => {
+    const source = newGedcomSource({
+      xref: "S1",
+      text: "https://example.com/record",
+      repositoryLinks: [
+        newGedcomRepositoryLink({
+          repositoryXref: "R1",
+          callNumber: "https://example.com/record",
+        }),
+      ],
+    });
+    const result = sourceValidators(source, newGedcomDatabase());
+
+    expect(result.warnings).toEqual([]);
   });
 
   it("has no findings when nothing contains a URL", () => {

@@ -49,9 +49,17 @@ export function applyUrlSuggestion(
     } else {
       existingLink.callNumber ||= suggestion.url;
     }
-    draftSource[suggestion.fieldName] = draftSource[suggestion.fieldName]
-      .replace(suggestion.url, "")
-      .trim();
+    // Only strip the URL out of the field when it occupied a line by
+    // itself -- removing it from the middle of a larger block of text
+    // would mangle the surrounding sentence, so an embedded URL is left in
+    // place even after the repository link is added.
+    if (suggestion.standalone) {
+      draftSource[suggestion.fieldName] = draftSource[suggestion.fieldName]
+        .split("\n")
+        .filter((line) => line.trim() !== suggestion.url)
+        .join("\n")
+        .trim();
+    }
   });
 
   return { database: updatedDatabase, repositoryXref };
