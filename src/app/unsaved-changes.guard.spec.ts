@@ -78,4 +78,21 @@ describe("confirmUnsavedChangesGuard", () => {
     expect(runGuard()).toBe(true);
     expect(confirmSpy).not.toHaveBeenCalled();
   });
+
+  it("keeps the current registrant when a stale one unregisters", () => {
+    const tracker = TestBed.inject(UnsavedChangesTracker);
+    const stale: ComponentWithUnsavedChanges = {
+      hasUnsavedChanges: () => false,
+    };
+    const current: ComponentWithUnsavedChanges = {
+      hasUnsavedChanges: () => true,
+    };
+    tracker.register(stale);
+    tracker.register(current);
+    tracker.unregister(stale);
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+
+    expect(runGuard()).toBe(true);
+    expect(tracker.hasUnsavedChanges()).toBe(true);
+  });
 });

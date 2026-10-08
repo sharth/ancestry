@@ -8,23 +8,26 @@ export interface ComponentWithUnsavedChanges {
 // GedcomEditorDialogComponent registers itself here on creation (see its
 // constructor) so this guard can ask about unsaved changes without every
 // routed component needing its own viewChild/hasUnsavedChanges boilerplate
-// to find and delegate to whichever dialog it happens to render.
+// to find and delegate to whichever dialog it happens to render. A guard
+// runs in the router's environment injector, which has no visibility into
+// the element-injector tree a rendered component lives in, so there's no
+// inject()-only way to reach "the dialog currently on screen" directly.
 @Injectable({ providedIn: "root" })
 export class UnsavedChangesTracker {
-  private readonly components = new Set<ComponentWithUnsavedChanges>();
+  private component?: ComponentWithUnsavedChanges;
 
   register(component: ComponentWithUnsavedChanges): void {
-    this.components.add(component);
+    this.component = component;
   }
 
   unregister(component: ComponentWithUnsavedChanges): void {
-    this.components.delete(component);
+    if (this.component === component) {
+      this.component = undefined;
+    }
   }
 
   hasUnsavedChanges(): boolean {
-    return [...this.components].some((component) =>
-      component.hasUnsavedChanges(),
-    );
+    return this.component?.hasUnsavedChanges() ?? false;
   }
 }
 
