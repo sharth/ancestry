@@ -6,7 +6,42 @@ import { newGedcomSource } from "../../gedcom/gedcomSource";
 import { applyUrlSuggestion } from "./apply-url-suggestion.util";
 
 describe("applyUrlSuggestion", () => {
-  it("links to the matched repository, with the URL as its call number, and strips the URL from the text", () => {
+  it("links to the matched repository, with the URL as its call number, and strips a standalone URL from the text", () => {
+    const repository = newGedcomRepository({
+      xref: "@R1@",
+      name: "FamilySearch",
+    });
+    const source = newGedcomSource({
+      xref: "@S1@",
+      text: "Record found at:\nhttps://www.familysearch.org/record",
+    });
+    const database = newGedcomDatabase({
+      sources: { [source.xref]: source },
+      repositories: { [repository.xref]: repository },
+    });
+
+    const result = applyUrlSuggestion(database, source, {
+      fieldName: "text",
+      url: "https://www.familysearch.org/record",
+      standalone: true,
+      suggestedName: "familysearch",
+      matchedRepository: repository,
+    });
+
+    expect(result.repositoryXref).toBe("@R1@");
+    const updatedSource = result.database.sources[source.xref];
+    expect(updatedSource?.text).toBe("Record found at:");
+    expect(updatedSource?.repositoryLinks).toEqual([
+      {
+        repositoryXref: "@R1@",
+        callNumber: "https://www.familysearch.org/record",
+      },
+    ]);
+    // Doesn't add a second repository since one already matched.
+    expect(Object.keys(result.database.repositories)).toEqual(["@R1@"]);
+  });
+
+  it("leaves the field text alone when the URL is embedded, not standalone", () => {
     const repository = newGedcomRepository({
       xref: "@R1@",
       name: "FamilySearch",
@@ -23,24 +58,24 @@ describe("applyUrlSuggestion", () => {
     const result = applyUrlSuggestion(database, source, {
       fieldName: "text",
       url: "https://www.familysearch.org/record",
+      standalone: false,
       suggestedName: "familysearch",
       matchedRepository: repository,
     });
 
-    expect(result.repositoryXref).toBe("@R1@");
     const updatedSource = result.database.sources[source.xref];
-    expect(updatedSource?.text).toBe("Record found at");
+    expect(updatedSource?.text).toBe(
+      "Record found at https://www.familysearch.org/record",
+    );
     expect(updatedSource?.repositoryLinks).toEqual([
       {
         repositoryXref: "@R1@",
         callNumber: "https://www.familysearch.org/record",
       },
     ]);
-    // Doesn't add a second repository since one already matched.
-    expect(Object.keys(result.database.repositories)).toEqual(["@R1@"]);
   });
 
-  it("strips the URL from the field the suggestion names, e.g. abbr", () => {
+  it("strips a standalone URL from the field the suggestion names, e.g. abbr", () => {
     const source = newGedcomSource({
       xref: "@S1@",
       abbr: "https://example.com/abbr",
@@ -51,6 +86,7 @@ describe("applyUrlSuggestion", () => {
     const result = applyUrlSuggestion(database, source, {
       fieldName: "abbr",
       url: "https://example.com/abbr",
+      standalone: true,
       suggestedName: "example",
       matchedRepository: undefined,
     });
@@ -70,6 +106,7 @@ describe("applyUrlSuggestion", () => {
     const result = applyUrlSuggestion(database, source, {
       fieldName: "text",
       url: "https://example.com/record",
+      standalone: false,
       suggestedName: "example",
       matchedRepository: undefined,
     });
@@ -98,6 +135,7 @@ describe("applyUrlSuggestion", () => {
     applyUrlSuggestion(database, source, {
       fieldName: "text",
       url: "https://example.com",
+      standalone: true,
       suggestedName: "example",
       matchedRepository: repository,
     });

@@ -2,26 +2,55 @@ import { describe, expect, it } from "vitest";
 
 import { newGedcomRepository } from "../../gedcom/gedcomRepository";
 import {
-  extractUrl,
+  extractUrls,
   findMatchingRepository,
   urlDomainLabel,
 } from "./source-url.util";
 
-describe("extractUrl", () => {
-  it("finds a URL embedded in surrounding text", () => {
-    expect(extractUrl("Available at https://example.com/foo see also")).toBe(
-      "https://example.com/foo",
-    );
+describe("extractUrls", () => {
+  it("finds a URL that's on a line by itself, marked standalone", () => {
+    expect(extractUrls("https://example.com/foo")).toEqual([
+      { url: "https://example.com/foo", standalone: true },
+    ]);
   });
 
-  it("returns undefined when there is no URL", () => {
-    expect(extractUrl("just some plain text")).toBeUndefined();
+  it("finds a URL embedded alongside other text, marked not standalone", () => {
+    expect(
+      extractUrls("Available at https://example.com/foo see also"),
+    ).toEqual([{ url: "https://example.com/foo", standalone: false }]);
   });
 
   it("stops at trailing punctuation and quotes", () => {
-    expect(extractUrl('see "https://example.com/foo".')).toBe(
-      "https://example.com/foo",
-    );
+    expect(extractUrls('see "https://example.com/foo".')).toEqual([
+      { url: "https://example.com/foo", standalone: false },
+    ]);
+  });
+
+  it("returns an empty array when there is no URL", () => {
+    expect(extractUrls("just some plain text")).toEqual([]);
+  });
+
+  it("finds every URL, tagging standalone vs. embedded lines independently", () => {
+    expect(
+      extractUrls(
+        [
+          "See the record below:",
+          "https://example.com/foo",
+          "Also mentioned inline: https://example.org/inline",
+          "https://example.org/bar",
+        ].join("\n"),
+      ),
+    ).toEqual([
+      { url: "https://example.com/foo", standalone: true },
+      { url: "https://example.org/inline", standalone: false },
+      { url: "https://example.org/bar", standalone: true },
+    ]);
+  });
+
+  it("trims surrounding whitespace before deciding a line is standalone", () => {
+    expect(extractUrls("  https://example.com/foo  \n")).toEqual([
+      { url: "https://example.com/foo", standalone: true },
+    ]);
   });
 });
 
