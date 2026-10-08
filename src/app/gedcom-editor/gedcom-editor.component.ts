@@ -93,7 +93,29 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   readonly workingDatabase = linkedSignal<GedcomDatabase>(() => {
     const tabs = this.effectiveTabs();
     return produce(this.ancestryDatabase(), (draft) => {
-      for (const tab of tabs) ensureRecordExists(draft, tab);
+      for (const tab of tabs) {
+        const xref = tab.xref;
+        switch (tab.type) {
+          case "INDI":
+            draft.individuals[xref] ??= newGedcomIndividual({ xref });
+            break;
+          case "SOUR":
+            draft.sources[xref] ??= newGedcomSource({ xref });
+            break;
+          case "FAM":
+            draft.families[xref] ??= newGedcomFamily({ xref });
+            break;
+          case "REPO":
+            draft.repositories[xref] ??= newGedcomRepository({ xref });
+            break;
+          case "OBJE":
+            draft.multimedias[xref] ??= newGedcomMultimedia({ xref });
+            break;
+          case "SUBM":
+            draft.submitters[xref] ??= newGedcomSubmitter({ xref });
+            break;
+        }
+      }
     });
   });
 
@@ -176,8 +198,8 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
       ),
   );
 
-  readonly activeTab = linkedSignal<TabInformation>(
-    () => this.effectiveTabs()[0] ?? { type: "INDI", xref: "" },
+  readonly activeTab = linkedSignal<TabInformation | undefined>(
+    () => this.effectiveTabs()[0],
   );
 
   openNewIndividual(): string {
@@ -221,10 +243,30 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   }
 
   openTab(tabInformation: TabInformation) {
+    const xref = tabInformation.xref;
     // Create a new record in the database if one didn't already exist.
     this.workingDatabase.update((workingDatabase) =>
       produce(workingDatabase, (draft) => {
-        ensureRecordExists(draft, tabInformation);
+        switch (tabInformation.type) {
+          case "INDI":
+            draft.individuals[xref] ??= newGedcomIndividual({ xref });
+            break;
+          case "SOUR":
+            draft.sources[xref] ??= newGedcomSource({ xref });
+            break;
+          case "FAM":
+            draft.families[xref] ??= newGedcomFamily({ xref });
+            break;
+          case "REPO":
+            draft.repositories[xref] ??= newGedcomRepository({ xref });
+            break;
+          case "OBJE":
+            draft.multimedias[xref] ??= newGedcomMultimedia({ xref });
+            break;
+          case "SUBM":
+            draft.submitters[xref] ??= newGedcomSubmitter({ xref });
+            break;
+        }
       }),
     );
 
@@ -326,28 +368,4 @@ function filteredProperties<T>(
   }
 
   return result;
-}
-
-function ensureRecordExists(draft: GedcomDatabase, tab: TabInformation) {
-  const xref = tab.xref;
-  switch (tab.type) {
-    case "INDI":
-      draft.individuals[xref] ??= newGedcomIndividual({ xref });
-      break;
-    case "SOUR":
-      draft.sources[xref] ??= newGedcomSource({ xref });
-      break;
-    case "FAM":
-      draft.families[xref] ??= newGedcomFamily({ xref });
-      break;
-    case "REPO":
-      draft.repositories[xref] ??= newGedcomRepository({ xref });
-      break;
-    case "OBJE":
-      draft.multimedias[xref] ??= newGedcomMultimedia({ xref });
-      break;
-    case "SUBM":
-      draft.submitters[xref] ??= newGedcomSubmitter({ xref });
-      break;
-  }
 }
