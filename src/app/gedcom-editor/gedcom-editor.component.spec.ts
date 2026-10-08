@@ -47,7 +47,7 @@ describe("GedcomEditorComponent Integration", () => {
     component = fixture.componentInstance;
     ancestryService = TestBed.inject(AncestryService);
 
-    fixture.componentRef.setInput("type", "INDI");
+    fixture.componentRef.setInput("tabs", [{ type: "INDI", xref: "" }]);
     fixture.componentRef.setInput("ancestryDatabase", initialDatabase);
   });
 
@@ -72,16 +72,20 @@ describe("GedcomEditorComponent Integration", () => {
     });
   });
 
-  describe("effectiveXref tests", () => {
-    it("effectiveXref contains the nextXref if none provided", () => {
-      fixture.componentRef.setInput("type", "INDI");
-      fixture.componentRef.setInput("xref", undefined);
-      expect(component.effectiveXref()).toEqual("@I1@");
+  describe("effectiveTabs tests", () => {
+    it("resolves an empty xref to the next available one", () => {
+      fixture.componentRef.setInput("tabs", [{ type: "INDI", xref: "" }]);
+      expect(component.effectiveTabs()).toEqual([
+        { type: "INDI", xref: "@I1@" },
+      ]);
     });
-    it("effectiveXref contains xref if provided", () => {
-      fixture.componentRef.setInput("type", "SOUR");
-      fixture.componentRef.setInput("xref", "@SOUR300@");
-      expect(component.effectiveXref()).toEqual("@SOUR300@");
+    it("keeps a provided xref as-is", () => {
+      fixture.componentRef.setInput("tabs", [
+        { type: "SOUR", xref: "@SOUR300@" },
+      ]);
+      expect(component.effectiveTabs()).toEqual([
+        { type: "SOUR", xref: "@SOUR300@" },
+      ]);
     });
   });
 
@@ -91,8 +95,9 @@ describe("GedcomEditorComponent Integration", () => {
     );
 
     it("If a user provides an xref that does not exist, it will be created", () => {
-      fixture.componentRef.setInput("type", "SOUR");
-      fixture.componentRef.setInput("xref", "@SOUR300@");
+      fixture.componentRef.setInput("tabs", [
+        { type: "SOUR", xref: "@SOUR300@" },
+      ]);
       expect(component.workingDatabase().sources["@SOUR300@"]).toEqual(
         newGedcomSource({
           xref: "@SOUR300@",
@@ -103,8 +108,9 @@ describe("GedcomEditorComponent Integration", () => {
 
   describe("WorkingDatabaseView tests", () => {
     it("WorkingDatabaseView will initially contain the xref provided by the user and nothing else", () => {
-      fixture.componentRef.setInput("type", "SOUR");
-      fixture.componentRef.setInput("xref", "@SOUR300@");
+      fixture.componentRef.setInput("tabs", [
+        { type: "SOUR", xref: "@SOUR300@" },
+      ]);
       expect(component.workingDatabase()).toEqual(
         newGedcomDatabase({
           individuals: {
@@ -142,8 +148,9 @@ describe("GedcomEditorComponent Integration", () => {
     });
 
     it("Updates to xrefsIncludedInView will add stuff to workingDraftView", () => {
-      fixture.componentRef.setInput("type", "SOUR");
-      fixture.componentRef.setInput("xref", "@SOUR300@");
+      fixture.componentRef.setInput("tabs", [
+        { type: "SOUR", xref: "@SOUR300@" },
+      ]);
       expect(component.workingDatabaseView()).toEqual(
         newGedcomDatabase({
           sources: {

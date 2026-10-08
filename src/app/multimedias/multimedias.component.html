@@ -21,7 +21,7 @@
 
   <app-gedcom-editor-dialog
     #editDialog
-    type="OBJE"
+    [tabs]="[{ type: 'OBJE', xref: '' }]"
     [ancestryDatabase]="ancestryDatabase()"
   />
 }

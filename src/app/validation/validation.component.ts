@@ -10,6 +10,7 @@ import {
 } from "../../gedcom/gedcomSource";
 import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
 import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
+import type { TabInformation } from "../gedcom-editor/gedcom-editor-interface";
 import type { ComponentWithUnsavedChanges } from "../unsaved-changes.guard";
 import { applyUrlSuggestion } from "./apply-url-suggestion.util";
 import {
@@ -54,6 +55,28 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
       suggestion.source,
       suggestion.urlSuggestion,
     ).database;
+  });
+
+  // The tabs to hand the editor dialog: the source being reviewed first
+  // (so it's the one shown by default), plus -- when the suggestion creates
+  // a new repository rather than linking to an existing one -- that
+  // repository's own tab, so the user sees both without having to go find
+  // the new repository themselves.
+  readonly reviewTabs = computed<TabInformation[]>(() => {
+    const suggestion = this.reviewSuggestion();
+    if (suggestion === undefined) return [];
+    const tabs: TabInformation[] = [
+      { type: "SOUR", xref: suggestion.source.xref },
+    ];
+    if (suggestion.urlSuggestion.matchedRepository === undefined) {
+      const { repositoryXref } = applyUrlSuggestion(
+        this.ancestryDatabase(),
+        suggestion.source,
+        suggestion.urlSuggestion,
+      );
+      tabs.push({ type: "REPO", xref: repositoryXref });
+    }
+    return tabs;
   });
 
   private readonly reviewSuggestion = computed(() => {

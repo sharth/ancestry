@@ -1,8 +1,7 @@
 <dialog #editDialog (cancel)="onDialogCancel($event)">
   @defer (when editDialog.open) {
     <app-gedcom-editor
-      [type]="type()"
-      [xref]="xref()"
+      [tabs]="tabs()"
       [ancestryDatabase]="ancestryDatabase()"
       (finished)="editDialog.close()"
     />

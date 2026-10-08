@@ -11,8 +11,8 @@
           <button
             type="button"
             class="btn btn-sm text-start"
-            [class.btn-primary]="activeTab().xref === item.xref"
-            [class.btn-outline-secondary]="activeTab().xref !== item.xref"
+            [class.btn-primary]="activeTab()?.xref === item.xref"
+            [class.btn-outline-secondary]="activeTab()?.xref !== item.xref"
             (click)="openTab(item)"
           >
             <i class="bi me-1" [class]="tabIcon(item)"></i>
@@ -127,8 +127,8 @@
 
   @for (tabInformation of xrefsIncludedInView(); track tabInformation.xref) {
     @let isActive =
-      activeTab().type === tabInformation.type &&
-      activeTab().xref === tabInformation.xref;
+      activeTab()?.type === tabInformation.type &&
+      activeTab()?.xref === tabInformation.xref;
     <div [hidden]="!isActive">
       @switch (tabInformation.type) {
         @case ("INDI") {

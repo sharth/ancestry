@@ -24,7 +24,7 @@
 
   <app-gedcom-editor-dialog
     #editDialog
-    type="INDI"
+    [tabs]="[{ type: 'INDI', xref: '' }]"
     [ancestryDatabase]="ancestryDatabase()"
   />
 }

@@ -18,8 +18,7 @@
 
   <app-gedcom-editor-dialog
     #editDialog
-    type="REPO"
-    [xref]="xref()"
+    [tabs]="[{ type: 'REPO', xref: xref() }]"
     [ancestryDatabase]="ancestryDatabase()"
   />
 }
