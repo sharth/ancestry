@@ -10,11 +10,8 @@
       <th>Fix</th>
     </tr>
   </thead>
-  <tbody>
-    @for (
-      sourceScenario of sourceScenarios();
-      track sourceScenario.source.xref
-    ) {
+  @for (sourceScenario of sourceScenarios(); track sourceScenario.source.xref) {
+    <tbody>
       @for (error of sourceScenario.result.errors; track error) {
         <tr>
           <td>
@@ -29,8 +26,10 @@
           <td></td>
         </tr>
       }
-      @for (warning of sourceScenario.result.warnings; track warning) {
-        <tr>
+    </tbody>
+    @for (warning of sourceScenario.result.warnings; track warning) {
+      <tbody>
+        <tr [class.sticky-row]="warning.urlSuggestion !== undefined">
           <td>
             <a [routerLink]="['/source', sourceScenario.source.xref]">
               {{ sourceScenario.source.abbr || sourceScenario.source.xref }}
@@ -92,9 +91,9 @@
             </td>
           </tr>
         }
-      }
+      </tbody>
     }
-  </tbody>
+  }
 </table>
 
 <app-gedcom-editor-dialog
