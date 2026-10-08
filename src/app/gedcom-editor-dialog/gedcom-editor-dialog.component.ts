@@ -1,7 +1,6 @@
 import {
   ChangeDetectorRef,
   Component,
-  DestroyRef,
   inject,
   input,
   viewChild,
@@ -11,7 +10,6 @@ import {
 import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { GedcomEditorComponent } from "../gedcom-editor/gedcom-editor.component";
-import { UnsavedChangesTracker } from "../unsaved-changes.guard";
 
 @Component({
   selector: "app-gedcom-editor-dialog",
@@ -33,14 +31,6 @@ export class GedcomEditorDialogComponent {
   readonly editDialog =
     viewChild.required<ElementRef<HTMLDialogElement>>("editDialog");
   readonly gedcomEditor = viewChild(GedcomEditorComponent);
-
-  constructor() {
-    const tracker = inject(UnsavedChangesTracker);
-    tracker.register(this);
-    inject(DestroyRef).onDestroy(() => {
-      tracker.unregister(this);
-    });
-  }
 
   async showModal() {
     // Settings only ever requests read access; upgrade to write access now
