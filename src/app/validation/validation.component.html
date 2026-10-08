@@ -42,21 +42,31 @@
           <td>{{ warning.message }}</td>
           <td>
             @if (warning.urlSuggestion; as urlSuggestion) {
-              <button
-                type="button"
-                class="btn btn-sm btn-outline-primary"
-                (click)="
-                  review(sourceScenario.source.xref); editDialog.showModal()
-                "
-              >
-                {{
-                  urlSuggestion.matchedRepository
-                    ? "Link to " +
-                      (urlSuggestion.matchedRepository.name ||
-                        urlSuggestion.matchedRepository.xref)
-                    : "Create repository"
-                }}
-              </button>
+              <div class="btn-group">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-primary"
+                  (click)="
+                    review(sourceScenario.source.xref); editDialog.showModal()
+                  "
+                >
+                  Open editor with proposed changes:
+                  {{
+                    urlSuggestion.matchedRepository
+                      ? "Link to " +
+                        (urlSuggestion.matchedRepository.name ||
+                          urlSuggestion.matchedRepository.xref)
+                      : "Create repository"
+                  }}
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-success"
+                  (click)="submitProposed(sourceScenario.source.xref)"
+                >
+                  Submit changes as proposed
+                </button>
+              </div>
             }
           </td>
         </tr>

@@ -1,6 +1,14 @@
-import { Component, computed, input, signal, viewChild } from "@angular/core";
-import { RouterModule } from "@angular/router";
+import {
+  Component,
+  computed,
+  inject,
+  input,
+  signal,
+  viewChild,
+} from "@angular/core";
+import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 
+import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import type { GedcomRecord } from "../../gedcom/gedcomRecord";
 import { serializeGedcomRepository } from "../../gedcom/gedcomRepository";
@@ -25,6 +33,10 @@ import {
   styleUrl: "./validation.component.css",
 })
 export class ValidationComponent implements ComponentWithUnsavedChanges {
+  private readonly ancestryService = inject(AncestryService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+
   readonly ancestryDatabase = input.required<GedcomDatabase>();
 
   readonly editDialog = viewChild<GedcomEditorDialogComponent>("editDialog");
@@ -79,8 +91,11 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
     return tabs;
   });
 
-  private readonly reviewSuggestion = computed(() => {
-    const xref = this.reviewXref();
+  private readonly reviewSuggestion = computed(() =>
+    this.findSuggestion(this.reviewXref()),
+  );
+
+  private findSuggestion(xref: string | undefined) {
     if (xref === undefined) return undefined;
     for (const sourceScenario of this.sourceScenarios()) {
       if (sourceScenario.source.xref !== xref) continue;
@@ -94,10 +109,32 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
       }
     }
     return undefined;
-  });
+  }
 
   review(xref: string) {
     this.reviewXref.set(xref);
+  }
+
+  // Applies the suggested fix directly and saves it, without opening the
+  // editor dialog for further review.
+  async submitProposed(xref: string) {
+    const suggestion = this.findSuggestion(xref);
+    if (suggestion === undefined) return;
+
+    const granted = await this.ancestryService.requestWritePermission();
+    if (!granted) return;
+
+    const { database } = applyUrlSuggestion(
+      this.ancestryDatabase(),
+      suggestion.source,
+      suggestion.urlSuggestion,
+    );
+    await this.ancestryService.updateGedcomDatabase(database);
+    await this.router.navigate([], {
+      relativeTo: this.route,
+      onSameUrlNavigation: "reload",
+      skipLocationChange: true,
+    });
   }
 
   beforeSourceRecord(source: GedcomSource): GedcomRecord {
