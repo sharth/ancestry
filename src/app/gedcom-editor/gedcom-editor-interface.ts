@@ -1,5 +1,10 @@
 import { InjectionToken } from "@angular/core";
 
+export interface TabInformation {
+  type: "INDI" | "SOUR" | "FAM" | "REPO" | "OBJE" | "SUBM";
+  xref: string;
+}
+
 export interface GedcomEditorInterface {
   openNewIndividual(): string;
   openIndividual(xref: string): void;
