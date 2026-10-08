@@ -37,6 +37,10 @@ describe("ValidationComponent", () => {
     expect(component).toBeTruthy();
   });
 
+  it("hasUnsavedChanges delegates to the edit dialog", () => {
+    expect(component.hasUnsavedChanges()).toBe(false);
+  });
+
   it("lists a warning with a button to review the suggested fix", async () => {
     expect(await screen.findByText(/Create repository/)).toBeTruthy();
   });

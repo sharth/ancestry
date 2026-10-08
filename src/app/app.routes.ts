@@ -149,6 +149,7 @@ export const routes: Routes = [
     component: ValidationComponent,
     resolve: { ancestryDatabase: ancestryDatabaseResolver },
     runGuardsAndResolvers: "always",
+    canDeactivate: [confirmUnsavedChangesGuard],
   },
   { path: "**", component: PageNotFoundComponent },
 ];
