@@ -1,9 +1,10 @@
-import type { ComponentFixture } from "@angular/core/testing";
+import { TestBed, type ComponentFixture } from "@angular/core/testing";
 import { provideRouter } from "@angular/router";
 import { render } from "@testing-library/angular/zoneless";
 import { produce } from "immer";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { AncestryService } from "../../database/ancestry.service";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomDate } from "../../gedcom/gedcomDate";
 import { newGedcomFact } from "../../gedcom/gedcomFact";
@@ -17,6 +18,7 @@ import { GedcomEditorComponent } from "./gedcom-editor.component";
 describe("GedcomEditorComponent Integration", () => {
   let component: GedcomEditorComponent;
   let fixture: ComponentFixture<GedcomEditorComponent>;
+  let ancestryService: AncestryService;
 
   const initialDatabase = newGedcomDatabase({
     individuals: {
@@ -43,6 +45,7 @@ describe("GedcomEditorComponent Integration", () => {
 
     fixture = renderResult.fixture;
     component = fixture.componentInstance;
+    ancestryService = TestBed.inject(AncestryService);
 
     fixture.componentRef.setInput("type", "INDI");
     fixture.componentRef.setInput("ancestryDatabase", initialDatabase);
@@ -50,6 +53,23 @@ describe("GedcomEditorComponent Integration", () => {
 
   it("should create", () => {
     expect(component).toBeTruthy();
+  });
+
+  describe("hasUnsavedChanges tests", () => {
+    // AncestryService.compareGedcomDatabase() diffs against whatever GEDCOM
+    // file is currently loaded (nothing, in this test environment), so it's
+    // stubbed directly to control what differences() reports.
+    it("returns false when compareGedcomDatabase reports no differences", () => {
+      vi.spyOn(ancestryService, "compareGedcomDatabase").mockReturnValue([]);
+      expect(component.hasUnsavedChanges()).toBe(false);
+    });
+
+    it("returns true when compareGedcomDatabase reports a difference", () => {
+      vi.spyOn(ancestryService, "compareGedcomDatabase").mockReturnValue([
+        { originalGedcomRecord: undefined, updatedGedcomRecord: undefined },
+      ]);
+      expect(component.hasUnsavedChanges()).toBe(true);
+    });
   });
 
   describe("effectiveXref tests", () => {

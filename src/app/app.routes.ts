@@ -23,6 +23,7 @@ import { RepositoryComponent } from "./repository/repository.component";
 import { SettingsComponent } from "./settings/settings.component";
 import { SourceComponent } from "./source/source.component";
 import { SourcesComponent } from "./sources/sources.component";
+import { confirmUnsavedChangesGuard } from "./unsaved-changes.guard";
 import { ValidationComponent } from "./validation/validation.component";
 
 export const routes: Routes = [
@@ -41,12 +42,14 @@ export const routes: Routes = [
     component: IndividualsComponent,
     resolve: { ancestryDatabase: ancestryDatabaseResolver },
     runGuardsAndResolvers: "always",
+    canDeactivate: [confirmUnsavedChangesGuard],
   },
   {
     path: "individual/:xref",
     component: IndividualComponent,
     resolve: { ancestryDatabase: ancestryDatabaseResolver },
     runGuardsAndResolvers: "always",
+    canDeactivate: [confirmUnsavedChangesGuard],
     children: [
       { path: "", redirectTo: "facts", pathMatch: "full" },
       { path: "facts", component: IndividualFactsComponent },
@@ -78,24 +81,28 @@ export const routes: Routes = [
     component: RepositoriesComponent,
     resolve: { ancestryDatabase: ancestryDatabaseResolver },
     runGuardsAndResolvers: "always",
+    canDeactivate: [confirmUnsavedChangesGuard],
   },
   {
     path: "repository/:xref",
     component: RepositoryComponent,
     resolve: { ancestryDatabase: ancestryDatabaseResolver },
     runGuardsAndResolvers: "always",
+    canDeactivate: [confirmUnsavedChangesGuard],
   },
   {
     path: "sources",
     component: SourcesComponent,
     resolve: { ancestryDatabase: ancestryDatabaseResolver },
     runGuardsAndResolvers: "always",
+    canDeactivate: [confirmUnsavedChangesGuard],
   },
   {
     path: "source/:xref",
     component: SourceComponent,
     resolve: { ancestryDatabase: ancestryDatabaseResolver },
     runGuardsAndResolvers: "always",
+    canDeactivate: [confirmUnsavedChangesGuard],
   },
   {
     path: "places",
@@ -128,18 +135,21 @@ export const routes: Routes = [
     component: MultimediasComponent,
     resolve: { ancestryDatabase: ancestryDatabaseResolver },
     runGuardsAndResolvers: "always",
+    canDeactivate: [confirmUnsavedChangesGuard],
   },
   {
     path: "multimedia/:xref",
     component: MultimediaComponent,
     resolve: { ancestryDatabase: ancestryDatabaseResolver },
     runGuardsAndResolvers: "always",
+    canDeactivate: [confirmUnsavedChangesGuard],
   },
   {
     path: "validation",
     component: ValidationComponent,
     resolve: { ancestryDatabase: ancestryDatabaseResolver },
     runGuardsAndResolvers: "always",
+    canDeactivate: [confirmUnsavedChangesGuard],
   },
   { path: "**", component: PageNotFoundComponent },
 ];

@@ -1,4 +1,4 @@
-import { Component, computed, input, signal } from "@angular/core";
+import { Component, computed, input, signal, viewChild } from "@angular/core";
 import { RouterModule } from "@angular/router";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
@@ -10,6 +10,7 @@ import {
 } from "../../gedcom/gedcomSource";
 import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
 import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
+import type { ComponentWithUnsavedChanges } from "../unsaved-changes.guard";
 import { applyUrlSuggestion } from "./apply-url-suggestion.util";
 import {
   sourceValidators,
@@ -22,8 +23,14 @@ import {
   templateUrl: "./validation.component.html",
   styleUrl: "./validation.component.css",
 })
-export class ValidationComponent {
+export class ValidationComponent implements ComponentWithUnsavedChanges {
   readonly ancestryDatabase = input.required<GedcomDatabase>();
+
+  readonly editDialog = viewChild<GedcomEditorDialogComponent>("editDialog");
+
+  hasUnsavedChanges(): boolean {
+    return this.editDialog()?.hasUnsavedChanges() ?? false;
+  }
 
   readonly sourceScenarios = computed(() =>
     Object.values(this.ancestryDatabase().sources).map((source) => ({
