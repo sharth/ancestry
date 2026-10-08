@@ -1,42 +1,94 @@
-<!-- <h1>Validation</h1>
-<table>
-    <thead>
+<h1>Validation</h1>
+<table class="table table-striped align-middle">
+  <thead>
+    <tr>
+      <th>Source</th>
+      <th>Severity</th>
+      <th>Field</th>
+      <th>Group</th>
+      <th>Message</th>
+      <th>Fix</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (
+      sourceScenario of sourceScenarios();
+      track sourceScenario.source.xref
+    ) {
+      @for (error of sourceScenario.result.errors; track error) {
         <tr>
-            <th>Source</th>
-            <th>Severity</th>
-            <th>Field</th>
-            <th>Group</th>
-            <th>Message</th>
+          <td>
+            <a [routerLink]="['/source', sourceScenario.source.xref]">
+              {{ sourceScenario.source.abbr || sourceScenario.source.xref }}
+            </a>
+          </td>
+          <td>Error</td>
+          <td>{{ error.fieldName }}</td>
+          <td>{{ error.groupName }}</td>
+          <td>{{ error.message }}</td>
+          <td></td>
         </tr>
-    </thead>
-    <tbody>
-        @for (sourceScenario of sourceScenarios(); track sourceScenario) {
-        @for (error of sourceScenario.result.errors; track error) {
+      }
+      @for (warning of sourceScenario.result.warnings; track warning) {
         <tr>
-            <td>
-                <a [routerLink]="['/source', sourceScenario.source.xref]">
-                    {{ sourceScenario.source.abbr ?? sourceScenario.source.xref }}
-                </a>
+          <td>
+            <a [routerLink]="['/source', sourceScenario.source.xref]">
+              {{ sourceScenario.source.abbr || sourceScenario.source.xref }}
+            </a>
+          </td>
+          <td>Warning</td>
+          <td>{{ warning.fieldName }}</td>
+          <td>{{ warning.groupName }}</td>
+          <td>{{ warning.message }}</td>
+          <td>
+            @if (warning.urlSuggestion; as urlSuggestion) {
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-primary"
+                (click)="
+                  review(sourceScenario.source.xref); editDialog.showModal()
+                "
+              >
+                {{
+                  urlSuggestion.matchedRepository
+                    ? "Link to " +
+                      (urlSuggestion.matchedRepository.name ||
+                        urlSuggestion.matchedRepository.xref)
+                    : "Create repository"
+                }}
+              </button>
+            }
+          </td>
+        </tr>
+        @if (warning.urlSuggestion; as urlSuggestion) {
+          <tr>
+            <td></td>
+            <td colspan="5">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="text-muted small">Before</div>
+                  <pre class="small bg-light border rounded p-2 mb-0">{{
+                    beforeGedcomText(sourceScenario.source)
+                  }}</pre>
+                </div>
+                <div class="col-md-6">
+                  <div class="text-muted small">Proposed after</div>
+                  <pre class="small bg-light border rounded p-2 mb-0">{{
+                    afterGedcomText(sourceScenario.source, urlSuggestion)
+                  }}</pre>
+                </div>
+              </div>
             </td>
-            <td>Error</td>
-            <td>{{ error.fieldName }}</td>
-            <td>{{ error.groupName }}</td>
-            <td>{{ error.message }}</td>
-        </tr>
+          </tr>
         }
-        @for (warning of sourceScenario.result.warnings; track warning) {
-        <tr>
-            <td>
-                <a [routerLink]="['/source', sourceScenario.source.xref]">
-                    {{ sourceScenario.source.abbr ?? sourceScenario.source.xref }}
-                </a>
-            </td>
-            <td>Warning</td>
-            <td>{{ warning.fieldName }}</td>
-            <td>{{ warning.groupName }}</td>
-            <td>{{ warning.message }}</td>
-        </tr>
-        }
-        }
-    </tbody>
-</table> -->
+      }
+    }
+  </tbody>
+</table>
+
+<app-gedcom-editor-dialog
+  #editDialog
+  type="SOUR"
+  [xref]="reviewXref()"
+  [ancestryDatabase]="reviewDatabase()"
+/>

@@ -135,6 +135,11 @@ export const routes: Routes = [
     resolve: { ancestryDatabase: ancestryDatabaseResolver },
     runGuardsAndResolvers: "always",
   },
-  { path: "validation", component: ValidationComponent },
+  {
+    path: "validation",
+    component: ValidationComponent,
+    resolve: { ancestryDatabase: ancestryDatabaseResolver },
+    runGuardsAndResolvers: "always",
+  },
   { path: "**", component: PageNotFoundComponent },
 ];
