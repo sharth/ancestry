@@ -16,10 +16,32 @@ describe("sourceValidators", () => {
     expect(result.errors).toEqual([]);
     expect(result.warnings).toHaveLength(1);
     expect(result.warnings[0]?.urlSuggestion).toEqual({
+      fieldName: "text",
       url: "https://example.com/record",
       suggestedName: "example",
       matchedRepository: undefined,
     });
+  });
+
+  it("warns when a source's abbreviation or title contains a URL", () => {
+    const source = newGedcomSource({
+      xref: "S1",
+      abbr: "https://www.ancestry.com/abbr",
+      title: "Census https://www.ancestry.com/title",
+    });
+    const result = sourceValidators(source, newGedcomDatabase());
+
+    expect(result.warnings).toHaveLength(2);
+    expect(result.warnings.map((warning) => warning.fieldName)).toEqual([
+      "abbr",
+      "title",
+    ]);
+    expect(result.warnings[0]?.urlSuggestion?.url).toBe(
+      "https://www.ancestry.com/abbr",
+    );
+    expect(result.warnings[1]?.urlSuggestion?.url).toBe(
+      "https://www.ancestry.com/title",
+    );
   });
 
   it("suggests the matching repository when its name overlaps the domain", () => {
@@ -40,8 +62,13 @@ describe("sourceValidators", () => {
     );
   });
 
-  it("has no findings when the text has no URL", () => {
-    const source = newGedcomSource({ xref: "S1", text: "No link here" });
+  it("has no findings when nothing contains a URL", () => {
+    const source = newGedcomSource({
+      xref: "S1",
+      abbr: "No link",
+      title: "No link",
+      text: "No link here",
+    });
     const result = sourceValidators(source, newGedcomDatabase());
 
     expect(result.errors).toEqual([]);
