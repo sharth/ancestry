@@ -64,20 +64,21 @@
           <tr>
             <td></td>
             <td colspan="5">
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="text-muted small">Before</div>
-                  <pre class="small bg-light border rounded p-2 mb-0">{{
-                    beforeGedcomText(sourceScenario.source)
-                  }}</pre>
-                </div>
-                <div class="col-md-6">
-                  <div class="text-muted small">Proposed after</div>
-                  <pre class="small bg-light border rounded p-2 mb-0">{{
-                    afterGedcomText(sourceScenario.source, urlSuggestion)
-                  }}</pre>
-                </div>
-              </div>
+              <app-gedcom-diff
+                [oldGedcomRecord]="beforeSourceRecord(sourceScenario.source)"
+                [newGedcomRecord]="
+                  afterSourceRecord(sourceScenario.source, urlSuggestion)
+                "
+              />
+              @if (
+                afterRepositoryRecord(sourceScenario.source, urlSuggestion);
+                as newRepositoryRecord
+              ) {
+                <app-gedcom-diff
+                  [oldGedcomRecord]="undefined"
+                  [newGedcomRecord]="newRepositoryRecord"
+                />
+              }
             </td>
           </tr>
         }
