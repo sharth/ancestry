@@ -7,6 +7,6 @@
   display: none;
 }
 
-.working-set-tabs {
+.working-set-tabs .tab-list {
   overflow-x: auto;
 }
