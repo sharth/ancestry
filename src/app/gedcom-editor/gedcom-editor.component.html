@@ -2,7 +2,10 @@
   <div
     class="working-set-tabs d-flex flex-wrap align-items-center justify-content-between gap-2 border-bottom pb-2"
   >
-    <div class="d-flex flex-wrap gap-1 align-items-center" role="tablist">
+    <div
+      class="tab-list d-flex flex-wrap gap-1 align-items-center"
+      role="tablist"
+    >
       @for (item of xrefsIncludedInView(); track item.xref) {
         <div class="btn-group" role="group">
           <button
