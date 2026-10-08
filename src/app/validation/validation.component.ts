@@ -52,12 +52,17 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
     })),
   );
 
-  // The source currently being reviewed in the GEDCOM editor dialog, if any.
-  readonly reviewXref = signal<string | undefined>(undefined);
+  // The source and specific URL suggestion currently being reviewed in the
+  // GEDCOM editor dialog, if any -- a source can have more than one
+  // suggestion (e.g. multiple URLs in its text), so the source's xref alone
+  // isn't enough to identify which one is being fixed.
+  readonly reviewSuggestion = signal<
+    { source: GedcomSource; urlSuggestion: UrlRepositorySuggestion } | undefined
+  >(undefined);
 
   // The database to hand the editor dialog: the suggested fix for
-  // `reviewXref`'s source pre-applied, so the dialog opens already showing
-  // it -- the user can then review it (alongside the editor's own
+  // `reviewSuggestion`'s source pre-applied, so the dialog opens already
+  // showing it -- the user can then review it (alongside the editor's own
   // before/after diff) and keep editing before saving, or cancel.
   readonly reviewDatabase = computed<GedcomDatabase>(() => {
     const suggestion = this.reviewSuggestion();
@@ -91,43 +96,23 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
     return tabs;
   });
 
-  private readonly reviewSuggestion = computed(() =>
-    this.findSuggestion(this.reviewXref()),
-  );
-
-  private findSuggestion(xref: string | undefined) {
-    if (xref === undefined) return undefined;
-    for (const sourceScenario of this.sourceScenarios()) {
-      if (sourceScenario.source.xref !== xref) continue;
-      for (const warning of sourceScenario.result.warnings) {
-        if (warning.urlSuggestion !== undefined) {
-          return {
-            source: sourceScenario.source,
-            urlSuggestion: warning.urlSuggestion,
-          };
-        }
-      }
-    }
-    return undefined;
-  }
-
-  review(xref: string) {
-    this.reviewXref.set(xref);
+  review(source: GedcomSource, urlSuggestion: UrlRepositorySuggestion) {
+    this.reviewSuggestion.set({ source, urlSuggestion });
   }
 
   // Applies the suggested fix directly and saves it, without opening the
   // editor dialog for further review.
-  async submitProposed(xref: string) {
-    const suggestion = this.findSuggestion(xref);
-    if (suggestion === undefined) return;
-
+  async submitProposed(
+    source: GedcomSource,
+    urlSuggestion: UrlRepositorySuggestion,
+  ) {
     const granted = await this.ancestryService.requestWritePermission();
     if (!granted) return;
 
     const { database } = applyUrlSuggestion(
       this.ancestryDatabase(),
-      suggestion.source,
-      suggestion.urlSuggestion,
+      source,
+      urlSuggestion,
     );
     await this.ancestryService.updateGedcomDatabase(database);
     await this.router.navigate([], {

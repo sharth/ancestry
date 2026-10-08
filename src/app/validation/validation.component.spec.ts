@@ -7,6 +7,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AncestryService } from "../../database/ancestry.service";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomSource } from "../../gedcom/gedcomSource";
+import type { UrlRepositorySuggestion } from "./source-validators";
 import { ValidationComponent } from "./validation.component";
 
 describe("ValidationComponent", () => {
@@ -14,15 +15,21 @@ describe("ValidationComponent", () => {
   let fixture: ComponentFixture<ValidationComponent>;
   let ancestryService: AncestryService;
 
+  const source = newGedcomSource({
+    xref: "S1",
+    text: "Found at https://example.com/record",
+  });
+  const urlSuggestion: UrlRepositorySuggestion = {
+    fieldName: "text",
+    url: "https://example.com/record",
+    suggestedName: "example",
+    matchedRepository: undefined,
+  };
+
   beforeEach(async () => {
     const ancestryDatabase = signal(
       newGedcomDatabase({
-        sources: {
-          S1: newGedcomSource({
-            xref: "S1",
-            text: "Found at https://example.com/record",
-          }),
-        },
+        sources: { [source.xref]: source },
       }),
     );
 
@@ -66,7 +73,7 @@ describe("ValidationComponent", () => {
       .spyOn(ancestryService, "updateGedcomDatabase")
       .mockResolvedValue(undefined);
 
-    await component.submitProposed("S1");
+    await component.submitProposed(source, urlSuggestion);
 
     expect(updateGedcomDatabaseSpy).toHaveBeenCalledTimes(1);
     const savedDatabase = updateGedcomDatabaseSpy.mock.calls[0]?.[0];
@@ -82,7 +89,7 @@ describe("ValidationComponent", () => {
       "updateGedcomDatabase",
     );
 
-    await component.submitProposed("S1");
+    await component.submitProposed(source, urlSuggestion);
 
     expect(updateGedcomDatabaseSpy).not.toHaveBeenCalled();
   });

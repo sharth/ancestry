@@ -2,26 +2,34 @@ import { describe, expect, it } from "vitest";
 
 import { newGedcomRepository } from "../../gedcom/gedcomRepository";
 import {
-  extractUrl,
+  extractUrls,
   findMatchingRepository,
   urlDomainLabel,
 } from "./source-url.util";
 
-describe("extractUrl", () => {
+describe("extractUrls", () => {
   it("finds a URL embedded in surrounding text", () => {
-    expect(extractUrl("Available at https://example.com/foo see also")).toBe(
-      "https://example.com/foo",
-    );
+    expect(
+      extractUrls("Available at https://example.com/foo see also"),
+    ).toEqual(["https://example.com/foo"]);
   });
 
-  it("returns undefined when there is no URL", () => {
-    expect(extractUrl("just some plain text")).toBeUndefined();
+  it("returns an empty array when there is no URL", () => {
+    expect(extractUrls("just some plain text")).toEqual([]);
   });
 
   it("stops at trailing punctuation and quotes", () => {
-    expect(extractUrl('see "https://example.com/foo".')).toBe(
+    expect(extractUrls('see "https://example.com/foo".')).toEqual([
       "https://example.com/foo",
-    );
+    ]);
+  });
+
+  it("finds every URL when the text has more than one", () => {
+    expect(
+      extractUrls(
+        "See https://example.com/foo and also https://example.org/bar",
+      ),
+    ).toEqual(["https://example.com/foo", "https://example.org/bar"]);
   });
 });
 

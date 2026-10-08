@@ -44,6 +44,19 @@ describe("sourceValidators", () => {
     );
   });
 
+  it("warns separately for each URL when a field has more than one", () => {
+    const source = newGedcomSource({
+      xref: "S1",
+      text: "See https://example.com/foo and https://example.org/bar",
+    });
+    const result = sourceValidators(source, newGedcomDatabase());
+
+    expect(result.warnings).toHaveLength(2);
+    expect(
+      result.warnings.map((warning) => warning.urlSuggestion?.url),
+    ).toEqual(["https://example.com/foo", "https://example.org/bar"]);
+  });
+
   it("suggests the matching repository when its name overlaps the domain", () => {
     const repository = newGedcomRepository({
       xref: "R1",

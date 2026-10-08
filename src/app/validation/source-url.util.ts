@@ -1,10 +1,11 @@
 import type { GedcomRepository } from "../../gedcom/gedcomRepository";
 
-const URL_PATTERN = /\bhttps?:\/\/[^\s<>"')\]]+/i;
+const URL_PATTERN = /\bhttps?:\/\/[^\s<>"')\]]+/gi;
 
-/** The first http(s) URL found in `text`, or undefined if there isn't one. */
-export function extractUrl(text: string): string | undefined {
-  return URL_PATTERN.exec(text)?.[0];
+/** Every http(s) URL found in `text`, in order, or an empty array if there
+ * isn't one. */
+export function extractUrls(text: string): string[] {
+  return [...text.matchAll(URL_PATTERN)].map((match) => match[0]);
 }
 
 /** The registrable domain label of a URL, e.g. "familysearch" for

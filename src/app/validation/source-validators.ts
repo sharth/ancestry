@@ -2,7 +2,7 @@ import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import type { GedcomRepository } from "../../gedcom/gedcomRepository";
 import type { GedcomSource } from "../../gedcom/gedcomSource";
 import {
-  extractUrl,
+  extractUrls,
   findMatchingRepository,
   urlDomainLabel,
 } from "./source-url.util";
@@ -51,24 +51,23 @@ export function sourceValidators(
   const warnings: ValidationFinding[] = [];
 
   for (const fieldName of URL_SEARCH_FIELDS) {
-    const url = extractUrl(source[fieldName]);
-    if (url === undefined) continue;
-
-    const matchedRepository = findMatchingRepository(
-      url,
-      database.repositories,
-    );
-    const suggestedName = urlDomainLabel(url) ?? url;
-    const fieldLabel = FIELD_LABELS[fieldName];
-    warnings.push({
-      fieldName,
-      groupName: "Repository",
-      message:
-        matchedRepository !== undefined
-          ? `${fieldLabel} contains a URL (${url}) that looks like it belongs to the "${matchedRepository.name || matchedRepository.xref}" repository.`
-          : `${fieldLabel} contains a URL (${url}) that could become a repository.`,
-      urlSuggestion: { fieldName, url, suggestedName, matchedRepository },
-    });
+    for (const url of extractUrls(source[fieldName])) {
+      const matchedRepository = findMatchingRepository(
+        url,
+        database.repositories,
+      );
+      const suggestedName = urlDomainLabel(url) ?? url;
+      const fieldLabel = FIELD_LABELS[fieldName];
+      warnings.push({
+        fieldName,
+        groupName: "Repository",
+        message:
+          matchedRepository !== undefined
+            ? `${fieldLabel} contains a URL (${url}) that looks like it belongs to the "${matchedRepository.name || matchedRepository.xref}" repository.`
+            : `${fieldLabel} contains a URL (${url}) that could become a repository.`,
+        urlSuggestion: { fieldName, url, suggestedName, matchedRepository },
+      });
+    }
   }
 
   return { errors: [], warnings };

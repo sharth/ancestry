@@ -47,7 +47,8 @@
                   type="button"
                   class="btn btn-sm btn-outline-primary"
                   (click)="
-                    review(sourceScenario.source.xref); editDialog.showModal()
+                    review(sourceScenario.source, urlSuggestion);
+                    editDialog.showModal()
                   "
                 >
                   Open editor with proposed changes:
@@ -62,7 +63,7 @@
                 <button
                   type="button"
                   class="btn btn-sm btn-outline-success"
-                  (click)="submitProposed(sourceScenario.source.xref)"
+                  (click)="submitProposed(sourceScenario.source, urlSuggestion)"
                 >
                   Submit changes as proposed
                 </button>
