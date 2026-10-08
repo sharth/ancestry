@@ -21,6 +21,7 @@ describe("applyUrlSuggestion", () => {
     });
 
     const result = applyUrlSuggestion(database, source, {
+      fieldName: "text",
       url: "https://www.familysearch.org/record",
       suggestedName: "familysearch",
       matchedRepository: repository,
@@ -39,6 +40,26 @@ describe("applyUrlSuggestion", () => {
     expect(Object.keys(result.database.repositories)).toEqual(["@R1@"]);
   });
 
+  it("strips the URL from the field the suggestion names, e.g. abbr", () => {
+    const source = newGedcomSource({
+      xref: "@S1@",
+      abbr: "https://example.com/abbr",
+      title: "Some Title",
+    });
+    const database = newGedcomDatabase({ sources: { [source.xref]: source } });
+
+    const result = applyUrlSuggestion(database, source, {
+      fieldName: "abbr",
+      url: "https://example.com/abbr",
+      suggestedName: "example",
+      matchedRepository: undefined,
+    });
+
+    const updatedSource = result.database.sources[source.xref];
+    expect(updatedSource?.abbr).toBe("");
+    expect(updatedSource?.title).toBe("Some Title");
+  });
+
   it("creates a new repository when nothing matched", () => {
     const source = newGedcomSource({
       xref: "@S1@",
@@ -47,6 +68,7 @@ describe("applyUrlSuggestion", () => {
     const database = newGedcomDatabase({ sources: { [source.xref]: source } });
 
     const result = applyUrlSuggestion(database, source, {
+      fieldName: "text",
       url: "https://example.com/record",
       suggestedName: "example",
       matchedRepository: undefined,
@@ -74,6 +96,7 @@ describe("applyUrlSuggestion", () => {
     });
 
     applyUrlSuggestion(database, source, {
+      fieldName: "text",
       url: "https://example.com",
       suggestedName: "example",
       matchedRepository: repository,

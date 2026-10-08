@@ -14,12 +14,12 @@ export interface ApplyUrlSuggestionResult {
   repositoryXref: string;
 }
 
-/** Applies a suggested fix for a URL found in a source's text: links the
- * source to the matched repository (or a newly created one), carrying the
- * URL over as that link's call number, and removes the URL from the
- * source's text. Pure -- doesn't mutate `database`, so it's safe to use
- * both for a preview and as the database handed to the GEDCOM editor for
- * further review before saving. */
+/** Applies a suggested fix for a URL found in one of a source's fields:
+ * links the source to the matched repository (or a newly created one),
+ * carrying the URL over as that link's call number, and removes the URL
+ * from whichever field it was found in. Pure -- doesn't mutate `database`,
+ * so it's safe to use both for a preview and as the database handed to the
+ * GEDCOM editor for further review before saving. */
 export function applyUrlSuggestion(
   database: GedcomDatabase,
   source: GedcomSource,
@@ -49,7 +49,9 @@ export function applyUrlSuggestion(
     } else {
       existingLink.callNumber ||= suggestion.url;
     }
-    draftSource.text = draftSource.text.replace(suggestion.url, "").trim();
+    draftSource[suggestion.fieldName] = draftSource[suggestion.fieldName]
+      .replace(suggestion.url, "")
+      .trim();
   });
 
   return { database: updatedDatabase, repositoryXref };
