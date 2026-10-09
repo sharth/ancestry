@@ -124,6 +124,45 @@ describe("sourceValidators", () => {
     expect(result.warnings).toEqual([]);
   });
 
+  it("warns when a source has two repository citations for the same repository", () => {
+    const repository = newGedcomRepository({ xref: "R1", name: "Example" });
+    const source = newGedcomSource({
+      xref: "S1",
+      repositoryLinks: [
+        newGedcomRepositoryLink({
+          repositoryXref: "R1",
+          callNumbers: ["one"],
+        }),
+        newGedcomRepositoryLink({
+          repositoryXref: "R1",
+          callNumbers: ["two"],
+        }),
+      ],
+    });
+    const database = newGedcomDatabase({ repositories: { R1: repository } });
+
+    const result = sourceValidators(source, database);
+
+    expect(result.warnings).toHaveLength(1);
+    expect(result.warnings[0]?.mergeRepositoryLinksSuggestion).toEqual({
+      repositoryXref: "R1",
+    });
+    expect(result.warnings[0]?.message).toContain("Example");
+  });
+
+  it("doesn't warn when a source has only one citation per repository", () => {
+    const source = newGedcomSource({
+      xref: "S1",
+      repositoryLinks: [
+        newGedcomRepositoryLink({ repositoryXref: "R1", callNumbers: [] }),
+        newGedcomRepositoryLink({ repositoryXref: "R2", callNumbers: [] }),
+      ],
+    });
+    const result = sourceValidators(source, newGedcomDatabase());
+
+    expect(result.warnings).toEqual([]);
+  });
+
   it("has no findings when nothing contains a URL", () => {
     const source = newGedcomSource({
       xref: "S1",
