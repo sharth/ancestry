@@ -4,14 +4,14 @@ import { render } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
-import { InputRepositoryCallNumberComponent } from "./input-repository-call-number.component";
+import { InputRepositoryCallNumbersComponent } from "./input-repository-call-numbers.component";
 
-describe("InputRepositoryCallNumberComponent", () => {
-  let fixture: ComponentFixture<InputRepositoryCallNumberComponent>;
-  let component: InputRepositoryCallNumberComponent;
+describe("InputRepositoryCallNumbersComponent", () => {
+  let fixture: ComponentFixture<InputRepositoryCallNumbersComponent>;
+  let component: InputRepositoryCallNumbersComponent;
 
   beforeEach(async () => {
-    const renderResult = await render(InputRepositoryCallNumberComponent, {
+    const renderResult = await render(InputRepositoryCallNumbersComponent, {
       bindings: [inputBinding("workingDatabase", signal(newGedcomDatabase()))],
       waitForStableOnRender: true,
     });
@@ -22,5 +22,15 @@ describe("InputRepositoryCallNumberComponent", () => {
 
   it("should create", () => {
     expect(component).toBeTruthy();
+  });
+
+  it("appends and removes call numbers", () => {
+    expect(component.value()).toEqual([]);
+
+    component.appendCallNumber();
+    expect(component.value()).toEqual([""]);
+
+    component.removeCallNumber(0);
+    expect(component.value()).toEqual([]);
   });
 });

@@ -3,7 +3,7 @@
     <thead>
       <tr>
         <th scope="col">Repository</th>
-        <th scope="col">Call Number</th>
+        <th scope="col">Call Numbers</th>
       </tr>
     </thead>
     <tbody>
@@ -15,7 +15,11 @@
               {{ repository?.name ?? citation.repositoryXref }}
             </a>
           </td>
-          <td>{{ citation.callNumber }}</td>
+          <td>
+            @for (callNumber of citation.callNumbers; track callNumber) {
+              <div>{{ callNumber }}</div>
+            }
+          </td>
         </tr>
       }
     </tbody>

@@ -33,7 +33,7 @@ export class RepositorySourcesComponent {
         .map(({ source, repositoryLink }) => ({
           xref: source.xref,
           abbr: source.abbr,
-          callNumber: repositoryLink.callNumber,
+          callNumbers: repositoryLink.callNumbers,
         })),
     };
   });

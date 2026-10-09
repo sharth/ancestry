@@ -36,26 +36,22 @@ export function applyUrlSuggestion(
 
     const draftSource = draft.sources[source.xref];
     if (draftSource === undefined) return;
-    // Reuse an existing link to the same repository only when it doesn't
-    // already carry a different call number -- otherwise the source cites
-    // the same repository twice for two different items (e.g. two scanned
-    // pages of the same record, each with its own URL), so this URL gets
-    // its own link rather than silently overwriting or discarding either
-    // one.
+    // Reuse an existing link to the same repository -- a repository citation
+    // can carry any number of call numbers, so a second URL to a repository
+    // the source already links to is added as another call number on that
+    // same link rather than as a second link.
     const existingLink = draftSource.repositoryLinks.find(
-      (link) =>
-        link.repositoryXref === repositoryXref &&
-        (link.callNumber === "" || link.callNumber === suggestion.url),
+      (link) => link.repositoryXref === repositoryXref,
     );
     if (existingLink === undefined) {
       draftSource.repositoryLinks.push(
         newGedcomRepositoryLink({
           repositoryXref,
-          callNumber: suggestion.url,
+          callNumbers: [suggestion.url],
         }),
       );
-    } else {
-      existingLink.callNumber ||= suggestion.url;
+    } else if (!existingLink.callNumbers.includes(suggestion.url)) {
+      existingLink.callNumbers.push(suggestion.url);
     }
     // Only strip the URL out of the field when it occupied a line by
     // itself -- removing it from the middle of a larger block of text

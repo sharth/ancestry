@@ -20,7 +20,7 @@ import {
   type GedcomRepositoryLink,
 } from "../../gedcom/gedcomRepositoryLink";
 import { GEDCOM_EDITOR } from "./gedcom-editor-interface";
-import { InputRepositoryCallNumberComponent } from "./input-repository-call-number.component";
+import { InputRepositoryCallNumbersComponent } from "./input-repository-call-numbers.component";
 import { InputRepositoryXrefComponent } from "./input-repository-xref.component";
 
 @Component({
@@ -30,7 +30,7 @@ import { InputRepositoryXrefComponent } from "./input-repository-xref.component"
   imports: [
     FormField,
     RouterModule,
-    InputRepositoryCallNumberComponent,
+    InputRepositoryCallNumbersComponent,
     InputRepositoryXrefComponent,
   ],
 })
