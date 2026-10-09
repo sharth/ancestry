@@ -65,52 +65,72 @@ export function newGedcomDatabase(
   };
 }
 
+// Wraps a per-record parse failure with which GEDCOM record it happened on
+// (tag + xref, e.g. "INDI @I166@"), since the individual gedcomXxx.ts
+// parsers mostly throw bare, message-less errors and there's no other way
+// for a user-facing error (see AncestryService.ancestryDatabaseError) to
+// say where in the file the problem is.
+function describeParseError(gedcomRecord: GedcomRecord, cause: unknown): Error {
+  const reason =
+    cause instanceof Error && cause.message
+      ? cause.message
+      : "malformed record";
+  const identifier = gedcomRecord.xref
+    ? `${gedcomRecord.tag} ${gedcomRecord.xref}`
+    : gedcomRecord.tag;
+  return new Error(`Failed to parse ${identifier}: ${reason}`, { cause });
+}
+
 export function parseGedcomDatabase(gedcomRecords: GedcomRecord[]) {
   const gedcomDatabase = newGedcomDatabase();
   const headers: GedcomHeader[] = [];
   const trailers: GedcomTrailer[] = [];
 
   for (const gedcomRecord of gedcomRecords) {
-    switch (gedcomRecord.tag) {
-      case "HEAD":
-        headers.push(parseGedcomHeader(gedcomRecord));
-        break;
-      case "TRLR":
-        trailers.push(parseGedcomTrailer(gedcomRecord));
-        break;
-      case "SUBM": {
-        const submitter = parseGedcomSubmitter(gedcomRecord);
-        gedcomDatabase.submitters[submitter.xref] = submitter;
-        break;
+    try {
+      switch (gedcomRecord.tag) {
+        case "HEAD":
+          headers.push(parseGedcomHeader(gedcomRecord));
+          break;
+        case "TRLR":
+          trailers.push(parseGedcomTrailer(gedcomRecord));
+          break;
+        case "SUBM": {
+          const submitter = parseGedcomSubmitter(gedcomRecord);
+          gedcomDatabase.submitters[submitter.xref] = submitter;
+          break;
+        }
+        case "INDI": {
+          const individual = parseGedcomIndividual(gedcomRecord);
+          gedcomDatabase.individuals[individual.xref] = individual;
+          break;
+        }
+        case "FAM": {
+          const family = parseGedcomFamily(gedcomRecord);
+          gedcomDatabase.families[family.xref] = family;
+          break;
+        }
+        case "REPO": {
+          const repository = parseGedcomRepository(gedcomRecord);
+          gedcomDatabase.repositories[repository.xref] = repository;
+          break;
+        }
+        case "SOUR": {
+          const source = parseGedcomSource(gedcomRecord);
+          gedcomDatabase.sources[source.xref] = source;
+          break;
+        }
+        case "OBJE": {
+          const multimedia = parseGedcomMultimedia(gedcomRecord);
+          gedcomDatabase.multimedias[multimedia.xref] = multimedia;
+          break;
+        }
+        default:
+          reportUnparsedRecord(gedcomRecord);
+          break;
       }
-      case "INDI": {
-        const individual = parseGedcomIndividual(gedcomRecord);
-        gedcomDatabase.individuals[individual.xref] = individual;
-        break;
-      }
-      case "FAM": {
-        const family = parseGedcomFamily(gedcomRecord);
-        gedcomDatabase.families[family.xref] = family;
-        break;
-      }
-      case "REPO": {
-        const repository = parseGedcomRepository(gedcomRecord);
-        gedcomDatabase.repositories[repository.xref] = repository;
-        break;
-      }
-      case "SOUR": {
-        const source = parseGedcomSource(gedcomRecord);
-        gedcomDatabase.sources[source.xref] = source;
-        break;
-      }
-      case "OBJE": {
-        const multimedia = parseGedcomMultimedia(gedcomRecord);
-        gedcomDatabase.multimedias[multimedia.xref] = multimedia;
-        break;
-      }
-      default:
-        reportUnparsedRecord(gedcomRecord);
-        break;
+    } catch (cause) {
+      throw describeParseError(gedcomRecord, cause);
     }
   }
 
@@ -119,18 +139,36 @@ export function parseGedcomDatabase(gedcomRecords: GedcomRecord[]) {
   for (const family of Object.values(gedcomDatabase.families)) {
     if (family.husbandXref) {
       const husband = gedcomDatabase.individuals[family.husbandXref];
-      if (!husband) throw new Error();
-      if (!husband.parentOfFamilyXrefs.includes(family.xref)) throw new Error();
+      if (!husband)
+        throw new Error(
+          `FAM ${family.xref} has HUSB ${family.husbandXref}, but no such individual exists`,
+        );
+      if (!husband.parentOfFamilyXrefs.includes(family.xref))
+        throw new Error(
+          `FAM ${family.xref} has HUSB ${family.husbandXref}, but that individual has no matching FAMS`,
+        );
     }
     if (family.wifeXref) {
       const wife = gedcomDatabase.individuals[family.wifeXref];
-      if (!wife) throw new Error();
-      if (!wife.parentOfFamilyXrefs.includes(family.xref)) throw new Error();
+      if (!wife)
+        throw new Error(
+          `FAM ${family.xref} has WIFE ${family.wifeXref}, but no such individual exists`,
+        );
+      if (!wife.parentOfFamilyXrefs.includes(family.xref))
+        throw new Error(
+          `FAM ${family.xref} has WIFE ${family.wifeXref}, but that individual has no matching FAMS`,
+        );
     }
     for (const childXref of family.childXrefs) {
       const child = gedcomDatabase.individuals[childXref];
-      if (!child) throw new Error();
-      if (!child.childOfFamilyXrefs.includes(family.xref)) throw new Error();
+      if (!child)
+        throw new Error(
+          `FAM ${family.xref} has CHIL ${childXref}, but no such individual exists`,
+        );
+      if (!child.childOfFamilyXrefs.includes(family.xref))
+        throw new Error(
+          `FAM ${family.xref} has CHIL ${childXref}, but that individual has no matching FAMC`,
+        );
     }
   }
   for (const individual of Object.values(gedcomDatabase.individuals)) {
@@ -139,13 +177,25 @@ export function parseGedcomDatabase(gedcomRecords: GedcomRecord[]) {
       const parents = [family?.husbandXref, family?.wifeXref].filter(
         (e) => e != null,
       );
-      if (!family) throw new Error();
-      if (!parents.includes(individual.xref)) throw new Error();
+      if (!family)
+        throw new Error(
+          `INDI ${individual.xref} has FAMS ${familyXref}, but no such family exists`,
+        );
+      if (!parents.includes(individual.xref))
+        throw new Error(
+          `INDI ${individual.xref} has FAMS ${familyXref}, but that family doesn't list them as HUSB or WIFE`,
+        );
     }
     for (const familyXref of individual.childOfFamilyXrefs) {
       const family = gedcomDatabase.families[familyXref];
-      if (!family) throw new Error();
-      if (!family.childXrefs.includes(individual.xref)) throw new Error();
+      if (!family)
+        throw new Error(
+          `INDI ${individual.xref} has FAMC ${familyXref}, but no such family exists`,
+        );
+      if (!family.childXrefs.includes(individual.xref))
+        throw new Error(
+          `INDI ${individual.xref} has FAMC ${familyXref}, but that family doesn't list them as CHIL`,
+        );
     }
   }
   return gedcomDatabase;

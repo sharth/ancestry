@@ -175,17 +175,51 @@ export class AncestryService {
       ),
   });
 
-  readonly ancestryDatabase = computed<GedcomDatabase | undefined>(() => {
+  // Combined into one computed (rather than two separate ones each calling
+  // parseGedcomDatabase) so a parse failure -- which is data-dependent, not
+  // a bug, e.g. a GEDCOM file with a dangling FAM/INDI cross reference --
+  // is only ever computed once and both the database and the error stay in
+  // sync with each other.
+  private readonly ancestryDatabaseResult = computed<
+    | { database: GedcomDatabase; error: undefined }
+    | { database: undefined; error: Error | undefined }
+  >(() => {
     const gedcomResourceValue = this.gedcomResource.value();
     if (
       gedcomResourceValue === undefined ||
       gedcomResourceValue.gedcomRecords.length === 0
     ) {
-      return undefined;
+      return { database: undefined, error: undefined };
     }
 
-    return parseGedcomDatabase(gedcomResourceValue.gedcomRecords);
+    try {
+      return {
+        database: parseGedcomDatabase(gedcomResourceValue.gedcomRecords),
+        error: undefined,
+      };
+    } catch (error) {
+      return {
+        database: undefined,
+        error: error instanceof Error ? error : new Error(String(error)),
+      };
+    }
   });
+
+  readonly ancestryDatabase = computed<GedcomDatabase | undefined>(
+    () => this.ancestryDatabaseResult().database,
+  );
+
+  // Set when the currently loaded GEDCOM file failed to parse (e.g. it has
+  // a referential-integrity problem parseGedcomDatabase caught) -- as
+  // opposed to ancestryDatabase() simply being undefined because no data
+  // source is loaded yet. The settings page surfaces this to the user
+  // instead of silently bouncing them back to /settings with no
+  // explanation (which is what used to happen: ancestryDatabaseResolver
+  // read ancestryDatabase() directly, so a parse error there threw out of
+  // the resolver uncaught and aborted the navigation).
+  readonly ancestryDatabaseError = computed<Error | undefined>(
+    () => this.ancestryDatabaseResult().error,
+  );
 
   compareGedcomDatabase(gedcomDatabase: GedcomDatabase): {
     originalGedcomRecord?: GedcomRecord;
