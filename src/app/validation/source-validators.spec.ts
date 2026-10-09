@@ -124,6 +124,24 @@ describe("sourceValidators", () => {
     expect(result.warnings).toEqual([]);
   });
 
+  it("doesn't suggest a change for a familysearch.org URL when already linked under the www host", () => {
+    const source = newGedcomSource({
+      xref: "S1",
+      title: "https://familysearch.org/ark:/61903/1:1:Q1FN-XCZM",
+      repositoryLinks: [
+        newGedcomRepositoryLink({
+          repositoryXref: "R1",
+          callNumbers: [
+            "https://www.familysearch.org/ark:/61903/1:1:Q1FN-XCZM",
+          ],
+        }),
+      ],
+    });
+    const result = sourceValidators(source, newGedcomDatabase());
+
+    expect(result.warnings).toEqual([]);
+  });
+
   it("warns when a source has two repository citations for the same repository", () => {
     const repository = newGedcomRepository({ xref: "R1", name: "Example" });
     const source = newGedcomSource({

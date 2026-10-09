@@ -199,6 +199,74 @@ describe("applyUrlSuggestion", () => {
     ]);
   });
 
+  it("normalizes a familysearch.org URL to the www host when adding a call number", () => {
+    const repository = newGedcomRepository({
+      xref: "@R1@",
+      name: "FamilySearch",
+    });
+    const source = newGedcomSource({
+      xref: "@S1@",
+      title: "https://familysearch.org/ark:/61903/1:1:Q1FN-XCZM",
+    });
+    const database = newGedcomDatabase({
+      sources: { [source.xref]: source },
+      repositories: { [repository.xref]: repository },
+    });
+
+    const result = applyUrlSuggestion(database, source, {
+      fieldName: "title",
+      url: "https://familysearch.org/ark:/61903/1:1:Q1FN-XCZM",
+      standalone: true,
+      suggestedName: "familysearch",
+      matchedRepository: repository,
+    });
+
+    expect(result.database.sources[source.xref]?.repositoryLinks).toEqual([
+      {
+        repositoryXref: "@R1@",
+        callNumbers: ["https://www.familysearch.org/ark:/61903/1:1:Q1FN-XCZM"],
+      },
+    ]);
+  });
+
+  it("doesn't add a duplicate call number when a bare-host familysearch.org URL already matches a www-host one on the existing link", () => {
+    const repository = newGedcomRepository({
+      xref: "@R1@",
+      name: "FamilySearch",
+    });
+    const source = newGedcomSource({
+      xref: "@S1@",
+      title: "https://familysearch.org/ark:/61903/1:1:Q1FN-XCZM",
+      repositoryLinks: [
+        newGedcomRepositoryLink({
+          repositoryXref: "@R1@",
+          callNumbers: [
+            "https://www.familysearch.org/ark:/61903/1:1:Q1FN-XCZM",
+          ],
+        }),
+      ],
+    });
+    const database = newGedcomDatabase({
+      sources: { [source.xref]: source },
+      repositories: { [repository.xref]: repository },
+    });
+
+    const result = applyUrlSuggestion(database, source, {
+      fieldName: "title",
+      url: "https://familysearch.org/ark:/61903/1:1:Q1FN-XCZM",
+      standalone: true,
+      suggestedName: "familysearch",
+      matchedRepository: repository,
+    });
+
+    expect(result.database.sources[source.xref]?.repositoryLinks).toEqual([
+      {
+        repositoryXref: "@R1@",
+        callNumbers: ["https://www.familysearch.org/ark:/61903/1:1:Q1FN-XCZM"],
+      },
+    ]);
+  });
+
   it("doesn't mutate the original database", () => {
     const repository = newGedcomRepository({ xref: "@R1@", name: "Example" });
     const source = newGedcomSource({

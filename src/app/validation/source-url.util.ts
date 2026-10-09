@@ -47,6 +47,26 @@ export function urlDomainLabel(url: string): string | undefined {
   }
 }
 
+/** Normalizes familysearch.org URLs so "familysearch.org" and
+ * "www.familysearch.org" are treated as the same site, preferring the www
+ * form -- FamilySearch serves the bare and www hosts interchangeably, and a
+ * source citing one shouldn't be flagged as missing a link already present
+ * under the other. Deliberately limited to familysearch.org; other
+ * bare/www host pairs aren't normalized. Returns `url` unchanged if it
+ * isn't a valid URL or isn't a familysearch.org host. */
+export function normalizeFamilySearchUrl(url: string): string {
+  try {
+    const parsed = new URL(url);
+    if (parsed.hostname === "familysearch.org") {
+      parsed.hostname = "www.familysearch.org";
+      return parsed.toString();
+    }
+    return url;
+  } catch {
+    return url;
+  }
+}
+
 function normalizeForMatch(text: string): string {
   return text.toLowerCase().replace(/[^a-z0-9]+/g, "");
 }
