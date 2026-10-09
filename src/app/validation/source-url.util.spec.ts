@@ -4,6 +4,7 @@ import { newGedcomRepository } from "../../gedcom/gedcomRepository";
 import {
   extractUrls,
   findMatchingRepository,
+  normalizeFamilySearchUrl,
   urlDomainLabel,
 } from "./source-url.util";
 
@@ -71,6 +72,34 @@ describe("urlDomainLabel", () => {
         "http://www.digitalarchives.state.pa.us/archive.asp?view=ArchivePrint",
       ),
     ).toBe("digitalarchives");
+  });
+});
+
+describe("normalizeFamilySearchUrl", () => {
+  it("rewrites a bare familysearch.org host to www", () => {
+    expect(
+      normalizeFamilySearchUrl(
+        "https://familysearch.org/ark:/61903/1:1:Q1FN-XCZM",
+      ),
+    ).toBe("https://www.familysearch.org/ark:/61903/1:1:Q1FN-XCZM");
+  });
+
+  it("leaves an already-www familysearch.org URL unchanged", () => {
+    expect(
+      normalizeFamilySearchUrl(
+        "https://www.familysearch.org/ark:/61903/1:1:Q1FN-XCZM",
+      ),
+    ).toBe("https://www.familysearch.org/ark:/61903/1:1:Q1FN-XCZM");
+  });
+
+  it("leaves other hosts unchanged", () => {
+    expect(normalizeFamilySearchUrl("https://example.com/record")).toBe(
+      "https://example.com/record",
+    );
+  });
+
+  it("returns an invalid URL unchanged", () => {
+    expect(normalizeFamilySearchUrl("not a url")).toBe("not a url");
   });
 });
 

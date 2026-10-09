@@ -4,6 +4,7 @@ import type { GedcomSource } from "../../gedcom/gedcomSource";
 import {
   extractUrls,
   findMatchingRepository,
+  normalizeFamilySearchUrl,
   urlDomainLabel,
 } from "./source-url.util";
 
@@ -68,9 +69,17 @@ export function sourceValidators(
   }[] = [];
   for (const fieldName of URL_SEARCH_FIELDS) {
     for (const { url, standalone } of extractUrls(source[fieldName])) {
-      // Already linked -- nothing to suggest.
+      // Already linked -- nothing to suggest. Compared via
+      // normalizeFamilySearchUrl so a FamilySearch URL counts as already
+      // linked whether the existing call number uses the bare or www host.
       if (
-        source.repositoryLinks.some((link) => link.callNumbers.includes(url))
+        source.repositoryLinks.some((link) =>
+          link.callNumbers.some(
+            (callNumber) =>
+              normalizeFamilySearchUrl(callNumber) ===
+              normalizeFamilySearchUrl(url),
+          ),
+        )
       ) {
         continue;
       }

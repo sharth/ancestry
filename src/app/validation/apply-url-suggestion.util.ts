@@ -5,6 +5,7 @@ import { newGedcomRepository } from "../../gedcom/gedcomRepository";
 import { newGedcomRepositoryLink } from "../../gedcom/gedcomRepositoryLink";
 import type { GedcomSource } from "../../gedcom/gedcomSource";
 import { calculateNextRepositoryXref } from "../../util/next-xref";
+import { normalizeFamilySearchUrl } from "./source-url.util";
 import type { UrlRepositorySuggestion } from "./source-validators";
 
 export interface ApplyUrlSuggestionResult {
@@ -40,6 +41,7 @@ export function applyUrlSuggestion(
     // can carry any number of call numbers, so a second URL to a repository
     // the source already links to is added as another call number on that
     // same link rather than as a second link.
+    const normalizedUrl = normalizeFamilySearchUrl(suggestion.url);
     const existingLink = draftSource.repositoryLinks.find(
       (link) => link.repositoryXref === repositoryXref,
     );
@@ -47,11 +49,15 @@ export function applyUrlSuggestion(
       draftSource.repositoryLinks.push(
         newGedcomRepositoryLink({
           repositoryXref,
-          callNumbers: [suggestion.url],
+          callNumbers: [normalizedUrl],
         }),
       );
-    } else if (!existingLink.callNumbers.includes(suggestion.url)) {
-      existingLink.callNumbers.push(suggestion.url);
+    } else if (
+      !existingLink.callNumbers.some(
+        (callNumber) => normalizeFamilySearchUrl(callNumber) === normalizedUrl,
+      )
+    ) {
+      existingLink.callNumbers.push(normalizedUrl);
     }
     // Only strip the URL out of the field when it occupied a line by
     // itself -- removing it from the middle of a larger block of text
