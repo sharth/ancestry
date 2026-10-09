@@ -88,6 +88,26 @@ describe("sourceValidators", () => {
     );
   });
 
+  it("skips an embedded URL that's just a prefix of a more complete URL elsewhere in the source", () => {
+    const source = newGedcomSource({
+      xref: "S1",
+      title: [
+        "https://www.findagrave.com/memorial/74983035/lennie-smylie",
+        "http://sites.rootsweb.com/~msfrank2/smylie.htm",
+        "",
+        "Find a Grave, database and images (https://www.findagrave.com : accessed 10 October 2020)",
+      ].join("\n"),
+    });
+    const result = sourceValidators(source, newGedcomDatabase());
+
+    expect(
+      result.warnings.map((warning) => warning.urlSuggestion?.url),
+    ).toEqual([
+      "https://www.findagrave.com/memorial/74983035/lennie-smylie",
+      "http://sites.rootsweb.com/~msfrank2/smylie.htm",
+    ]);
+  });
+
   it("doesn't suggest a change when the URL is already linked as a call number", () => {
     const source = newGedcomSource({
       xref: "S1",

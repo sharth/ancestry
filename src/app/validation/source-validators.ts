@@ -53,35 +53,57 @@ export function sourceValidators(
 ): SourceValidationResult {
   const warnings: ValidationFinding[] = [];
 
+  const candidates: {
+    fieldName: UrlSuggestionFieldName;
+    url: string;
+    standalone: boolean;
+  }[] = [];
   for (const fieldName of URL_SEARCH_FIELDS) {
     for (const { url, standalone } of extractUrls(source[fieldName])) {
       // Already linked -- nothing to suggest.
       if (source.repositoryLinks.some((link) => link.callNumber === url)) {
         continue;
       }
-
-      const matchedRepository = findMatchingRepository(
-        url,
-        database.repositories,
-      );
-      const suggestedName = urlDomainLabel(url) ?? url;
-      const fieldLabel = FIELD_LABELS[fieldName];
-      warnings.push({
-        fieldName,
-        groupName: "Repository",
-        message:
-          matchedRepository !== undefined
-            ? `${fieldLabel} contains a URL (${url}) that looks like it belongs to the "${matchedRepository.name || matchedRepository.xref}" repository.`
-            : `${fieldLabel} contains a URL (${url}) that could become a repository.`,
-        urlSuggestion: {
-          fieldName,
-          url,
-          standalone,
-          suggestedName,
-          matchedRepository,
-        },
-      });
+      candidates.push({ fieldName, url, standalone });
     }
+  }
+
+  for (const candidate of candidates) {
+    // Skip a URL that's just a shorter prefix of another, more complete URL
+    // also found in this source -- almost certainly the same reference
+    // mentioned twice (e.g. a bare domain inside a citation sentence,
+    // alongside the full link elsewhere in the same field), so only the
+    // more specific one is worth proposing.
+    const isPrefixOfAnother = candidates.some(
+      (other) =>
+        other !== candidate &&
+        other.url !== candidate.url &&
+        other.url.startsWith(candidate.url),
+    );
+    if (isPrefixOfAnother) continue;
+
+    const { fieldName, url, standalone } = candidate;
+    const matchedRepository = findMatchingRepository(
+      url,
+      database.repositories,
+    );
+    const suggestedName = urlDomainLabel(url) ?? url;
+    const fieldLabel = FIELD_LABELS[fieldName];
+    warnings.push({
+      fieldName,
+      groupName: "Repository",
+      message:
+        matchedRepository !== undefined
+          ? `${fieldLabel} contains a URL (${url}) that looks like it belongs to the "${matchedRepository.name || matchedRepository.xref}" repository.`
+          : `${fieldLabel} contains a URL (${url}) that could become a repository.`,
+      urlSuggestion: {
+        fieldName,
+        url,
+        standalone,
+        suggestedName,
+        matchedRepository,
+      },
+    });
   }
 
   return { errors: [], warnings };
