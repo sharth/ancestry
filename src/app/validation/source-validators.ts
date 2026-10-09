@@ -29,11 +29,19 @@ export interface UrlRepositorySuggestion {
   matchedRepository?: GedcomRepository;
 }
 
+/** A suggested fix for a source with more than one repository citation
+ * pointing at the same repository: merge them into a single citation
+ * carrying all of their call numbers. */
+export interface MergeRepositoryLinksSuggestion {
+  repositoryXref: string;
+}
+
 export interface ValidationFinding {
   fieldName: string;
   groupName: string;
   message: string;
   urlSuggestion?: UrlRepositorySuggestion;
+  mergeRepositoryLinksSuggestion?: MergeRepositoryLinksSuggestion;
 }
 
 export interface SourceValidationResult {
@@ -105,6 +113,25 @@ export function sourceValidators(
         suggestedName,
         matchedRepository,
       },
+    });
+  }
+
+  const linksByRepository = new Map<string, number>();
+  for (const link of source.repositoryLinks) {
+    linksByRepository.set(
+      link.repositoryXref,
+      (linksByRepository.get(link.repositoryXref) ?? 0) + 1,
+    );
+  }
+  for (const [repositoryXref, linkCount] of linksByRepository) {
+    if (linkCount < 2) continue;
+    const repository = database.repositories[repositoryXref];
+    const repositoryLabel = repository?.name || repositoryXref;
+    warnings.push({
+      fieldName: "repositoryLinks",
+      groupName: "Repository",
+      message: `Has ${linkCount} separate repository citations for the "${repositoryLabel}" repository; these could be merged into one citation with all the call numbers.`,
+      mergeRepositoryLinksSuggestion: { repositoryXref },
     });
   }
 

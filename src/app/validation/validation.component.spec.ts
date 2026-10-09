@@ -6,8 +6,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AncestryService } from "../../database/ancestry.service";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
+import { newGedcomRepository } from "../../gedcom/gedcomRepository";
+import { newGedcomRepositoryLink } from "../../gedcom/gedcomRepositoryLink";
 import { newGedcomSource } from "../../gedcom/gedcomSource";
-import type { UrlRepositorySuggestion } from "./source-validators";
+import type {
+  MergeRepositoryLinksSuggestion,
+  UrlRepositorySuggestion,
+} from "./source-validators";
 import { ValidationComponent } from "./validation.component";
 
 describe("ValidationComponent", () => {
@@ -68,20 +73,20 @@ describe("ValidationComponent", () => {
     expect(await screen.findByText(/Submit changes as proposed/)).toBeTruthy();
   });
 
-  it("submitProposed applies the suggestion and saves it directly", async () => {
+  it("submitUrlSuggestion applies the suggestion and saves it directly", async () => {
     vi.spyOn(ancestryService, "requestWritePermission").mockResolvedValue(true);
     const updateGedcomDatabaseSpy = vi
       .spyOn(ancestryService, "updateGedcomDatabase")
       .mockResolvedValue(undefined);
 
-    await component.submitProposed(source, urlSuggestion);
+    await component.submitUrlSuggestion(source, urlSuggestion);
 
     expect(updateGedcomDatabaseSpy).toHaveBeenCalledTimes(1);
     const savedDatabase = updateGedcomDatabaseSpy.mock.calls[0]?.[0];
     expect(savedDatabase?.repositories["@R0@"]).toBeDefined();
   });
 
-  it("submitProposed does nothing when write permission is denied", async () => {
+  it("submitUrlSuggestion does nothing when write permission is denied", async () => {
     vi.spyOn(ancestryService, "requestWritePermission").mockResolvedValue(
       false,
     );
@@ -90,7 +95,80 @@ describe("ValidationComponent", () => {
       "updateGedcomDatabase",
     );
 
-    await component.submitProposed(source, urlSuggestion);
+    await component.submitUrlSuggestion(source, urlSuggestion);
+
+    expect(updateGedcomDatabaseSpy).not.toHaveBeenCalled();
+  });
+});
+
+describe("ValidationComponent merge repository links suggestion", () => {
+  let component: ValidationComponent;
+  let ancestryService: AncestryService;
+
+  const repository = newGedcomRepository({ xref: "@R1@", name: "Example" });
+  const source = newGedcomSource({
+    xref: "@S1@",
+    repositoryLinks: [
+      newGedcomRepositoryLink({
+        repositoryXref: "@R1@",
+        callNumbers: ["one"],
+      }),
+      newGedcomRepositoryLink({
+        repositoryXref: "@R1@",
+        callNumbers: ["two"],
+      }),
+    ],
+  });
+  const mergeSuggestion: MergeRepositoryLinksSuggestion = {
+    repositoryXref: "@R1@",
+  };
+
+  beforeEach(async () => {
+    const ancestryDatabase = signal(
+      newGedcomDatabase({
+        sources: { [source.xref]: source },
+        repositories: { [repository.xref]: repository },
+      }),
+    );
+
+    const renderResult = await render(ValidationComponent, {
+      providers: [provideRouter([])],
+      bindings: [inputBinding("ancestryDatabase", ancestryDatabase)],
+      waitForStableOnRender: true,
+    });
+    component = renderResult.fixture.componentInstance;
+    ancestryService = TestBed.inject(AncestryService);
+  });
+
+  it("lists a warning with a button to review the merge suggestion", async () => {
+    expect(await screen.findByText(/Merge repository citations/)).toBeTruthy();
+  });
+
+  it("submitMergeSuggestion merges the links and saves it directly", async () => {
+    vi.spyOn(ancestryService, "requestWritePermission").mockResolvedValue(true);
+    const updateGedcomDatabaseSpy = vi
+      .spyOn(ancestryService, "updateGedcomDatabase")
+      .mockResolvedValue(undefined);
+
+    await component.submitMergeSuggestion(source, mergeSuggestion);
+
+    expect(updateGedcomDatabaseSpy).toHaveBeenCalledTimes(1);
+    const savedDatabase = updateGedcomDatabaseSpy.mock.calls[0]?.[0];
+    expect(savedDatabase?.sources[source.xref]?.repositoryLinks).toEqual([
+      { repositoryXref: "@R1@", callNumbers: ["one", "two"] },
+    ]);
+  });
+
+  it("submitMergeSuggestion does nothing when write permission is denied", async () => {
+    vi.spyOn(ancestryService, "requestWritePermission").mockResolvedValue(
+      false,
+    );
+    const updateGedcomDatabaseSpy = vi.spyOn(
+      ancestryService,
+      "updateGedcomDatabase",
+    );
+
+    await component.submitMergeSuggestion(source, mergeSuggestion);
 
     expect(updateGedcomDatabaseSpy).not.toHaveBeenCalled();
   });

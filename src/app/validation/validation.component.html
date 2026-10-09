@@ -47,7 +47,7 @@
                   type="button"
                   class="btn btn-sm btn-outline-primary"
                   (click)="
-                    review(sourceScenario.source, urlSuggestion);
+                    reviewUrlSuggestion(sourceScenario.source, urlSuggestion);
                     editDialog.showModal()
                   "
                 >
@@ -63,7 +63,38 @@
                 <button
                   type="button"
                   class="btn btn-sm btn-outline-success"
-                  (click)="submitProposed(sourceScenario.source, urlSuggestion)"
+                  (click)="
+                    submitUrlSuggestion(sourceScenario.source, urlSuggestion)
+                  "
+                >
+                  Submit changes as proposed
+                </button>
+              </div>
+            }
+            @if (warning.mergeRepositoryLinksSuggestion; as mergeSuggestion) {
+              <div class="btn-group">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-primary"
+                  (click)="
+                    reviewMergeSuggestion(
+                      sourceScenario.source,
+                      mergeSuggestion
+                    );
+                    editDialog.showModal()
+                  "
+                >
+                  Open editor with proposed changes: Merge repository citations
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-success"
+                  (click)="
+                    submitMergeSuggestion(
+                      sourceScenario.source,
+                      mergeSuggestion
+                    )
+                  "
                 >
                   Submit changes as proposed
                 </button>
@@ -78,7 +109,10 @@
               <app-gedcom-diff
                 [oldGedcomRecord]="beforeSourceRecord(sourceScenario.source)"
                 [newGedcomRecord]="
-                  afterSourceRecord(sourceScenario.source, urlSuggestion)
+                  afterSourceRecordForUrlSuggestion(
+                    sourceScenario.source,
+                    urlSuggestion
+                  )
                 "
               />
               @if (
@@ -90,6 +124,22 @@
                   [newGedcomRecord]="newRepositoryRecord"
                 />
               }
+            </td>
+          </tr>
+        }
+        @if (warning.mergeRepositoryLinksSuggestion; as mergeSuggestion) {
+          <tr>
+            <td></td>
+            <td colspan="5">
+              <app-gedcom-diff
+                [oldGedcomRecord]="beforeSourceRecord(sourceScenario.source)"
+                [newGedcomRecord]="
+                  afterSourceRecordForMergeSuggestion(
+                    sourceScenario.source,
+                    mergeSuggestion
+                  )
+                "
+              />
             </td>
           </tr>
         }
