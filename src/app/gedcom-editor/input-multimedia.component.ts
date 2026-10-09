@@ -7,10 +7,11 @@ import {
   newGedcomMultimedia,
   type GedcomMultimedia,
 } from "../../gedcom/gedcomMultimedia";
+import { MultimediaPreviewComponent } from "../multimedia/multimedia-preview.component";
 
 @Component({
   selector: "app-input-multimedia",
-  imports: [FormField],
+  imports: [FormField, MultimediaPreviewComponent],
   templateUrl: "./input-multimedia.component.html",
   styleUrl: "./input.component.css",
 })

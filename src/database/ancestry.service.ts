@@ -278,10 +278,18 @@ export class AncestryService {
       return undefined;
     }
 
-    for (const part of pathParts.slice(0, -1)) {
-      directoryHandle = await directoryHandle.getDirectoryHandle(part);
+    try {
+      for (const part of pathParts.slice(0, -1)) {
+        directoryHandle = await directoryHandle.getDirectoryHandle(part);
+      }
+      return await directoryHandle.getFileHandle(fileName);
+    } catch (error) {
+      console.error(
+        `Failed to resolve multimedia file ${relativePath}:`,
+        error,
+      );
+      return undefined;
     }
-    return directoryHandle.getFileHandle(fileName);
   }
 
   async requestPermissions() {

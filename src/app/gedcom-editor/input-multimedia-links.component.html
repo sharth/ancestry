@@ -60,6 +60,14 @@
           />
           <label for="title_{{ $index }}">Custom Title</label>
         </div>
+        @if (mediaXref && isImage(mediaXref)) {
+          <h6 class="mt-2">Crop</h6>
+          <app-input-multimedia-crop
+            [filePath]="filePathFor(mediaXref) ?? ''"
+            [value]="value()[$index]?.crop"
+            (valueChange)="setCrop($index, $event)"
+          />
+        }
       </details>
     }
     <div

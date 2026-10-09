@@ -21,15 +21,17 @@ import { RouterModule } from "@angular/router";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import {
   newGedcomMultimediaLink,
+  type GedcomMultimediaCrop,
   type GedcomMultimediaLink,
 } from "../../gedcom/gedcomMultimediaLink";
 import { GEDCOM_EDITOR } from "./gedcom-editor-interface";
+import { InputMultimediaCropComponent } from "./input-multimedia-crop.component";
 
 @Component({
   selector: "app-input-multimedia-links",
   templateUrl: "./input-multimedia-links.component.html",
   styleUrl: "./input.component.css",
-  imports: [RouterModule, FormField],
+  imports: [RouterModule, FormField, InputMultimediaCropComponent],
 })
 export class InputMultimediaLinksComponent implements FormValueControl<
   GedcomMultimediaLink[]
@@ -44,6 +46,23 @@ export class InputMultimediaLinksComponent implements FormValueControl<
   readonly multimedias = computed(() =>
     Object.values(this.workingDatabase().multimedias),
   );
+
+  filePathFor(xref: string): string | undefined {
+    return this.workingDatabase().multimedias[xref]?.filePath;
+  }
+
+  isImage(xref: string): boolean {
+    const mediaType = this.workingDatabase().multimedias[xref]?.mediaType;
+    return mediaType?.startsWith("image/") ?? false;
+  }
+
+  setCrop(index: number, crop: GedcomMultimediaCrop | undefined) {
+    this.value.update((multimediaLinks) =>
+      multimediaLinks.map((link, i) =>
+        i === index ? { ...link, crop } : link,
+      ),
+    );
+  }
 
   // Keep track of the controls that were added by a user interaction.
   readonly newControls = new WeakSet<FieldTree<GedcomMultimediaLink, number>>();
