@@ -115,7 +115,7 @@ describe("sourceValidators", () => {
       repositoryLinks: [
         newGedcomRepositoryLink({
           repositoryXref: "R1",
-          callNumber: "https://example.com/record",
+          callNumbers: ["https://example.com/record"],
         }),
       ],
     });

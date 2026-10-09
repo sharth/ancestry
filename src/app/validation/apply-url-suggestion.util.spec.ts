@@ -35,7 +35,7 @@ describe("applyUrlSuggestion", () => {
     expect(updatedSource?.repositoryLinks).toEqual([
       {
         repositoryXref: "@R1@",
-        callNumber: "https://www.familysearch.org/record",
+        callNumbers: ["https://www.familysearch.org/record"],
       },
     ]);
     // Doesn't add a second repository since one already matched.
@@ -71,7 +71,7 @@ describe("applyUrlSuggestion", () => {
     expect(updatedSource?.repositoryLinks).toEqual([
       {
         repositoryXref: "@R1@",
-        callNumber: "https://www.familysearch.org/record",
+        callNumbers: ["https://www.familysearch.org/record"],
       },
     ]);
   });
@@ -117,12 +117,12 @@ describe("applyUrlSuggestion", () => {
     expect(result.database.sources[source.xref]?.repositoryLinks).toEqual([
       {
         repositoryXref: result.repositoryXref,
-        callNumber: source.text.slice(4),
+        callNumbers: [source.text.slice(4)],
       },
     ]);
   });
 
-  it("gives a second distinct URL to the same repository its own link, instead of discarding it", () => {
+  it("appends a second distinct URL to the same repository as another call number on the existing link", () => {
     const repository = newGedcomRepository({
       xref: "@R1@",
       name: "ancestry.com",
@@ -133,7 +133,7 @@ describe("applyUrlSuggestion", () => {
       repositoryLinks: [
         newGedcomRepositoryLink({
           repositoryXref: "@R1@",
-          callNumber: "https://www.ancestry.com/images/007_01868",
+          callNumbers: ["https://www.ancestry.com/images/007_01868"],
         }),
       ],
     });
@@ -155,11 +155,46 @@ describe("applyUrlSuggestion", () => {
     expect(updatedSource?.repositoryLinks).toEqual([
       {
         repositoryXref: "@R1@",
-        callNumber: "https://www.ancestry.com/images/007_01868",
+        callNumbers: [
+          "https://www.ancestry.com/images/007_01868",
+          "https://www.ancestry.com/images/007_01869",
+        ],
       },
+    ]);
+  });
+
+  it("doesn't add a duplicate call number when the URL already matches one on the existing link", () => {
+    const repository = newGedcomRepository({
+      xref: "@R1@",
+      name: "ancestry.com",
+    });
+    const source = newGedcomSource({
+      xref: "@S1@",
+      title: "https://www.ancestry.com/images/007_01868",
+      repositoryLinks: [
+        newGedcomRepositoryLink({
+          repositoryXref: "@R1@",
+          callNumbers: ["https://www.ancestry.com/images/007_01868"],
+        }),
+      ],
+    });
+    const database = newGedcomDatabase({
+      sources: { [source.xref]: source },
+      repositories: { [repository.xref]: repository },
+    });
+
+    const result = applyUrlSuggestion(database, source, {
+      fieldName: "title",
+      url: "https://www.ancestry.com/images/007_01868",
+      standalone: true,
+      suggestedName: "ancestry.com",
+      matchedRepository: repository,
+    });
+
+    expect(result.database.sources[source.xref]?.repositoryLinks).toEqual([
       {
         repositoryXref: "@R1@",
-        callNumber: "https://www.ancestry.com/images/007_01869",
+        callNumbers: ["https://www.ancestry.com/images/007_01868"],
       },
     ]);
   });

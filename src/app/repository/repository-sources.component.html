@@ -14,7 +14,11 @@
               source.abbr || source.xref
             }}</a>
           </td>
-          <td>{{ source.callNumber }}</td>
+          <td>
+            @for (callNumber of source.callNumbers; track callNumber) {
+              <div>{{ callNumber }}</div>
+            }
+          </td>
         </tr>
       }
     </tbody>

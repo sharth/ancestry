@@ -1,0 +1,26 @@
+@for (callNumber of form; track callNumber) {
+  <div class="d-flex gap-2 align-items-center mb-2">
+    <div class="form-floating flex-grow-1">
+      <input
+        id="callNumber_{{ $index }}"
+        class="form-control"
+        type="text"
+        [formField]="callNumber"
+      />
+      <label for="callNumber_{{ $index }}">Call Number</label>
+    </div>
+    <button
+      class="btn btn-sm btn-outline-danger bi-trash"
+      type="button"
+      aria-label="Remove call number"
+      (click)="removeCallNumber($index)"
+    ></button>
+  </div>
+}
+<button
+  type="button"
+  class="btn btn-sm btn-outline-primary"
+  (click)="appendCallNumber()"
+>
+  <i class="bi bi-plus"></i> Add call number
+</button>

@@ -61,7 +61,9 @@ export function sourceValidators(
   for (const fieldName of URL_SEARCH_FIELDS) {
     for (const { url, standalone } of extractUrls(source[fieldName])) {
       // Already linked -- nothing to suggest.
-      if (source.repositoryLinks.some((link) => link.callNumber === url)) {
+      if (
+        source.repositoryLinks.some((link) => link.callNumbers.includes(url))
+      ) {
         continue;
       }
       candidates.push({ fieldName, url, standalone });
