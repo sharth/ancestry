@@ -36,8 +36,16 @@ export function applyUrlSuggestion(
 
     const draftSource = draft.sources[source.xref];
     if (draftSource === undefined) return;
+    // Reuse an existing link to the same repository only when it doesn't
+    // already carry a different call number -- otherwise the source cites
+    // the same repository twice for two different items (e.g. two scanned
+    // pages of the same record, each with its own URL), so this URL gets
+    // its own link rather than silently overwriting or discarding either
+    // one.
     const existingLink = draftSource.repositoryLinks.find(
-      (link) => link.repositoryXref === repositoryXref,
+      (link) =>
+        link.repositoryXref === repositoryXref &&
+        (link.callNumber === "" || link.callNumber === suggestion.url),
     );
     if (existingLink === undefined) {
       draftSource.repositoryLinks.push(

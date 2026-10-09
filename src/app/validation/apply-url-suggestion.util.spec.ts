@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomRepository } from "../../gedcom/gedcomRepository";
+import { newGedcomRepositoryLink } from "../../gedcom/gedcomRepositoryLink";
 import { newGedcomSource } from "../../gedcom/gedcomSource";
 import { applyUrlSuggestion } from "./apply-url-suggestion.util";
 
@@ -117,6 +118,48 @@ describe("applyUrlSuggestion", () => {
       {
         repositoryXref: result.repositoryXref,
         callNumber: source.text.slice(4),
+      },
+    ]);
+  });
+
+  it("gives a second distinct URL to the same repository its own link, instead of discarding it", () => {
+    const repository = newGedcomRepository({
+      xref: "@R1@",
+      name: "ancestry.com",
+    });
+    const source = newGedcomSource({
+      xref: "@S1@",
+      title: "Source Citation\nhttps://www.ancestry.com/images/007_01869",
+      repositoryLinks: [
+        newGedcomRepositoryLink({
+          repositoryXref: "@R1@",
+          callNumber: "https://www.ancestry.com/images/007_01868",
+        }),
+      ],
+    });
+    const database = newGedcomDatabase({
+      sources: { [source.xref]: source },
+      repositories: { [repository.xref]: repository },
+    });
+
+    const result = applyUrlSuggestion(database, source, {
+      fieldName: "title",
+      url: "https://www.ancestry.com/images/007_01869",
+      standalone: true,
+      suggestedName: "ancestry.com",
+      matchedRepository: repository,
+    });
+
+    const updatedSource = result.database.sources[source.xref];
+    expect(updatedSource?.title).toBe("Source Citation");
+    expect(updatedSource?.repositoryLinks).toEqual([
+      {
+        repositoryXref: "@R1@",
+        callNumber: "https://www.ancestry.com/images/007_01868",
+      },
+      {
+        repositoryXref: "@R1@",
+        callNumber: "https://www.ancestry.com/images/007_01869",
       },
     ]);
   });
