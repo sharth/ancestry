@@ -8,6 +8,7 @@ import {
   compareGedcomDatabase,
   parseGedcomDatabase,
   serializeGedcomDatabase,
+  stampChangeDates,
   type GedcomDatabase,
 } from "../gedcom/gedcomDatabase";
 import { parseGedcomRecords, type GedcomRecord } from "../gedcom/gedcomRecord";
@@ -200,7 +201,14 @@ export class AncestryService {
   async updateGedcomDatabase(gedcomDatabase: GedcomDatabase) {
     const gedcomResource = this.gedcomResource.value();
     const originalGedcomRecords = gedcomResource?.gedcomRecords ?? [];
-    const text = serializeGedcomDatabase(originalGedcomRecords, gedcomDatabase);
+    const stampedGedcomDatabase = stampChangeDates(
+      originalGedcomRecords,
+      gedcomDatabase,
+    );
+    const text = serializeGedcomDatabase(
+      originalGedcomRecords,
+      stampedGedcomDatabase,
+    );
 
     const gedcomFileHandle = this.gedcomResource.value()?.gedcomFileHandle;
     if (gedcomFileHandle == undefined) {

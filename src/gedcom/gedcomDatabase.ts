@@ -1,4 +1,8 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
+import {
+  formatGedcomChangeDate,
+  newGedcomChangeDate,
+} from "./gedcomChangeDate";
 import { monthNames } from "./gedcomDate";
 import {
   parseGedcomFamily,
@@ -201,6 +205,93 @@ export function compareGedcomDatabase(
   });
 
   return recordMap.values().toArray();
+}
+
+function withoutChangeDate(record: GedcomRecord): GedcomRecord {
+  return {
+    ...record,
+    children: record.children.filter((child) => child.tag !== "CHAN"),
+  };
+}
+
+// Whether `updatedRecord` (one entity's freshly serialized record, with its
+// CHAN blanked out so it never carries one) differs from the matching
+// record in `originalGedcomRecords`, ignoring each side's own CHAN child --
+// so a record whose only difference is a stale/missing CHAN doesn't itself
+// count as changed.
+function contentChanged(
+  originalByHash: Map<string, GedcomRecord>,
+  updatedRecord: GedcomRecord,
+): boolean {
+  const hash = `${updatedRecord.tag} ${updatedRecord.xref} ${updatedRecord.value}`;
+  const original = originalByHash.get(hash);
+  if (original === undefined) return true;
+  return (
+    serializeGedcomRecordToText(withoutChangeDate(original)).join("\n") !==
+    serializeGedcomRecordToText(withoutChangeDate(updatedRecord)).join("\n")
+  );
+}
+
+// Stamps CHAN (change date) on every individual, source, and multimedia
+// record whose content differs from `originalGedcomRecords` -- the one
+// place every save path routes through (AncestryService.updateGedcomDatabase),
+// rather than each editor form having to remember to do it itself. Limited
+// to the record types that already parse/serialize CHANGE_DATE (GEDCOM
+// 5.5.1 p. 31).
+export function stampChangeDates(
+  originalGedcomRecords: GedcomRecord[],
+  database: GedcomDatabase,
+  today: string = formatGedcomChangeDate(),
+): GedcomDatabase {
+  const originalByHash = new Map(
+    originalGedcomRecords.map(
+      (record) =>
+        [`${record.tag} ${record.xref} ${record.value}`, record] as const,
+    ),
+  );
+
+  return {
+    ...database,
+    individuals: Object.fromEntries(
+      Object.entries(database.individuals).map(([xref, individual]) => [
+        xref,
+        contentChanged(
+          originalByHash,
+          serializeGedcomIndividual({
+            ...individual,
+            changeDate: newGedcomChangeDate(),
+          }),
+        )
+          ? { ...individual, changeDate: { value: today } }
+          : individual,
+      ]),
+    ),
+    sources: Object.fromEntries(
+      Object.entries(database.sources).map(([xref, source]) => [
+        xref,
+        contentChanged(
+          originalByHash,
+          serializeGedcomSource({
+            ...source,
+            changeDate: newGedcomChangeDate(),
+          }),
+        )
+          ? { ...source, changeDate: { value: today } }
+          : source,
+      ]),
+    ),
+    multimedias: Object.fromEntries(
+      Object.entries(database.multimedias).map(([xref, multimedia]) => [
+        xref,
+        contentChanged(
+          originalByHash,
+          serializeGedcomMultimedia({ ...multimedia, changeDate: undefined }),
+        )
+          ? { ...multimedia, changeDate: { value: today } }
+          : multimedia,
+      ]),
+    ),
+  };
 }
 
 export function serializeGedcomDatabase(
