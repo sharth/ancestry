@@ -51,7 +51,7 @@
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.71.0",
     "uuid": "^14.0.2",
-    "vest": "^6.3.3",
+    "vest": "^6.3.4",
     "vitest": "^5.0.2"
   }
 }
