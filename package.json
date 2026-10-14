@@ -33,7 +33,7 @@
     "@vitest/eslint-plugin": "^1.6.27",
     "angular-eslint": "^22.5.0",
     "bootstrap": "^5.3.8",
-    "bootstrap-icons": "^1.13.1",
+    "bootstrap-icons": "^1.13.2",
     "d3": "^7.9.0",
     "d3-shape": "^3.2.0",
     "d3-zoom": "^3.0.0",
