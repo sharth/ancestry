@@ -80,7 +80,7 @@ jobs:
           git push origin screenshots
           echo "image_dir=$IMAGE_DIR" >> "$GITHUB_OUTPUT"
       - name: Post or update sticky comment
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const route = process.env.ROUTE;
