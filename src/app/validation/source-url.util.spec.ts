@@ -56,9 +56,9 @@ describe("extractUrls", () => {
 });
 
 describe("urlDomainLabel", () => {
-  it("extracts the registrable domain label, ignoring www", () => {
+  it("extracts the full domain, ignoring a leading www", () => {
     expect(urlDomainLabel("https://www.familysearch.org/search")).toBe(
-      "familysearch",
+      "familysearch.org",
     );
   });
 
@@ -66,12 +66,21 @@ describe("urlDomainLabel", () => {
     expect(urlDomainLabel("not a url")).toBeUndefined();
   });
 
-  it("picks the distinctive label on a multi-level government host, not a short trailing one", () => {
+  it("keeps the full multi-level host of a government site", () => {
     expect(
       urlDomainLabel(
         "http://www.digitalarchives.state.pa.us/archive.asp?view=ArchivePrint",
       ),
-    ).toBe("digitalarchives");
+    ).toBe("digitalarchives.state.pa.us");
+  });
+
+  it("doesn't treat two different sites sharing a word as the same domain", () => {
+    expect(urlDomainLabel("https://www.census.nationalarchives.ie/x")).toBe(
+      "census.nationalarchives.ie",
+    );
+    expect(urlDomainLabel("https://nationalarchives.uk/y")).toBe(
+      "nationalarchives.uk",
+    );
   });
 });
 
@@ -153,6 +162,18 @@ describe("findMatchingRepository", () => {
         "http://www.digitalarchives.state.pa.us/archive.asp?view=ArchivePrint",
         repositories,
       ),
+    ).toBeUndefined();
+  });
+
+  it("doesn't match two different sites that merely share a word in their domain", () => {
+    const repositories = {
+      R1: newGedcomRepository({
+        xref: "R1",
+        name: "census.nationalarchives.ie",
+      }),
+    };
+    expect(
+      findMatchingRepository("https://nationalarchives.uk/y", repositories),
     ).toBeUndefined();
   });
 });

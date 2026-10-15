@@ -26,22 +26,16 @@ export function extractUrls(text: string): ExtractedUrl[] {
   return urls;
 }
 
-/** The registrable domain label of a URL, e.g. "familysearch" for
- * "https://www.familysearch.org/search/record" -- the part of the host most
- * likely to also appear in a repository's name. Returns undefined if `url`
- * isn't a valid URL. Picks the longest dot-separated label rather than
- * always the second-to-last one: a host with more than two labels after
- * "www" (e.g. government sites like "digitalarchives.state.pa.us") puts its
- * distinctive name first, not second-to-last -- the second-to-last label
- * there is "pa", which is both meaningless on its own and liable to match
- * an unrelated repository by pure substring luck (e.g. "newspapers.com"). */
+/** The domain of a URL, e.g. "familysearch.org" for
+ * "https://www.familysearch.org/search/record" -- the part of the host used
+ * to decide whether two URLs belong to the same site. Returns undefined if
+ * `url` isn't a valid URL. Strips only a leading "www." label: two hosts
+ * are the same site only when they match in full otherwise, so
+ * "nationalarchives.uk" and "census.nationalarchives.ie" are correctly
+ * treated as different sites even though both contain "nationalarchives". */
 export function urlDomainLabel(url: string): string | undefined {
   try {
-    const host = new URL(url).hostname.replace(/^www\./, "");
-    const labels = host.split(".");
-    return labels.reduce((longest, label) =>
-      label.length > longest.length ? label : longest,
-    );
+    return new URL(url).hostname.replace(/^www\./, "");
   } catch {
     return undefined;
   }
