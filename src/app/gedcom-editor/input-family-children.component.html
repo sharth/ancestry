@@ -1,0 +1,33 @@
+<details [open]="true">
+  <summary>Children ({{ form.length }})</summary>
+  @for (childXref of form; track childXref) {
+    <div class="d-flex gap-2 align-items-center mb-2">
+      <div class="flex-grow-1">
+        <app-input-individual-xref
+          [formField]="childXref"
+          [workingDatabase]="workingDatabase()"
+        ></app-input-individual-xref>
+      </div>
+      <button
+        class="btn btn-sm btn-outline-danger bi-trash"
+        type="button"
+        aria-label="Remove child"
+        (click)="removeChild($index)"
+      ></button>
+    </div>
+  }
+  <div
+    class="details-lookalike"
+    tabindex="0"
+    (click)="appendChild()"
+    (keydown.enter)="appendChild()"
+  >
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-primary bi-plus"
+      aria-label="Add child"
+      (click)="$event.preventDefault()"
+    ></button>
+    Add child
+  </div>
+</details>

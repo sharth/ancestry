@@ -63,6 +63,7 @@ export const routes: Routes = [
     component: FamiliesComponent,
     resolve: { ancestryDatabase: ancestryDatabaseResolver },
     runGuardsAndResolvers: "always",
+    canDeactivate: [confirmUnsavedChangesGuard],
   },
   {
     path: "family/:xref",

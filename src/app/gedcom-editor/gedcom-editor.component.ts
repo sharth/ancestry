@@ -34,6 +34,7 @@ import {
   type GedcomEditorInterface,
   type TabInformation,
 } from "./gedcom-editor-interface";
+import { InputFamilyComponent } from "./input-family.component";
 import { InputIndividualComponent } from "./input-individual.component";
 import { InputMultimediaComponent } from "./input-multimedia.component";
 import { InputRepositoryComponent } from "./input-repository.component";
@@ -44,6 +45,7 @@ import { InputSourceComponent } from "./input-source.component";
   imports: [
     FormField,
     GedcomDiffComponent,
+    InputFamilyComponent,
     InputIndividualComponent,
     InputMultimediaComponent,
     InputRepositoryComponent,
@@ -241,6 +243,16 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
 
   openSource(xref: string) {
     this.openTab({ type: "SOUR", xref });
+  }
+
+  openNewFamily(): string {
+    const xref = calculateNextFamilyXref(this.workingDatabase());
+    this.openTab({ type: "FAM", xref });
+    return xref;
+  }
+
+  openFamily(xref: string) {
+    this.openTab({ type: "FAM", xref });
   }
 
   openTab(tabInformation: TabInformation) {
