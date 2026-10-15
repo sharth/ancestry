@@ -1,0 +1,25 @@
+<app-input-individual-xref
+  [formField]="form.husbandXref"
+  [workingDatabase]="workingDatabase()"
+></app-input-individual-xref>
+
+<app-input-individual-xref
+  [formField]="form.wifeXref"
+  [workingDatabase]="workingDatabase()"
+></app-input-individual-xref>
+
+<app-input-family-children
+  [formField]="form.childXrefs"
+  [workingDatabase]="workingDatabase()"
+></app-input-family-children>
+
+<app-input-family-facts
+  [open]="true"
+  [formField]="form.facts"
+  [workingDatabase]="workingDatabase()"
+></app-input-family-facts>
+
+<app-input-source-citations
+  [formField]="form.citations"
+  [workingDatabase]="workingDatabase()"
+></app-input-source-citations>

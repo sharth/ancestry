@@ -20,6 +20,21 @@
   </ul>
 
   <router-outlet />
+
+  <div class="position-fixed bottom-0 end-0 rounded-circle m-5">
+    <button
+      type="button"
+      class="btn btn-primary btn-lg bi-pencil"
+      aria-label="Edit family"
+      (click)="editDialog.showModal()"
+    ></button>
+  </div>
+
+  <app-gedcom-editor-dialog
+    #editDialog
+    [tabs]="[{ type: 'FAM', xref: xref() }]"
+    [ancestryDatabase]="ancestryDatabase()"
+  />
 } @else {
   <h1>Family {{ xref() }} not found</h1>
 }
