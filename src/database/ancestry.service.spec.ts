@@ -2,8 +2,18 @@ import { Component } from "@angular/core";
 import { TestBed } from "@angular/core/testing";
 import { Router, provideRouter } from "@angular/router";
 import { render } from "@testing-library/angular/zoneless";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { produce } from "immer";
+import {
+  afterEach,
+  assert,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
 
+import { serializeGedcomRecordToText } from "../gedcom/gedcomRecord";
 import { AncestryService, ancestryDatabaseResolver } from "./ancestry.service";
 
 @Component({ selector: "app-stub", template: "" })
@@ -91,5 +101,58 @@ describe("ancestryDatabaseResolver", () => {
     await router.navigateByUrl("/", { onSameUrlNavigation: "reload" });
 
     expect(router.url).toBe("/settings");
+  });
+});
+
+describe("AncestryService change-date stamping", () => {
+  let ancestryService: AncestryService;
+
+  beforeEach(async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() => Promise.resolve(new Response(MINIMAL_GEDCOM_TEXT))),
+    );
+
+    await render(StubComponent, { waitForStableOnRender: true });
+
+    ancestryService = TestBed.inject(AncestryService);
+    await ancestryService.openBuiltin();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  // Regression test for the diff shown in the editor and on the validation
+  // page before anything is saved: it comes from compareGedcomDatabase(),
+  // so the CHAN bump needs to show up there too, not just in the file
+  // written by updateGedcomDatabase().
+  it("compareGedcomDatabase shows a CHAN bump for a record that changed, before saving", async () => {
+    // liveQuery's change notification from openBuiltin() lands
+    // asynchronously, separately from the promise it awaits, so give it a
+    // moment to actually reach gedcomResource before reading the database.
+    await vi.waitFor(() => {
+      expect(ancestryService.ancestryDatabase()).toBeDefined();
+    });
+    const database = ancestryService.ancestryDatabase();
+    assert.isDefined(database);
+    const updatedDatabase = produce(database, (draft) => {
+      const name = draft.individuals["@I1@"]?.names[0];
+      assert.isDefined(name);
+      name.givenName = "Jane";
+    });
+
+    const differences = ancestryService.compareGedcomDatabase(updatedDatabase);
+    const individualDifference = differences.find(
+      ({ updatedGedcomRecord }) =>
+        updatedGedcomRecord?.tag === "INDI" &&
+        updatedGedcomRecord.xref === "@I1@",
+    );
+    assert.isDefined(individualDifference?.updatedGedcomRecord);
+
+    const text = serializeGedcomRecordToText(
+      individualDifference.updatedGedcomRecord,
+    ).join("\n");
+    expect(text).toContain("CHAN");
   });
 });

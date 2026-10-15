@@ -8,7 +8,7 @@ import {
   compareGedcomDatabase,
   parseGedcomDatabase,
   serializeGedcomDatabase,
-  stampChangeDates,
+  stampChangeDates as stampGedcomChangeDates,
   type GedcomDatabase,
 } from "../gedcom/gedcomDatabase";
 import { parseGedcomRecords, type GedcomRecord } from "../gedcom/gedcomRecord";
@@ -188,23 +188,32 @@ export class AncestryService {
     return parseGedcomDatabase(gedcomResourceValue.gedcomRecords);
   });
 
+  // Stamps CHAN on whatever in `gedcomDatabase` has actually changed relative
+  // to the GEDCOM file currently loaded -- shared by compareGedcomDatabase()
+  // (so diff previews show the change date bump before it's saved) and
+  // updateGedcomDatabase() (so the saved file carries it), rather than each
+  // having to remember to stamp it separately.
+  stampChangeDates(gedcomDatabase: GedcomDatabase): GedcomDatabase {
+    return stampGedcomChangeDates(
+      this.gedcomResource.value()?.gedcomRecords ?? [],
+      gedcomDatabase,
+    );
+  }
+
   compareGedcomDatabase(gedcomDatabase: GedcomDatabase): {
     originalGedcomRecord?: GedcomRecord;
     updatedGedcomRecord?: GedcomRecord;
   }[] {
     return compareGedcomDatabase(
       this.gedcomResource.value()?.gedcomRecords ?? [],
-      gedcomDatabase,
+      this.stampChangeDates(gedcomDatabase),
     );
   }
 
   async updateGedcomDatabase(gedcomDatabase: GedcomDatabase) {
     const gedcomResource = this.gedcomResource.value();
     const originalGedcomRecords = gedcomResource?.gedcomRecords ?? [];
-    const stampedGedcomDatabase = stampChangeDates(
-      originalGedcomRecords,
-      gedcomDatabase,
-    );
+    const stampedGedcomDatabase = this.stampChangeDates(gedcomDatabase);
     const text = serializeGedcomDatabase(
       originalGedcomRecords,
       stampedGedcomDatabase,

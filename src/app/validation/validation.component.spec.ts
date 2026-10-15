@@ -73,6 +73,20 @@ describe("ValidationComponent", () => {
     expect(await screen.findByText(/Submit changes as proposed/)).toBeTruthy();
   });
 
+  // Regression test: the proposed-after preview used to be built straight
+  // from applyUrlSuggestion's output, which never touches changeDate, so the
+  // CHAN bump that actually lands on save was invisible in this diff.
+  it("shows the change date bump in the proposed-after preview", async () => {
+    await screen.findByText(/Create repository/);
+    const afterRecord = component.afterSourceRecordForUrlSuggestion(
+      source,
+      urlSuggestion,
+    );
+    expect(afterRecord?.children.some((child) => child.tag === "CHAN")).toBe(
+      true,
+    );
+  });
+
   it("submitUrlSuggestion applies the suggestion and saves it directly", async () => {
     vi.spyOn(ancestryService, "requestWritePermission").mockResolvedValue(true);
     const updateGedcomDatabaseSpy = vi
