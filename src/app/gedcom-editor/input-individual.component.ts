@@ -6,6 +6,7 @@ import {
   newGedcomIndividual,
   type GedcomIndividual,
 } from "../../gedcom/gedcomIndividual";
+import { InputChangeDateComponent } from "./input-change-date.component";
 import { InputIndividualFactsComponent } from "./input-individual-facts.component";
 import { InputIndividualNamesComponent } from "./input-individual-names.component";
 import { InputIndividualSexComponent } from "./input-individual-sex.component";
@@ -21,6 +22,7 @@ import { InputUnknownRecordsComponent } from "./input-unknown-records.component"
     InputIndividualNamesComponent,
     InputUnknownRecordsComponent,
     InputNotesComponent,
+    InputChangeDateComponent,
   ],
   templateUrl: "./input-individual.component.html",
   styleUrl: "./input.component.css",

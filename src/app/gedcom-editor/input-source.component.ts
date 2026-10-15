@@ -3,6 +3,7 @@ import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomSource, type GedcomSource } from "../../gedcom/gedcomSource";
+import { InputChangeDateComponent } from "./input-change-date.component";
 import { InputMultimediaLinksComponent } from "./input-multimedia-links.component";
 import { InputRepositoryLinksComponent } from "./input-repository-links.component";
 import { InputUnknownRecordsComponent } from "./input-unknown-records.component";
@@ -14,6 +15,7 @@ import { InputUnknownRecordsComponent } from "./input-unknown-records.component"
     InputMultimediaLinksComponent,
     InputRepositoryLinksComponent,
     InputUnknownRecordsComponent,
+    InputChangeDateComponent,
   ],
   templateUrl: "./input-source.component.html",
   styleUrl: "./input.component.css",
