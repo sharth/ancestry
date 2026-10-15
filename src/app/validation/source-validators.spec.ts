@@ -20,7 +20,7 @@ describe("sourceValidators", () => {
       fieldName: "text",
       url: "https://example.com/record",
       standalone: true,
-      suggestedName: "example",
+      suggestedName: "example.com",
       matchedRepository: undefined,
     });
   });
