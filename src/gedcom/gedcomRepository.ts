@@ -1,5 +1,11 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import {
+  newGedcomChangeDate,
+  parseGedcomChangeDate,
+  serializeGedcomChangeDate,
+  type GedcomChangeDate,
+} from "./gedcomChangeDate";
+import {
   filterTrivialGedcomRecords,
   newGedcomRecord,
   type GedcomRecord,
@@ -8,6 +14,7 @@ import {
 export interface GedcomRepository {
   xref: string;
   name: string;
+  changeDate: GedcomChangeDate;
 }
 
 export function newGedcomRepository(
@@ -15,6 +22,7 @@ export function newGedcomRepository(
 ): GedcomRepository {
   return {
     name: "",
+    changeDate: newGedcomChangeDate(),
     ...fieldsToUpdate,
   };
 }
@@ -39,6 +47,10 @@ export function parseGedcomRepository(
         gedcomRepository.name = childRecord.value;
         break;
 
+      case "CHAN":
+        gedcomRepository.changeDate = parseGedcomChangeDate(childRecord);
+        break;
+
       default:
         reportUnparsedRecord(childRecord);
         break;
@@ -60,6 +72,7 @@ export function serializeGedcomRepository(
         abstag: "REPO.NAME",
         value: gedcomRepository.name,
       }),
+      serializeGedcomChangeDate(gedcomRepository.changeDate),
     ]),
   });
 }
