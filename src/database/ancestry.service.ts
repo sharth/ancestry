@@ -8,7 +8,7 @@ import {
   compareGedcomDatabase,
   parseGedcomDatabase,
   serializeGedcomDatabase,
-  stampChangeDates as stampGedcomChangeDates,
+  stampChangeDates,
   type GedcomDatabase,
 } from "../gedcom/gedcomDatabase";
 import { parseGedcomRecords, type GedcomRecord } from "../gedcom/gedcomRecord";
@@ -195,7 +195,7 @@ export class AncestryService {
   // this wrapper is for callers like the validation page's suggestion
   // previews that need one already-stamped record rather than a diff.
   stampChangeDates(gedcomDatabase: GedcomDatabase): GedcomDatabase {
-    return stampGedcomChangeDates(
+    return stampChangeDates(
       this.gedcomResource.value()?.gedcomRecords ?? [],
       gedcomDatabase,
     );
