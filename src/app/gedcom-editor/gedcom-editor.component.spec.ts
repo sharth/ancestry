@@ -296,9 +296,28 @@ describe("GedcomEditorComponent Integration", () => {
         return Promise.resolve(true);
       });
 
-      await component.submitForm();
+      await component.submitForm(new Event("submit"));
 
       expect(order).toEqual(["finished", "navigate"]);
+    });
+
+    // Regression test for the bug this guards against: the <form> has no
+    // `action`, so without preventDefault() the browser falls back to a
+    // real navigation to the current URL on submit. That race (a real
+    // unload attempt while the async save is still in flight) is what
+    // trips the browser's native "leave site" prompt on every save,
+    // across every page that embeds this editor -- see
+    // GedcomEditorDialogComponent.onBeforeUnload.
+    it("prevents the native form submission", async () => {
+      vi.spyOn(ancestryService, "updateGedcomDatabase").mockResolvedValue(
+        undefined,
+      );
+      vi.spyOn(TestBed.inject(Router), "navigate").mockResolvedValue(true);
+      const event = new Event("submit", { cancelable: true });
+
+      await component.submitForm(event);
+
+      expect(event.defaultPrevented).toBe(true);
     });
   });
 });
