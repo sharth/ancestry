@@ -1,5 +1,11 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import {
+  newGedcomChangeDate,
+  parseGedcomChangeDate,
+  serializeGedcomChangeDate,
+  type GedcomChangeDate,
+} from "./gedcomChangeDate";
+import {
   filterTrivialGedcomRecords,
   newGedcomRecord,
   type GedcomRecord,
@@ -9,6 +15,7 @@ export interface GedcomSubmitter {
   xref: string;
   name: string;
   email: string;
+  changeDate: GedcomChangeDate;
 }
 
 export function newGedcomSubmitter(
@@ -17,6 +24,7 @@ export function newGedcomSubmitter(
   return {
     name: "",
     email: "",
+    changeDate: newGedcomChangeDate(),
     ...fieldsToUpdate,
   };
 }
@@ -43,6 +51,9 @@ export function parseGedcomSubmitter(
         if (childRecord.xref != "") throw new Error();
         if (childRecord.value == "") throw new Error();
         gedcomSubmitter.email = childRecord.value;
+        break;
+      case "CHAN":
+        gedcomSubmitter.changeDate = parseGedcomChangeDate(childRecord);
         break;
       default:
         reportUnparsedRecord(childRecord);
@@ -71,6 +82,7 @@ export function serializeGedcomSubmitter(
         abstag: "SUBM._EMAIL",
         value: gedcomSubmitter.email,
       }),
+      serializeGedcomChangeDate(gedcomSubmitter.changeDate),
     ]),
   });
 }
