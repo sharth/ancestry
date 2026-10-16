@@ -156,6 +156,13 @@ export function parseGedcomDatabase(gedcomRecords: GedcomRecord[]) {
   return gedcomDatabase;
 }
 
+// Diffs `originalGedcomRecords` (the file as currently on disk) against
+// `updatedGedcomDatabase` (the in-memory, edited database), one entry per
+// record on either side. Stamps CHAN on whatever actually changed before
+// diffing, so every caller -- the editor's live diff, the validation
+// page's before/after preview, and the file `serializeGedcomDatabase()`
+// writes -- sees and saves the same change date, without each having to
+// remember to stamp it first.
 export function compareGedcomDatabase(
   originalGedcomRecords: GedcomRecord[],
   updatedGedcomDatabase: GedcomDatabase,
@@ -163,6 +170,11 @@ export function compareGedcomDatabase(
   originalGedcomRecord?: GedcomRecord;
   updatedGedcomRecord?: GedcomRecord;
 }[] {
+  const stampedGedcomDatabase = stampChangeDates(
+    originalGedcomRecords,
+    updatedGedcomDatabase,
+  );
+
   function hash(gedcomRecord: GedcomRecord) {
     return `${gedcomRecord.tag} ${gedcomRecord.xref} ${gedcomRecord.value}`;
   }
@@ -176,22 +188,22 @@ export function compareGedcomDatabase(
 
   [
     serializeGedcomHeader(generateGedcomHeader()),
-    ...Object.values(updatedGedcomDatabase.submitters).map((s) =>
+    ...Object.values(stampedGedcomDatabase.submitters).map((s) =>
       serializeGedcomSubmitter(s),
     ),
-    ...Object.values(updatedGedcomDatabase.individuals).map((i) =>
+    ...Object.values(stampedGedcomDatabase.individuals).map((i) =>
       serializeGedcomIndividual(i),
     ),
-    ...Object.values(updatedGedcomDatabase.families).map((f) =>
+    ...Object.values(stampedGedcomDatabase.families).map((f) =>
       serializeGedcomFamily(f),
     ),
-    ...Object.values(updatedGedcomDatabase.sources).map((s) =>
+    ...Object.values(stampedGedcomDatabase.sources).map((s) =>
       serializeGedcomSource(s),
     ),
-    ...Object.values(updatedGedcomDatabase.repositories).map((r) =>
+    ...Object.values(stampedGedcomDatabase.repositories).map((r) =>
       serializeGedcomRepository(r),
     ),
-    ...Object.values(updatedGedcomDatabase.multimedias).map((m) =>
+    ...Object.values(stampedGedcomDatabase.multimedias).map((m) =>
       serializeGedcomMultimedia(m),
     ),
     newGedcomRecord({ tag: "TRLR" }),
@@ -234,11 +246,13 @@ function contentChanged(
 }
 
 // Stamps CHAN (change date) on every individual, source, and multimedia
-// record whose content differs from `originalGedcomRecords` -- the one
-// place every save path routes through (AncestryService.updateGedcomDatabase),
-// rather than each editor form having to remember to do it itself. Limited
-// to the record types that already parse/serialize CHANGE_DATE (GEDCOM
-// 5.5.1 p. 31).
+// record whose content differs from `originalGedcomRecords`. `compareGedcomDatabase`
+// calls this for every caller that goes through it (the editor's diff,
+// `serializeGedcomDatabase`'s save path, and the validation page's
+// preview-by-diffing); it's also exported directly for callers like the
+// validation page's suggestion previews, which need one already-stamped
+// record rather than a diff. Limited to the record types that already
+// parse/serialize CHANGE_DATE (GEDCOM 5.5.1 p. 31).
 export function stampChangeDates(
   originalGedcomRecords: GedcomRecord[],
   database: GedcomDatabase,

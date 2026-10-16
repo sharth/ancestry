@@ -189,10 +189,11 @@ export class AncestryService {
   });
 
   // Stamps CHAN on whatever in `gedcomDatabase` has actually changed relative
-  // to the GEDCOM file currently loaded -- shared by compareGedcomDatabase()
-  // (so diff previews show the change date bump before it's saved) and
-  // updateGedcomDatabase() (so the saved file carries it), rather than each
-  // having to remember to stamp it separately.
+  // to the GEDCOM file currently loaded. `compareGedcomDatabase()` and
+  // `updateGedcomDatabase()` get this for free (it's built into
+  // `compareGedcomDatabase`/`serializeGedcomDatabase` in gedcomDatabase.ts);
+  // this wrapper is for callers like the validation page's suggestion
+  // previews that need one already-stamped record rather than a diff.
   stampChangeDates(gedcomDatabase: GedcomDatabase): GedcomDatabase {
     return stampGedcomChangeDates(
       this.gedcomResource.value()?.gedcomRecords ?? [],
@@ -206,18 +207,14 @@ export class AncestryService {
   }[] {
     return compareGedcomDatabase(
       this.gedcomResource.value()?.gedcomRecords ?? [],
-      this.stampChangeDates(gedcomDatabase),
+      gedcomDatabase,
     );
   }
 
   async updateGedcomDatabase(gedcomDatabase: GedcomDatabase) {
     const gedcomResource = this.gedcomResource.value();
     const originalGedcomRecords = gedcomResource?.gedcomRecords ?? [];
-    const stampedGedcomDatabase = this.stampChangeDates(gedcomDatabase);
-    const text = serializeGedcomDatabase(
-      originalGedcomRecords,
-      stampedGedcomDatabase,
-    );
+    const text = serializeGedcomDatabase(originalGedcomRecords, gedcomDatabase);
 
     const gedcomFileHandle = this.gedcomResource.value()?.gedcomFileHandle;
     if (gedcomFileHandle == undefined) {
