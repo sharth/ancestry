@@ -23,6 +23,7 @@ export interface GedcomFamily {
   childXrefs: string[];
   facts: GedcomFact[];
   citations: GedcomSourceCitation[];
+  unknownRecords: GedcomRecord[];
 }
 
 export function newGedcomFamily(
@@ -34,6 +35,7 @@ export function newGedcomFamily(
     childXrefs: [],
     facts: [],
     citations: [],
+    unknownRecords: [],
     ...fieldsToUpdate,
   };
 }
@@ -76,7 +78,7 @@ export function parseGedcomFamily(record: GedcomRecord): GedcomFamily {
         gedcomFamily.citations.push(parseGedcomSourceCitation(childRecord));
         break;
       default:
-        reportUnparsedRecord(childRecord);
+        gedcomFamily.unknownRecords.push(childRecord);
         break;
     }
   }
@@ -113,6 +115,7 @@ export function serializeGedcomFamily(
         serializeGedcomSourceCitation(citation),
       ),
       ...gedcomFamily.facts.map((event) => serializeGedcomFamilyFact(event)),
+      ...gedcomFamily.unknownRecords,
     ]),
   });
 }
