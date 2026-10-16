@@ -356,7 +356,13 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     return this.differences().length > 0;
   }
 
-  async submitForm() {
+  async submitForm(event: Event) {
+    // Without this, the native <form> falls back to its default submit
+    // behavior -- a real browser navigation to the current URL -- which
+    // races the async save below and trips the browser's own
+    // beforeunload prompt (GedcomEditorDialogComponent.onBeforeUnload)
+    // before the save has finished.
+    event.preventDefault();
     await this.ancestryService.updateGedcomDatabase(this.workingDatabase());
     // Close the dialog before the reload navigation below: the unsaved-changes
     // guard checks whether the dialog is still open, and the just-saved
