@@ -1,5 +1,5 @@
-import { Component, signal } from "@angular/core";
-import { RouterLink, RouterOutlet } from "@angular/router";
+import { Component, inject, signal } from "@angular/core";
+import { Router, RouterLink, RouterOutlet } from "@angular/router";
 
 @Component({
   selector: "app-root",
@@ -8,6 +8,8 @@ import { RouterLink, RouterOutlet } from "@angular/router";
   styleUrl: "./app.component.css",
 })
 export class AppComponent {
+  private readonly router = inject(Router);
+
   readonly sidebarOpen = signal(false);
 
   toggleSidebar() {
@@ -16,5 +18,10 @@ export class AppComponent {
 
   closeSidebar() {
     this.sidebarOpen.set(false);
+  }
+
+  search(query: string) {
+    this.closeSidebar();
+    void this.router.navigate(["/search"], { queryParams: { q: query } });
   }
 }
