@@ -32,4 +32,17 @@ describe("InputMultimediaLinksComponent", () => {
   it("should create", () => {
     expect(component).toBeTruthy();
   });
+
+  it("setCrop updates only the targeted link", () => {
+    component.appendMultimediaLink();
+    component.appendMultimediaLink();
+    component.setCrop(1, { top: 1, left: 2, height: 3, width: 4 });
+    expect(component.value()[0]?.crop).toBeUndefined();
+    expect(component.value()[1]?.crop).toEqual({
+      top: 1,
+      left: 2,
+      height: 3,
+      width: 4,
+    });
+  });
 });
