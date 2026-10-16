@@ -1,152 +1,142 @@
 <h1>Validation</h1>
-<table class="table table-striped align-middle">
-  <thead>
-    <tr>
-      <th>Source</th>
-      <th>Severity</th>
-      <th>Field</th>
-      <th>Group</th>
-      <th>Message</th>
-      <th>Fix</th>
-    </tr>
-  </thead>
-  <tbody>
-    @for (
-      sourceScenario of sourceScenarios();
-      track sourceScenario.source.xref
-    ) {
-      @for (error of sourceScenario.result.errors; track error) {
-        <tr>
-          <td>
-            <a [routerLink]="['/source', sourceScenario.source.xref]">
-              {{ sourceScenario.source.abbr || sourceScenario.source.xref }}
+
+<div class="grid-table" role="table">
+  <div class="grid-row header-row" role="row">
+    <div role="columnheader">Source</div>
+    <div role="columnheader">Severity</div>
+    <div role="columnheader">Field</div>
+    <div role="columnheader">Group</div>
+    <div role="columnheader">Message</div>
+    <div role="columnheader">Fix</div>
+  </div>
+
+  @for (row of rows(); track $index; let i = $index) {
+    @if (row.urlSuggestion; as urlSuggestion) {
+      <div class="diff-section" role="rowgroup">
+        <div
+          class="grid-row sticky-row"
+          [class.striped]="i % 2 === 1"
+          role="row"
+        >
+          <div role="cell">
+            <a [routerLink]="['/source', row.source.xref]">
+              {{ row.source.abbr || row.source.xref }}
             </a>
-          </td>
-          <td>Error</td>
-          <td>{{ error.fieldName }}</td>
-          <td>{{ error.groupName }}</td>
-          <td>{{ error.message }}</td>
-          <td></td>
-        </tr>
-      }
-      @for (warning of sourceScenario.result.warnings; track warning) {
-        <tr>
-          <td>
-            <a [routerLink]="['/source', sourceScenario.source.xref]">
-              {{ sourceScenario.source.abbr || sourceScenario.source.xref }}
+          </div>
+          <div role="cell">{{ row.severity }}</div>
+          <div role="cell">{{ row.fieldName }}</div>
+          <div role="cell">{{ row.groupName }}</div>
+          <div role="cell">{{ row.message }}</div>
+          <div role="cell">
+            <div class="btn-group">
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-primary"
+                (click)="
+                  reviewUrlSuggestion(row.source, urlSuggestion);
+                  editDialog.showModal()
+                "
+              >
+                Open editor with proposed changes:
+                {{
+                  urlSuggestion.matchedRepository
+                    ? "Link to " +
+                      (urlSuggestion.matchedRepository.name ||
+                        urlSuggestion.matchedRepository.xref)
+                    : "Create repository"
+                }}
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-success"
+                (click)="submitUrlSuggestion(row.source, urlSuggestion)"
+              >
+                Submit changes as proposed
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="diff-content" role="cell">
+          <app-gedcom-diff
+            [oldGedcomRecord]="beforeSourceRecord(row.source)"
+            [newGedcomRecord]="
+              afterSourceRecordForUrlSuggestion(row.source, urlSuggestion)
+            "
+          />
+          @if (
+            afterRepositoryRecord(row.source, urlSuggestion);
+            as newRepositoryRecord
+          ) {
+            <app-gedcom-diff
+              [oldGedcomRecord]="undefined"
+              [newGedcomRecord]="newRepositoryRecord"
+            />
+          }
+        </div>
+      </div>
+    } @else if (row.mergeSuggestion; as mergeSuggestion) {
+      <div class="diff-section" role="rowgroup">
+        <div
+          class="grid-row sticky-row"
+          [class.striped]="i % 2 === 1"
+          role="row"
+        >
+          <div role="cell">
+            <a [routerLink]="['/source', row.source.xref]">
+              {{ row.source.abbr || row.source.xref }}
             </a>
-          </td>
-          <td>Warning</td>
-          <td>{{ warning.fieldName }}</td>
-          <td>{{ warning.groupName }}</td>
-          <td>{{ warning.message }}</td>
-          <td>
-            @if (warning.urlSuggestion; as urlSuggestion) {
-              <div class="btn-group">
-                <button
-                  type="button"
-                  class="btn btn-sm btn-outline-primary"
-                  (click)="
-                    reviewUrlSuggestion(sourceScenario.source, urlSuggestion);
-                    editDialog.showModal()
-                  "
-                >
-                  Open editor with proposed changes:
-                  {{
-                    urlSuggestion.matchedRepository
-                      ? "Link to " +
-                        (urlSuggestion.matchedRepository.name ||
-                          urlSuggestion.matchedRepository.xref)
-                      : "Create repository"
-                  }}
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-sm btn-outline-success"
-                  (click)="
-                    submitUrlSuggestion(sourceScenario.source, urlSuggestion)
-                  "
-                >
-                  Submit changes as proposed
-                </button>
-              </div>
-            }
-            @if (warning.mergeRepositoryLinksSuggestion; as mergeSuggestion) {
-              <div class="btn-group">
-                <button
-                  type="button"
-                  class="btn btn-sm btn-outline-primary"
-                  (click)="
-                    reviewMergeSuggestion(
-                      sourceScenario.source,
-                      mergeSuggestion
-                    );
-                    editDialog.showModal()
-                  "
-                >
-                  Open editor with proposed changes: Merge repository citations
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-sm btn-outline-success"
-                  (click)="
-                    submitMergeSuggestion(
-                      sourceScenario.source,
-                      mergeSuggestion
-                    )
-                  "
-                >
-                  Submit changes as proposed
-                </button>
-              </div>
-            }
-          </td>
-        </tr>
-        @if (warning.urlSuggestion; as urlSuggestion) {
-          <tr>
-            <td></td>
-            <td colspan="5">
-              <app-gedcom-diff
-                [oldGedcomRecord]="beforeSourceRecord(sourceScenario.source)"
-                [newGedcomRecord]="
-                  afterSourceRecordForUrlSuggestion(
-                    sourceScenario.source,
-                    urlSuggestion
-                  )
+          </div>
+          <div role="cell">{{ row.severity }}</div>
+          <div role="cell">{{ row.fieldName }}</div>
+          <div role="cell">{{ row.groupName }}</div>
+          <div role="cell">{{ row.message }}</div>
+          <div role="cell">
+            <div class="btn-group">
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-primary"
+                (click)="
+                  reviewMergeSuggestion(row.source, mergeSuggestion);
+                  editDialog.showModal()
                 "
-              />
-              @if (
-                afterRepositoryRecord(sourceScenario.source, urlSuggestion);
-                as newRepositoryRecord
-              ) {
-                <app-gedcom-diff
-                  [oldGedcomRecord]="undefined"
-                  [newGedcomRecord]="newRepositoryRecord"
-                />
-              }
-            </td>
-          </tr>
-        }
-        @if (warning.mergeRepositoryLinksSuggestion; as mergeSuggestion) {
-          <tr>
-            <td></td>
-            <td colspan="5">
-              <app-gedcom-diff
-                [oldGedcomRecord]="beforeSourceRecord(sourceScenario.source)"
-                [newGedcomRecord]="
-                  afterSourceRecordForMergeSuggestion(
-                    sourceScenario.source,
-                    mergeSuggestion
-                  )
-                "
-              />
-            </td>
-          </tr>
-        }
-      }
+              >
+                Open editor with proposed changes: Merge repository citations
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-success"
+                (click)="submitMergeSuggestion(row.source, mergeSuggestion)"
+              >
+                Submit changes as proposed
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="diff-content" role="cell">
+          <app-gedcom-diff
+            [oldGedcomRecord]="beforeSourceRecord(row.source)"
+            [newGedcomRecord]="
+              afterSourceRecordForMergeSuggestion(row.source, mergeSuggestion)
+            "
+          />
+        </div>
+      </div>
+    } @else {
+      <div class="grid-row" [class.striped]="i % 2 === 1" role="row">
+        <div role="cell">
+          <a [routerLink]="['/source', row.source.xref]">
+            {{ row.source.abbr || row.source.xref }}
+          </a>
+        </div>
+        <div role="cell">{{ row.severity }}</div>
+        <div role="cell">{{ row.fieldName }}</div>
+        <div role="cell">{{ row.groupName }}</div>
+        <div role="cell">{{ row.message }}</div>
+        <div role="cell"></div>
+      </div>
     }
-  </tbody>
-</table>
+  }
+</div>
 
 <app-gedcom-editor-dialog
   #editDialog

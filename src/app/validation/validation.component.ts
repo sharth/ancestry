@@ -40,6 +40,16 @@ type ReviewState =
       suggestion: MergeRepositoryLinksSuggestion;
     };
 
+interface TableRow {
+  source: GedcomSource;
+  severity: "Error" | "Warning";
+  fieldName: string;
+  groupName: string;
+  message: string;
+  urlSuggestion?: UrlRepositorySuggestion;
+  mergeSuggestion?: MergeRepositoryLinksSuggestion;
+}
+
 @Component({
   selector: "app-validation",
   imports: [RouterModule, GedcomEditorDialogComponent, GedcomDiffComponent],
@@ -65,6 +75,41 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
       result: sourceValidators(source, this.ancestryDatabase()),
     })),
   );
+
+  // Errors and warnings across every source, flattened into a single list
+  // in display order -- rendered by one `@for` in the template (rather
+  // than nested per-source loops) so each row's position in the list is
+  // known, which is what lets a warning's button row stay `position:
+  // sticky` scoped to just its own diff (see validation.component.css):
+  // each row with a diff wraps itself and the diff that follows it in
+  // their own containing box, which only works cleanly with a flat list
+  // of rows to walk through, not a table nested two loops deep.
+  readonly rows = computed<TableRow[]>(() => {
+    const result: TableRow[] = [];
+    for (const sourceScenario of this.sourceScenarios()) {
+      for (const error of sourceScenario.result.errors) {
+        result.push({
+          source: sourceScenario.source,
+          severity: "Error",
+          fieldName: error.fieldName,
+          groupName: error.groupName,
+          message: error.message,
+        });
+      }
+      for (const warning of sourceScenario.result.warnings) {
+        result.push({
+          source: sourceScenario.source,
+          severity: "Warning",
+          fieldName: warning.fieldName,
+          groupName: warning.groupName,
+          message: warning.message,
+          urlSuggestion: warning.urlSuggestion,
+          mergeSuggestion: warning.mergeRepositoryLinksSuggestion,
+        });
+      }
+    }
+    return result;
+  });
 
   // The suggestion currently being reviewed in the GEDCOM editor dialog, if
   // any.

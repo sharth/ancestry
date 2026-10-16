@@ -1,9 +1,59 @@
-table {
-  table-layout: fixed;
+/* A hand-rolled "table" built from CSS Grid instead of a real <table>,
+   with ARIA roles standing in for the table semantics a <table> would
+   otherwise give screen readers for free. A real <table> (even split
+   across multiple <tbody> elements, one per section) is what this page
+   used before, but `position: sticky` on a table row renders
+   inconsistently across browsers once the table has several `<tbody>`s
+   and rows of varying height -- two different warnings' sticky rows could
+   end up visibly overlapping each other. Plain grid rows don't have that
+   problem: `position: sticky` behaves exactly like it does anywhere else
+   on the web. */
+
+.grid-table {
   width: 100%;
+  border: 1px solid #dee2e6;
+  border-top: 0;
+  --columns: 1fr 1fr 1fr 1fr 2fr 1fr;
 }
 
-td,
-th {
+.grid-row {
+  display: grid;
+  grid-template-columns: var(--columns);
+}
+
+.grid-row > [role="columnheader"],
+.grid-row > [role="cell"] {
+  padding: 0.5rem 0.75rem;
+  border-top: 1px solid #dee2e6;
   overflow-wrap: break-word;
+  vertical-align: middle;
+}
+
+.header-row {
+  font-weight: bold;
+}
+
+.striped > [role="cell"] {
+  background-color: rgb(0 0 0 / 2.5%);
+}
+
+/* Each warning that has a diff wraps its button row and the diff itself
+   in one box, so the button row's `position: sticky` sticks only within
+   that box -- it releases once this section has fully scrolled past,
+   right as the next one's button row reaches the top. */
+.diff-section {
+  position: relative;
+}
+
+.sticky-row {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: #fff;
+  box-shadow: 0 1px 0 #dee2e6;
+}
+
+.diff-content {
+  padding: 0.5rem 0.75rem 1rem 0.75rem;
+  border-top: 1px solid #dee2e6;
 }
