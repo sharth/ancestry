@@ -1,11 +1,11 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
-import { monthNames } from "./gedcomDate";
 import {
   parseGedcomFamily,
   serializeGedcomFamily,
   type GedcomFamily,
 } from "./gedcomFamily";
 import {
+  generateGedcomHeader,
   parseGedcomHeader,
   serializeGedcomHeader,
   type GedcomHeader,
@@ -211,29 +211,4 @@ export function serializeGedcomDatabase(
     .map(({ updatedGedcomRecord }) => updatedGedcomRecord)
     .filter((r) => r != null)
     .flatMap((r) => serializeGedcomRecordToText(r));
-}
-
-function generateGedcomHeader(now = new Date()): GedcomHeader {
-  const day = now.getDate();
-  const month = monthNames[now.getMonth()];
-  const year = now.getFullYear();
-  return {
-    record: newGedcomRecord({
-      tag: "HEAD",
-      children: [
-        newGedcomRecord({
-          tag: "GEDC",
-          children: [newGedcomRecord({ tag: "VERS", value: "7.0.14" })],
-        }),
-        newGedcomRecord({
-          tag: "SOUR",
-          value: "https://github.com/sharth/ancestry",
-        }),
-        newGedcomRecord({
-          tag: "DATE",
-          value: `${day} ${month} ${year}`,
-        }),
-      ],
-    }),
-  };
 }
