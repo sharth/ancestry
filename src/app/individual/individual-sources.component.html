@@ -1,33 +1,29 @@
 @if (vm(); as vm) {
   @if (vm.sourceGroups.length > 0) {
-    @for (group of vm.sourceGroups; track group.sourceXref) {
-      <h3>
-        <a routerLink="/source/{{ group.sourceXref }}">{{
-          group.source?.abbr || group.source?.title || group.sourceXref
-        }}</a>
-      </h3>
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>Event</th>
-            <th>Citation</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (row of group.rows; track row) {
-            <tr>
-              <td>
-                {{ row.eventDescription }}
-                @if (row.spouseXref) {
-                  (with <app-individual-link [xref]="row.spouseXref" />)
-                }
-              </td>
-              <td>{{ row.citation.text || row.citation.page }}</td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    }
+    <div class="sources-grid">
+      @for (group of vm.sourceGroups; track group.sourceXref) {
+        <h3 class="sources-grid-title">
+          <a routerLink="/source/{{ group.sourceXref }}">{{
+            group.source?.abbr || group.source?.title || group.sourceXref
+          }}</a>
+        </h3>
+        <div class="sources-grid-row sources-grid-row-header">
+          <div>Event</div>
+          <div>Citation</div>
+        </div>
+        @for (row of group.rows; track row) {
+          <div class="sources-grid-row">
+            <div>
+              {{ row.eventDescription }}
+              @if (row.spouseXref) {
+                (with <app-individual-link [xref]="row.spouseXref" />)
+              }
+            </div>
+            <div>{{ row.citation.text || row.citation.page }}</div>
+          </div>
+        }
+      }
+    </div>
   } @else {
     <p>No sources cited.</p>
   }
