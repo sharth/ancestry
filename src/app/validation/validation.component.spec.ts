@@ -173,3 +173,59 @@ describe("ValidationComponent merge repository links suggestion", () => {
     expect(updateGedcomDatabaseSpy).not.toHaveBeenCalled();
   });
 });
+
+describe("ValidationComponent sticky header", () => {
+  it("scopes each warning's sticky row to its own section, one per diff", async () => {
+    const ancestryDatabase = signal(
+      newGedcomDatabase({
+        sources: {
+          S1: newGedcomSource({
+            xref: "S1",
+            title:
+              "Newfoundland Virtal Records, 1892, Birth of Catherine Cooper https://familysearch.org/ark:/61903/3:1:S3HT-61DS-32F?cc=1790939&wc=M61G-RM3%3A144853601",
+          }),
+          S2: newGedcomSource({
+            xref: "S2",
+            title:
+              "Second Source https://www.ancestry.com/discoveryui-content/view/123456:7890?tid=111&pid=181",
+          }),
+          S3: newGedcomSource({
+            xref: "S3",
+            title:
+              "Jackson Daily News, Obituary, 1910 https://www.newspapers.com/clip/56286648/jackson-daily-news/",
+          }),
+        },
+      }),
+    );
+
+    await render(ValidationComponent, {
+      providers: [provideRouter([])],
+      bindings: [inputBinding("ancestryDatabase", ancestryDatabase)],
+      waitForStableOnRender: true,
+    });
+
+    await screen.findAllByText(/Submit changes as proposed/);
+
+    // One `.sticky-row` per warning with a diff, each the first child of
+    // its own `.diff-section`. That's what scopes a `position: sticky`
+    // row's "stuck" range to just its own section: the containing block a
+    // sticky element sticks within is the nearest block-level ancestor,
+    // so each row only ever competes for the top of the page with the
+    // content inside its own section, never a different warning's row --
+    // unlike putting them all in one shared `<table>`, which is what let
+    // two different warnings' sticky rows render on top of each other
+    // (the bug in #444).
+    const sections = Array.from(
+      document.querySelectorAll<HTMLElement>(".diff-section"),
+    );
+    expect(sections).toHaveLength(3);
+    for (const section of sections) {
+      const stickyRows = section.querySelectorAll(".sticky-row");
+      expect(stickyRows).toHaveLength(1);
+      expect(section.firstElementChild).toBe(stickyRows[0]);
+      expect(getComputedStyle(stickyRows[0] as HTMLElement).position).toBe(
+        "sticky",
+      );
+    }
+  });
+});
