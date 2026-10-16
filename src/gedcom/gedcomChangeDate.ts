@@ -11,13 +11,13 @@ export interface GedcomChangeDate {
   value: string;
 }
 
-// The CHAN.DATE value for "now", in the GEDCOM DATE_EXACT format used
-// throughout this file (e.g. "9 OCT 2026").
-export function formatGedcomChangeDate(now = new Date()): string {
+// A CHAN for "now", in the GEDCOM DATE_EXACT format used throughout this
+// file (e.g. "9 OCT 2026").
+export function generateChangeDate(now = new Date()): GedcomChangeDate {
   const day = now.getDate();
   const month = monthNames[now.getMonth()];
   const year = now.getFullYear();
-  return `${day} ${month} ${year}`;
+  return newGedcomChangeDate({ value: `${day} ${month} ${year}` });
 }
 
 export function newGedcomChangeDate(

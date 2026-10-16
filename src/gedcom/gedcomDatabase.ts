@@ -1,7 +1,8 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import {
-  formatGedcomChangeDate,
+  generateChangeDate,
   newGedcomChangeDate,
+  type GedcomChangeDate,
 } from "./gedcomChangeDate";
 import {
   parseGedcomFamily,
@@ -241,7 +242,7 @@ function contentChanged(
 export function stampChangeDates(
   originalGedcomRecords: GedcomRecord[],
   database: GedcomDatabase,
-  today: string = formatGedcomChangeDate(),
+  changeDate: GedcomChangeDate = generateChangeDate(),
 ): GedcomDatabase {
   const originalByHash = new Map(
     originalGedcomRecords.map(
@@ -262,7 +263,7 @@ export function stampChangeDates(
             changeDate: newGedcomChangeDate(),
           }),
         )
-          ? { ...individual, changeDate: { value: today } }
+          ? { ...individual, changeDate }
           : individual,
       ]),
     ),
@@ -276,7 +277,7 @@ export function stampChangeDates(
             changeDate: newGedcomChangeDate(),
           }),
         )
-          ? { ...source, changeDate: { value: today } }
+          ? { ...source, changeDate }
           : source,
       ]),
     ),
@@ -287,7 +288,7 @@ export function stampChangeDates(
           originalByHash,
           serializeGedcomMultimedia({ ...multimedia, changeDate: undefined }),
         )
-          ? { ...multimedia, changeDate: { value: today } }
+          ? { ...multimedia, changeDate }
           : multimedia,
       ]),
     ),

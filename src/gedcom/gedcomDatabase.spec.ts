@@ -10,7 +10,7 @@ import { newGedcomName } from "./gedcomName";
 import { parseGedcomRecords } from "./gedcomRecord";
 import { newGedcomSource, serializeGedcomSource } from "./gedcomSource";
 
-const TODAY = "9 OCT 2026";
+const TODAY = newGedcomChangeDate({ value: "9 OCT 2026" });
 
 describe("stampChangeDates", () => {
   it("stamps a newly created record that has no original", () => {
@@ -20,9 +20,7 @@ describe("stampChangeDates", () => {
 
     const stamped = stampChangeDates([], database, TODAY);
 
-    expect(stamped.individuals["@I1@"]?.changeDate).toEqual(
-      newGedcomChangeDate({ value: TODAY }),
-    );
+    expect(stamped.individuals["@I1@"]?.changeDate).toEqual(TODAY);
   });
 
   it("stamps a record whose content differs from the original", () => {
@@ -43,9 +41,7 @@ describe("stampChangeDates", () => {
 
     const stamped = stampChangeDates(originalGedcomRecords, database, TODAY);
 
-    expect(stamped.individuals["@I1@"]?.changeDate).toEqual(
-      newGedcomChangeDate({ value: TODAY }),
-    );
+    expect(stamped.individuals["@I1@"]?.changeDate).toEqual(TODAY);
   });
 
   it("leaves a record's change date alone when nothing changed", () => {
