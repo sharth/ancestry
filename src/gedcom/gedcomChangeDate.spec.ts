@@ -1,6 +1,7 @@
 import { assert, describe, expect, it } from "vitest";
 
 import {
+  generateChangeDate,
   newGedcomChangeDate,
   parseGedcomChangeDate,
   serializeGedcomChangeDate,
@@ -41,5 +42,11 @@ describe("GedcomChangeDate", () => {
   it("without value is null", () => {
     const gedcomChangeDate = newGedcomChangeDate();
     expect(serializeGedcomChangeDate(gedcomChangeDate)).toBeNull();
+  });
+
+  it("generateChangeDate formats a date as GEDCOM DATE_EXACT", () => {
+    expect(generateChangeDate(new Date(2026, 9, 9))).toEqual(
+      newGedcomChangeDate({ value: "9 OCT 2026" }),
+    );
   });
 });

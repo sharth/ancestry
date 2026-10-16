@@ -284,6 +284,68 @@ describe("GedcomEditorComponent Integration", () => {
     });
   });
 
+  // These go through the real GedcomEditorComponent -- the thing that hosts
+  // <app-input-individual> and <app-input-source> -- rather than only the
+  // lower-level AncestryService/gedcomDatabase unit tests, so a change made
+  // the way the editor actually makes one is shown ending up with a CHAN.
+  // (A literal "type into the rendered form" test isn't possible here: fully
+  // stabilizing this form against immer's produce()-derived workingDatabase
+  // throws in dev builds -- see the ancestry-immer-freeze-signal-forms note
+  // -- so, like every other test in this file, this drives the same
+  // workingDatabaseView signal the form itself writes to.)
+  describe("change date stamping", () => {
+    it("differences() includes a CHAN record for an edited individual", () => {
+      component.workingDatabaseView.update(
+        produce((draft) => {
+          const individual = draft.individuals["@I0@"];
+          if (individual)
+            individual.names[0] = newGedcomName({ surname: "Changed" });
+        }),
+      );
+
+      const individualDifference = component
+        .differences()
+        .find(
+          ({ updatedGedcomRecord }) =>
+            updatedGedcomRecord?.tag === "INDI" &&
+            updatedGedcomRecord.xref === "@I0@",
+        );
+
+      expect(
+        individualDifference?.updatedGedcomRecord?.children.some(
+          (child) => child.tag === "CHAN",
+        ),
+      ).toBe(true);
+    });
+
+    it("differences() includes a CHAN record for an edited source", () => {
+      fixture.componentRef.setInput("tabs", [
+        { type: "SOUR", xref: "@SOUR300@" },
+      ]);
+
+      component.workingDatabaseView.update(
+        produce((draft) => {
+          const source = draft.sources["@SOUR300@"];
+          if (source) source.title = "Changed Title";
+        }),
+      );
+
+      const sourceDifference = component
+        .differences()
+        .find(
+          ({ updatedGedcomRecord }) =>
+            updatedGedcomRecord?.tag === "SOUR" &&
+            updatedGedcomRecord.xref === "@SOUR300@",
+        );
+
+      expect(
+        sourceDifference?.updatedGedcomRecord?.children.some(
+          (child) => child.tag === "CHAN",
+        ),
+      ).toBe(true);
+    });
+  });
+
   describe("submitForm tests", () => {
     it("emits finished before navigating, so the dialog is already closed by the time the reload re-checks the unsaved-changes guard", async () => {
       vi.spyOn(ancestryService, "updateGedcomDatabase").mockResolvedValue(

@@ -231,7 +231,8 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
       source,
       suggestion,
     );
-    const updatedSource = database.sources[source.xref];
+    const stampedDatabase = this.ancestryService.stampChangeDates(database);
+    const updatedSource = stampedDatabase.sources[source.xref];
     if (updatedSource === undefined) return undefined;
     return serializeGedcomSource(updatedSource);
   }
@@ -245,7 +246,8 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
       source,
       suggestion,
     );
-    const updatedSource = database.sources[source.xref];
+    const stampedDatabase = this.ancestryService.stampChangeDates(database);
+    const updatedSource = stampedDatabase.sources[source.xref];
     if (updatedSource === undefined) return undefined;
     return serializeGedcomSource(updatedSource);
   }

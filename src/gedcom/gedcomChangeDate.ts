@@ -1,4 +1,5 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
+import { monthNames } from "./gedcomDate";
 import {
   filterTrivialGedcomRecord,
   filterTrivialGedcomRecords,
@@ -8,6 +9,15 @@ import {
 
 export interface GedcomChangeDate {
   value: string;
+}
+
+// A CHAN for "now", in the GEDCOM DATE_EXACT format used throughout this
+// file (e.g. "9 OCT 2026").
+export function generateChangeDate(now = new Date()): GedcomChangeDate {
+  const day = now.getDate();
+  const month = monthNames[now.getMonth()];
+  const year = now.getFullYear();
+  return newGedcomChangeDate({ value: `${day} ${month} ${year}` });
 }
 
 export function newGedcomChangeDate(
