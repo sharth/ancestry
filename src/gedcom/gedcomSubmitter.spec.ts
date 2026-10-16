@@ -1,8 +1,10 @@
 import { assert, describe, expect, it } from "vitest";
 
+import { newGedcomChangeDate } from "./gedcomChangeDate";
 import {
   newGedcomRecord,
   parseGedcomRecords,
+  serializeGedcomRecordToText,
   type GedcomRecord,
 } from "./gedcomRecord";
 import {
@@ -48,5 +50,20 @@ describe("GedcomSubmitter", () => {
     expect(
       serializeGedcomSubmitter(parseGedcomSubmitter(gedcomRecord)),
     ).toEqual(gedcomRecord);
+  });
+  it("with a change date", () => {
+    const gedcomText = ["0 @X3@ SUBM", "1 CHAN", "2 DATE 1 JAN 1900"];
+    const [gedcomRecord] = parseGedcomRecords(gedcomText.join("\n"));
+    assert.isDefined(gedcomRecord);
+    const gedcomSubmitter = parseGedcomSubmitter(gedcomRecord);
+    expect(gedcomSubmitter).toEqual(
+      newGedcomSubmitter({
+        xref: "@X3@",
+        changeDate: newGedcomChangeDate({ value: "1 JAN 1900" }),
+      }),
+    );
+    expect(
+      serializeGedcomRecordToText(serializeGedcomSubmitter(gedcomSubmitter)),
+    ).toEqual(gedcomText);
   });
 });
