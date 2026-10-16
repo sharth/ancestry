@@ -42,6 +42,13 @@
           <button
             type="button"
             class="btn btn-sm btn-outline-secondary"
+            (click)="openNewFamily()"
+          >
+            <i class="bi bi-people me-1"></i>Family
+          </button>
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary"
             (click)="openNewSource()"
           >
             <i class="bi bi-journal-bookmark me-1"></i>Source
@@ -87,14 +94,14 @@
             />
           }
         }
-        <!-- @case ("FAM") {
+        @case ("FAM") {
           @if (form.families[tabInformation.xref]; as family) {
             <app-input-family
               [workingDatabase]="workingDatabase()"
               [formField]="family"
             />
           }
-        } -->
+        }
         @case ("REPO") {
           @if (form.repositories[tabInformation.xref]; as repository) {
             <app-input-repository

@@ -14,6 +14,8 @@ export interface GedcomEditorInterface {
   openRepository(xref: string): void;
   openNewSource(): string;
   openSource(xref: string): void;
+  openNewFamily(): string;
+  openFamily(xref: string): void;
 }
 
 export const GEDCOM_EDITOR = new InjectionToken<GedcomEditorInterface>(

@@ -63,12 +63,14 @@ export const routes: Routes = [
     component: FamiliesComponent,
     resolve: { ancestryDatabase: ancestryDatabaseResolver },
     runGuardsAndResolvers: "always",
+    canDeactivate: [confirmUnsavedChangesGuard],
   },
   {
     path: "family/:xref",
     component: FamilyComponent,
     resolve: { ancestryDatabase: ancestryDatabaseResolver },
     runGuardsAndResolvers: "always",
+    canDeactivate: [confirmUnsavedChangesGuard],
     children: [
       { path: "", redirectTo: "facts", pathMatch: "full" },
       { path: "facts", component: FamilyFactsComponent },

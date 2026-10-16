@@ -1,0 +1,34 @@
+<details [open]="open()">
+  <summary>Events ({{ form.length }})</summary>
+  @for (event of form; track event) {
+    <details [open]="newControls.has(event)">
+      <summary>
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-danger bi-trash"
+          aria-label="Remove event"
+          (click)="removeEvent($index)"
+        ></button>
+        {{ event.tag().value() }}
+      </summary>
+      <app-input-family-fact
+        [workingDatabase]="workingDatabase()"
+        [formField]="event"
+      ></app-input-family-fact>
+    </details>
+  }
+  <div
+    class="details-lookalike"
+    tabindex="0"
+    (click)="appendEvent()"
+    (keydown.enter)="appendEvent()"
+  >
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-primary bi-plus"
+      aria-label="Add event"
+      (click)="$event.preventDefault()"
+    ></button>
+    Append another event
+  </div>
+</details>
