@@ -1,5 +1,6 @@
 import { assert, describe, expect, it } from "vitest";
 
+import { newGedcomChangeDate } from "./gedcomChangeDate";
 import { newGedcomFact } from "./gedcomFact";
 import {
   newGedcomFamily,
@@ -116,6 +117,26 @@ describe("gedcomFamily", () => {
           newGedcomFact({ tag: "MARS" }),
           newGedcomFact({ tag: "EVEN", value: "value", type: "type" }),
         ],
+      }),
+    );
+    expect(
+      serializeGedcomRecordToText(serializeGedcomFamily(gedcomFamily)),
+    ).toEqual(gedcomText);
+  });
+
+  it("parse family with a change date", () => {
+    const gedcomText = [
+      "0 @F5@ FAM", //
+      "1 CHAN",
+      "2 DATE 1 JAN 1900",
+    ];
+    const [gedcomRecord] = parseGedcomRecords(gedcomText.join("\n"));
+    assert.isOk(gedcomRecord);
+    const gedcomFamily = parseGedcomFamily(gedcomRecord);
+    expect(gedcomFamily).toEqual(
+      newGedcomFamily({
+        xref: "@F5@",
+        changeDate: newGedcomChangeDate({ value: "1 JAN 1900" }),
       }),
     );
     expect(
