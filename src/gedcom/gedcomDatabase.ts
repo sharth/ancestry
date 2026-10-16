@@ -156,6 +156,21 @@ export function parseGedcomDatabase(gedcomRecords: GedcomRecord[]) {
   return gedcomDatabase;
 }
 
+function hashRecord(gedcomRecord: GedcomRecord): string {
+  return `${gedcomRecord.tag} ${gedcomRecord.xref} ${gedcomRecord.value}`;
+}
+
+// Builds the hash -> original-record lookup once, shared by
+// `compareGedcomDatabase` (which also uses it to seed the diff) and
+// `stampChangeDates` (which builds its own when called standalone).
+function buildOriginalByHash(
+  originalGedcomRecords: GedcomRecord[],
+): Map<string, GedcomRecord> {
+  return new Map(
+    originalGedcomRecords.map((record) => [hashRecord(record), record]),
+  );
+}
+
 // Diffs `originalGedcomRecords` (the file as currently on disk) against
 // `updatedGedcomDatabase` (the in-memory, edited database), one entry per
 // record on either side. Stamps CHAN on whatever actually changed before
@@ -170,20 +185,18 @@ export function compareGedcomDatabase(
   originalGedcomRecord?: GedcomRecord;
   updatedGedcomRecord?: GedcomRecord;
 }[] {
-  const stampedGedcomDatabase = stampChangeDates(
-    originalGedcomRecords,
+  const originalByHash = buildOriginalByHash(originalGedcomRecords);
+  const stampedGedcomDatabase = stampChangeDatesUsing(
+    originalByHash,
     updatedGedcomDatabase,
   );
 
-  function hash(gedcomRecord: GedcomRecord) {
-    return `${gedcomRecord.tag} ${gedcomRecord.xref} ${gedcomRecord.value}`;
-  }
   const recordMap = new Map<
     string,
     { originalGedcomRecord?: GedcomRecord; updatedGedcomRecord?: GedcomRecord }
   >();
-  originalGedcomRecords.forEach((gedcomRecord) => {
-    recordMap.set(hash(gedcomRecord), { originalGedcomRecord: gedcomRecord });
+  originalByHash.forEach((gedcomRecord, h) => {
+    recordMap.set(h, { originalGedcomRecord: gedcomRecord });
   });
 
   [
@@ -208,7 +221,7 @@ export function compareGedcomDatabase(
     ),
     newGedcomRecord({ tag: "TRLR" }),
   ].forEach((gedcomRecord: GedcomRecord) => {
-    const h = hash(gedcomRecord);
+    const h = hashRecord(gedcomRecord);
     const r = recordMap.get(h);
     if (r === undefined) {
       recordMap.set(h, { updatedGedcomRecord: gedcomRecord });
@@ -236,8 +249,7 @@ function contentChanged(
   originalByHash: Map<string, GedcomRecord>,
   updatedRecord: GedcomRecord,
 ): boolean {
-  const hash = `${updatedRecord.tag} ${updatedRecord.xref} ${updatedRecord.value}`;
-  const original = originalByHash.get(hash);
+  const original = originalByHash.get(hashRecord(updatedRecord));
   if (original === undefined) return true;
   return (
     serializeGedcomRecordToText(withoutChangeDate(original)).join("\n") !==
@@ -246,25 +258,18 @@ function contentChanged(
 }
 
 // Stamps CHAN (change date) on every individual, source, and multimedia
-// record whose content differs from `originalGedcomRecords`. `compareGedcomDatabase`
-// calls this for every caller that goes through it (the editor's diff,
-// `serializeGedcomDatabase`'s save path, and the validation page's
-// preview-by-diffing); it's also exported directly for callers like the
-// validation page's suggestion previews, which need one already-stamped
-// record rather than a diff. Limited to the record types that already
-// parse/serialize CHANGE_DATE (GEDCOM 5.5.1 p. 31).
-export function stampChangeDates(
-  originalGedcomRecords: GedcomRecord[],
+// record whose content differs from the original, given an already-built
+// hash -> original-record lookup. `compareGedcomDatabase` calls this with
+// the lookup it already built, so the records aren't hashed twice; the
+// exported `stampChangeDates` below builds the lookup itself for standalone
+// callers like the validation page's suggestion previews, which need one
+// already-stamped record rather than a diff. Limited to the record types
+// that already parse/serialize CHANGE_DATE (GEDCOM 5.5.1 p. 31).
+function stampChangeDatesUsing(
+  originalByHash: Map<string, GedcomRecord>,
   database: GedcomDatabase,
   changeDate: GedcomChangeDate = generateChangeDate(),
 ): GedcomDatabase {
-  const originalByHash = new Map(
-    originalGedcomRecords.map(
-      (record) =>
-        [`${record.tag} ${record.xref} ${record.value}`, record] as const,
-    ),
-  );
-
   return {
     ...database,
     individuals: Object.fromEntries(
@@ -307,6 +312,18 @@ export function stampChangeDates(
       ]),
     ),
   };
+}
+
+export function stampChangeDates(
+  originalGedcomRecords: GedcomRecord[],
+  database: GedcomDatabase,
+  changeDate: GedcomChangeDate = generateChangeDate(),
+): GedcomDatabase {
+  return stampChangeDatesUsing(
+    buildOriginalByHash(originalGedcomRecords),
+    database,
+    changeDate,
+  );
 }
 
 export function serializeGedcomDatabase(
