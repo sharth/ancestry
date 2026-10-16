@@ -18,8 +18,8 @@ import {
   vi,
 } from "vitest";
 
-import { AncestryService } from "../database/ancestry.service";
-import { routes } from "./app.routes";
+import { AncestryService } from "../../database/ancestry.service";
+import { routes } from "../app.routes";
 
 /**
  * Regression test for a bug that kept coming back across the GEDCOM
