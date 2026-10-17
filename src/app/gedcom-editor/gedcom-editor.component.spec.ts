@@ -1,16 +1,29 @@
 import { TestBed, type ComponentFixture } from "@angular/core/testing";
 import { provideRouter, Router } from "@angular/router";
-import { render } from "@testing-library/angular/zoneless";
+import { render, screen } from "@testing-library/angular/zoneless";
+import { userEvent } from "@testing-library/user-event";
 import { produce } from "immer";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { assert, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AncestryService } from "../../database/ancestry.service";
-import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
+import {
+  compareGedcomDatabase,
+  newGedcomDatabase,
+  parseGedcomDatabase,
+} from "../../gedcom/gedcomDatabase";
 import { newGedcomDate } from "../../gedcom/gedcomDate";
 import { newGedcomFact } from "../../gedcom/gedcomFact";
 import { newGedcomFamily } from "../../gedcom/gedcomFamily";
+import {
+  generateGedcomHeader,
+  serializeGedcomHeader,
+} from "../../gedcom/gedcomHeader";
 import { newGedcomIndividual } from "../../gedcom/gedcomIndividual";
 import { newGedcomName } from "../../gedcom/gedcomName";
+import {
+  parseGedcomRecords,
+  serializeGedcomRecordToText,
+} from "../../gedcom/gedcomRecord";
 import { newGedcomSex } from "../../gedcom/gedcomSex";
 import { newGedcomSource } from "../../gedcom/gedcomSource";
 import { GedcomEditorComponent } from "./gedcom-editor.component";
@@ -55,20 +68,36 @@ describe("GedcomEditorComponent Integration", () => {
     expect(component).toBeTruthy();
   });
 
-  describe("hasUnsavedChanges tests", () => {
+  describe("differences tests", () => {
     // AncestryService.compareGedcomDatabase() diffs against whatever GEDCOM
     // file is currently loaded (nothing, in this test environment), so it's
-    // stubbed directly to control what differences() reports.
-    it("returns false when compareGedcomDatabase reports no differences", () => {
+    // stubbed directly to control what differences() reports. differences()
+    // still drives the Gedcom diff-review tab.
+    it("reflects an empty compareGedcomDatabase result", () => {
       vi.spyOn(ancestryService, "compareGedcomDatabase").mockReturnValue([]);
-      expect(component.hasUnsavedChanges()).toBe(false);
+      expect(component.differences()).toEqual([]);
     });
 
-    it("returns true when compareGedcomDatabase reports a difference", () => {
+    it("reflects a non-empty compareGedcomDatabase result", () => {
+      const difference = {
+        originalGedcomRecord: undefined,
+        updatedGedcomRecord: undefined,
+      };
+      vi.spyOn(ancestryService, "compareGedcomDatabase").mockReturnValue([
+        difference,
+      ]);
+      expect(component.differences()).toEqual([difference]);
+    });
+  });
+
+  describe("hasUnsavedChanges tests", () => {
+    // hasUnsavedChanges() is based on the Signal Forms "dirty" state, not
+    // compareGedcomDatabase(), so it's unaffected by what that mock reports.
+    it("returns false when the form hasn't been touched, even if compareGedcomDatabase reports differences", () => {
       vi.spyOn(ancestryService, "compareGedcomDatabase").mockReturnValue([
         { originalGedcomRecord: undefined, updatedGedcomRecord: undefined },
       ]);
-      expect(component.hasUnsavedChanges()).toBe(true);
+      expect(component.hasUnsavedChanges()).toBe(false);
     });
   });
 
@@ -319,5 +348,141 @@ describe("GedcomEditorComponent Integration", () => {
 
       expect(event.defaultPrevented).toBe(true);
     });
+  });
+});
+
+// Regression test for a bug where opening the editor on an existing
+// family and making no changes still reported unsaved changes. The root
+// cause: GedcomFamily had no `unknownRecords` fallback (unlike
+// GedcomIndividual/GedcomSource), so FAM child records the parser doesn't
+// have a typed field for (e.g. NOTE, RIN) were silently dropped on
+// serialize. That made the freshly opened, unedited family look
+// different from the file on disk, which compareGedcomDatabase() (used
+// here via the real implementation, not a canned mock) reports as a real
+// difference. differences() still surfaces that comparison (it drives the
+// Gedcom diff-review tab), so it's what this regression test checks now;
+// hasUnsavedChanges() itself no longer depends on compareGedcomDatabase()
+// at all -- see the dirty-form tests below.
+//
+// This is a separate top-level describe, with its own TestBed, rather
+// than nested in the suite above: that suite's beforeEach already
+// renders a GedcomEditorComponent and sets its inputs, and re-setting
+// `ancestryDatabase` after the Signal Forms field tree has already been
+// built against that initial database hits a known, unrelated
+// test-environment fragility (see [[ancestry-immer-freeze-signal-forms]]).
+describe("GedcomEditorComponent differences with a real, unedited family", () => {
+  it("reports no differences even when the family has fields the parser doesn't have a typed field for", async () => {
+    // compareGedcomDatabase() always regenerates a canonical HEAD record
+    // (see generateGedcomHeader()), independent of this test's family
+    // bug, so the original records need a matching header or that
+    // unrelated, pre-existing behavior would show up as a difference too
+    // and mask what this test is actually checking.
+    const headerText = serializeGedcomRecordToText(
+      serializeGedcomHeader(generateGedcomHeader()),
+    );
+    const originalGedcomRecords = parseGedcomRecords(
+      [
+        ...headerText,
+        "0 @I0@ INDI",
+        "1 FAMS @F0@",
+        "0 @F0@ FAM",
+        "1 HUSB @I0@",
+        "1 NOTE Some family note",
+        "1 RIN 123",
+        "0 TRLR",
+      ].join("\n"),
+    );
+    const originalDatabase = parseGedcomDatabase(originalGedcomRecords);
+
+    const renderResult = await render(GedcomEditorComponent, {
+      providers: [provideRouter([])],
+      skipDetectChanges: true,
+    });
+    renderResult.fixture.componentRef.setInput("tabs", [
+      { type: "FAM", xref: "@F0@" },
+    ]);
+    renderResult.fixture.componentRef.setInput(
+      "ancestryDatabase",
+      originalDatabase,
+    );
+
+    vi.spyOn(
+      TestBed.inject(AncestryService),
+      "compareGedcomDatabase",
+    ).mockImplementation((gedcomDatabase) =>
+      compareGedcomDatabase(originalGedcomRecords, gedcomDatabase),
+    );
+
+    expect(renderResult.fixture.componentInstance.differences()).toEqual([]);
+  });
+});
+
+// Regression test for the bug Bill reported directly: opening the family
+// editor and making no changes still triggered the unsaved-changes
+// warning on Escape. hasUnsavedChanges() is now based on the Signal Forms
+// "dirty" state (this.form().dirty()) rather than diffing serialized
+// GEDCOM text, since dirty tracks genuine user interaction and sidesteps
+// unrelated differences (header restamping, fact/field reordering, etc.)
+// that compareGedcomDatabase() can report even when nothing was edited.
+// This is a separate top-level describe for the same TestBed-isolation
+// reason as above.
+describe("GedcomEditorComponent hasUnsavedChanges with real form interaction", () => {
+  const database = newGedcomDatabase({
+    individuals: {
+      "@I0@": newGedcomIndividual({
+        xref: "@I0@",
+        names: [newGedcomName({ givenName: "Stock", surname: "Individual" })],
+        sex: newGedcomSex({ sex: "M" }),
+        parentOfFamilyXrefs: ["@F0@"],
+      }),
+      "@I1@": newGedcomIndividual({
+        xref: "@I1@",
+        names: [newGedcomName({ givenName: "Other", surname: "Individual" })],
+        sex: newGedcomSex({ sex: "F" }),
+      }),
+    },
+    families: {
+      "@F0@": newGedcomFamily({
+        xref: "@F0@",
+        husbandXref: "@I0@",
+      }),
+    },
+  });
+
+  async function renderOnFamily() {
+    const renderResult = await render(GedcomEditorComponent, {
+      providers: [provideRouter([])],
+      skipDetectChanges: true,
+    });
+    renderResult.fixture.componentRef.setInput("tabs", [
+      { type: "FAM", xref: "@F0@" },
+    ]);
+    renderResult.fixture.componentRef.setInput("ancestryDatabase", database);
+    renderResult.fixture.detectChanges();
+    await renderResult.fixture.whenStable();
+    return renderResult;
+  }
+
+  it("returns false when the family has just been opened and nothing was edited", async () => {
+    const renderResult = await renderOnFamily();
+
+    expect(renderResult.fixture.componentInstance.hasUnsavedChanges()).toBe(
+      false,
+    );
+  });
+
+  it("returns true after a real edit to a field in the family form", async () => {
+    const renderResult = await renderOnFamily();
+
+    const [, wifeSelect] = screen.getAllByRole<HTMLSelectElement>("combobox");
+    assert.isOk(wifeSelect);
+    const user = userEvent.setup();
+    await user.selectOptions(wifeSelect, "@I1@");
+    renderResult.fixture.detectChanges();
+    await renderResult.fixture.whenStable();
+
+    expect(renderResult.fixture.componentInstance.hasUnsavedChanges()).toBe(
+      true,
+    );
   });
 });
