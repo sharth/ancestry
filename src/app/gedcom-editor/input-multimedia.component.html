@@ -29,3 +29,7 @@
   />
   <label for="mediaType">Media Type</label>
 </div>
+
+@if (form.filePath().value()) {
+  <app-multimedia-preview [filePath]="form.filePath().value()" />
+}

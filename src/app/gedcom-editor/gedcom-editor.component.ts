@@ -353,7 +353,16 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   }
 
   hasUnsavedChanges(): boolean {
-    return this.differences().length > 0;
+    // Signal Forms only marks a field (and the form's own aggregate dirty
+    // flag) dirty in response to a real control-originated value change --
+    // typing into a bound input, or a custom FormValueControl emitting a
+    // new value -- not in response to a programmatic signal update like
+    // workingDatabase.update() in openTab(). That makes it the right
+    // signal for "did the user actually change anything", unlike
+    // differences() (which also reflects unrelated, by-design differences
+    // between the working database and the file on disk, such as the
+    // header getting a fresh DATE/VERS stamp on every save).
+    return this.form().dirty();
   }
 
   async submitForm(event: Event) {
