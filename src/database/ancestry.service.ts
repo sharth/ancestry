@@ -8,7 +8,6 @@ import {
   compareGedcomDatabase,
   parseGedcomDatabase,
   serializeGedcomDatabase,
-  stampChangeDates,
   type GedcomDatabase,
 } from "../gedcom/gedcomDatabase";
 import { parseGedcomRecords, type GedcomRecord } from "../gedcom/gedcomRecord";
@@ -187,19 +186,6 @@ export class AncestryService {
 
     return parseGedcomDatabase(gedcomResourceValue.gedcomRecords);
   });
-
-  // Stamps CHAN on whatever in `gedcomDatabase` has actually changed relative
-  // to the GEDCOM file currently loaded. `compareGedcomDatabase()` and
-  // `updateGedcomDatabase()` get this for free (it's built into
-  // `compareGedcomDatabase`/`serializeGedcomDatabase` in gedcomDatabase.ts);
-  // this wrapper is for callers like the validation page's suggestion
-  // previews that need one already-stamped record rather than a diff.
-  stampChangeDates(gedcomDatabase: GedcomDatabase): GedcomDatabase {
-    return stampChangeDates(
-      this.gedcomResource.value()?.gedcomRecords ?? [],
-      gedcomDatabase,
-    );
-  }
 
   compareGedcomDatabase(gedcomDatabase: GedcomDatabase): {
     originalGedcomRecord?: GedcomRecord;

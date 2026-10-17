@@ -78,13 +78,18 @@ describe("ValidationComponent", () => {
   // CHAN bump that actually lands on save was invisible in this diff.
   it("shows the change date bump in the proposed-after preview", async () => {
     await screen.findByText(/Create repository/);
-    const afterRecord = component.afterSourceRecordForUrlSuggestion(
+    const differences = component.differencesForUrlSuggestion(
       source,
       urlSuggestion,
     );
-    expect(afterRecord?.children.some((child) => child.tag === "CHAN")).toBe(
-      true,
+    const sourceDifference = differences.find(
+      (d) => d.updatedGedcomRecord?.tag === "SOUR",
     );
+    expect(
+      sourceDifference?.updatedGedcomRecord?.children.some(
+        (child) => child.tag === "CHAN",
+      ),
+    ).toBe(true);
   });
 
   it("submitUrlSuggestion applies the suggestion and saves it directly", async () => {
