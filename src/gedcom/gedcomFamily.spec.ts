@@ -7,6 +7,7 @@ import {
   serializeGedcomFamily,
 } from "./gedcomFamily";
 import {
+  newGedcomRecord,
   parseGedcomRecords,
   serializeGedcomRecordToText,
 } from "./gedcomRecord";
@@ -147,20 +148,16 @@ describe("gedcomFamily", () => {
         husbandXref: "@I1@",
         wifeXref: "@I2@",
         unknownRecords: [
-          {
-            xref: "",
+          newGedcomRecord({
             tag: "NOTE",
             abstag: "FAM.NOTE",
             value: "Some family note",
-            children: [],
-          },
-          {
-            xref: "",
+          }),
+          newGedcomRecord({
             tag: "RIN",
             abstag: "FAM.RIN",
             value: "123",
-            children: [],
-          },
+          }),
         ],
       }),
     );
