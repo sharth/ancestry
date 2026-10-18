@@ -1,29 +1,32 @@
-import { Component, computed, inject, input } from "@angular/core";
+import { Component, computed, input } from "@angular/core";
+import { RouterModule } from "@angular/router";
 
-import { AncestryService } from "../../database/ancestry.service";
-import { SourceMultimediaComponent } from "./source-multimedia.component";
+import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 
 @Component({
   selector: "app-source-overview",
   templateUrl: "./source-overview.component.html",
   styleUrl: "./source.component.css",
-  imports: [SourceMultimediaComponent],
+  imports: [RouterModule],
 })
 export class SourceOverviewComponent {
+  readonly ancestryDatabase = input.required<GedcomDatabase>();
   readonly xref = input.required<string>();
 
-  private readonly ancestryService = inject(AncestryService);
-
   readonly vm = computed(() => {
-    const ancestry = this.ancestryService.ancestryDatabase();
-    if (ancestry == undefined) {
-      return undefined;
-    }
-    const source = ancestry.sources[this.xref()];
+    const ancestryDatabase = this.ancestryDatabase();
+    const source = ancestryDatabase.sources[this.xref()];
     if (source == undefined) {
       return undefined;
     }
 
-    return { source };
+    return {
+      source,
+      multimediaLinks: source.multimediaLinks.map((multimediaLink) => ({
+        multimedia: ancestryDatabase.multimedias[multimediaLink.xref],
+        xref: multimediaLink.xref,
+        title: multimediaLink.title,
+      })),
+    };
   });
 }

@@ -6,5 +6,28 @@
   <div>{{ vm.source.text }}</div>
 
   <h2>Multimedia</h2>
-  <app-source-multimedia [xref]="xref()" />
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Xref</th>
+        <th>Title</th>
+        <th>filePath</th>
+        <th>mediaType</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (multimediaLink of vm.multimediaLinks; track multimediaLink) {
+        <tr>
+          <td>
+            <a routerLink="/multimedia/{{ multimediaLink.xref }}">{{
+              multimediaLink.xref
+            }}</a>
+          </td>
+          <td>{{ multimediaLink.title }}</td>
+          <td>{{ multimediaLink.multimedia?.filePath }}</td>
+          <td>{{ multimediaLink.multimedia?.mediaType }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
 }
