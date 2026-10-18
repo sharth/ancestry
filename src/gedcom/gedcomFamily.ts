@@ -1,5 +1,11 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import {
+  newGedcomChangeDate,
+  parseGedcomChangeDate,
+  serializeGedcomChangeDate,
+  type GedcomChangeDate,
+} from "./gedcomChangeDate";
+import {
   parseGedcomFamilyEvent,
   serializeGedcomFamilyFact,
   type GedcomFact,
@@ -23,6 +29,7 @@ export interface GedcomFamily {
   childXrefs: string[];
   facts: GedcomFact[];
   citations: GedcomSourceCitation[];
+  changeDate: GedcomChangeDate;
   unknownRecords: GedcomRecord[];
 }
 
@@ -35,6 +42,7 @@ export function newGedcomFamily(
     childXrefs: [],
     facts: [],
     citations: [],
+    changeDate: newGedcomChangeDate(),
     unknownRecords: [],
     ...fieldsToUpdate,
   };
@@ -77,6 +85,9 @@ export function parseGedcomFamily(record: GedcomRecord): GedcomFamily {
       case "SOUR":
         gedcomFamily.citations.push(parseGedcomSourceCitation(childRecord));
         break;
+      case "CHAN":
+        gedcomFamily.changeDate = parseGedcomChangeDate(childRecord);
+        break;
       default:
         gedcomFamily.unknownRecords.push(childRecord);
         break;
@@ -115,6 +126,7 @@ export function serializeGedcomFamily(
         serializeGedcomSourceCitation(citation),
       ),
       ...gedcomFamily.facts.map((event) => serializeGedcomFamilyFact(event)),
+      serializeGedcomChangeDate(gedcomFamily.changeDate),
       ...gedcomFamily.unknownRecords,
     ]),
   });

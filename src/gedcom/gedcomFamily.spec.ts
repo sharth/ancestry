@@ -1,5 +1,6 @@
 import { assert, describe, expect, it } from "vitest";
 
+import { newGedcomChangeDate } from "./gedcomChangeDate";
 import { newGedcomFact } from "./gedcomFact";
 import {
   newGedcomFamily,
@@ -124,6 +125,26 @@ describe("gedcomFamily", () => {
     ).toEqual(gedcomText);
   });
 
+  it("parse family with a change date", () => {
+    const gedcomText = [
+      "0 @F5@ FAM", //
+      "1 CHAN",
+      "2 DATE 1 JAN 1900",
+    ];
+    const [gedcomRecord] = parseGedcomRecords(gedcomText.join("\n"));
+    assert.isOk(gedcomRecord);
+    const gedcomFamily = parseGedcomFamily(gedcomRecord);
+    expect(gedcomFamily).toEqual(
+      newGedcomFamily({
+        xref: "@F5@",
+        changeDate: newGedcomChangeDate({ value: "1 JAN 1900" }),
+      }),
+    );
+    expect(
+      serializeGedcomRecordToText(serializeGedcomFamily(gedcomFamily)),
+    ).toEqual(gedcomText);
+  });
+
   // Regression test: a FAM record containing tags the parser doesn't have
   // a typed field for (e.g. NOTE, RIN) used to be silently dropped on
   // serialize, since GedcomFamily had no `unknownRecords` fallback (unlike
@@ -133,7 +154,7 @@ describe("gedcomFamily", () => {
   // Escape even without any edits.
   it("round-trips FAM child records it doesn't have a typed field for", () => {
     const gedcomText = [
-      "0 @F5@ FAM", //
+      "0 @F6@ FAM", //
       "1 HUSB @I1@",
       "1 WIFE @I2@",
       "1 NOTE Some family note",
@@ -144,7 +165,7 @@ describe("gedcomFamily", () => {
     const gedcomFamily = parseGedcomFamily(gedcomRecord);
     expect(gedcomFamily).toEqual(
       newGedcomFamily({
-        xref: "@F5@",
+        xref: "@F6@",
         husbandXref: "@I1@",
         wifeXref: "@I2@",
         unknownRecords: [
