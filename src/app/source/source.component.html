@@ -1,26 +1,30 @@
 @if (vm(); as vm) {
   <h1>{{ vm.source.abbr || vm.source.xref }}</h1>
 
-  <h2>Title</h2>
-  <div>{{ vm.source.title }}</div>
+  <ul class="nav nav-tabs mb-3" role="tablist">
+    <li class="nav-item" role="presentation">
+      <a class="nav-link" routerLink="overview" routerLinkActive="active">
+        Overview
+      </a>
+    </li>
+    <li class="nav-item" role="presentation">
+      <a class="nav-link" routerLink="citations" routerLinkActive="active">
+        Citations
+      </a>
+    </li>
+    <li class="nav-item" role="presentation">
+      <a class="nav-link" routerLink="repositories" routerLinkActive="active">
+        Repositories
+      </a>
+    </li>
+    <li class="nav-item" role="presentation">
+      <a class="nav-link" routerLink="gedcom" routerLinkActive="active">
+        Gedcom
+      </a>
+    </li>
+  </ul>
 
-  <h2>Text</h2>
-  <div>{{ vm.source.text }}</div>
-
-  <h2>Citations</h2>
-  <app-source-citations [xref]="xref()" />
-
-  <h2>Repositories</h2>
-  <app-source-repositories [xref]="xref()" />
-
-  <h2>Multimedia</h2>
-  <app-source-multimedia [xref]="xref()" />
-
-  <h2>Unknown Records</h2>
-  <app-source-unknowns [xref]="xref()" />
-
-  <h2>Gedcom</h2>
-  <app-gedcom-display [gedcomRecord]="vm.gedcomRecord" />
+  <router-outlet />
 
   <div class="position-fixed bottom-0 end-0 rounded-circle m-5">
     <button
