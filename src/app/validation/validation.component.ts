@@ -10,12 +10,11 @@ import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 
 import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
-import type { GedcomRecord } from "../../gedcom/gedcomRecord";
-import { serializeGedcomRepository } from "../../gedcom/gedcomRepository";
 import {
-  serializeGedcomSource,
-  type GedcomSource,
-} from "../../gedcom/gedcomSource";
+  serializeGedcomRecordToText,
+  type GedcomRecord,
+} from "../../gedcom/gedcomRecord";
+import type { GedcomSource } from "../../gedcom/gedcomSource";
 import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
 import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
 import type { TabInformation } from "../gedcom-editor/gedcom-editor-interface";
@@ -215,56 +214,55 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
     });
   }
 
-  beforeSourceRecord(source: GedcomSource): GedcomRecord {
-    return serializeGedcomSource(source);
-  }
-
-  // The source as it'd look after `suggestion` is applied -- a preview
-  // only, computed fresh each time rather than reusing `reviewDatabase` so
-  // it stays correct even when nothing has been selected for review yet.
-  afterSourceRecordForUrlSuggestion(
+  // The records that would actually change on disk if `suggestion` is
+  // applied and saved -- built from AncestryService.compareGedcomDatabase(),
+  // the exact same diff serializeGedcomDatabase() writes from, so this
+  // preview shows everything that would change (CHAN and HEAD included),
+  // not just the source being fixed. Computed fresh each time rather than
+  // reusing `reviewDatabase` so it stays correct even when nothing has been
+  // selected for review yet.
+  differencesForUrlSuggestion(
     source: GedcomSource,
     suggestion: UrlRepositorySuggestion,
-  ): GedcomRecord | undefined {
+  ): {
+    originalGedcomRecord?: GedcomRecord;
+    updatedGedcomRecord?: GedcomRecord;
+  }[] {
     const { database } = applyUrlSuggestion(
       this.ancestryDatabase(),
       source,
       suggestion,
     );
-    const updatedSource = database.sources[source.xref];
-    if (updatedSource === undefined) return undefined;
-    return serializeGedcomSource(updatedSource);
+    return this.actualDifferences(database);
   }
 
-  afterSourceRecordForMergeSuggestion(
+  differencesForMergeSuggestion(
     source: GedcomSource,
     suggestion: MergeRepositoryLinksSuggestion,
-  ): GedcomRecord | undefined {
+  ): {
+    originalGedcomRecord?: GedcomRecord;
+    updatedGedcomRecord?: GedcomRecord;
+  }[] {
     const database = applyMergeRepositoryLinksSuggestion(
       this.ancestryDatabase(),
       source,
       suggestion,
     );
-    const updatedSource = database.sources[source.xref];
-    if (updatedSource === undefined) return undefined;
-    return serializeGedcomSource(updatedSource);
+    return this.actualDifferences(database);
   }
 
-  // The repository a suggestion would create, when it doesn't match an
-  // existing one -- undefined when the suggestion links to an existing
-  // repository instead, since that repository is left unchanged.
-  afterRepositoryRecord(
-    source: GedcomSource,
-    suggestion: UrlRepositorySuggestion,
-  ): GedcomRecord | undefined {
-    if (suggestion.matchedRepository !== undefined) return undefined;
-    const { database, repositoryXref } = applyUrlSuggestion(
-      this.ancestryDatabase(),
-      source,
-      suggestion,
-    );
-    const newRepository = database.repositories[repositoryXref];
-    if (newRepository === undefined) return undefined;
-    return serializeGedcomRepository(newRepository);
+  private actualDifferences(database: GedcomDatabase): {
+    originalGedcomRecord?: GedcomRecord;
+    updatedGedcomRecord?: GedcomRecord;
+  }[] {
+    return this.ancestryService
+      .compareGedcomDatabase(database)
+      .filter(
+        ({ originalGedcomRecord, updatedGedcomRecord }) =>
+          originalGedcomRecord == undefined ||
+          updatedGedcomRecord == undefined ||
+          serializeGedcomRecordToText(originalGedcomRecord).join("\n") !==
+            serializeGedcomRecordToText(updatedGedcomRecord).join("\n"),
+      );
   }
 }

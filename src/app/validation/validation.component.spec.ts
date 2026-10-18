@@ -73,6 +73,26 @@ describe("ValidationComponent", () => {
     expect(await screen.findByText(/Submit changes as proposed/)).toBeTruthy();
   });
 
+  // Regression test: the proposed-after preview used to be built straight
+  // from applyUrlSuggestion's output rather than through
+  // AncestryService.compareGedcomDatabase(), so it could drift from what
+  // actually gets written to disk. This confirms the preview goes through
+  // the same diff the save path uses.
+  it("builds the preview from AncestryService.compareGedcomDatabase", async () => {
+    await screen.findByText(/Create repository/);
+    const compareSpy = vi.spyOn(ancestryService, "compareGedcomDatabase");
+
+    const differences = component.differencesForUrlSuggestion(
+      source,
+      urlSuggestion,
+    );
+
+    expect(compareSpy).toHaveBeenCalled();
+    expect(differences.some((d) => d.updatedGedcomRecord?.tag === "SOUR")).toBe(
+      true,
+    );
+  });
+
   it("submitUrlSuggestion applies the suggestion and saves it directly", async () => {
     vi.spyOn(ancestryService, "requestWritePermission").mockResolvedValue(true);
     const updateGedcomDatabaseSpy = vi
