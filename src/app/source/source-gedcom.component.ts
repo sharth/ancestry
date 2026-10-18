@@ -1,6 +1,6 @@
-import { Component, computed, inject, input } from "@angular/core";
+import { Component, computed, input } from "@angular/core";
 
-import { AncestryService } from "../../database/ancestry.service";
+import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { serializeGedcomSource } from "../../gedcom/gedcomSource";
 import { GedcomDisplayComponent } from "../gedcom-display/gedcom-display.component";
 import { SourceUnknownsComponent } from "./source-unknowns.component";
@@ -12,16 +12,11 @@ import { SourceUnknownsComponent } from "./source-unknowns.component";
   imports: [GedcomDisplayComponent, SourceUnknownsComponent],
 })
 export class SourceGedcomComponent {
+  readonly ancestryDatabase = input.required<GedcomDatabase>();
   readonly xref = input.required<string>();
 
-  private readonly ancestryService = inject(AncestryService);
-
   readonly vm = computed(() => {
-    const ancestry = this.ancestryService.ancestryDatabase();
-    if (ancestry == undefined) {
-      return undefined;
-    }
-    const source = ancestry.sources[this.xref()];
+    const source = this.ancestryDatabase().sources[this.xref()];
     if (source == undefined) {
       return undefined;
     }
