@@ -30,6 +30,7 @@ export interface GedcomFamily {
   facts: GedcomFact[];
   citations: GedcomSourceCitation[];
   changeDate: GedcomChangeDate;
+  unknownRecords: GedcomRecord[];
 }
 
 export function newGedcomFamily(
@@ -42,6 +43,7 @@ export function newGedcomFamily(
     facts: [],
     citations: [],
     changeDate: newGedcomChangeDate(),
+    unknownRecords: [],
     ...fieldsToUpdate,
   };
 }
@@ -87,7 +89,7 @@ export function parseGedcomFamily(record: GedcomRecord): GedcomFamily {
         gedcomFamily.changeDate = parseGedcomChangeDate(childRecord);
         break;
       default:
-        reportUnparsedRecord(childRecord);
+        gedcomFamily.unknownRecords.push(childRecord);
         break;
     }
   }
@@ -125,6 +127,7 @@ export function serializeGedcomFamily(
       ),
       ...gedcomFamily.facts.map((event) => serializeGedcomFamilyFact(event)),
       serializeGedcomChangeDate(gedcomFamily.changeDate),
+      ...gedcomFamily.unknownRecords,
     ]),
   });
 }

@@ -57,19 +57,13 @@
           </div>
         </div>
         <div class="diff-content" role="cell">
-          <app-gedcom-diff
-            [oldGedcomRecord]="beforeSourceRecord(row.source)"
-            [newGedcomRecord]="
-              afterSourceRecordForUrlSuggestion(row.source, urlSuggestion)
-            "
-          />
-          @if (
-            afterRepositoryRecord(row.source, urlSuggestion);
-            as newRepositoryRecord
+          @for (
+            d of differencesForUrlSuggestion(row.source, urlSuggestion);
+            track $index
           ) {
             <app-gedcom-diff
-              [oldGedcomRecord]="undefined"
-              [newGedcomRecord]="newRepositoryRecord"
+              [oldGedcomRecord]="d.originalGedcomRecord"
+              [newGedcomRecord]="d.updatedGedcomRecord"
             />
           }
         </div>
@@ -113,12 +107,15 @@
           </div>
         </div>
         <div class="diff-content" role="cell">
-          <app-gedcom-diff
-            [oldGedcomRecord]="beforeSourceRecord(row.source)"
-            [newGedcomRecord]="
-              afterSourceRecordForMergeSuggestion(row.source, mergeSuggestion)
-            "
-          />
+          @for (
+            d of differencesForMergeSuggestion(row.source, mergeSuggestion);
+            track $index
+          ) {
+            <app-gedcom-diff
+              [oldGedcomRecord]="d.originalGedcomRecord"
+              [newGedcomRecord]="d.updatedGedcomRecord"
+            />
+          }
         </div>
       </div>
     } @else {

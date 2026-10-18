@@ -1,0 +1,91 @@
+@if (vm(); as vm) {
+  <h1>Search</h1>
+
+  @if (!vm.query) {
+    <p>Type something into the search box above.</p>
+  } @else {
+    @let totalResults =
+      vm.individuals.length +
+      vm.families.length +
+      vm.sources.length +
+      vm.repositories.length +
+      vm.multimedias.length +
+      vm.places.length;
+
+    @if (totalResults === 0) {
+      <p>No results for "{{ vm.query }}".</p>
+    } @else {
+      @if (vm.individuals.length) {
+        <h4>Individuals</h4>
+        <ul class="list-group mb-4">
+          @for (result of vm.individuals; track result.xref) {
+            <li class="list-group-item">
+              <app-individual-link [xref]="result.xref" />
+            </li>
+          }
+        </ul>
+      }
+
+      @if (vm.families.length) {
+        <h4>Families</h4>
+        <ul class="list-group mb-4">
+          @for (result of vm.families; track result.xref) {
+            <li class="list-group-item">
+              <a [routerLink]="['/family', result.xref]">{{ result.label }}</a>
+            </li>
+          }
+        </ul>
+      }
+
+      @if (vm.sources.length) {
+        <h4>Sources</h4>
+        <ul class="list-group mb-4">
+          @for (result of vm.sources; track result.xref) {
+            <li class="list-group-item">
+              <a [routerLink]="['/source', result.xref]">{{ result.label }}</a>
+            </li>
+          }
+        </ul>
+      }
+
+      @if (vm.repositories.length) {
+        <h4>Repositories</h4>
+        <ul class="list-group mb-4">
+          @for (result of vm.repositories; track result.xref) {
+            <li class="list-group-item">
+              <a [routerLink]="['/repository', result.xref]">{{
+                result.label
+              }}</a>
+            </li>
+          }
+        </ul>
+      }
+
+      @if (vm.multimedias.length) {
+        <h4>Multimedia</h4>
+        <ul class="list-group mb-4">
+          @for (result of vm.multimedias; track result.xref) {
+            <li class="list-group-item">
+              <a [routerLink]="['/multimedia', result.xref]">{{
+                result.label
+              }}</a>
+            </li>
+          }
+        </ul>
+      }
+
+      @if (vm.places.length) {
+        <h4>Places</h4>
+        <ul class="list-group mb-4">
+          @for (result of vm.places; track result.slugs.join("/")) {
+            <li class="list-group-item">
+              <a [routerLink]="['/place', ...result.slugs]">{{
+                result.label
+              }}</a>
+            </li>
+          }
+        </ul>
+      }
+    }
+  }
+}

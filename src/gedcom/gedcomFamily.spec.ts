@@ -8,6 +8,7 @@ import {
   serializeGedcomFamily,
 } from "./gedcomFamily";
 import {
+  newGedcomRecord,
   parseGedcomRecords,
   serializeGedcomRecordToText,
 } from "./gedcomRecord";
@@ -137,6 +138,48 @@ describe("gedcomFamily", () => {
       newGedcomFamily({
         xref: "@F5@",
         changeDate: newGedcomChangeDate({ value: "1 JAN 1900" }),
+      }),
+    );
+    expect(
+      serializeGedcomRecordToText(serializeGedcomFamily(gedcomFamily)),
+    ).toEqual(gedcomText);
+  });
+
+  // Regression test: a FAM record containing tags the parser doesn't have
+  // a typed field for (e.g. NOTE, RIN) used to be silently dropped on
+  // serialize, since GedcomFamily had no `unknownRecords` fallback (unlike
+  // GedcomIndividual/GedcomSource). That data loss made an untouched,
+  // freshly opened family look different from the original file, which is
+  // what caused the GEDCOM editor's unsaved-changes warning to fire on
+  // Escape even without any edits.
+  it("round-trips FAM child records it doesn't have a typed field for", () => {
+    const gedcomText = [
+      "0 @F6@ FAM", //
+      "1 HUSB @I1@",
+      "1 WIFE @I2@",
+      "1 NOTE Some family note",
+      "1 RIN 123",
+    ];
+    const [gedcomRecord] = parseGedcomRecords(gedcomText.join("\n"));
+    assert.isOk(gedcomRecord);
+    const gedcomFamily = parseGedcomFamily(gedcomRecord);
+    expect(gedcomFamily).toEqual(
+      newGedcomFamily({
+        xref: "@F6@",
+        husbandXref: "@I1@",
+        wifeXref: "@I2@",
+        unknownRecords: [
+          newGedcomRecord({
+            tag: "NOTE",
+            abstag: "FAM.NOTE",
+            value: "Some family note",
+          }),
+          newGedcomRecord({
+            tag: "RIN",
+            abstag: "FAM.RIN",
+            value: "123",
+          }),
+        ],
       }),
     );
     expect(
