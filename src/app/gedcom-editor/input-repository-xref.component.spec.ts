@@ -4,6 +4,7 @@ import { render } from "@testing-library/angular/zoneless";
 import { assert, beforeEach, describe, expect, it } from "vitest";
 
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
+import { newGedcomRepository } from "../../gedcom/gedcomRepository";
 import { InputRepositoryXrefComponent } from "./input-repository-xref.component";
 
 describe("InputRepositoryXrefComponent", () => {
@@ -13,7 +14,7 @@ describe("InputRepositoryXrefComponent", () => {
   const workingDatabase = signal(
     newGedcomDatabase({
       repositories: {
-        R1: { xref: "R1", name: "Mock Repository 1" },
+        R1: newGedcomRepository({ xref: "R1", name: "Mock Repository 1" }),
       },
     }),
   );

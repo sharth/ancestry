@@ -9,6 +9,7 @@ import { userEvent } from "@testing-library/user-event";
 import { assert, beforeEach, describe, expect, it } from "vitest";
 
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
+import { newGedcomRepository } from "../../gedcom/gedcomRepository";
 import { InputRepositoryLinksComponent } from "./input-repository-links.component";
 
 describe("InputRepositoryLinksComponent", () => {
@@ -19,7 +20,7 @@ describe("InputRepositoryLinksComponent", () => {
   const workingDatabase = signal(
     newGedcomDatabase({
       repositories: {
-        R1: { xref: "R1", name: "Mock Repository 1" },
+        R1: newGedcomRepository({ xref: "R1", name: "Mock Repository 1" }),
       },
     }),
   );
