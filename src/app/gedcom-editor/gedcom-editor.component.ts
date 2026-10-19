@@ -175,14 +175,16 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     }),
     {
       set: (updates: GedcomDatabase) => {
-        this.workingDatabase.update((database) => ({
-          submitters: { ...database.submitters, ...updates.submitters },
-          individuals: { ...database.individuals, ...updates.individuals },
-          families: { ...database.families, ...updates.families },
-          sources: { ...database.sources, ...updates.sources },
-          repositories: { ...database.repositories, ...updates.repositories },
-          multimedias: { ...database.multimedias, ...updates.multimedias },
-        }));
+        this.workingDatabase.update((database) =>
+          produce(database, (draft) => {
+            Object.assign(draft.submitters, updates.submitters);
+            Object.assign(draft.individuals, updates.individuals);
+            Object.assign(draft.families, updates.families);
+            Object.assign(draft.sources, updates.sources);
+            Object.assign(draft.repositories, updates.repositories);
+            Object.assign(draft.multimedias, updates.multimedias);
+          }),
+        );
       },
     },
   );
