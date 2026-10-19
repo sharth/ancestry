@@ -2,6 +2,7 @@ import { Component, computed, inject, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
 
 import { AncestryService } from "../../database/ancestry.service";
+import { gedcomIndividualFacts } from "../../gedcom/gedcomFactMetadata";
 import { IndividualLinkComponent } from "../individual-link/individual-link.component";
 
 @Component({
@@ -38,6 +39,9 @@ export class SourceCitationsComponent {
           .map(({ individual, event, citation }) => ({
             individual,
             event: event.tag,
+            eventDescription:
+              gedcomIndividualFacts[event.tag]?.humanReadableDescription ??
+              event.tag,
             citation,
           })),
         // Individual Sex Citations
@@ -50,6 +54,7 @@ export class SourceCitationsComponent {
             citations.map((citation) => ({
               individual,
               event: "SEX",
+              eventDescription: "Sex",
               citation,
             })),
           ),

@@ -2,6 +2,7 @@ import { Component, computed, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
+import { gedcomFamilyFacts } from "../../gedcom/gedcomFactMetadata";
 import { getFamilySourceCitations } from "../../gedcom/gedcomFamily";
 import type { GedcomSourceCitation } from "../../gedcom/gedcomSourceCitation";
 
@@ -24,9 +25,18 @@ export class FamilySourcesComponent {
 
     const sourceGroups = new Map<
       string,
-      { event: string; citation: GedcomSourceCitation }[]
+      {
+        event: string;
+        eventDescription: string;
+        citation: GedcomSourceCitation;
+      }[]
     >();
-    const citations = getFamilySourceCitations(family);
+    const citations = getFamilySourceCitations(family).map((citation) => ({
+      ...citation,
+      eventDescription:
+        gedcomFamilyFacts[citation.event]?.humanReadableDescription ??
+        citation.event,
+    }));
     for (const citation of citations) {
       const rows = sourceGroups.get(citation.citation.sourceXref) ?? [];
       rows.push(citation);

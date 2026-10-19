@@ -13,7 +13,7 @@
         </div>
         @for (row of group.rows; track row) {
           <div class="sources-grid-row">
-            <div>{{ row.event }}</div>
+            <div>{{ row.eventDescription }}</div>
             <div>{{ row.citation.text || row.citation.page }}</div>
           </div>
         }
