@@ -25,7 +25,6 @@ import { SettingsComponent } from "./settings/settings.component";
 import { SourceCitationsComponent } from "./source/source-citations.component";
 import { SourceGedcomComponent } from "./source/source-gedcom.component";
 import { SourceOverviewComponent } from "./source/source-overview.component";
-import { SourceRepositoriesComponent } from "./source/source-repositories.component";
 import { SourceComponent } from "./source/source.component";
 import { SourcesComponent } from "./sources/sources.component";
 import { confirmUnsavedChangesGuard } from "./unsaved-changes.guard";
@@ -120,7 +119,6 @@ export const routes: Routes = [
       { path: "", redirectTo: "overview", pathMatch: "full" },
       { path: "overview", component: SourceOverviewComponent },
       { path: "citations", component: SourceCitationsComponent },
-      { path: "repositories", component: SourceRepositoriesComponent },
       { path: "gedcom", component: SourceGedcomComponent },
     ],
   },

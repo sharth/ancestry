@@ -27,6 +27,12 @@ export class SourceOverviewComponent {
         xref: multimediaLink.xref,
         title: multimediaLink.title,
       })),
+      repositoryCitations: source.repositoryLinks.map((repositoryLink) => ({
+        repositoryXref: repositoryLink.repositoryXref,
+        callNumbers: repositoryLink.callNumbers,
+        repository:
+          ancestryDatabase.repositories[repositoryLink.repositoryXref],
+      })),
     };
   });
 }

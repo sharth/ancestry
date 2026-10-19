@@ -13,7 +13,6 @@ import { newGedcomSource } from "../../gedcom/gedcomSource";
 import { SourceCitationsComponent } from "./source-citations.component";
 import { SourceGedcomComponent } from "./source-gedcom.component";
 import { SourceOverviewComponent } from "./source-overview.component";
-import { SourceRepositoriesComponent } from "./source-repositories.component";
 import { SourceComponent } from "./source.component";
 
 describe("SourceComponent", () => {
@@ -45,14 +44,6 @@ describe("SourceComponent", () => {
             {
               path: "citations",
               component: SourceCitationsComponent,
-              resolve: {
-                ancestryDatabase: () => ancestryDatabase(),
-                xref: () => "@S1@",
-              },
-            },
-            {
-              path: "repositories",
-              component: SourceRepositoriesComponent,
               resolve: {
                 ancestryDatabase: () => ancestryDatabase(),
                 xref: () => "@S1@",

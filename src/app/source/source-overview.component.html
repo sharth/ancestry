@@ -30,4 +30,31 @@
       }
     </tbody>
   </table>
+
+  <h2>Repositories</h2>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Repository</th>
+        <th scope="col">Call Numbers</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (citation of vm.repositoryCitations; track citation) {
+        @let repository = citation.repository;
+        <tr>
+          <td>
+            <a routerLink="/repository/{{ citation.repositoryXref }}">
+              {{ repository?.name ?? citation.repositoryXref }}
+            </a>
+          </td>
+          <td>
+            @for (callNumber of citation.callNumbers; track callNumber) {
+              <div>{{ callNumber }}</div>
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
 }
