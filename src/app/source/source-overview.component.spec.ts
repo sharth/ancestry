@@ -7,6 +7,8 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomMultimedia } from "../../gedcom/gedcomMultimedia";
 import { newGedcomMultimediaLink } from "../../gedcom/gedcomMultimediaLink";
+import { newGedcomRepository } from "../../gedcom/gedcomRepository";
+import { newGedcomRepositoryLink } from "../../gedcom/gedcomRepositoryLink";
 import { newGedcomSource } from "../../gedcom/gedcomSource";
 import { SourceOverviewComponent } from "./source-overview.component";
 
@@ -33,6 +35,12 @@ describe("SourceOverviewComponent", () => {
                       title: "Scan of record",
                     }),
                   ],
+                  repositoryLinks: [
+                    newGedcomRepositoryLink({
+                      repositoryXref: "@R1@",
+                      callNumbers: ["12345"],
+                    }),
+                  ],
                 }),
               },
               multimedias: {
@@ -40,6 +48,12 @@ describe("SourceOverviewComponent", () => {
                   xref: "@M1@",
                   filePath: "scan.jpg",
                   mediaType: "image/jpeg",
+                }),
+              },
+              repositories: {
+                "@R1@": newGedcomRepository({
+                  xref: "@R1@",
+                  name: "Springfield Hall of Records",
                 }),
               },
             }),
@@ -62,5 +76,14 @@ describe("SourceOverviewComponent", () => {
     expect(multimediaLink?.xref).toBe("@M1@");
     expect(multimediaLink?.title).toBe("Scan of record");
     expect(multimediaLink?.multimedia?.filePath).toBe("scan.jpg");
+  });
+
+  it("includes the repository citation in the view model", () => {
+    const [repositoryCitation] = component.vm()?.repositoryCitations ?? [];
+    expect(repositoryCitation?.repositoryXref).toBe("@R1@");
+    expect(repositoryCitation?.callNumbers).toEqual(["12345"]);
+    expect(repositoryCitation?.repository?.name).toBe(
+      "Springfield Hall of Records",
+    );
   });
 });
