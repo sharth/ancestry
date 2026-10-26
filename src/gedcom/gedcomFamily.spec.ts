@@ -199,7 +199,7 @@ describe("gedcomFamily", () => {
         newGedcomFact({
           tag: "ENGA",
           date: newGedcomDate({ value: "ABT 1949" }),
-          sortDate: newGedcomDate({ value: "1949" }),
+          sortDate: newGedcomDate({ value: "2005" }),
         }),
         newGedcomFact({
           tag: "MARR",
@@ -211,13 +211,13 @@ describe("gedcomFamily", () => {
       serializeGedcomRecordToText(serializeGedcomFamily(gedcomFamily)),
     ).toEqual([
       "0 @F1@ FAM",
-      "1 ENGA",
-      "2 DATE ABT 1949",
-      "2 SDATE 1949",
       "1 MARR",
       "2 DATE 1950",
       "1 DIV",
       "2 DATE 1960",
+      "1 ENGA",
+      "2 DATE ABT 1949",
+      "2 SDATE 2005",
     ]);
   });
 });
