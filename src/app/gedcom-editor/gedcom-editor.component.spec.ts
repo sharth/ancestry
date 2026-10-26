@@ -313,6 +313,56 @@ describe("GedcomEditorComponent Integration", () => {
     });
   });
 
+  describe("deleteRecord tests", () => {
+    it("does nothing when the user declines the confirmation", () => {
+      vi.spyOn(globalThis, "confirm").mockReturnValue(false);
+
+      component.deleteRecord({ type: "INDI", xref: "@I0@" });
+
+      expect(component.workingDatabase().individuals["@I0@"]).toBeDefined();
+      expect(component.hasUnsavedChanges()).toBe(false);
+    });
+
+    it("removes the record, closes its tab, and reports an unsaved change", () => {
+      vi.spyOn(globalThis, "confirm").mockReturnValue(true);
+      component.xrefsIncludedInView.set([{ type: "INDI", xref: "@I0@" }]);
+      component.activeTab.set({ type: "INDI", xref: "@I0@" });
+
+      component.deleteRecord({ type: "INDI", xref: "@I0@" });
+
+      expect(component.workingDatabase().individuals["@I0@"]).toBeUndefined();
+      expect(component.xrefsIncludedInView()).toEqual([]);
+      expect(component.activeTab()).toBeUndefined();
+      expect(component.hasUnsavedChanges()).toBe(true);
+    });
+
+    it("switches the active tab to another open tab when the deleted one was active", () => {
+      vi.spyOn(globalThis, "confirm").mockReturnValue(true);
+      component.xrefsIncludedInView.set([
+        { type: "INDI", xref: "@I0@" },
+        { type: "FAM", xref: "@F0@" },
+      ]);
+      component.activeTab.set({ type: "INDI", xref: "@I0@" });
+
+      component.deleteRecord({ type: "INDI", xref: "@I0@" });
+
+      expect(component.activeTab()).toEqual({ type: "FAM", xref: "@F0@" });
+    });
+
+    it("leaves the active tab alone when a different tab is deleted", () => {
+      vi.spyOn(globalThis, "confirm").mockReturnValue(true);
+      component.xrefsIncludedInView.set([
+        { type: "INDI", xref: "@I0@" },
+        { type: "FAM", xref: "@F0@" },
+      ]);
+      component.activeTab.set({ type: "FAM", xref: "@F0@" });
+
+      component.deleteRecord({ type: "INDI", xref: "@I0@" });
+
+      expect(component.activeTab()).toEqual({ type: "FAM", xref: "@F0@" });
+    });
+  });
+
   describe("submitForm tests", () => {
     it("emits finished before navigating, so the dialog is already closed by the time the reload re-checks the unsaved-changes guard", async () => {
       vi.spyOn(ancestryService, "updateGedcomDatabase").mockResolvedValue(

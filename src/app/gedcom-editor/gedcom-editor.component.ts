@@ -5,6 +5,7 @@ import {
   input,
   linkedSignal,
   output,
+  signal,
 } from "@angular/core";
 import { FormField, form } from "@angular/forms/signals";
 import { ActivatedRoute, Router } from "@angular/router";
@@ -29,6 +30,7 @@ import {
   calculateNextSubmitterXref,
 } from "../../util/next-xref";
 import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
+import { deleteGedcomRecord } from "./delete-gedcom-record.util";
 import {
   GEDCOM_EDITOR,
   type GedcomEditorInterface,
@@ -207,6 +209,13 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     () => this.effectiveTabs()[0],
   );
 
+  // deleteRecord() removes a record (and any references to it) from
+  // workingDatabase() directly, bypassing the Signal Forms form -- the same
+  // way openTab() creates a new record -- so it never flips form().dirty().
+  // Track it separately so hasUnsavedChanges() still reports a pending
+  // deletion as an unsaved change.
+  private readonly hasDeletedRecords = signal(false);
+
   openNewIndividual(): string {
     const xref = calculateNextIndividualXref(this.workingDatabase());
     this.openTab({ type: "INDI", xref });
@@ -303,6 +312,56 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     this.activeTab.set(tabInformation);
   }
 
+  deleteRecordLabel(tabInformation: TabInformation): string {
+    switch (tabInformation.type) {
+      case "INDI":
+        return "individual";
+      case "FAM":
+        return "family";
+      case "SOUR":
+        return "source";
+      case "REPO":
+        return "repository";
+      case "OBJE":
+        return "multimedia item";
+      case "SUBM":
+        return "submitter";
+    }
+  }
+
+  deleteRecord(tabInformation: TabInformation) {
+    const confirmed = confirm(
+      `Delete this ${this.deleteRecordLabel(tabInformation)}? Any records ` +
+        "that reference it will be updated to no longer reference it. " +
+        "This cannot be undone once saved.",
+    );
+    if (!confirmed) return;
+
+    this.workingDatabase.update((workingDatabase) =>
+      deleteGedcomRecord(workingDatabase, tabInformation),
+    );
+    this.hasDeletedRecords.set(true);
+
+    this.xrefsIncludedInView.update((xrefsIncludedInView) =>
+      xrefsIncludedInView.filter(
+        (other) =>
+          !(
+            other.type === tabInformation.type &&
+            other.xref === tabInformation.xref
+          ),
+      ),
+    );
+
+    if (
+      this.activeTab()?.type === tabInformation.type &&
+      this.activeTab()?.xref === tabInformation.xref
+    ) {
+      // The deleted tab is already gone from xrefsIncludedInView() above, so
+      // its first entry (if any) is simply whichever tab should become active.
+      this.activeTab.set(this.xrefsIncludedInView()[0]);
+    }
+  }
+
   tabIcon(tabInformation: TabInformation): string {
     switch (tabInformation.type) {
       case "INDI":
@@ -363,8 +422,10 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     // signal for "did the user actually change anything", unlike
     // differences() (which also reflects unrelated, by-design differences
     // between the working database and the file on disk, such as the
-    // header getting a fresh DATE/VERS stamp on every save).
-    return this.form().dirty();
+    // header getting a fresh DATE/VERS stamp on every save). deleteRecord()
+    // updates workingDatabase() the same programmatic way, so it can't flip
+    // form().dirty() either -- hasDeletedRecords() covers that case.
+    return this.form().dirty() || this.hasDeletedRecords();
   }
 
   async submitForm(event: Event) {
