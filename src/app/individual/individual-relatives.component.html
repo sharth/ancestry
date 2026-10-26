@@ -9,7 +9,7 @@
       } @empty {
         <dd>None</dd>
       }
-      <dt>Siblings</dt>
+      <dt class="ms-3">Siblings</dt>
       @for (sibling of group.siblings; track sibling.xref) {
         <dd class="ms-3">
           <app-individual-link [xref]="sibling.xref"></app-individual-link>
@@ -17,7 +17,7 @@
       } @empty {
         <dd class="ms-3">None</dd>
       }
-      <dt>Halfsiblings</dt>
+      <dt class="ms-3">Halfsiblings</dt>
       @for (halfsibling of group.halfsiblings; track halfsibling.xref) {
         <dd class="ms-3">
           <app-individual-link [xref]="halfsibling.xref"></app-individual-link>
@@ -35,7 +35,7 @@
       } @else {
         <dd>None</dd>
       }
-      <dt>Children</dt>
+      <dt class="ms-3">Children</dt>
       @for (child of group.children; track child.xref) {
         <dd class="ms-3">
           <app-individual-link [xref]="child.xref"></app-individual-link>
