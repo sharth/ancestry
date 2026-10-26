@@ -155,8 +155,8 @@ export function serializeGedcomIndividual(
       ...gedcomIndividual.unknownRecords.filter(
         (record) => record.tag == "SOUR",
       ),
-      ...sortChronologically(gedcomIndividual.facts, (event) => event).map(
-        (event) => serializeGedcomIndividualFact(event),
+      ...sortChronologically(gedcomIndividual.facts).map((event) =>
+        serializeGedcomIndividualFact(event),
       ),
       ...gedcomIndividual.parentOfFamilyXrefs.map((xref) =>
         newGedcomRecord({ tag: "FAMS", value: xref }),

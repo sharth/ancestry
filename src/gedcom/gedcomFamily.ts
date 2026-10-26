@@ -126,8 +126,8 @@ export function serializeGedcomFamily(
       ...gedcomFamily.citations.map((citation) =>
         serializeGedcomSourceCitation(citation),
       ),
-      ...sortChronologically(gedcomFamily.facts, (event) => event).map(
-        (event) => serializeGedcomFamilyFact(event),
+      ...sortChronologically(gedcomFamily.facts).map((event) =>
+        serializeGedcomFamilyFact(event),
       ),
       serializeGedcomChangeDate(gedcomFamily.changeDate),
       ...gedcomFamily.unknownRecords,
