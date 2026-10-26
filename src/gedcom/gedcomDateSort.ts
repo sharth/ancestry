@@ -186,20 +186,22 @@ export function gedcomFactSortKey(fact: GedcomFact): number | undefined {
 // Returns a copy of `items` sorted chronologically. Items without an
 // interpretable date are kept in their original relative order at the end.
 // `factOf` can be omitted when `items` are already `GedcomFact`s.
-export function sortChronologically(items: readonly GedcomFact[]): GedcomFact[];
+export function sortChronologically<T extends GedcomFact>(
+  items: readonly T[],
+): T[];
 export function sortChronologically<T>(
   items: readonly T[],
   factOf: (item: T) => GedcomFact,
 ): T[];
 export function sortChronologically<T>(
   items: readonly T[],
-  factOf: (item: T) => GedcomFact = (item) => item as unknown as GedcomFact,
+  factOf?: (item: T) => GedcomFact,
 ): T[] {
   return items
     .map((item, index) => ({
       item,
       index,
-      key: gedcomFactSortKey(factOf(item)),
+      key: gedcomFactSortKey(factOf ? factOf(item) : (item as GedcomFact)),
     }))
     .sort((a, b) => {
       if (a.key !== undefined && b.key !== undefined && a.key !== b.key) {
