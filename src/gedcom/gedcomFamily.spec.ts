@@ -1,6 +1,7 @@
 import { assert, describe, expect, it } from "vitest";
 
 import { newGedcomChangeDate } from "./gedcomChangeDate";
+import { newGedcomDate } from "./gedcomDate";
 import { newGedcomFact } from "./gedcomFact";
 import {
   newGedcomFamily,
@@ -185,5 +186,38 @@ describe("gedcomFamily", () => {
     expect(
       serializeGedcomRecordToText(serializeGedcomFamily(gedcomFamily)),
     ).toEqual(gedcomText);
+  });
+
+  it("serializes facts ordered by SDATE when present, otherwise DATE", () => {
+    const gedcomFamily = newGedcomFamily({
+      xref: "@F1@",
+      facts: [
+        newGedcomFact({
+          tag: "DIV",
+          date: newGedcomDate({ value: "1960" }),
+        }),
+        newGedcomFact({
+          tag: "ENGA",
+          date: newGedcomDate({ value: "ABT 1949" }),
+          sortDate: newGedcomDate({ value: "2005" }),
+        }),
+        newGedcomFact({
+          tag: "MARR",
+          date: newGedcomDate({ value: "1950" }),
+        }),
+      ],
+    });
+    expect(
+      serializeGedcomRecordToText(serializeGedcomFamily(gedcomFamily)),
+    ).toEqual([
+      "0 @F1@ FAM",
+      "1 MARR",
+      "2 DATE 1950",
+      "1 DIV",
+      "2 DATE 1960",
+      "1 ENGA",
+      "2 DATE ABT 1949",
+      "2 SDATE 2005",
+    ]);
   });
 });

@@ -5,6 +5,7 @@ import {
   serializeGedcomChangeDate,
   type GedcomChangeDate,
 } from "./gedcomChangeDate";
+import { sortChronologically } from "./gedcomDateSort";
 import {
   parseGedcomFamilyEvent,
   serializeGedcomFamilyFact,
@@ -125,7 +126,9 @@ export function serializeGedcomFamily(
       ...gedcomFamily.citations.map((citation) =>
         serializeGedcomSourceCitation(citation),
       ),
-      ...gedcomFamily.facts.map((event) => serializeGedcomFamilyFact(event)),
+      ...sortChronologically(gedcomFamily.facts).map((event) =>
+        serializeGedcomFamilyFact(event),
+      ),
       serializeGedcomChangeDate(gedcomFamily.changeDate),
       ...gedcomFamily.unknownRecords,
     ]),

@@ -191,9 +191,24 @@ describe("gedcomIndividual", () => {
         ],
       }),
     );
+    // Serialization reorders facts chronologically (BIRT has a date; IDNO and
+    // OCCU don't, so they keep their original relative order after it).
     expect(
       serializeGedcomRecordToText(serializeGedcomIndividual(gedcomIndividual)),
-    ).toEqual(gedcomText);
+    ).toEqual([
+      "0 @I5@ INDI",
+      "1 BIRT",
+      "2 CAUS normal",
+      "2 DATE ABT 1 Jan 2000",
+      "2 SDATE 1 Jan 2000",
+      "2 PLAC place",
+      "2 ADDR address",
+      "2 SOUR @S1@",
+      "1 IDNO abcd",
+      "2 TYPE familysearch.org",
+      "1 OCCU Truck Driver",
+      "2 TYPE Permanent",
+    ]);
   });
 
   it("MARR on an individual is not a recognized fact", () => {
@@ -235,5 +250,39 @@ describe("gedcomIndividual", () => {
     expect(
       serializeGedcomRecordToText(serializeGedcomIndividual(gedcomIndividual)),
     ).toEqual(gedcomText);
+  });
+
+  it("serializes facts ordered by SDATE when present, otherwise DATE", () => {
+    const gedcomIndividual = newGedcomIndividual({
+      xref: "@I1@",
+      facts: [
+        newGedcomFact({
+          tag: "OCCU",
+          value: "Farmer",
+          date: newGedcomDate({ value: "1920" }),
+        }),
+        newGedcomFact({
+          tag: "BIRT",
+          date: newGedcomDate({ value: "ABT 1900" }),
+          sortDate: newGedcomDate({ value: "1900" }),
+        }),
+        newGedcomFact({
+          tag: "DEAT",
+          date: newGedcomDate({ value: "1950" }),
+        }),
+      ],
+    });
+    expect(
+      serializeGedcomRecordToText(serializeGedcomIndividual(gedcomIndividual)),
+    ).toEqual([
+      "0 @I1@ INDI",
+      "1 BIRT",
+      "2 DATE ABT 1900",
+      "2 SDATE 1900",
+      "1 OCCU Farmer",
+      "2 DATE 1920",
+      "1 DEAT",
+      "2 DATE 1950",
+    ]);
   });
 });
