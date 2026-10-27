@@ -16,17 +16,31 @@
   [workingDatabase]="workingDatabase()"
 ></app-input-individual-facts>
 
-@if (familyLinks().length) {
+@let individual = value();
+@if (
+  individual.childOfFamilyXrefs.length || individual.parentOfFamilyXrefs.length
+) {
   <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
-    @for (link of familyLinks(); track link.xref) {
+    @for (xref of individual.childOfFamilyXrefs; track xref) {
       <button
         type="button"
         class="btn btn-sm btn-outline-secondary"
         [disabled]="!gedcomEditor"
-        (click)="gedcomEditor?.openFamily(link.xref)"
+        (click)="gedcomEditor?.openFamily(xref)"
         title="Edit this family in a session tab"
       >
-        <i class="bi bi-people me-1"></i>{{ link.label }}
+        <i class="bi bi-people me-1"></i>{{ childOfFamilyLabel(xref) }}
+      </button>
+    }
+    @for (xref of individual.parentOfFamilyXrefs; track xref) {
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-secondary"
+        [disabled]="!gedcomEditor"
+        (click)="gedcomEditor?.openFamily(xref)"
+        title="Edit this family in a session tab"
+      >
+        <i class="bi bi-people me-1"></i>{{ parentOfFamilyLabel(xref) }}
       </button>
     }
   </div>
