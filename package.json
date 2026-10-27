@@ -30,7 +30,7 @@
     "@types/d3": "^7.4.3",
     "@types/wicg-file-system-access": "^2023.10.7",
     "@vitest/browser-playwright": "^5.0.3",
-    "@vitest/eslint-plugin": "^1.6.27",
+    "@vitest/eslint-plugin": "^1.6.28",
     "angular-eslint": "^22.6.0",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.2",
