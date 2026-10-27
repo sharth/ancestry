@@ -1,9 +1,11 @@
 import { inputBinding, signal } from "@angular/core";
 import type { ComponentFixture } from "@angular/core/testing";
-import { render } from "@testing-library/angular/zoneless";
-import { beforeEach, describe, expect, it } from "vitest";
+import { render, screen } from "@testing-library/angular/zoneless";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
+import { newGedcomSource } from "../../gedcom/gedcomSource";
+import { GEDCOM_EDITOR } from "./gedcom-editor-interface";
 import { InputSourceXrefComponent } from "./input-source-xref.component";
 
 describe("InputSourceXrefComponent", () => {
@@ -22,5 +24,85 @@ describe("InputSourceXrefComponent", () => {
 
   it("should create", () => {
     expect(component).toBeTruthy();
+  });
+
+  it("disables the New button without an editor", () => {
+    expect(screen.getByRole("button", { name: /New/ })).toHaveProperty(
+      "disabled",
+      true,
+    );
+  });
+
+  it("disables the Edit button without an editor", () => {
+    expect(screen.getByRole("button", { name: /Edit/ })).toHaveProperty(
+      "disabled",
+      true,
+    );
+  });
+});
+
+describe("InputSourceXrefComponent with an editor", () => {
+  it("creates a new source and selects it", async () => {
+    const openNewSource = vi.fn().mockReturnValue("@S7@");
+    const { fixture } = await render(InputSourceXrefComponent, {
+      bindings: [inputBinding("workingDatabase", signal(newGedcomDatabase()))],
+      providers: [{ provide: GEDCOM_EDITOR, useValue: { openNewSource } }],
+      waitForStableOnRender: true,
+    });
+
+    screen.getByRole("button", { name: /New/ }).click();
+
+    expect(openNewSource).toHaveBeenCalledOnce();
+    expect(fixture.componentInstance.value()).toBe("@S7@");
+  });
+
+  it("opens the selected source", async () => {
+    const openSource = vi.fn();
+    await render(InputSourceXrefComponent, {
+      bindings: [
+        inputBinding("workingDatabase", signal(newGedcomDatabase())),
+        inputBinding("value", signal("@S3@")),
+      ],
+      providers: [{ provide: GEDCOM_EDITOR, useValue: { openSource } }],
+      waitForStableOnRender: true,
+    });
+
+    screen.getByRole("button", { name: /Edit/ }).click();
+
+    expect(openSource).toHaveBeenCalledWith("@S3@");
+  });
+
+  it("disables Edit until a source is selected", async () => {
+    await render(InputSourceXrefComponent, {
+      bindings: [inputBinding("workingDatabase", signal(newGedcomDatabase()))],
+      providers: [{ provide: GEDCOM_EDITOR, useValue: {} }],
+      waitForStableOnRender: true,
+    });
+
+    expect(screen.getByRole("button", { name: /Edit/ })).toHaveProperty(
+      "disabled",
+      true,
+    );
+  });
+});
+
+describe("InputSourceXrefComponent options", () => {
+  it("labels sources by abbreviation, falling back to untitled", async () => {
+    const database = newGedcomDatabase();
+    database.sources = {
+      "@S1@": newGedcomSource({ xref: "@S1@", abbr: "Census" }),
+      "@S2@": newGedcomSource({ xref: "@S2@" }),
+    };
+    await render(InputSourceXrefComponent, {
+      bindings: [inputBinding("workingDatabase", signal(database))],
+      waitForStableOnRender: true,
+    });
+
+    expect(
+      screen.getByRole("option", { name: /Census \(@S1@\)/ }),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("option", { name: /Untitled Source \(@S2@\)/ }),
+    ).toBeTruthy();
   });
 });
