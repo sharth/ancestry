@@ -31,6 +31,13 @@ describe("InputSourceXrefComponent", () => {
       true,
     );
   });
+
+  it("disables the Edit button without an editor", () => {
+    expect(screen.getByRole("button", { name: /Edit/ })).toHaveProperty(
+      "disabled",
+      true,
+    );
+  });
 });
 
 describe("InputSourceXrefComponent with an editor", () => {
@@ -46,5 +53,34 @@ describe("InputSourceXrefComponent with an editor", () => {
 
     expect(openNewSource).toHaveBeenCalledOnce();
     expect(fixture.componentInstance.value()).toBe("@S7@");
+  });
+
+  it("opens the selected source", async () => {
+    const openSource = vi.fn();
+    await render(InputSourceXrefComponent, {
+      bindings: [
+        inputBinding("workingDatabase", signal(newGedcomDatabase())),
+        inputBinding("value", signal("@S3@")),
+      ],
+      providers: [{ provide: GEDCOM_EDITOR, useValue: { openSource } }],
+      waitForStableOnRender: true,
+    });
+
+    screen.getByRole("button", { name: /Edit/ }).click();
+
+    expect(openSource).toHaveBeenCalledWith("@S3@");
+  });
+
+  it("disables Edit until a source is selected", async () => {
+    await render(InputSourceXrefComponent, {
+      bindings: [inputBinding("workingDatabase", signal(newGedcomDatabase()))],
+      providers: [{ provide: GEDCOM_EDITOR, useValue: {} }],
+      waitForStableOnRender: true,
+    });
+
+    expect(screen.getByRole("button", { name: /Edit/ })).toHaveProperty(
+      "disabled",
+      true,
+    );
   });
 });
