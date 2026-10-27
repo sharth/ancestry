@@ -41,13 +41,11 @@ export class InputIndividualComponent implements FormValueControl<GedcomIndividu
     return [
       ...individual.childOfFamilyXrefs.map((xref) => ({
         xref,
-        relationship: "Child of",
-        label: this.familyLabel(xref, individual.xref),
+        label: `Child of: ${this.familyLabel(xref, individual.xref)}`,
       })),
       ...individual.parentOfFamilyXrefs.map((xref) => ({
         xref,
-        relationship: "Spouse in",
-        label: this.familyLabel(xref, individual.xref),
+        label: `Spouse in: ${this.familyLabel(xref, individual.xref)}`,
       })),
     ];
   });
