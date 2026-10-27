@@ -25,8 +25,11 @@ describe("InputIndividualXrefComponent", () => {
     expect(component).toBeTruthy();
   });
 
-  it("hides the New button without an editor", () => {
-    expect(screen.queryByRole("button", { name: /New/ })).toBeNull();
+  it("disables the New button without an editor", () => {
+    expect(screen.getByRole("button", { name: /New/ })).toHaveProperty(
+      "disabled",
+      true,
+    );
   });
 });
 

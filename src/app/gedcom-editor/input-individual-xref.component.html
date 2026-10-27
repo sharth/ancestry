@@ -18,14 +18,13 @@
     </select>
     <label for="individual">Individual</label>
   </div>
-  @if (gedcomEditor) {
-    <button
-      type="button"
-      class="btn btn-sm btn-outline-primary text-nowrap"
-      (click)="createNewIndividual()"
-      title="Create a new individual and open in tab"
-    >
-      <i class="bi bi-plus"></i> New
-    </button>
-  }
+  <button
+    type="button"
+    class="btn btn-sm btn-outline-primary text-nowrap"
+    [disabled]="!gedcomEditor"
+    (click)="createNewIndividual()"
+    title="Create a new individual and open in tab"
+  >
+    <i class="bi bi-plus"></i> New
+  </button>
 </div>
