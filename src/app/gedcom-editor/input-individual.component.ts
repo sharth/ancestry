@@ -53,8 +53,8 @@ export class InputIndividualComponent implements FormValueControl<GedcomIndividu
   private familyLabel(familyXref: string, excludeXref: string): string {
     const database = this.workingDatabase();
     const family = database.families[familyXref];
-    const names = [family?.husbandXref, family?.wifeXref]
-      .filter((xref): xref is string => !!xref && xref !== excludeXref)
+    const names = (family ? [family.husbandXref, family.wifeXref] : [])
+      .filter((xref) => xref !== "" && xref !== excludeXref)
       .map((xref) => {
         const name = database.individuals[xref]?.names.at(0);
         return name ? displayGedcomName(name) : xref;
