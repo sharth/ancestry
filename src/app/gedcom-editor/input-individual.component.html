@@ -16,6 +16,31 @@
   [workingDatabase]="workingDatabase()"
 ></app-input-individual-facts>
 
+<div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+  @for (xref of value().childOfFamilyXrefs; track xref) {
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-secondary"
+      [disabled]="!gedcomEditor"
+      (click)="gedcomEditor?.openFamily(xref)"
+      title="Edit this family in a session tab"
+    >
+      <i class="bi bi-people me-1"></i>{{ childOfFamilyLabel(xref) }}
+    </button>
+  }
+  @for (xref of value().parentOfFamilyXrefs; track xref) {
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-secondary"
+      [disabled]="!gedcomEditor"
+      (click)="gedcomEditor?.openFamily(xref)"
+      title="Edit this family in a session tab"
+    >
+      <i class="bi bi-people me-1"></i>{{ parentOfFamilyLabel(xref) }}
+    </button>
+  }
+</div>
+
 <app-input-notes
   [open]="true"
   [formField]="form.notes"
