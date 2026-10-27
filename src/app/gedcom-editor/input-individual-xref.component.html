@@ -1,19 +1,39 @@
-<div class="form-floating">
-  <select id="individual" #focusTarget class="form-select" [formField]="form">
-    <option selected value="">Individuals...</option>
-    @for (
-      individual of Object.values(workingDatabase().individuals);
-      track individual.xref
-    ) {
-      <option value="{{ individual.xref }}">
-        @let name = individual.names.at(0);
-        @if (name === undefined) {
-          Unnamed Person ({{ individual.xref }})
-        } @else {
-          {{ displayGedcomName(name) }} ({{ individual.xref }})
-        }
-      </option>
-    }
-  </select>
-  <label for="individual">Individual</label>
+<div class="d-flex gap-2 align-items-center">
+  <div class="form-floating flex-grow-1">
+    <select id="individual" #focusTarget class="form-select" [formField]="form">
+      <option selected value="">Individuals...</option>
+      @for (
+        individual of Object.values(workingDatabase().individuals);
+        track individual.xref
+      ) {
+        <option value="{{ individual.xref }}">
+          @let name = individual.names.at(0);
+          @if (name === undefined) {
+            Unnamed Person ({{ individual.xref }})
+          } @else {
+            {{ displayGedcomName(name) }} ({{ individual.xref }})
+          }
+        </option>
+      }
+    </select>
+    <label for="individual">Individual</label>
+  </div>
+  <button
+    type="button"
+    class="btn btn-sm btn-outline-primary text-nowrap"
+    [disabled]="!gedcomEditor"
+    (click)="createNewIndividual()"
+    title="Create a new individual and open in tab"
+  >
+    <i class="bi bi-plus"></i> New
+  </button>
+  <button
+    type="button"
+    class="btn btn-sm btn-outline-secondary text-nowrap"
+    [disabled]="!gedcomEditor || !value()"
+    (click)="gedcomEditor?.openIndividual(value())"
+    title="Edit this individual in a session tab"
+  >
+    <i class="bi bi-pencil"></i> Edit
+  </button>
 </div>
