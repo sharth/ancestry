@@ -36,29 +36,37 @@ export class InputIndividualComponent implements FormValueControl<GedcomIndividu
   readonly value = model<GedcomIndividual>(newGedcomIndividual({ xref: "" }));
   readonly form = form(this.value);
 
-  readonly familyLinks = computed(() => {
-    const individual = this.value();
-    return [
-      ...individual.childOfFamilyXrefs.map((xref) => ({
-        xref,
-        label: `Child of: ${this.familyLabel(xref, individual.xref)}`,
-      })),
-      ...individual.parentOfFamilyXrefs.map((xref) => ({
-        xref,
-        label: `Spouse in: ${this.familyLabel(xref, individual.xref)}`,
-      })),
-    ];
-  });
+  readonly familyLinks = computed(() => [
+    ...this.value().childOfFamilyXrefs.map((xref) => ({
+      xref,
+      label: this.childOfFamilyLabel(xref),
+    })),
+    ...this.value().parentOfFamilyXrefs.map((xref) => ({
+      xref,
+      label: this.parentOfFamilyLabel(xref),
+    })),
+  ]);
 
-  private familyLabel(familyXref: string, excludeXref: string): string {
-    const database = this.workingDatabase();
-    const family = database.families[familyXref];
-    const names = (family ? [family.husbandXref, family.wifeXref] : [])
-      .filter((xref) => xref !== "" && xref !== excludeXref)
-      .map((xref) => {
-        const name = database.individuals[xref]?.names.at(0);
-        return name ? displayGedcomName(name) : xref;
-      });
-    return `${names.join(" & ") || "Family"} (${familyXref})`;
+  private childOfFamilyLabel(familyXref: string): string {
+    const family = this.workingDatabase().families[familyXref];
+    const parents = [family?.husbandXref, family?.wifeXref]
+      .map((xref) => this.individualLabel(xref ?? ""))
+      .filter((label) => label !== "");
+    return `Child of: ${parents.join(" & ") || "Unknown"} (${familyXref})`;
+  }
+
+  private parentOfFamilyLabel(familyXref: string): string {
+    const family = this.workingDatabase().families[familyXref];
+    const spouseXref =
+      family?.husbandXref === this.value().xref
+        ? family.wifeXref
+        : family?.husbandXref;
+    const spouse = this.individualLabel(spouseXref ?? "");
+    return `Spouse in: ${spouse || "Unknown"} (${familyXref})`;
+  }
+
+  private individualLabel(xref: string): string {
+    const name = this.workingDatabase().individuals[xref]?.names.at(0);
+    return (name ? displayGedcomName(name) : "") || xref;
   }
 }
