@@ -21,6 +21,7 @@ import {
 import { newGedcomIndividual } from "../../gedcom/gedcomIndividual";
 import { newGedcomName } from "../../gedcom/gedcomName";
 import {
+  newGedcomRecord,
   parseGedcomRecords,
   serializeGedcomRecordToText,
 } from "../../gedcom/gedcomRecord";
@@ -87,6 +88,38 @@ describe("GedcomEditorComponent Integration", () => {
         difference,
       ]);
       expect(component.differences()).toEqual([difference]);
+    });
+
+    it("includes the open tab's record even when it is unchanged", () => {
+      // The default tab (set in beforeEach) is a new individual resolved
+      // to xref @I1@. Its Gedcom should still show up here even though
+      // nothing differs from the file on disk, so the Gedcom tab isn't
+      // hidden just because there's nothing to show as changed.
+      const unchangedOpenRecord = newGedcomRecord({
+        tag: "INDI",
+        xref: "@I1@",
+      });
+      const unchangedUnrelatedRecord = newGedcomRecord({
+        tag: "INDI",
+        xref: "@I0@",
+      });
+      vi.spyOn(ancestryService, "compareGedcomDatabase").mockReturnValue([
+        {
+          originalGedcomRecord: unchangedOpenRecord,
+          updatedGedcomRecord: unchangedOpenRecord,
+        },
+        {
+          originalGedcomRecord: unchangedUnrelatedRecord,
+          updatedGedcomRecord: unchangedUnrelatedRecord,
+        },
+      ]);
+
+      expect(component.differences()).toEqual([
+        {
+          originalGedcomRecord: unchangedOpenRecord,
+          updatedGedcomRecord: unchangedOpenRecord,
+        },
+      ]);
     });
   });
 
@@ -371,7 +404,7 @@ describe("GedcomEditorComponent Integration", () => {
 // built against that initial database hits a known, unrelated
 // test-environment fragility (see [[ancestry-immer-freeze-signal-forms]]).
 describe("GedcomEditorComponent differences with a real, unedited family", () => {
-  it("reports no differences even when the family has fields the parser doesn't have a typed field for", async () => {
+  it("reports the open family's unchanged Gedcom, even when it has fields the parser doesn't have a typed field for", async () => {
     // compareGedcomDatabase() always regenerates a canonical HEAD record
     // (see generateGedcomHeader()), independent of this test's family
     // bug, so the original records need a matching header or that
@@ -413,7 +446,23 @@ describe("GedcomEditorComponent differences with a real, unedited family", () =>
       compareGedcomDatabase(originalGedcomRecords, gedcomDatabase),
     );
 
-    expect(renderResult.fixture.componentInstance.differences()).toEqual([]);
+    // The open family's record is always included (the point of this
+    // fix: the Gedcom tab stays visible even with nothing to show as
+    // changed), but it must be reported as unchanged -- not as an
+    // incidental difference caused by the unknownRecords bug this test
+    // was originally written to catch.
+    const differences = renderResult.fixture.componentInstance.differences();
+    expect(differences).toHaveLength(1);
+    const [difference] = differences;
+    if (
+      difference?.originalGedcomRecord == undefined ||
+      difference.updatedGedcomRecord == undefined
+    ) {
+      throw new Error("expected both an original and an updated record");
+    }
+    expect(
+      serializeGedcomRecordToText(difference.originalGedcomRecord),
+    ).toEqual(serializeGedcomRecordToText(difference.updatedGedcomRecord));
   });
 });
 

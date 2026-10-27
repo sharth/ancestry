@@ -191,17 +191,28 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
 
   readonly form = form(this.workingDatabaseView);
 
-  readonly differences = computed(() =>
-    this.ancestryService
+  readonly differences = computed(() => {
+    // Every record currently open as a tab should show its Gedcom, even if
+    // the user hasn't changed anything -- otherwise opening an unedited
+    // record just hides the Gedcom Delta section entirely. Records outside
+    // the view only show up here when they genuinely differ (e.g. an
+    // incidental header DATE/VERS stamp, or another tab's edits).
+    const viewXrefs = new Set(
+      this.xrefsIncludedInView().map((tab) => tab.xref),
+    );
+    return this.ancestryService
       .compareGedcomDatabase(this.workingDatabase())
-      .filter(
-        ({ originalGedcomRecord, updatedGedcomRecord }) =>
+      .filter(({ originalGedcomRecord, updatedGedcomRecord }) => {
+        const xref = originalGedcomRecord?.xref ?? updatedGedcomRecord?.xref;
+        return (
+          (xref != undefined && viewXrefs.has(xref)) ||
           originalGedcomRecord == undefined ||
           updatedGedcomRecord == undefined ||
           serializeGedcomRecordToText(originalGedcomRecord).join("\n") !==
-            serializeGedcomRecordToText(updatedGedcomRecord).join("\n"),
-      ),
-  );
+            serializeGedcomRecordToText(updatedGedcomRecord).join("\n")
+        );
+      });
+  });
 
   readonly activeTab = linkedSignal<TabInformation | undefined>(
     () => this.effectiveTabs()[0],
