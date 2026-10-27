@@ -151,13 +151,71 @@ export function parseGedcomDatabase(gedcomRecords: GedcomRecord[]) {
   return gedcomDatabase;
 }
 
+// GEDCOM records family membership on both sides, but the family is where it
+// gets edited. Rebuild each individual's FAMS and FAMC from the families, so the
+// two sides agree and the saved file can be loaded again.
+function syncFamilyLinks(gedcomDatabase: GedcomDatabase): GedcomDatabase {
+  const parentOf = new Map<string, string[]>();
+  const childOf = new Map<string, string[]>();
+  function link(
+    links: Map<string, string[]>,
+    xref: string,
+    familyXref: string,
+  ) {
+    links.set(xref, [...(links.get(xref) ?? []), familyXref]);
+  }
+  for (const family of Object.values(gedcomDatabase.families)) {
+    for (const spouseXref of [family.husbandXref, family.wifeXref]) {
+      if (spouseXref) link(parentOf, spouseXref, family.xref);
+    }
+    for (const childXref of family.childXrefs) {
+      link(childOf, childXref, family.xref);
+    }
+  }
+
+  // Keep the existing order of the links that remain, and add new ones last.
+  function reconcile(current: string[], wanted: string[] = []) {
+    const kept = current.filter((familyXref) => wanted.includes(familyXref));
+    const added = wanted.filter((familyXref) => !current.includes(familyXref));
+    const result = [...kept, ...added];
+    return result.length === current.length &&
+      result.every((familyXref, i) => familyXref === current[i])
+      ? current
+      : result;
+  }
+
+  return {
+    ...gedcomDatabase,
+    individuals: Object.fromEntries(
+      Object.entries(gedcomDatabase.individuals).map(([xref, individual]) => {
+        const parentOfFamilyXrefs = reconcile(
+          individual.parentOfFamilyXrefs,
+          parentOf.get(xref),
+        );
+        const childOfFamilyXrefs = reconcile(
+          individual.childOfFamilyXrefs,
+          childOf.get(xref),
+        );
+        return [
+          xref,
+          parentOfFamilyXrefs === individual.parentOfFamilyXrefs &&
+          childOfFamilyXrefs === individual.childOfFamilyXrefs
+            ? individual
+            : { ...individual, parentOfFamilyXrefs, childOfFamilyXrefs },
+        ];
+      }),
+    ),
+  };
+}
+
 export function compareGedcomDatabase(
   originalGedcomRecords: GedcomRecord[],
-  updatedGedcomDatabase: GedcomDatabase,
+  unsyncedGedcomDatabase: GedcomDatabase,
 ): {
   originalGedcomRecord?: GedcomRecord;
   updatedGedcomRecord?: GedcomRecord;
 }[] {
+  const updatedGedcomDatabase = syncFamilyLinks(unsyncedGedcomDatabase);
   function hash(gedcomRecord: GedcomRecord) {
     return `${gedcomRecord.tag} ${gedcomRecord.xref} ${gedcomRecord.value}`;
   }
