@@ -18,7 +18,7 @@
 
 @if (familyLinks().length) {
   <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
-    @for (link of familyLinks(); track link.relationship + link.xref) {
+    @for (link of familyLinks(); track link.xref) {
       <button
         type="button"
         class="btn btn-sm btn-outline-secondary"
