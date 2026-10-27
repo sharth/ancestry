@@ -50,10 +50,6 @@ export class InputIndividualComponent implements FormValueControl<GedcomIndividu
     ];
   });
 
-  openFamily(xref: string) {
-    this.gedcomEditor?.openFamily(xref);
-  }
-
   private familyLabel(familyXref: string, excludeXref: string): string {
     const database = this.workingDatabase();
     const family = database.families[familyXref];

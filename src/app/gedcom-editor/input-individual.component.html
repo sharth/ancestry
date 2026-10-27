@@ -22,7 +22,8 @@
       <button
         type="button"
         class="btn btn-sm btn-outline-secondary"
-        (click)="openFamily(link.xref)"
+        [disabled]="!gedcomEditor"
+        (click)="gedcomEditor?.openFamily(link.xref)"
         title="Edit this family in a session tab"
       >
         <i class="bi bi-people me-1"></i>{{ link.label }}

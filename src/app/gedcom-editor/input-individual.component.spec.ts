@@ -1,4 +1,4 @@
-import { inputBinding, signal } from "@angular/core";
+import { inputBinding, signal, type Provider } from "@angular/core";
 import type { ComponentFixture } from "@angular/core/testing";
 import { render, screen } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -29,41 +29,46 @@ describe("InputIndividualComponent", () => {
   });
 });
 
+function renderWithFamilies(providers: Provider[]) {
+  const database = newGedcomDatabase();
+  const john = newGedcomIndividual({
+    xref: "@I1@",
+    names: [newGedcomName({ givenName: "John", surname: "Smith" })],
+    childOfFamilyXrefs: ["@F1@"],
+    parentOfFamilyXrefs: ["@F2@"],
+  });
+  const mary = newGedcomIndividual({
+    xref: "@I2@",
+    names: [newGedcomName({ givenName: "Mary", surname: "Jones" })],
+  });
+  database.individuals = { "@I1@": john, "@I2@": mary };
+  database.families = {
+    "@F1@": newGedcomFamily({ xref: "@F1@" }),
+    "@F2@": newGedcomFamily({
+      xref: "@F2@",
+      husbandXref: "@I1@",
+      wifeXref: "@I2@",
+    }),
+  };
+
+  return render(InputIndividualComponent, {
+    bindings: [
+      inputBinding("workingDatabase", signal(database)),
+      inputBinding("value", signal(john)),
+    ],
+    providers,
+    waitForStableOnRender: true,
+  });
+}
+
 describe("InputIndividualComponent family buttons", () => {
   const openFamily = vi.fn();
 
   beforeEach(async () => {
     openFamily.mockClear();
-
-    const database = newGedcomDatabase();
-    const john = newGedcomIndividual({
-      xref: "@I1@",
-      names: [newGedcomName({ givenName: "John", surname: "Smith" })],
-      childOfFamilyXrefs: ["@F1@"],
-      parentOfFamilyXrefs: ["@F2@"],
-    });
-    const mary = newGedcomIndividual({
-      xref: "@I2@",
-      names: [newGedcomName({ givenName: "Mary", surname: "Jones" })],
-    });
-    database.individuals = { "@I1@": john, "@I2@": mary };
-    database.families = {
-      "@F1@": newGedcomFamily({ xref: "@F1@" }),
-      "@F2@": newGedcomFamily({
-        xref: "@F2@",
-        husbandXref: "@I1@",
-        wifeXref: "@I2@",
-      }),
-    };
-
-    await render(InputIndividualComponent, {
-      bindings: [
-        inputBinding("workingDatabase", signal(database)),
-        inputBinding("value", signal(john)),
-      ],
-      providers: [{ provide: GEDCOM_EDITOR, useValue: { openFamily } }],
-      waitForStableOnRender: true,
-    });
+    await renderWithFamilies([
+      { provide: GEDCOM_EDITOR, useValue: { openFamily } },
+    ]);
   });
 
   it("opens the spouse family, labelled with the other spouse", () => {
@@ -76,5 +81,19 @@ describe("InputIndividualComponent family buttons", () => {
   it("opens the family the individual is a child of", () => {
     screen.getByRole("button", { name: /Child of/ }).click();
     expect(openFamily).toHaveBeenCalledWith("@F1@");
+  });
+});
+
+describe("InputIndividualComponent family buttons without an editor", () => {
+  it("disables the buttons", async () => {
+    await renderWithFamilies([]);
+    expect(screen.getByRole("button", { name: /Spouse in/ })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(screen.getByRole("button", { name: /Child of/ })).toHaveProperty(
+      "disabled",
+      true,
+    );
   });
 });
