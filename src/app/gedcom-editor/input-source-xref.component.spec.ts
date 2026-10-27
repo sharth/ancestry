@@ -4,6 +4,7 @@ import { render, screen } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
+import { newGedcomSource } from "../../gedcom/gedcomSource";
 import { GEDCOM_EDITOR } from "./gedcom-editor-interface";
 import { InputSourceXrefComponent } from "./input-source-xref.component";
 
@@ -82,5 +83,26 @@ describe("InputSourceXrefComponent with an editor", () => {
       "disabled",
       true,
     );
+  });
+});
+
+describe("InputSourceXrefComponent options", () => {
+  it("labels sources by abbreviation, falling back to untitled", async () => {
+    const database = newGedcomDatabase();
+    database.sources = {
+      "@S1@": newGedcomSource({ xref: "@S1@", abbr: "Census" }),
+      "@S2@": newGedcomSource({ xref: "@S2@" }),
+    };
+    await render(InputSourceXrefComponent, {
+      bindings: [inputBinding("workingDatabase", signal(database))],
+      waitForStableOnRender: true,
+    });
+
+    expect(
+      screen.getByRole("option", { name: /Census \(@S1@\)/ }),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("option", { name: /Untitled Source \(@S2@\)/ }),
+    ).toBeTruthy();
   });
 });
