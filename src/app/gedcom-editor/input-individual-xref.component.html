@@ -27,4 +27,13 @@
   >
     <i class="bi bi-plus"></i> New
   </button>
+  <button
+    type="button"
+    class="btn btn-sm btn-outline-secondary text-nowrap"
+    [disabled]="!gedcomEditor || !value()"
+    (click)="gedcomEditor?.openIndividual(value())"
+    title="Edit this individual in a session tab"
+  >
+    <i class="bi bi-pencil"></i> Edit
+  </button>
 </div>

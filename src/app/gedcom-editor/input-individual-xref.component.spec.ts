@@ -31,6 +31,13 @@ describe("InputIndividualXrefComponent", () => {
       true,
     );
   });
+
+  it("disables the Edit button without an editor", () => {
+    expect(screen.getByRole("button", { name: /Edit/ })).toHaveProperty(
+      "disabled",
+      true,
+    );
+  });
 });
 
 describe("InputIndividualXrefComponent with an editor", () => {
@@ -46,5 +53,34 @@ describe("InputIndividualXrefComponent with an editor", () => {
 
     expect(openNewIndividual).toHaveBeenCalledOnce();
     expect(fixture.componentInstance.value()).toBe("@I7@");
+  });
+
+  it("opens the selected individual", async () => {
+    const openIndividual = vi.fn();
+    await render(InputIndividualXrefComponent, {
+      bindings: [
+        inputBinding("workingDatabase", signal(newGedcomDatabase())),
+        inputBinding("value", signal("@I3@")),
+      ],
+      providers: [{ provide: GEDCOM_EDITOR, useValue: { openIndividual } }],
+      waitForStableOnRender: true,
+    });
+
+    screen.getByRole("button", { name: /Edit/ }).click();
+
+    expect(openIndividual).toHaveBeenCalledWith("@I3@");
+  });
+
+  it("disables Edit until an individual is selected", async () => {
+    await render(InputIndividualXrefComponent, {
+      bindings: [inputBinding("workingDatabase", signal(newGedcomDatabase()))],
+      providers: [{ provide: GEDCOM_EDITOR, useValue: {} }],
+      waitForStableOnRender: true,
+    });
+
+    expect(screen.getByRole("button", { name: /Edit/ })).toHaveProperty(
+      "disabled",
+      true,
+    );
   });
 });
