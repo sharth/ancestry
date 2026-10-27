@@ -15,6 +15,7 @@ interface SourceCitationRow {
   event: string;
   eventDescription: string;
   spouseXref?: string;
+  nameText?: string;
   citation: GedcomSourceCitation;
 }
 
@@ -39,8 +40,10 @@ export class IndividualSourcesComponent {
       ...getIndividualSourceCitations(individual).map((citation) => ({
         ...citation,
         eventDescription:
-          gedcomIndividualFacts[citation.event]?.humanReadableDescription ??
-          citation.event,
+          citation.event === "NAME"
+            ? "Name"
+            : (gedcomIndividualFacts[citation.event]
+                ?.humanReadableDescription ?? citation.event),
       })),
       ...individual.parentOfFamilyXrefs.flatMap((familyXref) => {
         const family = ancestryDatabase.families[familyXref];

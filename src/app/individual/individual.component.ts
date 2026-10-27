@@ -2,7 +2,11 @@ import { Component, computed, input, viewChild } from "@angular/core";
 import { RouterModule } from "@angular/router";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
-import { fullname } from "../../gedcom/gedcomIndividual";
+import {
+  alternateNames,
+  fullname,
+  nameToString,
+} from "../../gedcom/gedcomIndividual";
 import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
 import type { ComponentWithUnsavedChanges } from "../unsaved-changes.guard";
 
@@ -31,6 +35,10 @@ export class IndividualComponent implements ComponentWithUnsavedChanges {
     return {
       individual,
       name: fullname(individual),
+      alternateNames: alternateNames(individual).map((name) => ({
+        name: nameToString(name),
+        nameType: name.nameType,
+      })),
       sex: individual.sex.sex || "Unknown",
     };
   });

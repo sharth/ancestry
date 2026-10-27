@@ -23,7 +23,20 @@ describe("IndividualSourcesComponent", () => {
       individuals: {
         "@I1@": newGedcomIndividual({
           xref: "@I1@",
-          names: [newGedcomName({ givenName: "John", surname: "Doe" })],
+          names: [
+            newGedcomName({ givenName: "John", surname: "Doe" }),
+            newGedcomName({
+              givenName: "Johnny",
+              surname: "Doe",
+              nameType: "aka",
+              citations: [
+                newGedcomSourceCitation({
+                  sourceXref: "@S1@",
+                  page: "Nickname reference",
+                }),
+              ],
+            }),
+          ],
           sex: newGedcomSex({ sex: "M" }),
           facts: [
             newGedcomFact({
@@ -112,5 +125,14 @@ describe("IndividualSourcesComponent", () => {
     expect(text).toContain("Marriage");
     expect(text).not.toContain("BIRT");
     expect(text).not.toContain("MARR");
+  });
+
+  it("shows name citations with the cited name's text", () => {
+    const element = fixture.nativeElement as HTMLElement;
+    const text = element.textContent;
+    expect(text).toContain("Name");
+    expect(text).toContain("Johnny Doe");
+    expect(text).toContain("Nickname reference");
+    expect(text).not.toContain("NAME");
   });
 });

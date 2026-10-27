@@ -31,7 +31,14 @@ describe("IndividualComponent", () => {
       individuals: {
         "@I1@": newGedcomIndividual({
           xref: "@I1@",
-          names: [newGedcomName({ givenName: "John", surname: "Doe" })],
+          names: [
+            newGedcomName({ givenName: "John", surname: "Doe" }),
+            newGedcomName({
+              givenName: "Johnny",
+              surname: "Doe",
+              nameType: "aka",
+            }),
+          ],
           sex: newGedcomSex({ sex: "M" }),
           facts: [
             newGedcomFact({
@@ -148,5 +155,13 @@ describe("IndividualComponent", () => {
 
   it("hasUnsavedChanges delegates to the edit dialog", () => {
     expect(component.hasUnsavedChanges()).toBe(false);
+  });
+
+  it("shows alternate names with their name type", () => {
+    const element = fixture.nativeElement as HTMLElement;
+    const text = element.textContent;
+    expect(text).toContain("Alternate Names");
+    expect(text).toContain("Johnny Doe");
+    expect(text).toContain("aka");
   });
 });

@@ -63,9 +63,7 @@ export function newGedcomIndividual(
   };
 }
 
-export function fullname(gedcomIndividual: GedcomIndividual): string {
-  const gedcomName = gedcomIndividual.names.at(0);
-  if (gedcomName == null) return "";
+export function nameToString(gedcomName: GedcomName): string {
   return [
     gedcomName.prefix,
     gedcomName.givenName,
@@ -76,6 +74,18 @@ export function fullname(gedcomIndividual: GedcomIndividual): string {
   ]
     .filter((part) => part != "")
     .join(" ");
+}
+
+export function fullname(gedcomIndividual: GedcomIndividual): string {
+  const gedcomName = gedcomIndividual.names.at(0);
+  if (gedcomName == null) return "";
+  return nameToString(gedcomName);
+}
+
+export function alternateNames(
+  gedcomIndividual: GedcomIndividual,
+): GedcomName[] {
+  return gedcomIndividual.names.slice(1);
 }
 
 export function surname(gedcomIndividual: GedcomIndividual): string {
@@ -213,10 +223,16 @@ export function getIndividualMultimediaCitations(
   return references;
 }
 
-export function getIndividualSourceCitations(
-  individual: GedcomIndividual,
-): { event: string; citation: GedcomSourceCitation }[] {
-  const references: { event: string; citation: GedcomSourceCitation }[] = [];
+export function getIndividualSourceCitations(individual: GedcomIndividual): {
+  event: string;
+  citation: GedcomSourceCitation;
+  nameText?: string;
+}[] {
+  const references: {
+    event: string;
+    citation: GedcomSourceCitation;
+    nameText?: string;
+  }[] = [];
 
   for (const event of individual.facts) {
     for (const citation of event.citations) {
@@ -226,6 +242,16 @@ export function getIndividualSourceCitations(
 
   for (const citation of individual.sex.citations) {
     references.push({ event: "SEX", citation });
+  }
+
+  for (const name of individual.names) {
+    for (const citation of name.citations) {
+      references.push({
+        event: "NAME",
+        citation,
+        nameText: nameToString(name),
+      });
+    }
   }
 
   return references;
