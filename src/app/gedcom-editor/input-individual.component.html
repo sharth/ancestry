@@ -16,7 +16,7 @@
   [workingDatabase]="workingDatabase()"
 ></app-input-individual-facts>
 
-@if (gedcomEditor && familyLinks().length) {
+@if (familyLinks().length) {
   <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
     @for (link of familyLinks(); track link.relationship + link.xref) {
       <button
