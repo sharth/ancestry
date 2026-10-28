@@ -1,9 +1,9 @@
-<details #container (toggle)="(true)">
+<details #container open (toggle)="(true)">
   <summary>Multimedia ({{ form.length }})</summary>
   @defer (when container.open) {
     @for (multimediaLink of form; track multimediaLink) {
       @let mediaXref = multimediaLink.xref().value();
-      <details [open]="newControls.has(multimediaLink)">
+      <details [open]="true">
         <summary>
           <button
             class="btn btn-sm btn-outline-danger bi-trash"

@@ -6,12 +6,7 @@ import {
   input,
   model,
 } from "@angular/core";
-import {
-  FormField,
-  form,
-  type FieldTree,
-  type FormValueControl,
-} from "@angular/forms/signals";
+import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 import { RouterModule } from "@angular/router";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
@@ -44,11 +39,6 @@ export class InputRepositoryLinksComponent implements FormValueControl<
   readonly value = model<GedcomRepositoryLink[]>([]);
   readonly form = form(this.value);
 
-  // Keep track of the controls that were added by a user interaction.
-  readonly newControls = new WeakSet<FieldTree<GedcomRepositoryLink, number>>(
-    [],
-  );
-
   appendCitation() {
     this.value.update((repositoryLinks) => [
       ...repositoryLinks,
@@ -56,7 +46,6 @@ export class InputRepositoryLinksComponent implements FormValueControl<
     ]);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const newControl = this.form[this.form.length - 1]!;
-    this.newControls.add(newControl);
     afterNextRender(
       {
         read: () => {

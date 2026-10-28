@@ -38,6 +38,7 @@ describe("InputRepositoryLinksComponent", () => {
           deferBlockBehavior: DeferBlockBehavior.Playthrough,
         });
       },
+      waitForStableOnRender: true,
     });
 
     fixture = renderResult.fixture;
@@ -54,15 +55,10 @@ describe("InputRepositoryLinksComponent", () => {
     //   const element = fixture.nativeElement as HTMLElement;
     // const focusSpy = vi.spyOn(InputRepositoryXrefComponent.prototype, "focus");
 
-    // Open the container details to render the defer block content.
+    // The container details is open by default, rendering the defer block content.
     const containerDetails =
       nativeElement.querySelector<HTMLDetailsElement>("details");
     assert.isOk(containerDetails);
-    const containerSummary =
-      containerDetails.querySelector<HTMLElement>("summary");
-    assert.isOk(containerSummary);
-    await user.click(containerSummary);
-    await fixture.whenStable();
     assert.isTrue(containerDetails.open);
 
     // Add an additional repository link.

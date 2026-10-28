@@ -6,12 +6,7 @@ import {
   input,
   model,
 } from "@angular/core";
-import {
-  FormField,
-  form,
-  type FieldTree,
-  type FormValueControl,
-} from "@angular/forms/signals";
+import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomFact, type GedcomFact } from "../../gedcom/gedcomFact";
@@ -29,17 +24,14 @@ export class InputFamilyFactsComponent implements FormValueControl<
   private readonly _injector = inject(Injector);
 
   readonly workingDatabase = input.required<GedcomDatabase>();
-  readonly open = input<boolean>(false);
+  readonly open = input<boolean>(true);
   readonly value = model<GedcomFact[]>([]);
   readonly form = form(this.value);
-
-  readonly newControls = new WeakSet<FieldTree<GedcomFact, number>>();
 
   appendEvent() {
     this.value.update((events) => [...events, newGedcomFact()]);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const newControl = this.form[this.form.length - 1]!;
-    this.newControls.add(newControl);
     afterNextRender(
       {
         read: () => {

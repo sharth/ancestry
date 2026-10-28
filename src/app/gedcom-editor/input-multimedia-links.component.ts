@@ -10,12 +10,7 @@ import {
   type ElementRef,
   type QueryList,
 } from "@angular/core";
-import {
-  FormField,
-  form,
-  type FieldTree,
-  type FormValueControl,
-} from "@angular/forms/signals";
+import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 import { RouterModule } from "@angular/router";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
@@ -64,9 +59,6 @@ export class InputMultimediaLinksComponent implements FormValueControl<
     );
   }
 
-  // Keep track of the controls that were added by a user interaction.
-  readonly newControls = new WeakSet<FieldTree<GedcomMultimediaLink, number>>();
-
   @ViewChildren("focusTarget") private focusTargets!: QueryList<
     ElementRef<HTMLElement>
   >;
@@ -76,8 +68,6 @@ export class InputMultimediaLinksComponent implements FormValueControl<
       ...multimediaLinks,
       newGedcomMultimediaLink(),
     ]);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.newControls.add(this.form[this.form.length - 1]!);
     afterNextRender(
       {
         read: () => {
