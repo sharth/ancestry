@@ -3,10 +3,7 @@ import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomFact, type GedcomFact } from "../../gedcom/gedcomFact";
-import {
-  gedcomIndividualAttributes,
-  gedcomIndividualEvents,
-} from "../../gedcom/gedcomFactMetadata";
+import { gedcomIndividualFacts } from "../../gedcom/gedcomFactMetadata";
 import { InputNotesComponent } from "./input-notes.component";
 import { InputSharedWithComponent } from "./input-shared-with.component";
 import { InputSourceCitationsComponent } from "./input-source-citations.component";
@@ -32,10 +29,7 @@ export class InputIndividualFactComponent implements FormValueControl<GedcomFact
     this.form.tag().focusBoundControl(options);
   }
 
-  readonly gedcomEventTags = Object.entries({
-    ...gedcomIndividualEvents,
-    ...gedcomIndividualAttributes,
-  })
+  readonly gedcomEventTags = Object.entries(gedcomIndividualFacts)
     .map(([tag, metadata]) => ({ tag, ...metadata }))
     .sort((a, b) =>
       a.humanReadableDescription.localeCompare(b.humanReadableDescription),
