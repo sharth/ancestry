@@ -346,6 +346,28 @@ describe("GedcomEditorComponent Integration", () => {
     });
   });
 
+  describe("tab unmounting", () => {
+    // Switching the active tab must remove the previously-active tab's
+    // component from the DOM (not just hide it), so that a tab embedding
+    // a record elsewhere in its own view (e.g. a family's facts shown
+    // inline on an individual's tab) is never mounted at the same time as
+    // that same record rendered by its own session tab.
+    it("removes the inactive individual tab from the DOM when switching to another tab", async () => {
+      fixture.componentRef.setInput("tabs", [{ type: "INDI", xref: "@I0@" }]);
+      fixture.detectChanges();
+      await fixture.whenStable();
+      const element = fixture.nativeElement as HTMLElement;
+      expect(element.querySelector("app-input-individual")).not.toBeNull();
+
+      component.openFamily("@F0@");
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      expect(element.querySelector("app-input-individual")).toBeNull();
+      expect(element.querySelector("app-input-family")).not.toBeNull();
+    });
+  });
+
   describe("submitForm tests", () => {
     it("emits finished before navigating, so the dialog is already closed by the time the reload re-checks the unsaved-changes guard", async () => {
       vi.spyOn(ancestryService, "updateGedcomDatabase").mockResolvedValue(

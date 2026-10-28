@@ -76,7 +76,7 @@
     @let isActive =
       activeTab()?.type === tabInformation.type &&
       activeTab()?.xref === tabInformation.xref;
-    <div [hidden]="!isActive">
+    @if (isActive) {
       @switch (tabInformation.type) {
         @case ("INDI") {
           @if (form.individuals[tabInformation.xref]; as individual) {
@@ -119,7 +119,7 @@
           }
         }
       }
-    </div>
+    }
   }
 
   <h2>Gedcom Delta</h2>
