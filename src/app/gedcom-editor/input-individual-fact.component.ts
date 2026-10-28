@@ -35,5 +35,9 @@ export class InputIndividualFactComponent implements FormValueControl<GedcomFact
   readonly gedcomEventTags = Object.entries({
     ...gedcomIndividualEvents,
     ...gedcomIndividualAttributes,
-  }).map(([tag, metadata]) => ({ tag, ...metadata }));
+  })
+    .map(([tag, metadata]) => ({ tag, ...metadata }))
+    .sort((a, b) =>
+      a.humanReadableDescription.localeCompare(b.humanReadableDescription),
+    );
 }

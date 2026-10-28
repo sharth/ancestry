@@ -35,5 +35,9 @@ export class InputFamilyFactComponent implements FormValueControl<GedcomFact> {
   readonly gedcomEventTags = Object.entries({
     ...gedcomFamilyEvents,
     ...gedcomFamilyAttributes,
-  }).map(([tag, metadata]) => ({ tag, ...metadata }));
+  })
+    .map(([tag, metadata]) => ({ tag, ...metadata }))
+    .sort((a, b) =>
+      a.humanReadableDescription.localeCompare(b.humanReadableDescription),
+    );
 }

@@ -39,4 +39,22 @@ describe("InputIndividualFactComponent", () => {
     component.focus();
     expect(document.activeElement).toBe(tagSelect);
   });
+
+  it("should list fact types sorted alphabetically by their readable name", () => {
+    const descriptions = component.gedcomEventTags.map(
+      (event) => event.humanReadableDescription,
+    );
+    const sorted = [...descriptions].sort((a, b) => a.localeCompare(b));
+    expect(descriptions).toEqual(sorted);
+  });
+
+  it("should render the tag select options sorted alphabetically", () => {
+    const element = fixture.nativeElement as HTMLElement;
+    const tagSelect = element.querySelector<HTMLSelectElement>("select#tag");
+    assert.isOk(tagSelect);
+
+    const optionLabels = [...tagSelect.options].map((option) => option.text);
+    const sorted = [...optionLabels].sort((a, b) => a.localeCompare(b));
+    expect(optionLabels).toEqual(sorted);
+  });
 });
