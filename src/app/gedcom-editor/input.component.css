@@ -22,12 +22,96 @@ textarea {
   height: auto !important;
 }
 
-details::details-content {
-  padding-left: 1em;
+details {
+  margin-bottom: 0.3rem;
+}
+
+details > summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.65rem;
+  background-color: #f1f3f5;
+  border: 1px solid #dee2e6;
+  border-radius: 0.3rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+details > summary::-webkit-details-marker {
+  display: none;
+}
+
+details > summary::marker {
+  content: "";
+}
+
+details > summary::before {
+  content: "▸";
+  display: inline-block;
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  color: #6c757d;
+  transition: transform 0.15s ease;
+}
+
+details[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+details[open] > summary {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+details[open]::details-content {
+  padding: 0.6rem 0.75rem 0.6rem 1.15rem;
+  border: 1px solid #dee2e6;
+  border-top: none;
+  border-bottom-left-radius: 0.3rem;
+  border-bottom-right-radius: 0.3rem;
+}
+
+details details {
+  margin: 0.35rem 0;
 }
 
 div.details-lookalike {
   cursor: pointer;
-  display: list-item;
-  list-style: inside disclosure-closed;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.5rem;
+  color: #0d6efd;
+  font-size: 0.9rem;
+}
+
+.form-floating {
+  margin-bottom: 0.3rem;
+}
+
+.form-floating > .form-control,
+.form-floating > .form-select {
+  min-height: calc(1.9rem + 2px);
+  height: calc(1.9rem + 2px);
+  padding: 0.25rem 0.65rem;
+  font-size: 0.9rem;
+}
+
+.form-floating > label {
+  padding: 0.3rem 0.65rem;
+  font-size: 0.75rem;
+}
+
+.form-floating > textarea.form-control {
+  height: auto !important;
+  min-height: calc(1.9rem + 2px);
+}
+
+.fields-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 0 0.6rem;
 }

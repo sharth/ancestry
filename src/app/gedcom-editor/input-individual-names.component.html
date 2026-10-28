@@ -2,7 +2,7 @@
   <summary>Names ({{ form.length }})</summary>
   @defer (when container.open) {
     @for (name of form; track name) {
-      <details [open]="newControls.has(name)">
+      <details [open]="true">
         <summary>
           <button
             type="button"
@@ -16,54 +16,56 @@
           {{ name.surname().value() }}
           {{ name.suffix().value() }}
         </summary>
-        <div class="form-floating">
-          <input
-            #focusTarget
-            class="form-control"
-            id="prefix_{{ $index }}"
-            [formField]="name.prefix"
-          />
-          <label for="prefix_{{ $index }}">Prefix</label>
-        </div>
-        <div class="form-floating">
-          <input
-            class="form-control"
-            id="given_{{ $index }}"
-            [formField]="name.givenName"
-          />
-          <label for="given_{{ $index }}">Given Name</label>
-        </div>
-        <div class="form-floating">
-          <input
-            class="form-control"
-            id="nick_{{ $index }}"
-            [formField]="name.nickName"
-          />
-          <label for="nick_{{ $index }}">Nickname</label>
-        </div>
-        <div class="form-floating">
-          <input
-            class="form-control"
-            id="surnamePrefix_{{ $index }}"
-            [formField]="name.surnamePrefix"
-          />
-          <label for="surnamePrefix_{{ $index }}">Surname Prefix</label>
-        </div>
-        <div class="form-floating">
-          <input
-            class="form-control"
-            id="surname_{{ $index }}"
-            [formField]="name.surname"
-          />
-          <label for="surname_{{ $index }}">Surname</label>
-        </div>
-        <div class="form-floating">
-          <input
-            class="form-control"
-            id="suffix_{{ $index }}"
-            [formField]="name.suffix"
-          />
-          <label for="suffix_{{ $index }}">Suffix</label>
+        <div class="fields-grid">
+          <div class="form-floating">
+            <input
+              #focusTarget
+              class="form-control"
+              id="prefix_{{ $index }}"
+              [formField]="name.prefix"
+            />
+            <label for="prefix_{{ $index }}">Prefix</label>
+          </div>
+          <div class="form-floating">
+            <input
+              class="form-control"
+              id="given_{{ $index }}"
+              [formField]="name.givenName"
+            />
+            <label for="given_{{ $index }}">Given Name</label>
+          </div>
+          <div class="form-floating">
+            <input
+              class="form-control"
+              id="nick_{{ $index }}"
+              [formField]="name.nickName"
+            />
+            <label for="nick_{{ $index }}">Nickname</label>
+          </div>
+          <div class="form-floating">
+            <input
+              class="form-control"
+              id="surnamePrefix_{{ $index }}"
+              [formField]="name.surnamePrefix"
+            />
+            <label for="surnamePrefix_{{ $index }}">Surname Prefix</label>
+          </div>
+          <div class="form-floating">
+            <input
+              class="form-control"
+              id="surname_{{ $index }}"
+              [formField]="name.surname"
+            />
+            <label for="surname_{{ $index }}">Surname</label>
+          </div>
+          <div class="form-floating">
+            <input
+              class="form-control"
+              id="suffix_{{ $index }}"
+              [formField]="name.suffix"
+            />
+            <label for="suffix_{{ $index }}">Suffix</label>
+          </div>
         </div>
         <app-input-source-citations
           [formField]="name.citations"

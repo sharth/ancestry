@@ -5,12 +5,7 @@ import {
   model,
   type QueryList,
 } from "@angular/core";
-import {
-  FormField,
-  form,
-  type FieldTree,
-  type FormValueControl,
-} from "@angular/forms/signals";
+import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import type { GedcomFactSharedWith } from "../../gedcom/gedcomFact";
@@ -29,17 +24,11 @@ export class InputSharedWithComponent implements FormValueControl<
   readonly value = model<GedcomFactSharedWith[]>([]);
   readonly form = form(this.value);
 
-  readonly newControls = new WeakSet<FieldTree<GedcomFactSharedWith, number>>(
-    [],
-  );
-
   @ViewChildren("focusTarget")
   private focusTargets!: QueryList<InputIndividualXrefComponent>;
 
   appendSharedEvent() {
     this.value.update((sharedWith) => [...sharedWith, { xref: "", role: "" }]);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.newControls.add(this.form[-1]!);
     setTimeout(() => {
       this.focusTargets.last.focus();
     });

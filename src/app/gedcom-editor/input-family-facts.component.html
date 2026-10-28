@@ -1,7 +1,7 @@
 <details [open]="open()">
   <summary>Events ({{ form.length }})</summary>
   @for (event of form; track event) {
-    <details [open]="newControls.has(event)">
+    <details [open]="true">
       <summary>
         <button
           type="button"

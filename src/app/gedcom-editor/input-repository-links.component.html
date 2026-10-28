@@ -1,9 +1,9 @@
-<details #container (toggle)="(true)">
+<details #container open (toggle)="(true)">
   <summary>Repositories ({{ form.length }})</summary>
   @defer (when container.open) {
     @for (formGroup of form; track formGroup) {
       @let repositoryXref = formGroup.repositoryXref().value();
-      <details [open]="newControls.has(formGroup)">
+      <details [open]="true">
         <summary>
           <button
             class="btn btn-sm btn-outline-danger bi-trash"

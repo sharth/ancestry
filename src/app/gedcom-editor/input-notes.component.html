@@ -1,4 +1,4 @@
-<details #container (toggle)="(true)">
+<details #container open (toggle)="(true)">
   <summary>Notes ({{ form.length }})</summary>
   @defer (when container.open) {
     @for (note of form; track note) {

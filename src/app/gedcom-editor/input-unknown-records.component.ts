@@ -17,7 +17,7 @@ export class InputUnknownRecordsComponent implements FormValueControl<
   GedcomRecord[]
 > {
   readonly workingDatabase = input.required<GedcomDatabase>();
-  readonly open = input<boolean>(false);
+  readonly open = input<boolean>(true);
   readonly value = model<GedcomRecord[]>([]);
 
   removeUnknownRecord(index: number) {

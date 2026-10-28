@@ -9,12 +9,7 @@ import {
   type ElementRef,
   type QueryList,
 } from "@angular/core";
-import {
-  FormField,
-  form,
-  type FieldTree,
-  type FormValueControl,
-} from "@angular/forms/signals";
+import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomName, type GedcomName } from "../../gedcom/gedcomName";
@@ -34,13 +29,10 @@ export class InputIndividualNamesComponent implements FormValueControl<
   readonly workingDatabase = input.required<GedcomDatabase>();
 
   // Set true to expand the details by default.
-  readonly open = input<boolean>(false);
+  readonly open = input<boolean>(true);
 
   readonly value = model<GedcomName[]>([]);
   readonly form = form(this.value);
-
-  // Keep track of the controls that were added by a user interation.
-  readonly newControls = new WeakSet<FieldTree<GedcomName, number>>([]);
 
   @ViewChildren("focusTarget") private focusTargets!: QueryList<
     ElementRef<HTMLElement>
@@ -48,8 +40,6 @@ export class InputIndividualNamesComponent implements FormValueControl<
 
   appendName() {
     this.value.update((names) => [...names, newGedcomName()]);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.newControls.add(this.form[this.form.length - 1]!);
     afterNextRender(
       {
         read: () => {
