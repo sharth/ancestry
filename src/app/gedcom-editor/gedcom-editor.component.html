@@ -76,7 +76,7 @@
     @let isActive =
       activeTab()?.type === tabInformation.type &&
       activeTab()?.xref === tabInformation.xref;
-    <div [hidden]="!isActive">
+    @if (isActive) {
       @switch (tabInformation.type) {
         @case ("INDI") {
           @if (form.individuals[tabInformation.xref]; as individual) {
@@ -84,6 +84,57 @@
               [workingDatabase]="workingDatabase()"
               [formField]="individual"
             />
+
+            <h2>Marriages</h2>
+            @for (
+              famXref of spouseFamilyXrefs(tabInformation.xref);
+              track famXref
+            ) {
+              @if (form.families[famXref]; as family) {
+                <div class="border rounded p-2 mb-2">
+                  <div class="fw-bold mb-1">
+                    <i class="bi bi-people me-1"></i
+                    >{{ tabLabel({ type: "FAM", xref: famXref }) }}
+                  </div>
+                  <app-input-family-facts
+                    [open]="true"
+                    [workingDatabase]="workingDatabase()"
+                    [formField]="family.facts"
+                  />
+                </div>
+              }
+            }
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+              <select
+                class="form-select form-select-sm w-auto"
+                #spouseSelect
+                aria-label="Choose a spouse"
+              >
+                <option value="" disabled selected>Choose a spouse…</option>
+                @for (
+                  candidate of otherIndividuals(tabInformation.xref);
+                  track candidate.xref
+                ) {
+                  <option [value]="candidate.xref">
+                    {{ candidate.label }}
+                  </option>
+                }
+              </select>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-primary"
+                (click)="addSpouse(tabInformation.xref, spouseSelect.value)"
+              >
+                <i class="bi bi-person-plus me-1"></i>Add Spouse
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary"
+                (click)="addSpouse(tabInformation.xref, openNewIndividual())"
+              >
+                <i class="bi bi-person-plus me-1"></i>New Spouse
+              </button>
+            </div>
           }
         }
         @case ("SOUR") {
@@ -119,7 +170,7 @@
           }
         }
       }
-    </div>
+    }
   }
 
   <h2>Gedcom Delta</h2>

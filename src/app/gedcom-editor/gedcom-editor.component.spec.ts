@@ -346,6 +346,115 @@ describe("GedcomEditorComponent Integration", () => {
     });
   });
 
+  describe("tab unmounting", () => {
+    // Switching the active tab must remove the previously-active tab's
+    // component from the DOM (not just hide it), so that an inline family
+    // view embedded in one tab is never mounted at the same time as that
+    // same family rendered by its own session tab.
+    it("removes the inactive individual tab from the DOM when switching to another tab", async () => {
+      fixture.componentRef.setInput("tabs", [{ type: "INDI", xref: "@I0@" }]);
+      fixture.detectChanges();
+      await fixture.whenStable();
+      const element = fixture.nativeElement as HTMLElement;
+      expect(element.querySelector("app-input-individual")).not.toBeNull();
+
+      component.openFamily("@F0@");
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      expect(element.querySelector("app-input-individual")).toBeNull();
+      expect(element.querySelector("app-input-family")).not.toBeNull();
+    });
+  });
+
+  describe("inline marriage section", () => {
+    it("renders the individual's existing spouse family inline, without a session tab for it", async () => {
+      fixture.componentRef.setInput("tabs", [{ type: "INDI", xref: "@I0@" }]);
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      const element = fixture.nativeElement as HTMLElement;
+      expect(element.querySelector("app-input-family-facts")).not.toBeNull();
+      expect(screen.queryByRole("button", { name: /Family @F0@/ })).toBeNull();
+    });
+  });
+
+  describe("spouseFamilyXrefs and impliedFamilyXrefs tests", () => {
+    it("finds the families where the individual is husband or wife", () => {
+      expect(component.spouseFamilyXrefs("@I0@")).toEqual(["@F0@"]);
+      expect(component.spouseFamilyXrefs("@I1@")).toEqual([]);
+    });
+
+    it("brings a spouse family into the form without adding it as a session tab", () => {
+      fixture.componentRef.setInput("tabs", [{ type: "INDI", xref: "@I0@" }]);
+      expect(component.impliedFamilyXrefs()).toEqual(["@F0@"]);
+      expect(component.workingDatabaseView().families["@F0@"]).toEqual(
+        newGedcomFamily({ xref: "@F0@", husbandXref: "@I0@" }),
+      );
+      expect(
+        component
+          .xrefsIncludedInView()
+          .some((tab) => tab.type === "FAM" && tab.xref === "@F0@"),
+      ).toBe(false);
+    });
+  });
+
+  describe("addSpouse tests", () => {
+    beforeEach(() => {
+      fixture.componentRef.setInput("tabs", [{ type: "INDI", xref: "@I0@" }]);
+    });
+
+    it("does nothing when no spouse is chosen", () => {
+      expect(component.addSpouse("@I0@", "")).toBe("");
+      expect(component.workingDatabase().families).toEqual(
+        initialDatabase.families,
+      );
+    });
+
+    it("reuses an existing family where the two are already husband and wife", () => {
+      component.workingDatabase.update(
+        produce((draft) => {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          draft.families["@F0@"]!.wifeXref = "@I1@";
+          draft.individuals["@I1@"] = newGedcomIndividual({
+            xref: "@I1@",
+            sex: newGedcomSex({ sex: "F" }),
+            parentOfFamilyXrefs: ["@F0@"],
+          });
+        }),
+      );
+
+      expect(component.addSpouse("@I0@", "@I1@")).toBe("@F0@");
+      expect(Object.keys(component.workingDatabase().families)).toEqual([
+        "@F0@",
+      ]);
+    });
+
+    it("creates a new family and links both individuals when none exists", () => {
+      component.workingDatabase.update(
+        produce((draft) => {
+          draft.individuals["@I1@"] = newGedcomIndividual({
+            xref: "@I1@",
+            sex: newGedcomSex({ sex: "F" }),
+          });
+        }),
+      );
+
+      const familyXref = component.addSpouse("@I0@", "@I1@");
+
+      expect(familyXref).toBe("@F1@");
+      const family = component.workingDatabase().families[familyXref];
+      expect(family?.husbandXref).toBe("@I0@");
+      expect(family?.wifeXref).toBe("@I1@");
+      expect(
+        component.workingDatabase().individuals["@I0@"]?.parentOfFamilyXrefs,
+      ).toContain(familyXref);
+      expect(
+        component.workingDatabase().individuals["@I1@"]?.parentOfFamilyXrefs,
+      ).toContain(familyXref);
+    });
+  });
+
   describe("submitForm tests", () => {
     it("emits finished before navigating, so the dialog is already closed by the time the reload re-checks the unsaved-changes guard", async () => {
       vi.spyOn(ancestryService, "updateGedcomDatabase").mockResolvedValue(
