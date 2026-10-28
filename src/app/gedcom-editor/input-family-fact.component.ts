@@ -3,10 +3,7 @@ import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomFact, type GedcomFact } from "../../gedcom/gedcomFact";
-import {
-  gedcomFamilyAttributes,
-  gedcomFamilyEvents,
-} from "../../gedcom/gedcomFactMetadata";
+import { gedcomFamilyFacts } from "../../gedcom/gedcomFactMetadata";
 import { InputNotesComponent } from "./input-notes.component";
 import { InputSharedWithComponent } from "./input-shared-with.component";
 import { InputSourceCitationsComponent } from "./input-source-citations.component";
@@ -32,8 +29,9 @@ export class InputFamilyFactComponent implements FormValueControl<GedcomFact> {
     this.form.tag().focusBoundControl(options);
   }
 
-  readonly gedcomEventTags = Object.entries({
-    ...gedcomFamilyEvents,
-    ...gedcomFamilyAttributes,
-  }).map(([tag, metadata]) => ({ tag, ...metadata }));
+  readonly gedcomEventTags = Object.entries(gedcomFamilyFacts)
+    .map(([tag, metadata]) => ({ tag, ...metadata }))
+    .sort((a, b) =>
+      a.humanReadableDescription.localeCompare(b.humanReadableDescription),
+    );
 }
