@@ -358,12 +358,7 @@ describe("GedcomEditorComponent Integration", () => {
     });
   });
 
-  describe("spouseFamilyXrefs and impliedFamilyXrefs tests", () => {
-    it("finds the families where the individual is husband or wife", () => {
-      expect(component.spouseFamilyXrefs("@I0@")).toEqual(["@F0@"]);
-      expect(component.spouseFamilyXrefs("@I1@")).toEqual([]);
-    });
-
+  describe("impliedFamilyXrefs tests", () => {
     it("brings a spouse family into the form without adding it as a session tab", () => {
       fixture.componentRef.setInput("tabs", [{ type: "INDI", xref: "@I0@" }]);
       expect(component.impliedFamilyXrefs()).toEqual(["@F0@"]);

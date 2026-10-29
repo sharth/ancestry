@@ -6,12 +6,13 @@ import {
   linkedSignal,
   output,
 } from "@angular/core";
-import { FormField, form } from "@angular/forms/signals";
+import { FormField, form, type FieldTree } from "@angular/forms/signals";
 import { ActivatedRoute, Router } from "@angular/router";
 import { produce } from "immer";
 
 import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
+import type { GedcomFact } from "../../gedcom/gedcomFact";
 import { newGedcomFamily } from "../../gedcom/gedcomFamily";
 import { newGedcomIndividual } from "../../gedcom/gedcomIndividual";
 import { newGedcomMultimedia } from "../../gedcom/gedcomMultimedia";
@@ -34,7 +35,6 @@ import {
   type GedcomEditorInterface,
   type TabInformation,
 } from "./gedcom-editor-interface";
-import { InputFamilyFactsComponent } from "./input-family-facts.component";
 import { InputFamilyComponent } from "./input-family.component";
 import { InputIndividualComponent } from "./input-individual.component";
 import { InputMultimediaComponent } from "./input-multimedia.component";
@@ -47,7 +47,6 @@ import { InputSourceComponent } from "./input-source.component";
     FormField,
     GedcomDiffComponent,
     InputFamilyComponent,
-    InputFamilyFactsComponent,
     InputIndividualComponent,
     InputMultimediaComponent,
     InputRepositoryComponent,
@@ -132,22 +131,18 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     this.effectiveTabs(),
   );
 
-  // Families where one of the spouses is an individual open in a tab. These
-  // are brought into the form (so their facts can be edited inline on the
-  // individual's own tab, e.g. a marriage) without being session tabs of
-  // their own, so they don't appear in the tab bar.
+  // Spouse families of the individuals open in a tab. These are brought into
+  // the form (so their facts can be edited inline on the individual's own
+  // tab, e.g. a marriage) without being session tabs of their own, so they
+  // don't appear in the tab bar.
   readonly impliedFamilyXrefs = computed<string[]>(() => {
     const database = this.workingDatabase();
-    const individualXrefs = this.xrefsIncludedInView()
+    return this.xrefsIncludedInView()
       .filter((tabInformation) => tabInformation.type === "INDI")
-      .map((tabInformation) => tabInformation.xref);
-    return Object.values(database.families)
-      .filter(
-        (family) =>
-          individualXrefs.includes(family.husbandXref) ||
-          individualXrefs.includes(family.wifeXref),
-      )
-      .map((family) => family.xref);
+      .flatMap(
+        (tabInformation) =>
+          database.individuals[tabInformation.xref]?.parentOfFamilyXrefs ?? [],
+      );
   });
 
   // A GedcomDatabase made up of only the xrefs found in `xrefsIncludedInView`.
@@ -288,29 +283,8 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     this.openTab({ type: "FAM", xref });
   }
 
-  // Families where the given individual is a spouse, for inline display on
-  // that individual's own tab (see `impliedFamilyXrefs`).
-  spouseFamilyXrefs(individualXref: string): string[] {
-    return Object.values(this.workingDatabase().families)
-      .filter(
-        (family) =>
-          family.husbandXref === individualXref ||
-          family.wifeXref === individualXref,
-      )
-      .map((family) => family.xref);
-  }
-
-  // Individuals that could be added as a spouse, for the "Add Spouse" picker.
-  otherIndividuals(excludeXref: string): { xref: string; label: string }[] {
-    return Object.values(this.workingDatabase().individuals)
-      .filter((individual) => individual.xref !== excludeXref)
-      .map((individual) => ({
-        xref: individual.xref,
-        label: individual.names[0]
-          ? displayGedcomName(individual.names[0])
-          : individual.xref,
-      }))
-      .sort((a, b) => a.label.localeCompare(b.label));
+  familyFactsField(familyXref: string): FieldTree<GedcomFact[]> | undefined {
+    return this.form.families[familyXref]?.facts;
   }
 
   // Finds the family where `individualXref` and `spouseXref` are already

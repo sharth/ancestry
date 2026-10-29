@@ -9,6 +9,7 @@ import {
 import { displayGedcomName } from "../../gedcom/gedcomName";
 import { GEDCOM_EDITOR } from "./gedcom-editor-interface";
 import { InputChangeDateComponent } from "./input-change-date.component";
+import { InputFamilyFactsComponent } from "./input-family-facts.component";
 import { InputIndividualFactsComponent } from "./input-individual-facts.component";
 import { InputIndividualNamesComponent } from "./input-individual-names.component";
 import { InputIndividualSexComponent } from "./input-individual-sex.component";
@@ -19,6 +20,7 @@ import { InputUnknownRecordsComponent } from "./input-unknown-records.component"
   selector: "app-input-individual",
   imports: [
     FormField,
+    InputFamilyFactsComponent,
     InputIndividualFactsComponent,
     InputIndividualSexComponent,
     InputIndividualNamesComponent,
@@ -52,6 +54,17 @@ export class InputIndividualComponent implements FormValueControl<GedcomIndividu
         : family?.husbandXref;
     const spouse = this.individualLabel(spouseXref ?? "");
     return `Spouse in: ${spouse || "Unknown"} (${familyXref})`;
+  }
+
+  // Individuals that could be added as a spouse, for the "Add Spouse" picker.
+  otherIndividuals(): { xref: string; label: string }[] {
+    return Object.values(this.workingDatabase().individuals)
+      .filter((individual) => individual.xref !== this.value().xref)
+      .map((individual) => ({
+        xref: individual.xref,
+        label: this.individualLabel(individual.xref),
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label));
   }
 
   private individualLabel(xref: string): string {
