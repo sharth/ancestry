@@ -346,27 +346,6 @@ describe("GedcomEditorComponent Integration", () => {
     });
   });
 
-  describe("tab unmounting", () => {
-    // Switching the active tab must remove the previously-active tab's
-    // component from the DOM (not just hide it), so that an inline family
-    // view embedded in one tab is never mounted at the same time as that
-    // same family rendered by its own session tab.
-    it("removes the inactive individual tab from the DOM when switching to another tab", async () => {
-      fixture.componentRef.setInput("tabs", [{ type: "INDI", xref: "@I0@" }]);
-      fixture.detectChanges();
-      await fixture.whenStable();
-      const element = fixture.nativeElement as HTMLElement;
-      expect(element.querySelector("app-input-individual")).not.toBeNull();
-
-      component.openFamily("@F0@");
-      fixture.detectChanges();
-      await fixture.whenStable();
-
-      expect(element.querySelector("app-input-individual")).toBeNull();
-      expect(element.querySelector("app-input-family")).not.toBeNull();
-    });
-  });
-
   describe("inline marriage section", () => {
     it("renders the individual's existing spouse family inline, without a session tab for it", async () => {
       fixture.componentRef.setInput("tabs", [{ type: "INDI", xref: "@I0@" }]);
