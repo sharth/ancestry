@@ -361,6 +361,77 @@ describe("GedcomEditorComponent Integration", () => {
       expect(element.querySelector("app-input-family-fact")).not.toBeNull();
       expect(screen.queryByRole("button", { name: /Family @F0@/ })).toBeNull();
     });
+
+    async function renderWithTwoMarriages() {
+      fixture.componentRef.setInput("tabs", [{ type: "INDI", xref: "@I0@" }]);
+      component.workingDatabase.update(
+        produce((draft) => {
+          draft.individuals["@I0@"]?.facts.push(newGedcomFact({ tag: "BIRT" }));
+          draft.individuals["@I0@"]?.parentOfFamilyXrefs.push("@F1@");
+          draft.individuals["@I1@"] = newGedcomIndividual({ xref: "@I1@" });
+          draft.families["@F0@"]?.facts.push(
+            newGedcomFact({ tag: "MARR", place: "First" }),
+          );
+          draft.families["@F1@"] = newGedcomFamily({
+            xref: "@F1@",
+            husbandXref: "@I0@",
+            wifeXref: "@I1@",
+            facts: [newGedcomFact({ tag: "MARR", place: "Second" })],
+          });
+        }),
+      );
+      fixture.detectChanges();
+      await fixture.whenStable();
+    }
+
+    function rowPlaces(): string[] {
+      const element = fixture.nativeElement as HTMLElement;
+      return Array.from(
+        element.querySelectorAll<HTMLInputElement>(
+          "app-input-individual-facts > details > details input#place",
+        ),
+      ).map((input) => input.value);
+    }
+
+    it("keeps a family event in its row when it becomes an individual event", async () => {
+      await renderWithTwoMarriages();
+      expect(rowPlaces()).toEqual(["", "First", "Second"]);
+
+      const element = fixture.nativeElement as HTMLElement;
+      const secondTag = element.querySelectorAll<HTMLSelectElement>(
+        "app-input-family-fact select#tag",
+      )[1];
+      assert.isOk(secondTag);
+      await userEvent.setup().selectOptions(secondTag, "CENS");
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      expect(rowPlaces()).toEqual(["", "First", "Second"]);
+      const database = component.workingDatabase();
+      expect(database.individuals["@I0@"]?.facts.map((f) => f.tag)).toEqual([
+        "BIRT",
+        "CENS",
+      ]);
+      expect(database.families["@F1@"]?.facts).toEqual([]);
+      expect(component.hasUnsavedChanges()).toBe(true);
+    });
+
+    it("keeps a family event in its row when its spouse changes", async () => {
+      await renderWithTwoMarriages();
+      const element = fixture.nativeElement as HTMLElement;
+      const firstSpouse = element.querySelector<HTMLSelectElement>(
+        "app-input-individual-xref select",
+      );
+      assert.isOk(firstSpouse);
+      await userEvent.setup().selectOptions(firstSpouse, "@I1@");
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      expect(rowPlaces()).toEqual(["", "First", "Second"]);
+      expect(
+        component.workingDatabase().families["@F1@"]?.facts.map((f) => f.place),
+      ).toEqual(["Second", "First"]);
+    });
   });
 
   describe("impliedFamilyXrefs tests", () => {

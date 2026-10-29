@@ -5,6 +5,7 @@ import {
   computed,
   inject,
   input,
+  linkedSignal,
   model,
   signal,
   viewChild,
@@ -86,11 +87,66 @@ export class InputIndividualFactsComponent implements FormValueControl<
     });
   });
 
-  eventCount(): number {
-    return this.spouseFamilies().reduce(
-      (count, family) => count + family.facts().value().length,
-      this.form.length,
+  // How many facts each list holds: the individual's own, and each spouse
+  // family's.
+  private readonly shape = computed<Shape>(() => ({
+    individual: this.value().length,
+    families: this.spouseFamilies().map(
+      (family) => [family.xref, family.facts().value().length] as const,
+    ),
+  }));
+
+  // Every row gets a token that stays with it when its fact moves between
+  // the individual and a family (picking a new spouse, or changing a
+  // Marriage to a Census), so the row keeps its place on the screen. Rows
+  // start out as the individual's facts followed by each family's.
+  private nextToken = 0;
+  private readonly layout = linkedSignal<Shape, Layout>({
+    source: this.shape,
+    computation: (shape, previous) =>
+      previous && fits(previous.value, shape)
+        ? previous.value
+        : this.freshLayout(shape),
+  });
+
+  private freshLayout(shape: Shape): Layout {
+    const tokens = (count: number) =>
+      Array.from({ length: count }, () => this.nextToken++);
+    const individual = tokens(shape.individual);
+    const families = Object.fromEntries(
+      shape.families.map(([xref, count]) => [xref, tokens(count)]),
     );
+    return {
+      order: [...individual, ...Object.values(families).flat()],
+      individual,
+      families,
+    };
+  }
+
+  readonly rows = computed<Row[]>(() => {
+    const layout = this.layout();
+    const families = new Map(
+      this.spouseFamilies().map((family) => [family.xref, family.facts]),
+    );
+    const locations = new Map<number, Row>();
+    layout.individual.forEach((token, index) => {
+      const field = this.form[index];
+      if (field) locations.set(token, { token, field, index });
+    });
+    for (const [familyXref, tokens] of Object.entries(layout.families)) {
+      const facts = families.get(familyXref);
+      tokens.forEach((token, index) => {
+        const field = facts?.[index];
+        if (facts && field) {
+          locations.set(token, { token, field, index, familyXref, facts });
+        }
+      });
+    }
+    return layout.order.flatMap((token) => locations.get(token) ?? []);
+  });
+
+  eventCount(): number {
+    return this.rows().length;
   }
 
   appendEvent() {
@@ -106,7 +162,14 @@ export class InputIndividualFactsComponent implements FormValueControl<
   }
 
   private appendIndividualEvent(fact: GedcomFact) {
+    const layout = this.layout();
+    const token = this.nextToken++;
     this.value.update((events) => [...events, fact]);
+    this.layout.set({
+      ...layout,
+      order: [...layout.order, token],
+      individual: [...layout.individual, token],
+    });
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const newControl = this.form[this.form.length - 1]!;
     afterNextRender(
@@ -120,7 +183,14 @@ export class InputIndividualFactsComponent implements FormValueControl<
   }
 
   removeEvent(index: number) {
+    const layout = this.layout();
+    const token = layout.individual[index];
     this.value.update((events) => events.toSpliced(index, 1));
+    this.layout.set({
+      ...layout,
+      order: layout.order.filter((other) => other !== token),
+      individual: layout.individual.toSpliced(index, 1),
+    });
   }
 
   choosePendingTag(tag: string) {
@@ -137,12 +207,23 @@ export class InputIndividualFactsComponent implements FormValueControl<
     const tag = this.pendingTag();
     if (!editor || !tag || !spouseXref) return;
     const individualXref = this.individualXref();
+    const layout = this.layout();
+    const token = this.nextToken++;
     this.pendingTag.set(undefined);
-    editor.addFactToSpouseFamily(
+    const familyXref = editor.addFactToSpouseFamily(
       individualXref,
       spouseXref,
       newGedcomFact({ tag }),
     );
+    if (!familyXref) return;
+    this.layout.set({
+      ...layout,
+      order: [...layout.order, token],
+      families: {
+        ...layout.families,
+        [familyXref]: [...(layout.families[familyXref] ?? []), token],
+      },
+    });
   }
 
   spouseOf(familyXref: string): string {
@@ -155,14 +236,118 @@ export class InputIndividualFactsComponent implements FormValueControl<
   changeSpouse(familyXref: string, factIndex: number, spouseXref: string) {
     const editor = this.gedcomEditor;
     if (!editor) return;
-    const individualXref = this.individualXref();
-    editor.moveFamilyFact(individualXref, familyXref, factIndex, spouseXref);
+    const layout = this.layout();
+    const toFamilyXref = editor.moveFamilyFact(
+      this.individualXref(),
+      familyXref,
+      factIndex,
+      spouseXref,
+    );
+    if (toFamilyXref === familyXref) return;
+    const fromTokens = layout.families[familyXref] ?? [];
+    const token = fromTokens[factIndex];
+    if (token === undefined) return;
+    this.layout.set({
+      ...layout,
+      families: {
+        ...layout.families,
+        [familyXref]: fromTokens.toSpliced(factIndex, 1),
+        [toFamilyXref]: [...(layout.families[toFamilyXref] ?? []), token],
+      },
+    });
   }
 
-  removeFamilyEvent(facts: FieldTree<GedcomFact[]>, index: number) {
+  // A family event changed to a type an individual can have (e.g. Marriage
+  // to Census) becomes the individual's own event, in the same row.
+  familyTagPicked(
+    familyXref: string,
+    facts: FieldTree<GedcomFact[]>,
+    factIndex: number,
+    tag: string,
+  ) {
+    if (!(tag in gedcomIndividualFacts)) return;
+    const layout = this.layout();
+    const fromTokens = layout.families[familyXref] ?? [];
+    const token = fromTokens[factIndex];
+    const fact = facts().value()[factIndex];
+    if (token === undefined || fact === undefined) return;
+    facts().value.update((events) => events.toSpliced(factIndex, 1));
+    facts().markAsDirty();
+    this.value.update((events) => [...events, fact]);
+    this.layout.set({
+      ...layout,
+      individual: [...layout.individual, token],
+      families: {
+        ...layout.families,
+        [familyXref]: fromTokens.toSpliced(factIndex, 1),
+      },
+    });
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const newControl = this.form[this.form.length - 1]!;
+    afterNextRender(
+      {
+        read: () => {
+          newControl.tag().focusBoundControl();
+        },
+      },
+      { injector: this._injector },
+    );
+  }
+
+  removeFamilyEvent(
+    familyXref: string,
+    facts: FieldTree<GedcomFact[]>,
+    index: number,
+  ) {
+    const layout = this.layout();
+    const tokens = layout.families[familyXref] ?? [];
+    const token = tokens[index];
     facts().value.update((events) => events.toSpliced(index, 1));
     facts().markAsDirty();
+    this.layout.set({
+      ...layout,
+      order: layout.order.filter((other) => other !== token),
+      families: {
+        ...layout.families,
+        [familyXref]: tokens.toSpliced(index, 1),
+      },
+    });
   }
+}
+
+interface Shape {
+  individual: number;
+  families: (readonly [string, number])[];
+}
+
+interface Layout {
+  order: number[];
+  individual: number[];
+  families: Record<string, number[]>;
+}
+
+interface Row {
+  token: number;
+  field: FieldTree<GedcomFact>;
+  index: number;
+  // Set when the fact is on a spouse family rather than the individual.
+  familyXref?: string;
+  facts?: FieldTree<GedcomFact[]>;
+}
+
+// Whether the layout still has one token per fact in every list. A family
+// not in the layout yet (just created) fits if it has no facts.
+function fits(layout: Layout, shape: Shape): boolean {
+  return (
+    layout.individual.length === shape.individual &&
+    shape.families.every(
+      ([xref, count]) => (layout.families[xref]?.length ?? 0) === count,
+    ) &&
+    Object.entries(layout.families).every(
+      ([xref, tokens]) =>
+        tokens.length === 0 || shape.families.some(([other]) => other === xref),
+    )
+  );
 }
 
 function sortedTags(facts: Record<string, GedcomEventMetadata>) {

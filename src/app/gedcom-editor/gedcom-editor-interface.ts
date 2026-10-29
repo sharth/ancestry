@@ -24,13 +24,13 @@ export interface GedcomEditorInterface {
     individualXref: string,
     spouseXref: string,
     fact: GedcomFact,
-  ): void;
+  ): string;
   moveFamilyFact(
     individualXref: string,
     fromFamilyXref: string,
     factIndex: number,
     spouseXref: string,
-  ): void;
+  ): string;
 }
 
 export const GEDCOM_EDITOR = new InjectionToken<GedcomEditorInterface>(

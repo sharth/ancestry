@@ -288,13 +288,14 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   }
 
   // Adds the fact to the family `individualXref` shares with `spouseXref`,
-  // creating that family if they don't have one yet.
+  // creating that family if they don't have one yet. Returns the family's
+  // xref, or "" if no spouse was chosen.
   addFactToSpouseFamily(
     individualXref: string,
     spouseXref: string,
     fact: GedcomFact,
-  ): void {
-    if (!spouseXref || spouseXref === individualXref) return;
+  ): string {
+    if (!spouseXref || spouseXref === individualXref) return "";
     const familyXref = this.findOrCreateSpouseFamily(
       individualXref,
       spouseXref,
@@ -305,22 +306,24 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
       }),
     );
     this.markIndividualDirty(individualXref);
+    return familyXref;
   }
 
   // Moves one of a family's facts to the family `individualXref` shares with
-  // `spouseXref` instead, creating that family if needed.
+  // `spouseXref` instead, creating that family if needed. Returns the family
+  // the fact is now on.
   moveFamilyFact(
     individualXref: string,
     fromFamilyXref: string,
     factIndex: number,
     spouseXref: string,
-  ): void {
-    if (!spouseXref || spouseXref === individualXref) return;
+  ): string {
+    if (!spouseXref || spouseXref === individualXref) return fromFamilyXref;
     const familyXref = this.findOrCreateSpouseFamily(
       individualXref,
       spouseXref,
     );
-    if (familyXref === fromFamilyXref) return;
+    if (familyXref === fromFamilyXref) return fromFamilyXref;
     this.workingDatabase.update((workingDatabase) =>
       produce(workingDatabase, (draft) => {
         const [fact] =
@@ -329,6 +332,7 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
       }),
     );
     this.markIndividualDirty(individualXref);
+    return familyXref;
   }
 
   // Programmatic updates to workingDatabase don't count as user edits to
