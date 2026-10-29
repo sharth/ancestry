@@ -287,14 +287,62 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     return this.form.families[familyXref]?.facts;
   }
 
-  // Finds the family where `individualXref` and `spouseXref` are already
-  // husband and wife, or creates one and wires up both sides (the HUSB/WIFE
-  // xrefs on the family, and the FAMS xref on each individual), so a
-  // marriage event can be added right away. Returns the family's xref, or ""
-  // if no spouse was chosen.
-  addSpouse(individualXref: string, spouseXref: string): string {
-    if (!spouseXref || spouseXref === individualXref) return "";
+  // Adds the fact to the family `individualXref` shares with `spouseXref`,
+  // creating that family if they don't have one yet.
+  addFactToSpouseFamily(
+    individualXref: string,
+    spouseXref: string,
+    fact: GedcomFact,
+  ): void {
+    if (!spouseXref || spouseXref === individualXref) return;
+    const familyXref = this.findOrCreateSpouseFamily(
+      individualXref,
+      spouseXref,
+    );
+    this.workingDatabase.update((workingDatabase) =>
+      produce(workingDatabase, (draft) => {
+        draft.families[familyXref]?.facts.push(fact);
+      }),
+    );
+    this.markIndividualDirty(individualXref);
+  }
 
+  // Moves one of a family's facts to the family `individualXref` shares with
+  // `spouseXref` instead, creating that family if needed.
+  moveFamilyFact(
+    individualXref: string,
+    fromFamilyXref: string,
+    factIndex: number,
+    spouseXref: string,
+  ): void {
+    if (!spouseXref || spouseXref === individualXref) return;
+    const familyXref = this.findOrCreateSpouseFamily(
+      individualXref,
+      spouseXref,
+    );
+    if (familyXref === fromFamilyXref) return;
+    this.workingDatabase.update((workingDatabase) =>
+      produce(workingDatabase, (draft) => {
+        const [fact] =
+          draft.families[fromFamilyXref]?.facts.splice(factIndex, 1) ?? [];
+        if (fact) draft.families[familyXref]?.facts.push(fact);
+      }),
+    );
+    this.markIndividualDirty(individualXref);
+  }
+
+  // Programmatic updates to workingDatabase don't count as user edits to
+  // Signal Forms, so hasUnsavedChanges() needs telling.
+  private markIndividualDirty(individualXref: string) {
+    this.form.individuals[individualXref]?.().markAsDirty();
+  }
+
+  // Finds the family where the two are husband and wife, or creates one and
+  // links both sides (HUSB/WIFE on the family, FAMS on each individual).
+  private findOrCreateSpouseFamily(
+    individualXref: string,
+    spouseXref: string,
+  ): string {
     const database = this.workingDatabase();
     const existingFamily = Object.values(database.families).find(
       (family) =>

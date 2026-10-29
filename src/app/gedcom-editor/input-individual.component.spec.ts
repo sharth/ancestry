@@ -1,7 +1,6 @@
 import { inputBinding, signal, type Provider } from "@angular/core";
 import type { ComponentFixture } from "@angular/core/testing";
 import { render, screen } from "@testing-library/angular/zoneless";
-import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
@@ -64,15 +63,13 @@ function renderWithFamilies(providers: Provider[]) {
 
 describe("InputIndividualComponent family buttons", () => {
   const openFamily = vi.fn();
-  const addSpouse = vi.fn();
 
   beforeEach(async () => {
     openFamily.mockClear();
-    addSpouse.mockClear();
     await renderWithFamilies([
       {
         provide: GEDCOM_EDITOR,
-        useValue: { openFamily, addSpouse, familyFactsField: () => undefined },
+        useValue: { openFamily, familyFactsField: () => undefined },
       },
     ]);
   });
@@ -88,28 +85,10 @@ describe("InputIndividualComponent family buttons", () => {
     screen.getByRole("button", { name: /Child of/ }).click();
     expect(openFamily).toHaveBeenCalledWith("@F1@");
   });
-
-  it("offers everyone but the individual as a spouse", () => {
-    const picker = screen.getByRole<HTMLSelectElement>("combobox", {
-      name: "Choose a spouse",
-    });
-    const options = Array.from(picker.options).map((option) => option.value);
-    expect(options).toEqual(["", "@I2@"]);
-  });
-
-  it("adds the chosen spouse through the editor", async () => {
-    const user = userEvent.setup();
-    await user.selectOptions(
-      screen.getByRole("combobox", { name: "Choose a spouse" }),
-      "@I2@",
-    );
-    screen.getByRole("button", { name: /Add Spouse/ }).click();
-    expect(addSpouse).toHaveBeenCalledWith("@I1@", "@I2@");
-  });
 });
 
 describe("InputIndividualComponent family buttons without an editor", () => {
-  it("disables the buttons and hides the spouse picker", async () => {
+  it("disables the buttons", async () => {
     await renderWithFamilies([]);
     expect(screen.getByRole("button", { name: /Spouse in/ })).toHaveProperty(
       "disabled",
@@ -119,6 +98,5 @@ describe("InputIndividualComponent family buttons without an editor", () => {
       "disabled",
       true,
     );
-    expect(screen.queryByRole("button", { name: /Add Spouse/ })).toBeNull();
   });
 });

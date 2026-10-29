@@ -14,6 +14,7 @@
   [open]="true"
   [formField]="form.facts"
   [workingDatabase]="workingDatabase()"
+  [individualXref]="value().xref"
 ></app-input-individual-facts>
 
 <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
@@ -28,57 +29,18 @@
       <i class="bi bi-people me-1"></i>{{ childOfFamilyLabel(xref) }}
     </button>
   }
-</div>
-
-<h2>Marriages</h2>
-@for (xref of value().parentOfFamilyXrefs; track xref) {
-  <div class="border rounded p-2 mb-2">
+  @for (xref of value().parentOfFamilyXrefs; track xref) {
     <button
       type="button"
-      class="btn btn-sm btn-outline-secondary mb-1"
+      class="btn btn-sm btn-outline-secondary"
       [disabled]="!gedcomEditor"
       (click)="gedcomEditor?.openFamily(xref)"
       title="Edit this family in a session tab"
     >
       <i class="bi bi-people me-1"></i>{{ parentOfFamilyLabel(xref) }}
     </button>
-    @if (gedcomEditor?.familyFactsField(xref); as familyFacts) {
-      <app-input-family-facts
-        [open]="true"
-        [workingDatabase]="workingDatabase()"
-        [formField]="familyFacts"
-      />
-    }
-  </div>
-}
-@if (gedcomEditor; as editor) {
-  <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
-    <select
-      class="form-select form-select-sm w-auto"
-      #spouseSelect
-      aria-label="Choose a spouse"
-    >
-      <option value="" disabled selected>Choose a spouse…</option>
-      @for (candidate of otherIndividuals(); track candidate.xref) {
-        <option [value]="candidate.xref">{{ candidate.label }}</option>
-      }
-    </select>
-    <button
-      type="button"
-      class="btn btn-sm btn-outline-primary"
-      (click)="editor.addSpouse(value().xref, spouseSelect.value)"
-    >
-      <i class="bi bi-person-plus me-1"></i>Add Spouse
-    </button>
-    <button
-      type="button"
-      class="btn btn-sm btn-outline-secondary"
-      (click)="editor.addSpouse(value().xref, editor.openNewIndividual())"
-    >
-      <i class="bi bi-person-plus me-1"></i>New Spouse
-    </button>
-  </div>
-}
+  }
+</div>
 
 <app-input-notes
   [open]="true"

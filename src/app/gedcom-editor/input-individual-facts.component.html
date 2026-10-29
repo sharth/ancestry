@@ -1,5 +1,5 @@
 <details [open]="open()">
-  <summary>Events ({{ form.length }})</summary>
+  <summary>Events ({{ eventCount() }})</summary>
   @for (event of form; track event) {
     <details [open]="true">
       <summary>
@@ -15,6 +15,108 @@
         [workingDatabase]="workingDatabase()"
         [formField]="event"
       ></app-input-individual-fact>
+    </details>
+  }
+  @for (family of spouseFamilies(); track family.xref) {
+    @let familyXref = family.xref;
+    @for (event of family.facts; track event) {
+      <details [open]="true">
+        <summary>
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-danger bi-trash"
+            aria-label="Remove event"
+            (click)="removeFamilyEvent(family.facts, $index)"
+          ></button>
+          {{ event.tag().value() }}
+        </summary>
+        <div class="form-floating mb-2">
+          <select
+            #spouse
+            class="form-select"
+            id="spouse"
+            aria-label="Spouse"
+            (change)="changeSpouse(familyXref, $index, spouse.value)"
+          >
+            @if (!spouseOf(familyXref)) {
+              <option value="" selected>Unknown</option>
+            }
+            @for (candidate of spouseCandidates(); track candidate.xref) {
+              <option
+                [value]="candidate.xref"
+                [selected]="candidate.xref === spouseOf(familyXref)"
+              >
+                {{ candidate.label }}
+              </option>
+            }
+            <option [value]="NEW_SPOUSE">New person…</option>
+          </select>
+          <label for="spouse">Spouse</label>
+        </div>
+        <app-input-family-fact
+          [workingDatabase]="workingDatabase()"
+          [formField]="event"
+        ></app-input-family-fact>
+      </details>
+    }
+  }
+  @if (pendingTag() !== undefined) {
+    <details [open]="true">
+      <summary>
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-danger bi-trash"
+          aria-label="Remove event"
+          (click)="pendingTag.set(undefined)"
+        ></button>
+        New event
+      </summary>
+      <div class="fields-grid">
+        <div class="form-floating">
+          <select
+            #pendingTagSelect
+            class="form-control"
+            id="newTag"
+            aria-label="Tag"
+            (change)="choosePendingTag(pendingTagSelect.value)"
+          >
+            <option value="" disabled [selected]="!pendingTag()">
+              Choose…
+            </option>
+            @for (tag of individualTags; track tag.tag) {
+              <option [value]="tag.tag">
+                {{ tag.humanReadableDescription }}
+              </option>
+            }
+            <optgroup label="With a spouse">
+              @for (tag of coupleTags; track tag.tag) {
+                <option [value]="tag.tag" [selected]="tag.tag === pendingTag()">
+                  {{ tag.humanReadableDescription }}
+                </option>
+              }
+            </optgroup>
+          </select>
+          <label for="newTag">Tag</label>
+        </div>
+        @if (pendingTag()) {
+          <div class="form-floating">
+            <select
+              #pendingSpouse
+              class="form-select is-invalid"
+              id="newSpouse"
+              aria-label="Spouse"
+              (change)="choosePendingSpouse(pendingSpouse.value)"
+            >
+              <option value="" disabled selected>Choose a spouse…</option>
+              @for (candidate of spouseCandidates(); track candidate.xref) {
+                <option [value]="candidate.xref">{{ candidate.label }}</option>
+              }
+              <option [value]="NEW_SPOUSE">New person…</option>
+            </select>
+            <label for="newSpouse">Spouse</label>
+          </div>
+        }
+      </div>
     </details>
   }
   <div
