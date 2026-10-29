@@ -72,51 +72,46 @@
     </details>
   </div>
 
-  @for (tabInformation of xrefsIncludedInView(); track tabInformation.xref) {
-    @let isActive =
-      activeTab()?.type === tabInformation.type &&
-      activeTab()?.xref === tabInformation.xref;
-    @if (isActive) {
-      @switch (tabInformation.type) {
-        @case ("INDI") {
-          @if (form.individuals[tabInformation.xref]; as individual) {
-            <app-input-individual
-              [workingDatabase]="workingDatabase()"
-              [formField]="individual"
-            />
-          }
+  @if (activeTab(); as tabInformation) {
+    @switch (tabInformation.type) {
+      @case ("INDI") {
+        @if (form.individuals[tabInformation.xref]; as individual) {
+          <app-input-individual
+            [workingDatabase]="workingDatabase()"
+            [formField]="individual"
+          />
         }
-        @case ("SOUR") {
-          @if (form.sources[tabInformation.xref]; as source) {
-            <app-input-source
-              [workingDatabase]="workingDatabase()"
-              [formField]="source"
-            />
-          }
+      }
+      @case ("SOUR") {
+        @if (form.sources[tabInformation.xref]; as source) {
+          <app-input-source
+            [workingDatabase]="workingDatabase()"
+            [formField]="source"
+          />
         }
-        @case ("FAM") {
-          @if (form.families[tabInformation.xref]; as family) {
-            <app-input-family
-              [workingDatabase]="workingDatabase()"
-              [formField]="family"
-            />
-          }
+      }
+      @case ("FAM") {
+        @if (form.families[tabInformation.xref]; as family) {
+          <app-input-family
+            [workingDatabase]="workingDatabase()"
+            [formField]="family"
+          />
         }
-        @case ("REPO") {
-          @if (form.repositories[tabInformation.xref]; as repository) {
-            <app-input-repository
-              [workingDatabase]="workingDatabase()"
-              [formField]="repository"
-            />
-          }
+      }
+      @case ("REPO") {
+        @if (form.repositories[tabInformation.xref]; as repository) {
+          <app-input-repository
+            [workingDatabase]="workingDatabase()"
+            [formField]="repository"
+          />
         }
-        @case ("OBJE") {
-          @if (form.multimedias[tabInformation.xref]; as multimedia) {
-            <app-input-multimedia
-              [workingDatabase]="workingDatabase()"
-              [formField]="multimedia"
-            />
-          }
+      }
+      @case ("OBJE") {
+        @if (form.multimedias[tabInformation.xref]; as multimedia) {
+          <app-input-multimedia
+            [workingDatabase]="workingDatabase()"
+            [formField]="multimedia"
+          />
         }
       }
     }
