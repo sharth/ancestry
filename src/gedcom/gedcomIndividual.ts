@@ -82,12 +82,6 @@ export function fullname(gedcomIndividual: GedcomIndividual): string {
   return nameToString(gedcomName);
 }
 
-export function alternateNames(
-  gedcomIndividual: GedcomIndividual,
-): GedcomName[] {
-  return gedcomIndividual.names.slice(1);
-}
-
 export function surname(gedcomIndividual: GedcomIndividual): string {
   const gedcomName = gedcomIndividual.names.at(0);
   return gedcomName?.surname ?? "";

@@ -2,7 +2,7 @@ import { Component, computed, input } from "@angular/core";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomFact } from "../../gedcom/gedcomFact";
-import { alternateNames, nameToString } from "../../gedcom/gedcomIndividual";
+import { nameToString } from "../../gedcom/gedcomIndividual";
 import {
   EventsTimelineComponent,
   type TimelineEvent,
@@ -27,14 +27,15 @@ export class IndividualFactsComponent {
     }
 
     // The individual's own events, merged with the events of each family in
-    // which they are a spouse. Alternate names have no date, so (like other
-    // undated facts) they naturally sort to the end of the timeline.
+    // which they are a spouse. Names have no date, so (like other undated
+    // facts) they naturally sort to the end of the timeline - this is also
+    // the only place the primary name's citations are shown.
     const events: TimelineEvent[] = [
       ...individual.facts.map((fact): TimelineEvent => ({
         fact,
         owner: "individual",
       })),
-      ...alternateNames(individual).map((name): TimelineEvent => ({
+      ...individual.names.map((name): TimelineEvent => ({
         fact: newGedcomFact({
           tag: "NAME",
           type: name.nameType,

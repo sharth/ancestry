@@ -104,17 +104,17 @@ describe("IndividualFactsComponent", () => {
           " ",
         ),
     );
-    expect(titles).toEqual(["Birth", "Marriage", "Death", "Name"]);
-    expect(labels).toEqual(["1900 (Age)", "1925 25", "1970 70", ""]);
+    expect(titles).toEqual(["Birth", "Marriage", "Death", "Name", "Name"]);
+    expect(labels).toEqual(["1900 (Age)", "1925 25", "1970 70", "", ""]);
   });
 
-  it("should list alternate names at the end of the timeline, not the primary name", () => {
+  it("should list every name, including the primary one, at the end of the timeline", () => {
     const details = Array.from(
       element.querySelectorAll(".timeline-details"),
       (detail) => detail.textContent.trim(),
     );
     expect(details.some((detail) => detail.includes("Johnny Doe"))).toBe(true);
-    expect(details.some((detail) => detail.includes("John Doe"))).toBe(false);
+    expect(details.some((detail) => detail.includes("John Doe"))).toBe(true);
   });
 
   it("should tag each family's events with that family and spouse", async () => {
