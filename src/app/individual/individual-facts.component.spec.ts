@@ -12,6 +12,7 @@ import { newGedcomDate } from "../../gedcom/gedcomDate";
 import { newGedcomFact } from "../../gedcom/gedcomFact";
 import { newGedcomFamily } from "../../gedcom/gedcomFamily";
 import { newGedcomIndividual } from "../../gedcom/gedcomIndividual";
+import { newGedcomName } from "../../gedcom/gedcomName";
 import { IndividualFactsComponent } from "./individual-facts.component";
 
 describe("IndividualFactsComponent", () => {
@@ -26,6 +27,14 @@ describe("IndividualFactsComponent", () => {
         individuals: {
           "@I1@": newGedcomIndividual({
             xref: "@I1@",
+            names: [
+              newGedcomName({ givenName: "John", surname: "Doe" }),
+              newGedcomName({
+                givenName: "Johnny",
+                surname: "Doe",
+                nameType: "aka",
+              }),
+            ],
             facts: [
               newGedcomFact({
                 tag: "DEAT",
@@ -95,8 +104,17 @@ describe("IndividualFactsComponent", () => {
           " ",
         ),
     );
-    expect(titles).toEqual(["Birth", "Marriage", "Death"]);
-    expect(labels).toEqual(["1900 (Age)", "1925 25", "1970 70"]);
+    expect(titles).toEqual(["Birth", "Marriage", "Death", "Name"]);
+    expect(labels).toEqual(["1900 (Age)", "1925 25", "1970 70", ""]);
+  });
+
+  it("should list alternate names at the end of the timeline, not the primary name", () => {
+    const details = Array.from(
+      element.querySelectorAll(".timeline-details"),
+      (detail) => detail.textContent.trim(),
+    );
+    expect(details.some((detail) => detail.includes("Johnny Doe"))).toBe(true);
+    expect(details.some((detail) => detail.includes("John Doe"))).toBe(false);
   });
 
   it("should tag each family's events with that family and spouse", async () => {

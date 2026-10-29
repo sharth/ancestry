@@ -60,7 +60,10 @@ export class EventsTimelineComponent {
           event.owner === "individual"
             ? individualMetadata[fact.tag]
             : familyMetadata[fact.tag];
-        const description = metadata?.humanReadableDescription ?? fact.tag;
+        const description =
+          fact.tag === "NAME"
+            ? "Name"
+            : (metadata?.humanReadableDescription ?? fact.tag);
         // Generic events and facts are best described by their type.
         const typeIsTitle =
           (fact.tag === "EVEN" || fact.tag === "FACT") && fact.type !== "";
