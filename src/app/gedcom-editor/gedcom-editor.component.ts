@@ -34,6 +34,7 @@ import {
   type GedcomEditorInterface,
   type TabInformation,
 } from "./gedcom-editor-interface";
+import { InputFamilyFactsComponent } from "./input-family-facts.component";
 import { InputFamilyComponent } from "./input-family.component";
 import { InputIndividualComponent } from "./input-individual.component";
 import { InputMultimediaComponent } from "./input-multimedia.component";
@@ -46,6 +47,7 @@ import { InputSourceComponent } from "./input-source.component";
     FormField,
     GedcomDiffComponent,
     InputFamilyComponent,
+    InputFamilyFactsComponent,
     InputIndividualComponent,
     InputMultimediaComponent,
     InputRepositoryComponent,
@@ -130,6 +132,24 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     this.effectiveTabs(),
   );
 
+  // Families where one of the spouses is an individual open in a tab. These
+  // are brought into the form (so their facts can be edited inline on the
+  // individual's own tab, e.g. a marriage) without being session tabs of
+  // their own, so they don't appear in the tab bar.
+  readonly impliedFamilyXrefs = computed<string[]>(() => {
+    const database = this.workingDatabase();
+    const individualXrefs = this.xrefsIncludedInView()
+      .filter((tabInformation) => tabInformation.type === "INDI")
+      .map((tabInformation) => tabInformation.xref);
+    return Object.values(database.families)
+      .filter(
+        (family) =>
+          individualXrefs.includes(family.husbandXref) ||
+          individualXrefs.includes(family.wifeXref),
+      )
+      .map((family) => family.xref);
+  });
+
   // A GedcomDatabase made up of only the xrefs found in `xrefsIncludedInView`.
   // Any changes will be persisted in workingDatabase().
   // This will be used in the Angular Signal Forms. The indirection is required,
@@ -148,12 +168,12 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
           .filter((tabInformation) => tabInformation.type === "INDI")
           .map((tabInformation) => tabInformation.xref),
       ),
-      families: filteredProperties(
-        this.workingDatabase().families,
-        this.xrefsIncludedInView()
+      families: filteredProperties(this.workingDatabase().families, [
+        ...this.xrefsIncludedInView()
           .filter((tabInformation) => tabInformation.type === "FAM")
           .map((tabInformation) => tabInformation.xref),
-      ),
+        ...this.impliedFamilyXrefs(),
+      ]),
       sources: filteredProperties(
         this.workingDatabase().sources,
         this.xrefsIncludedInView()
@@ -266,6 +286,70 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
 
   openFamily(xref: string) {
     this.openTab({ type: "FAM", xref });
+  }
+
+  // Families where the given individual is a spouse, for inline display on
+  // that individual's own tab (see `impliedFamilyXrefs`).
+  spouseFamilyXrefs(individualXref: string): string[] {
+    return Object.values(this.workingDatabase().families)
+      .filter(
+        (family) =>
+          family.husbandXref === individualXref ||
+          family.wifeXref === individualXref,
+      )
+      .map((family) => family.xref);
+  }
+
+  // Individuals that could be added as a spouse, for the "Add Spouse" picker.
+  otherIndividuals(excludeXref: string): { xref: string; label: string }[] {
+    return Object.values(this.workingDatabase().individuals)
+      .filter((individual) => individual.xref !== excludeXref)
+      .map((individual) => ({
+        xref: individual.xref,
+        label: individual.names[0]
+          ? displayGedcomName(individual.names[0])
+          : individual.xref,
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }
+
+  // Finds the family where `individualXref` and `spouseXref` are already
+  // husband and wife, or creates one and wires up both sides (the HUSB/WIFE
+  // xrefs on the family, and the FAMS xref on each individual), so a
+  // marriage event can be added right away. Returns the family's xref, or ""
+  // if no spouse was chosen.
+  addSpouse(individualXref: string, spouseXref: string): string {
+    if (!spouseXref || spouseXref === individualXref) return "";
+
+    const database = this.workingDatabase();
+    const existingFamily = Object.values(database.families).find(
+      (family) =>
+        (family.husbandXref === individualXref &&
+          family.wifeXref === spouseXref) ||
+        (family.husbandXref === spouseXref &&
+          family.wifeXref === individualXref),
+    );
+    if (existingFamily) return existingFamily.xref;
+
+    const familyXref = calculateNextFamilyXref(database);
+    const individualIsWife =
+      database.individuals[individualXref]?.sex.sex === "F";
+    const [husbandXref, wifeXref] = individualIsWife
+      ? [spouseXref, individualXref]
+      : [individualXref, spouseXref];
+
+    this.workingDatabase.update((workingDatabase) =>
+      produce(workingDatabase, (draft) => {
+        draft.families[familyXref] = newGedcomFamily({
+          xref: familyXref,
+          husbandXref,
+          wifeXref,
+        });
+        draft.individuals[individualXref]?.parentOfFamilyXrefs.push(familyXref);
+        draft.individuals[spouseXref]?.parentOfFamilyXrefs.push(familyXref);
+      }),
+    );
+    return familyXref;
   }
 
   openTab(tabInformation: TabInformation) {
