@@ -346,6 +346,28 @@ describe("GedcomEditorComponent Integration", () => {
     });
   });
 
+  describe("tab unmounting", () => {
+    // Switching the active tab must remove the previously-active tab's
+    // component from the DOM (not just hide it), so that a tab embedding
+    // a record elsewhere in its own view (e.g. a family's facts shown
+    // inline on an individual's tab) is never mounted at the same time as
+    // that same record rendered by its own session tab.
+    it("removes the inactive individual tab from the DOM when switching to another tab", async () => {
+      fixture.componentRef.setInput("tabs", [{ type: "INDI", xref: "@I0@" }]);
+      fixture.detectChanges();
+      await fixture.whenStable();
+      const element = fixture.nativeElement as HTMLElement;
+      expect(element.querySelector("app-input-individual")).not.toBeNull();
+
+      component.openFamily("@F0@");
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      expect(element.querySelector("app-input-individual")).toBeNull();
+      expect(element.querySelector("app-input-family")).not.toBeNull();
+    });
+  });
+
   describe("submitForm tests", () => {
     it("emits finished before navigating, so the dialog is already closed by the time the reload re-checks the unsaved-changes guard", async () => {
       vi.spyOn(ancestryService, "updateGedcomDatabase").mockResolvedValue(
@@ -533,5 +555,55 @@ describe("GedcomEditorComponent hasUnsavedChanges with real form interaction", (
     expect(renderResult.fixture.componentInstance.hasUnsavedChanges()).toBe(
       true,
     );
+  });
+
+  // Regression coverage for the tab-unmounting change: once a tab stops
+  // being active, its component (and the DOM control the user actually
+  // typed into) is destroyed. The edit itself must still count as dirty --
+  // form().dirty() is driven by the shared Signal Forms field tree, not by
+  // any one tab's component instance, so it must survive that tab being
+  // unmounted and even stay true once the user has navigated away.
+  it("stays dirty after editing a tab and then switching away from it", async () => {
+    const renderResult = await render(GedcomEditorComponent, {
+      providers: [provideRouter([])],
+      skipDetectChanges: true,
+    });
+    renderResult.fixture.componentRef.setInput("tabs", [
+      { type: "FAM", xref: "@F0@" },
+      { type: "INDI", xref: "@I1@" },
+    ]);
+    renderResult.fixture.componentRef.setInput("ancestryDatabase", database);
+    renderResult.fixture.detectChanges();
+    await renderResult.fixture.whenStable();
+    const component = renderResult.fixture.componentInstance;
+
+    expect(component.hasUnsavedChanges()).toBe(false);
+
+    const [, wifeSelect] = screen.getAllByRole<HTMLSelectElement>("combobox");
+    assert.isOk(wifeSelect);
+    const user = userEvent.setup();
+    await user.selectOptions(wifeSelect, "@I1@");
+    renderResult.fixture.detectChanges();
+    await renderResult.fixture.whenStable();
+    expect(component.hasUnsavedChanges()).toBe(true);
+
+    // Switch away from the family tab: its component (and the <select> just
+    // edited) is unmounted, since only the active tab is rendered.
+    component.openIndividual("@I1@");
+    renderResult.fixture.detectChanges();
+    await renderResult.fixture.whenStable();
+    expect(
+      (renderResult.fixture.nativeElement as HTMLElement).querySelector(
+        "app-input-family",
+      ),
+    ).toBeNull();
+    expect(component.hasUnsavedChanges()).toBe(true);
+
+    // And switching back to the family tab still shows the edit took.
+    component.openFamily("@F0@");
+    renderResult.fixture.detectChanges();
+    await renderResult.fixture.whenStable();
+    expect(component.workingDatabase().families["@F0@"]?.wifeXref).toBe("@I1@");
+    expect(component.hasUnsavedChanges()).toBe(true);
   });
 });
