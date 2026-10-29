@@ -18,6 +18,9 @@
               @if (row.spouseXref) {
                 (with <app-individual-link [xref]="row.spouseXref" />)
               }
+              @if (row.nameText) {
+                ({{ row.nameText }})
+              }
             </div>
             <div>{{ row.citation.text || row.citation.page }}</div>
           </div>
