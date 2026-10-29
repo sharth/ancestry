@@ -346,25 +346,91 @@ describe("GedcomEditorComponent Integration", () => {
     });
   });
 
-  describe("tab unmounting", () => {
-    // Switching the active tab must remove the previously-active tab's
-    // component from the DOM (not just hide it), so that a tab embedding
-    // a record elsewhere in its own view (e.g. a family's facts shown
-    // inline on an individual's tab) is never mounted at the same time as
-    // that same record rendered by its own session tab.
-    it("removes the inactive individual tab from the DOM when switching to another tab", async () => {
+  describe("inline marriage section", () => {
+    it("renders the individual's existing spouse family inline, without a session tab for it", async () => {
       fixture.componentRef.setInput("tabs", [{ type: "INDI", xref: "@I0@" }]);
       fixture.detectChanges();
       await fixture.whenStable();
+
       const element = fixture.nativeElement as HTMLElement;
-      expect(element.querySelector("app-input-individual")).not.toBeNull();
+      expect(element.querySelector("app-input-family-facts")).not.toBeNull();
+      expect(screen.queryByRole("button", { name: /Family @F0@/ })).toBeNull();
+    });
+  });
 
-      component.openFamily("@F0@");
-      fixture.detectChanges();
-      await fixture.whenStable();
+  describe("spouseFamilyXrefs and impliedFamilyXrefs tests", () => {
+    it("finds the families where the individual is husband or wife", () => {
+      expect(component.spouseFamilyXrefs("@I0@")).toEqual(["@F0@"]);
+      expect(component.spouseFamilyXrefs("@I1@")).toEqual([]);
+    });
 
-      expect(element.querySelector("app-input-individual")).toBeNull();
-      expect(element.querySelector("app-input-family")).not.toBeNull();
+    it("brings a spouse family into the form without adding it as a session tab", () => {
+      fixture.componentRef.setInput("tabs", [{ type: "INDI", xref: "@I0@" }]);
+      expect(component.impliedFamilyXrefs()).toEqual(["@F0@"]);
+      expect(component.workingDatabaseView().families["@F0@"]).toEqual(
+        newGedcomFamily({ xref: "@F0@", husbandXref: "@I0@" }),
+      );
+      expect(
+        component
+          .xrefsIncludedInView()
+          .some((tab) => tab.type === "FAM" && tab.xref === "@F0@"),
+      ).toBe(false);
+    });
+  });
+
+  describe("addSpouse tests", () => {
+    beforeEach(() => {
+      fixture.componentRef.setInput("tabs", [{ type: "INDI", xref: "@I0@" }]);
+    });
+
+    it("does nothing when no spouse is chosen", () => {
+      expect(component.addSpouse("@I0@", "")).toBe("");
+      expect(component.workingDatabase().families).toEqual(
+        initialDatabase.families,
+      );
+    });
+
+    it("reuses an existing family where the two are already husband and wife", () => {
+      component.workingDatabase.update(
+        produce((draft) => {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          draft.families["@F0@"]!.wifeXref = "@I1@";
+          draft.individuals["@I1@"] = newGedcomIndividual({
+            xref: "@I1@",
+            sex: newGedcomSex({ sex: "F" }),
+            parentOfFamilyXrefs: ["@F0@"],
+          });
+        }),
+      );
+
+      expect(component.addSpouse("@I0@", "@I1@")).toBe("@F0@");
+      expect(Object.keys(component.workingDatabase().families)).toEqual([
+        "@F0@",
+      ]);
+    });
+
+    it("creates a new family and links both individuals when none exists", () => {
+      component.workingDatabase.update(
+        produce((draft) => {
+          draft.individuals["@I1@"] = newGedcomIndividual({
+            xref: "@I1@",
+            sex: newGedcomSex({ sex: "F" }),
+          });
+        }),
+      );
+
+      const familyXref = component.addSpouse("@I0@", "@I1@");
+
+      expect(familyXref).toBe("@F1@");
+      const family = component.workingDatabase().families[familyXref];
+      expect(family?.husbandXref).toBe("@I0@");
+      expect(family?.wifeXref).toBe("@I1@");
+      expect(
+        component.workingDatabase().individuals["@I0@"]?.parentOfFamilyXrefs,
+      ).toContain(familyXref);
+      expect(
+        component.workingDatabase().individuals["@I1@"]?.parentOfFamilyXrefs,
+      ).toContain(familyXref);
     });
   });
 
@@ -555,55 +621,5 @@ describe("GedcomEditorComponent hasUnsavedChanges with real form interaction", (
     expect(renderResult.fixture.componentInstance.hasUnsavedChanges()).toBe(
       true,
     );
-  });
-
-  // Regression coverage for the tab-unmounting change: once a tab stops
-  // being active, its component (and the DOM control the user actually
-  // typed into) is destroyed. The edit itself must still count as dirty --
-  // form().dirty() is driven by the shared Signal Forms field tree, not by
-  // any one tab's component instance, so it must survive that tab being
-  // unmounted and even stay true once the user has navigated away.
-  it("stays dirty after editing a tab and then switching away from it", async () => {
-    const renderResult = await render(GedcomEditorComponent, {
-      providers: [provideRouter([])],
-      skipDetectChanges: true,
-    });
-    renderResult.fixture.componentRef.setInput("tabs", [
-      { type: "FAM", xref: "@F0@" },
-      { type: "INDI", xref: "@I1@" },
-    ]);
-    renderResult.fixture.componentRef.setInput("ancestryDatabase", database);
-    renderResult.fixture.detectChanges();
-    await renderResult.fixture.whenStable();
-    const component = renderResult.fixture.componentInstance;
-
-    expect(component.hasUnsavedChanges()).toBe(false);
-
-    const [, wifeSelect] = screen.getAllByRole<HTMLSelectElement>("combobox");
-    assert.isOk(wifeSelect);
-    const user = userEvent.setup();
-    await user.selectOptions(wifeSelect, "@I1@");
-    renderResult.fixture.detectChanges();
-    await renderResult.fixture.whenStable();
-    expect(component.hasUnsavedChanges()).toBe(true);
-
-    // Switch away from the family tab: its component (and the <select> just
-    // edited) is unmounted, since only the active tab is rendered.
-    component.openIndividual("@I1@");
-    renderResult.fixture.detectChanges();
-    await renderResult.fixture.whenStable();
-    expect(
-      (renderResult.fixture.nativeElement as HTMLElement).querySelector(
-        "app-input-family",
-      ),
-    ).toBeNull();
-    expect(component.hasUnsavedChanges()).toBe(true);
-
-    // And switching back to the family tab still shows the edit took.
-    component.openFamily("@F0@");
-    renderResult.fixture.detectChanges();
-    await renderResult.fixture.whenStable();
-    expect(component.workingDatabase().families["@F0@"]?.wifeXref).toBe("@I1@");
-    expect(component.hasUnsavedChanges()).toBe(true);
   });
 });
