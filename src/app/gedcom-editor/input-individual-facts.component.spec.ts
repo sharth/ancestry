@@ -108,7 +108,7 @@ describe("InputIndividualFactsComponent new events in the editor", () => {
       "MARR",
     );
     await user.selectOptions(
-      screen.getByRole("combobox", { name: "Individual" }),
+      screen.getByRole("combobox", { name: "Spouse" }),
       "@I2@",
     );
     expect(addFactToSpouseFamily).toHaveBeenCalledWith(
@@ -142,7 +142,7 @@ describe("InputIndividualFactsComponent new events in the editor", () => {
       "BIRT",
     );
     expect(value().map((fact) => fact.tag)).toEqual(["BIRT"]);
-    expect(screen.queryByRole("combobox", { name: "Individual" })).toBeNull();
+    expect(screen.queryByRole("combobox", { name: "Spouse" })).toBeNull();
     expect(addFactToSpouseFamily).not.toHaveBeenCalled();
   });
 });
