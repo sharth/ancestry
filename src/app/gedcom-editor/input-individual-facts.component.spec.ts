@@ -64,10 +64,12 @@ describe("InputIndividualFactsComponent", () => {
 
 describe("InputIndividualFactsComponent new events in the editor", () => {
   const addFactToSpouseFamily = vi.fn();
+  const openNewIndividual = vi.fn(() => "@I3@");
   const value = signal<GedcomFact[]>([]);
 
   beforeEach(async () => {
     addFactToSpouseFamily.mockClear();
+    openNewIndividual.mockClear();
     value.set([]);
     const database = newGedcomDatabase({
       individuals: {
@@ -90,6 +92,7 @@ describe("InputIndividualFactsComponent new events in the editor", () => {
           useValue: {
             familyFactsField: () => undefined,
             addFactToSpouseFamily,
+            openNewIndividual,
           },
         },
       ],
@@ -105,7 +108,7 @@ describe("InputIndividualFactsComponent new events in the editor", () => {
       "MARR",
     );
     await user.selectOptions(
-      screen.getByRole("combobox", { name: "Spouse" }),
+      screen.getByRole("combobox", { name: "Individual" }),
       "@I2@",
     );
     expect(addFactToSpouseFamily).toHaveBeenCalledWith(
@@ -116,6 +119,22 @@ describe("InputIndividualFactsComponent new events in the editor", () => {
     expect(value()).toEqual([]);
   });
 
+  it("can create a new person as the spouse", async () => {
+    const user = userEvent.setup();
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Tag" }),
+      "MARR",
+    );
+    await user.click(screen.getByRole("button", { name: /New/ }));
+
+    expect(openNewIndividual).toHaveBeenCalled();
+    expect(addFactToSpouseFamily).toHaveBeenCalledWith(
+      "@I1@",
+      "@I3@",
+      newGedcomFact({ tag: "MARR" }),
+    );
+  });
+
   it("adds an individual event to the individual's own facts", async () => {
     const user = userEvent.setup();
     await user.selectOptions(
@@ -123,7 +142,7 @@ describe("InputIndividualFactsComponent new events in the editor", () => {
       "BIRT",
     );
     expect(value().map((fact) => fact.tag)).toEqual(["BIRT"]);
-    expect(screen.queryByRole("combobox", { name: "Spouse" })).toBeNull();
+    expect(screen.queryByRole("combobox", { name: "Individual" })).toBeNull();
     expect(addFactToSpouseFamily).not.toHaveBeenCalled();
   });
 });

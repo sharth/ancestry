@@ -24,16 +24,19 @@ import {
   gedcomIndividualFacts,
   type GedcomEventMetadata,
 } from "../../gedcom/gedcomFactMetadata";
-import { displayGedcomName } from "../../gedcom/gedcomName";
 import { GEDCOM_EDITOR } from "./gedcom-editor-interface";
 import { InputFamilyFactComponent } from "./input-family-fact.component";
 import { InputIndividualFactComponent } from "./input-individual-fact.component";
-
-const NEW_SPOUSE = "new";
+import { InputIndividualXrefComponent } from "./input-individual-xref.component";
 
 @Component({
   selector: "app-input-individual-facts",
-  imports: [FormField, InputFamilyFactComponent, InputIndividualFactComponent],
+  imports: [
+    FormField,
+    InputFamilyFactComponent,
+    InputIndividualFactComponent,
+    InputIndividualXrefComponent,
+  ],
   templateUrl: "./input-individual-facts.component.html",
   styleUrl: "./input.component.css",
 })
@@ -52,7 +55,6 @@ export class InputIndividualFactsComponent implements FormValueControl<
   readonly value = model<GedcomFact[]>([]);
   readonly form = form(this.value);
 
-  readonly NEW_SPOUSE = NEW_SPOUSE;
   readonly individualTags = sortedTags(gedcomIndividualFacts);
   readonly coupleTags = sortedTags(
     Object.fromEntries(
@@ -83,19 +85,6 @@ export class InputIndividualFactsComponent implements FormValueControl<
       return facts ? [{ xref, facts }] : [];
     });
   });
-
-  readonly spouseCandidates = computed(() =>
-    Object.values(this.workingDatabase().individuals)
-      .filter((individual) => individual.xref !== this.individualXref())
-      .map((individual) => {
-        const name = individual.names.at(0);
-        return {
-          xref: individual.xref,
-          label: (name ? displayGedcomName(name) : "") || individual.xref,
-        };
-      })
-      .sort((a, b) => a.label.localeCompare(b.label)),
-  );
 
   eventCount(): number {
     return this.spouseFamilies().reduce(
@@ -146,12 +135,12 @@ export class InputIndividualFactsComponent implements FormValueControl<
   choosePendingSpouse(spouseXref: string) {
     const editor = this.gedcomEditor;
     const tag = this.pendingTag();
-    if (!editor || !tag) return;
+    if (!editor || !tag || !spouseXref) return;
     const individualXref = this.individualXref();
     this.pendingTag.set(undefined);
     editor.addFactToSpouseFamily(
       individualXref,
-      this.resolveSpouse(spouseXref),
+      spouseXref,
       newGedcomFact({ tag }),
     );
   }
@@ -167,24 +156,12 @@ export class InputIndividualFactsComponent implements FormValueControl<
     const editor = this.gedcomEditor;
     if (!editor) return;
     const individualXref = this.individualXref();
-    editor.moveFamilyFact(
-      individualXref,
-      familyXref,
-      factIndex,
-      this.resolveSpouse(spouseXref),
-    );
+    editor.moveFamilyFact(individualXref, familyXref, factIndex, spouseXref);
   }
 
   removeFamilyEvent(facts: FieldTree<GedcomFact[]>, index: number) {
     facts().value.update((events) => events.toSpliced(index, 1));
     facts().markAsDirty();
-  }
-
-  // "New person…" creates the spouse (and opens them in a tab to fill in).
-  private resolveSpouse(spouseXref: string): string {
-    return spouseXref === NEW_SPOUSE && this.gedcomEditor
-      ? this.gedcomEditor.openNewIndividual()
-      : spouseXref;
   }
 }
 
