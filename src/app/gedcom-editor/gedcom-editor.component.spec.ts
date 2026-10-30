@@ -449,9 +449,7 @@ describe("GedcomEditorComponent Integration", () => {
     });
   });
 
-  describe("spouse family fact tests", () => {
-    const marriage = newGedcomFact({ tag: "MARR", place: "Boston" });
-
+  describe("createSpouseFamily tests", () => {
     beforeEach(() => {
       fixture.componentRef.setInput("tabs", [{ type: "INDI", xref: "@I0@" }]);
       component.workingDatabase.update(
@@ -460,56 +458,32 @@ describe("GedcomEditorComponent Integration", () => {
             xref: "@I1@",
             sex: newGedcomSex({ sex: "F" }),
           });
-          draft.individuals["@I2@"] = newGedcomIndividual({ xref: "@I2@" });
         }),
       );
     });
 
-    it("does nothing when no spouse is chosen", () => {
-      const before = component.workingDatabase();
-      component.addFactToSpouseFamily("@I0@", "", marriage);
-      expect(component.workingDatabase()).toBe(before);
-    });
-
-    it("adds the fact to the family the two already share", () => {
-      component.workingDatabase.update(
-        produce((draft) => {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          draft.families["@F0@"]!.wifeXref = "@I1@";
-          draft.individuals["@I1@"]?.parentOfFamilyXrefs.push("@F0@");
-        }),
-      );
-
-      component.addFactToSpouseFamily("@I0@", "@I1@", marriage);
+    it("creates a family and links both spouses", () => {
+      const familyXref = component.createSpouseFamily("@I0@", "@I1@");
 
       const database = component.workingDatabase();
-      expect(Object.keys(database.families)).toEqual(["@F0@"]);
-      expect(database.families["@F0@"]?.facts).toEqual([marriage]);
-    });
-
-    it("creates a family and links both spouses when they don't share one", () => {
-      component.addFactToSpouseFamily("@I0@", "@I1@", marriage);
-
-      const database = component.workingDatabase();
-      const family = database.families["@F1@"];
+      const family = database.families[familyXref];
       expect(family?.husbandXref).toBe("@I0@");
       expect(family?.wifeXref).toBe("@I1@");
-      expect(family?.facts).toEqual([marriage]);
       expect(database.individuals["@I0@"]?.parentOfFamilyXrefs).toContain(
-        "@F1@",
+        familyXref,
       );
       expect(database.individuals["@I1@"]?.parentOfFamilyXrefs).toContain(
-        "@F1@",
+        familyXref,
       );
+      expect(component.familyFactsField(familyXref)).toBeDefined();
     });
 
-    it("moves a family's fact to the family shared with a different spouse", () => {
-      component.addFactToSpouseFamily("@I0@", "@I1@", marriage);
-      component.moveFamilyFact("@I0@", "@F1@", 0, "@I2@");
+    it("makes the individual the wife when she is female", () => {
+      const familyXref = component.createSpouseFamily("@I1@", "@I0@");
 
-      const database = component.workingDatabase();
-      expect(database.families["@F1@"]?.facts).toEqual([]);
-      expect(database.families["@F2@"]?.facts).toEqual([marriage]);
+      const family = component.workingDatabase().families[familyXref];
+      expect(family?.husbandXref).toBe("@I0@");
+      expect(family?.wifeXref).toBe("@I1@");
     });
   });
 

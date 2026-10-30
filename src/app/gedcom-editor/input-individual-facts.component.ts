@@ -203,19 +203,16 @@ export class InputIndividualFactsComponent implements FormValueControl<
   }
 
   choosePendingSpouse(spouseXref: string) {
-    const editor = this.gedcomEditor;
     const tag = this.pendingTag();
-    if (!editor || !tag || !spouseXref) return;
-    const individualXref = this.individualXref();
+    if (!tag) return;
     const layout = this.layout();
+    const familyXref = this.spouseFamilyXref(spouseXref);
+    const facts = familyXref && this.gedcomEditor?.familyFactsField(familyXref);
+    if (!familyXref || !facts) return;
     const token = this.nextToken++;
     this.pendingTag.set(undefined);
-    const familyXref = editor.addFactToSpouseFamily(
-      individualXref,
-      spouseXref,
-      newGedcomFact({ tag }),
-    );
-    if (!familyXref) return;
+    facts().value.update((events) => [...events, newGedcomFact({ tag })]);
+    facts().markAsDirty();
     this.layout.set({
       ...layout,
       order: [...layout.order, token],
@@ -233,20 +230,45 @@ export class InputIndividualFactsComponent implements FormValueControl<
       : (family?.husbandXref ?? "");
   }
 
-  changeSpouse(familyXref: string, factIndex: number, spouseXref: string) {
-    const editor = this.gedcomEditor;
-    if (!editor) return;
-    const layout = this.layout();
-    const toFamilyXref = editor.moveFamilyFact(
-      this.individualXref(),
-      familyXref,
-      factIndex,
-      spouseXref,
+  // The family where the individual and `spouseXref` are husband and wife,
+  // created if they don't have one yet. "" if there's no spouse to pair with.
+  private spouseFamilyXref(spouseXref: string): string {
+    const individualXref = this.individualXref();
+    if (!this.gedcomEditor || !spouseXref || spouseXref === individualXref) {
+      return "";
+    }
+    const existingFamily = Object.values(this.workingDatabase().families).find(
+      (family) =>
+        (family.husbandXref === individualXref &&
+          family.wifeXref === spouseXref) ||
+        (family.husbandXref === spouseXref &&
+          family.wifeXref === individualXref),
     );
-    if (toFamilyXref === familyXref) return;
+    return (
+      existingFamily?.xref ??
+      this.gedcomEditor.createSpouseFamily(individualXref, spouseXref)
+    );
+  }
+
+  changeSpouse(
+    familyXref: string,
+    facts: FieldTree<GedcomFact[]>,
+    factIndex: number,
+    spouseXref: string,
+  ) {
+    const layout = this.layout();
     const fromTokens = layout.families[familyXref] ?? [];
     const token = fromTokens[factIndex];
-    if (token === undefined) return;
+    const fact = facts().value()[factIndex];
+    if (token === undefined || fact === undefined) return;
+    const toFamilyXref = this.spouseFamilyXref(spouseXref);
+    const toFacts =
+      toFamilyXref && this.gedcomEditor?.familyFactsField(toFamilyXref);
+    if (!toFamilyXref || !toFacts || toFamilyXref === familyXref) return;
+    facts().value.update((events) => events.toSpliced(factIndex, 1));
+    facts().markAsDirty();
+    toFacts().value.update((events) => [...events, fact]);
+    toFacts().markAsDirty();
     this.layout.set({
       ...layout,
       families: {

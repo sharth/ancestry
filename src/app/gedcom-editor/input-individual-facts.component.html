@@ -24,7 +24,7 @@
           class="d-block mb-2"
           [workingDatabase]="workingDatabase()"
           [value]="spouseOf(familyXref)"
-          (valueChange)="changeSpouse(familyXref, row.index, $event)"
+          (valueChange)="changeSpouse(familyXref, facts, row.index, $event)"
         ></app-input-individual-xref>
         <app-input-family-fact
           [workingDatabase]="workingDatabase()"

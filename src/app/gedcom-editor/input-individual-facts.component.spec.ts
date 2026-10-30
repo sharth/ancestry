@@ -1,11 +1,12 @@
-import { inputBinding, signal, twoWayBinding } from "@angular/core";
-import type { ComponentFixture } from "@angular/core/testing";
+import { Injector, inputBinding, signal, twoWayBinding } from "@angular/core";
+import { TestBed, type ComponentFixture } from "@angular/core/testing";
+import { form, type FieldTree } from "@angular/forms/signals";
 import { render, screen } from "@testing-library/angular/zoneless";
 import { userEvent } from "@testing-library/user-event";
 import { assert, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
-import { newGedcomFact, type GedcomFact } from "../../gedcom/gedcomFact";
+import type { GedcomFact } from "../../gedcom/gedcomFact";
 import { newGedcomIndividual } from "../../gedcom/gedcomIndividual";
 import { newGedcomName } from "../../gedcom/gedcomName";
 import { GEDCOM_EDITOR } from "./gedcom-editor-interface";
@@ -63,12 +64,19 @@ describe("InputIndividualFactsComponent", () => {
 });
 
 describe("InputIndividualFactsComponent new events in the editor", () => {
-  const addFactToSpouseFamily = vi.fn();
+  // Stands in for the editor's form over the families' facts.
+  const families = signal<Record<string, GedcomFact[]>>({});
+  let familiesForm: FieldTree<Record<string, GedcomFact[]>>;
+  const createSpouseFamily = vi.fn(() => {
+    families.update((facts) => ({ ...facts, "@F1@": [] }));
+    return "@F1@";
+  });
   const openNewIndividual = vi.fn(() => "@I3@");
   const value = signal<GedcomFact[]>([]);
 
   beforeEach(async () => {
-    addFactToSpouseFamily.mockClear();
+    families.set({});
+    createSpouseFamily.mockClear();
     openNewIndividual.mockClear();
     value.set([]);
     const database = newGedcomDatabase({
@@ -90,14 +98,15 @@ describe("InputIndividualFactsComponent new events in the editor", () => {
         {
           provide: GEDCOM_EDITOR,
           useValue: {
-            familyFactsField: () => undefined,
-            addFactToSpouseFamily,
+            familyFactsField: (xref: string) => familiesForm[xref],
+            createSpouseFamily,
             openNewIndividual,
           },
         },
       ],
       waitForStableOnRender: true,
     });
+    familiesForm = form(families, { injector: TestBed.inject(Injector) });
     await userEvent.setup().click(screen.getByText("Append another event"));
   });
 
@@ -111,11 +120,8 @@ describe("InputIndividualFactsComponent new events in the editor", () => {
       screen.getByRole("combobox", { name: "Spouse" }),
       "@I2@",
     );
-    expect(addFactToSpouseFamily).toHaveBeenCalledWith(
-      "@I1@",
-      "@I2@",
-      newGedcomFact({ tag: "MARR" }),
-    );
+    expect(createSpouseFamily).toHaveBeenCalledWith("@I1@", "@I2@");
+    expect(families()["@F1@"]?.map((fact) => fact.tag)).toEqual(["MARR"]);
     expect(value()).toEqual([]);
   });
 
@@ -128,11 +134,8 @@ describe("InputIndividualFactsComponent new events in the editor", () => {
     await user.click(screen.getByRole("button", { name: /New/ }));
 
     expect(openNewIndividual).toHaveBeenCalled();
-    expect(addFactToSpouseFamily).toHaveBeenCalledWith(
-      "@I1@",
-      "@I3@",
-      newGedcomFact({ tag: "MARR" }),
-    );
+    expect(createSpouseFamily).toHaveBeenCalledWith("@I1@", "@I3@");
+    expect(families()["@F1@"]?.map((fact) => fact.tag)).toEqual(["MARR"]);
   });
 
   it("adds an individual event to the individual's own facts", async () => {
@@ -143,6 +146,6 @@ describe("InputIndividualFactsComponent new events in the editor", () => {
     );
     expect(value().map((fact) => fact.tag)).toEqual(["BIRT"]);
     expect(screen.queryByRole("combobox", { name: "Spouse" })).toBeNull();
-    expect(addFactToSpouseFamily).not.toHaveBeenCalled();
+    expect(createSpouseFamily).not.toHaveBeenCalled();
   });
 });

@@ -20,17 +20,7 @@ export interface GedcomEditorInterface {
   openNewFamily(): string;
   openFamily(xref: string): void;
   familyFactsField(familyXref: string): FieldTree<GedcomFact[]> | undefined;
-  addFactToSpouseFamily(
-    individualXref: string,
-    spouseXref: string,
-    fact: GedcomFact,
-  ): string;
-  moveFamilyFact(
-    individualXref: string,
-    fromFamilyXref: string,
-    factIndex: number,
-    spouseXref: string,
-  ): string;
+  createSpouseFamily(individualXref: string, spouseXref: string): string;
 }
 
 export const GEDCOM_EDITOR = new InjectionToken<GedcomEditorInterface>(
