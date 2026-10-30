@@ -323,7 +323,7 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
       case "REPO":
         return "repository";
       case "OBJE":
-        return "multimedia item";
+        return "multimedia";
       case "SUBM":
         return "submitter";
     }
