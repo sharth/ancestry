@@ -16,30 +16,39 @@
   [workingDatabase]="workingDatabase()"
 ></app-input-individual-facts>
 
-<div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+<details [open]="true">
+  <summary>
+    Families ({{
+      value().childOfFamilyXrefs.length + value().parentOfFamilyXrefs.length
+    }})
+  </summary>
   @for (xref of value().childOfFamilyXrefs; track xref) {
-    <button
-      type="button"
-      class="btn btn-sm btn-outline-secondary"
-      [disabled]="!gedcomEditor"
-      (click)="gedcomEditor?.openFamily(xref)"
-      title="Edit this family in a session tab"
-    >
-      <i class="bi bi-people me-1"></i>{{ childOfFamilyLabel(xref) }}
-    </button>
+    <div class="mb-2">
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-secondary"
+        [disabled]="!gedcomEditor"
+        (click)="gedcomEditor?.openFamily(xref)"
+        title="Edit this family in a session tab"
+      >
+        <i class="bi bi-people me-1"></i>{{ childOfFamilyLabel(xref) }}
+      </button>
+    </div>
   }
   @for (xref of value().parentOfFamilyXrefs; track xref) {
-    <button
-      type="button"
-      class="btn btn-sm btn-outline-secondary"
-      [disabled]="!gedcomEditor"
-      (click)="gedcomEditor?.openFamily(xref)"
-      title="Edit this family in a session tab"
-    >
-      <i class="bi bi-people me-1"></i>{{ parentOfFamilyLabel(xref) }}
-    </button>
+    <div class="mb-2">
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-secondary"
+        [disabled]="!gedcomEditor"
+        (click)="gedcomEditor?.openFamily(xref)"
+        title="Edit this family in a session tab"
+      >
+        <i class="bi bi-people me-1"></i>{{ parentOfFamilyLabel(xref) }}
+      </button>
+    </div>
   }
-</div>
+</details>
 
 <app-input-notes
   [open]="true"
