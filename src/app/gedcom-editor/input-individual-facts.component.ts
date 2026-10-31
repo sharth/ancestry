@@ -17,19 +17,28 @@ import {
   type FieldTree,
   type FormValueControl,
 } from "@angular/forms/signals";
+import { produce, type Draft } from "immer";
 
-import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
+import {
+  newGedcomDatabase,
+  type GedcomDatabase,
+} from "../../gedcom/gedcomDatabase";
 import { newGedcomFact, type GedcomFact } from "../../gedcom/gedcomFact";
 import {
   gedcomFamilyFacts,
   gedcomIndividualFacts,
   type GedcomEventMetadata,
 } from "../../gedcom/gedcomFactMetadata";
-import { GEDCOM_EDITOR } from "./gedcom-editor-interface";
+import { newGedcomFamily } from "../../gedcom/gedcomFamily";
+import { calculateNextFamilyXref } from "../../util/next-xref";
 import { InputFamilyFactComponent } from "./input-family-fact.component";
 import { InputIndividualFactComponent } from "./input-individual-fact.component";
 import { InputIndividualXrefComponent } from "./input-individual-xref.component";
 
+// The events of one individual: their own facts, plus the facts of each of
+// their spouse families (Marriage, Divorce, ...). The value is the whole
+// database being edited, so that a couple event can be put on (or moved to)
+// the family the individual shares with a spouse, creating it if needed.
 @Component({
   selector: "app-input-individual-facts",
   imports: [
@@ -41,19 +50,13 @@ import { InputIndividualXrefComponent } from "./input-individual-xref.component"
   templateUrl: "./input-individual-facts.component.html",
   styleUrl: "./input.component.css",
 })
-export class InputIndividualFactsComponent implements FormValueControl<
-  GedcomFact[]
-> {
+export class InputIndividualFactsComponent implements FormValueControl<GedcomDatabase> {
   private readonly _injector = inject(Injector);
-  readonly gedcomEditor = inject(GEDCOM_EDITOR, { optional: true });
 
   readonly workingDatabase = input.required<GedcomDatabase>();
   readonly open = input<boolean>(true);
-  // The individual these facts belong to. Inside the editor, the facts of
-  // the individual's spouse families are listed alongside their own, and a
-  // new event can be a couple's event (Marriage, Divorce, ...).
-  readonly individualXref = input<string>("");
-  readonly value = model<GedcomFact[]>([]);
+  readonly individualXref = input.required<string>();
+  readonly value = model<GedcomDatabase>(newGedcomDatabase());
   readonly form = form(this.value);
 
   readonly individualTags = sortedTags(gedcomIndividualFacts);
@@ -72,27 +75,22 @@ export class InputIndividualFactsComponent implements FormValueControl<
   private readonly pendingTagSelect =
     viewChild<ElementRef<HTMLSelectElement>>("pendingTagSelect");
 
-  private readonly inEditor = computed(
-    () => this.gedcomEditor !== null && this.individualXref() !== "",
+  private readonly individual = computed(
+    () => this.value().individuals[this.individualXref()],
   );
 
-  readonly spouseFamilies = computed(() => {
-    const editor = this.gedcomEditor;
-    if (!editor || !this.inEditor()) return [];
-    const individual =
-      this.workingDatabase().individuals[this.individualXref()];
-    return (individual?.parentOfFamilyXrefs ?? []).flatMap((xref) => {
-      const facts = editor.familyFactsField(xref);
-      return facts ? [{ xref, facts }] : [];
-    });
-  });
+  private readonly spouseFamilyXrefs = computed(() =>
+    (this.individual()?.parentOfFamilyXrefs ?? []).filter(
+      (xref) => this.value().families[xref] !== undefined,
+    ),
+  );
 
   // How many facts each list holds: the individual's own, and each spouse
   // family's.
   private readonly shape = computed<Shape>(() => ({
-    individual: this.value().length,
-    families: this.spouseFamilies().map(
-      (family) => [family.xref, family.facts().value().length] as const,
+    individual: this.individual()?.facts.length ?? 0,
+    families: this.spouseFamilyXrefs().map(
+      (xref) => [xref, this.value().families[xref]?.facts.length ?? 0] as const,
     ),
   }));
 
@@ -125,21 +123,17 @@ export class InputIndividualFactsComponent implements FormValueControl<
 
   readonly rows = computed<Row[]>(() => {
     const layout = this.layout();
-    const families = new Map(
-      this.spouseFamilies().map((family) => [family.xref, family.facts]),
-    );
     const locations = new Map<number, Row>();
+    const individualFacts = this.form.individuals[this.individualXref()]?.facts;
     layout.individual.forEach((token, index) => {
-      const field = this.form[index];
+      const field = individualFacts?.[index];
       if (field) locations.set(token, { token, field, index });
     });
     for (const [familyXref, tokens] of Object.entries(layout.families)) {
-      const facts = families.get(familyXref);
+      const familyFacts = this.form.families[familyXref]?.facts;
       tokens.forEach((token, index) => {
-        const field = facts?.[index];
-        if (facts && field) {
-          locations.set(token, { token, field, index, familyXref, facts });
-        }
+        const field = familyFacts?.[index];
+        if (field) locations.set(token, { token, field, index, familyXref });
       });
     }
     return layout.order.flatMap((token) => locations.get(token) ?? []);
@@ -150,69 +144,46 @@ export class InputIndividualFactsComponent implements FormValueControl<
   }
 
   appendEvent() {
-    if (this.inEditor()) {
-      this.pendingTag.set("");
-      afterNextRender(
-        { read: () => this.pendingTagSelect()?.nativeElement.focus() },
-        { injector: this._injector },
-      );
-      return;
-    }
-    this.appendIndividualEvent(newGedcomFact());
+    this.pendingTag.set("");
+    afterNextRender(
+      { read: () => this.pendingTagSelect()?.nativeElement.focus() },
+      { injector: this._injector },
+    );
   }
 
-  private appendIndividualEvent(fact: GedcomFact) {
+  choosePendingTag(tag: string) {
+    if (!(tag in gedcomIndividualFacts)) {
+      this.pendingTag.set(tag);
+      return;
+    }
     const layout = this.layout();
     const token = this.nextToken++;
-    this.value.update((events) => [...events, fact]);
+    this.pendingTag.set(undefined);
+    this.edit((draft) => {
+      draft.individuals[this.individualXref()]?.facts.push(
+        newGedcomFact({ tag }),
+      );
+    });
     this.layout.set({
       ...layout,
       order: [...layout.order, token],
       individual: [...layout.individual, token],
     });
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const newControl = this.form[this.form.length - 1]!;
-    afterNextRender(
-      {
-        read: () => {
-          newControl().focusBoundControl();
-        },
-      },
-      { injector: this._injector },
-    );
-  }
-
-  removeEvent(index: number) {
-    const layout = this.layout();
-    const token = layout.individual[index];
-    this.value.update((events) => events.toSpliced(index, 1));
-    this.layout.set({
-      ...layout,
-      order: layout.order.filter((other) => other !== token),
-      individual: layout.individual.toSpliced(index, 1),
-    });
-  }
-
-  choosePendingTag(tag: string) {
-    if (tag in gedcomIndividualFacts) {
-      this.pendingTag.set(undefined);
-      this.appendIndividualEvent(newGedcomFact({ tag }));
-    } else {
-      this.pendingTag.set(tag);
-    }
+    this.focusLastIndividualFact();
   }
 
   choosePendingSpouse(spouseXref: string) {
     const tag = this.pendingTag();
     if (!tag) return;
     const layout = this.layout();
-    const familyXref = this.spouseFamilyXref(spouseXref);
-    const facts = familyXref && this.gedcomEditor?.familyFactsField(familyXref);
-    if (!familyXref || !facts) return;
     const token = this.nextToken++;
+    let familyXref = "";
+    this.edit((draft) => {
+      familyXref = this.spouseFamily(draft, spouseXref);
+      draft.families[familyXref]?.facts.push(newGedcomFact({ tag }));
+    });
+    if (!familyXref) return;
     this.pendingTag.set(undefined);
-    facts().value.update((events) => [...events, newGedcomFact({ tag })]);
-    facts().markAsDirty();
     this.layout.set({
       ...layout,
       order: [...layout.order, token],
@@ -223,117 +194,154 @@ export class InputIndividualFactsComponent implements FormValueControl<
     });
   }
 
+  removeEvent(row: Row) {
+    const layout = this.layout();
+    const familyXref = row.familyXref;
+    this.edit((draft) => {
+      const facts = familyXref
+        ? draft.families[familyXref]?.facts
+        : draft.individuals[this.individualXref()]?.facts;
+      facts?.splice(row.index, 1);
+    });
+    this.layout.set({
+      order: layout.order.filter((token) => token !== row.token),
+      individual: familyXref
+        ? layout.individual
+        : layout.individual.toSpliced(row.index, 1),
+      families: familyXref
+        ? {
+            ...layout.families,
+            [familyXref]: (layout.families[familyXref] ?? []).toSpliced(
+              row.index,
+              1,
+            ),
+          }
+        : layout.families,
+    });
+  }
+
   spouseOf(familyXref: string): string {
-    const family = this.workingDatabase().families[familyXref];
+    const family = this.value().families[familyXref];
     return family?.husbandXref === this.individualXref()
       ? family.wifeXref
       : (family?.husbandXref ?? "");
   }
 
-  // The family where the individual and `spouseXref` are husband and wife,
-  // created if they don't have one yet. "" if there's no spouse to pair with.
-  private spouseFamilyXref(spouseXref: string): string {
-    const individualXref = this.individualXref();
-    if (!this.gedcomEditor || !spouseXref || spouseXref === individualXref) {
-      return "";
-    }
-    const existingFamily = Object.values(this.workingDatabase().families).find(
-      (family) =>
-        (family.husbandXref === individualXref &&
-          family.wifeXref === spouseXref) ||
-        (family.husbandXref === spouseXref &&
-          family.wifeXref === individualXref),
-    );
-    return (
-      existingFamily?.xref ??
-      this.gedcomEditor.createSpouseFamily(individualXref, spouseXref)
-    );
-  }
-
-  changeSpouse(
-    familyXref: string,
-    facts: FieldTree<GedcomFact[]>,
-    factIndex: number,
-    spouseXref: string,
-  ) {
+  // Moves a family's event to the family shared with `spouseXref` instead.
+  changeSpouse(row: Row, spouseXref: string) {
+    const fromFamilyXref = row.familyXref;
+    if (!fromFamilyXref) return;
     const layout = this.layout();
-    const fromTokens = layout.families[familyXref] ?? [];
-    const token = fromTokens[factIndex];
-    const fact = facts().value()[factIndex];
-    if (token === undefined || fact === undefined) return;
-    const toFamilyXref = this.spouseFamilyXref(spouseXref);
-    const toFacts =
-      toFamilyXref && this.gedcomEditor?.familyFactsField(toFamilyXref);
-    if (!toFamilyXref || !toFacts || toFamilyXref === familyXref) return;
-    facts().value.update((events) => events.toSpliced(factIndex, 1));
-    facts().markAsDirty();
-    toFacts().value.update((events) => [...events, fact]);
-    toFacts().markAsDirty();
+    let toFamilyXref = "";
+    this.edit((draft) => {
+      toFamilyXref = this.spouseFamily(draft, spouseXref);
+      if (!toFamilyXref || toFamilyXref === fromFamilyXref) return;
+      const [fact] =
+        draft.families[fromFamilyXref]?.facts.splice(row.index, 1) ?? [];
+      if (fact) draft.families[toFamilyXref]?.facts.push(fact);
+    });
+    if (!toFamilyXref || toFamilyXref === fromFamilyXref) return;
     this.layout.set({
       ...layout,
       families: {
         ...layout.families,
-        [familyXref]: fromTokens.toSpliced(factIndex, 1),
-        [toFamilyXref]: [...(layout.families[toFamilyXref] ?? []), token],
+        [fromFamilyXref]: (layout.families[fromFamilyXref] ?? []).toSpliced(
+          row.index,
+          1,
+        ),
+        [toFamilyXref]: [...(layout.families[toFamilyXref] ?? []), row.token],
       },
     });
   }
 
   // A family event changed to a type an individual can have (e.g. Marriage
   // to Census) becomes the individual's own event, in the same row.
-  familyTagPicked(
-    familyXref: string,
-    facts: FieldTree<GedcomFact[]>,
-    factIndex: number,
-    tag: string,
-  ) {
-    if (!(tag in gedcomIndividualFacts)) return;
+  familyTagPicked(row: Row, tag: string) {
+    const familyXref = row.familyXref;
+    if (!familyXref || !(tag in gedcomIndividualFacts)) return;
     const layout = this.layout();
-    const fromTokens = layout.families[familyXref] ?? [];
-    const token = fromTokens[factIndex];
-    const fact = facts().value()[factIndex];
-    if (token === undefined || fact === undefined) return;
-    facts().value.update((events) => events.toSpliced(factIndex, 1));
-    facts().markAsDirty();
-    this.value.update((events) => [...events, fact]);
+    this.edit((draft) => {
+      const [fact] =
+        draft.families[familyXref]?.facts.splice(row.index, 1) ?? [];
+      if (fact) draft.individuals[this.individualXref()]?.facts.push(fact);
+    });
     this.layout.set({
       ...layout,
-      individual: [...layout.individual, token],
+      individual: [...layout.individual, row.token],
       families: {
         ...layout.families,
-        [familyXref]: fromTokens.toSpliced(factIndex, 1),
+        [familyXref]: (layout.families[familyXref] ?? []).toSpliced(
+          row.index,
+          1,
+        ),
       },
     });
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const newControl = this.form[this.form.length - 1]!;
-    afterNextRender(
-      {
-        read: () => {
-          newControl.tag().focusBoundControl();
-        },
-      },
-      { injector: this._injector },
-    );
+    this.focusLastIndividualFact();
   }
 
-  removeFamilyEvent(
-    familyXref: string,
-    facts: FieldTree<GedcomFact[]>,
-    index: number,
-  ) {
-    const layout = this.layout();
-    const tokens = layout.families[familyXref] ?? [];
-    const token = tokens[index];
-    facts().value.update((events) => events.toSpliced(index, 1));
-    facts().markAsDirty();
-    this.layout.set({
-      ...layout,
-      order: layout.order.filter((other) => other !== token),
-      families: {
-        ...layout.families,
-        [familyXref]: tokens.toSpliced(index, 1),
-      },
+  private edit(recipe: (draft: Draft<GedcomDatabase>) => void) {
+    this.value.update((database) => produce(database, recipe));
+  }
+
+  // The family where the individual and `spouseXref` are husband and wife.
+  // If they don't have one, it is created and linked from both sides
+  // (HUSB/WIFE on the family, FAMS on each individual). "" if there's no
+  // spouse to pair with.
+  private spouseFamily(
+    draft: Draft<GedcomDatabase>,
+    spouseXref: string,
+  ): string {
+    const individualXref = this.individualXref();
+    if (!spouseXref || spouseXref === individualXref) return "";
+
+    // The draft only holds the records open in the editor, so look up the
+    // spouse and their families in the whole database.
+    const database = this.workingDatabase();
+    const existingFamily = Object.values({
+      ...database.families,
+      ...draft.families,
+    }).find(
+      (family) =>
+        (family.husbandXref === individualXref &&
+          family.wifeXref === spouseXref) ||
+        (family.husbandXref === spouseXref &&
+          family.wifeXref === individualXref),
+    );
+    if (existingFamily) return existingFamily.xref;
+
+    const familyXref = calculateNextFamilyXref({
+      ...database,
+      families: { ...database.families, ...draft.families },
     });
+    const individual = draft.individuals[individualXref];
+    const [husbandXref, wifeXref] =
+      individual?.sex.sex === "F"
+        ? [spouseXref, individualXref]
+        : [individualXref, spouseXref];
+    draft.families[familyXref] = newGedcomFamily({
+      xref: familyXref,
+      husbandXref,
+      wifeXref,
+    });
+    individual?.parentOfFamilyXrefs.push(familyXref);
+    const spouse =
+      draft.individuals[spouseXref] ?? database.individuals[spouseXref];
+    if (spouse) {
+      draft.individuals[spouseXref] = {
+        ...spouse,
+        parentOfFamilyXrefs: [...spouse.parentOfFamilyXrefs, familyXref],
+      };
+    }
+    return familyXref;
+  }
+
+  private focusLastIndividualFact() {
+    const facts = this.form.individuals[this.individualXref()]?.facts;
+    const newControl = facts?.[facts.length - 1];
+    afterNextRender(
+      { read: () => newControl?.().focusBoundControl() },
+      { injector: this._injector },
+    );
   }
 }
 
@@ -348,13 +356,12 @@ interface Layout {
   families: Record<string, number[]>;
 }
 
-interface Row {
+export interface Row {
   token: number;
   field: FieldTree<GedcomFact>;
   index: number;
   // Set when the fact is on a spouse family rather than the individual.
   familyXref?: string;
-  facts?: FieldTree<GedcomFact[]>;
 }
 
 // Whether the layout still has one token per fact in every list. A family
