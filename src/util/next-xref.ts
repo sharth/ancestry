@@ -70,13 +70,10 @@ function calculateNextXref(
   gedcomDatabase: GedcomDatabase,
   prefix: string,
 ): string {
-  const pattern = new RegExp(`^@${prefix}(\\d+)@$`);
-  let nextIndex = 0;
-  for (const xref of usedXrefs(gedcomDatabase)) {
-    const xrefNumber = pattern.exec(xref)?.[1];
-    if (xrefNumber !== undefined) {
-      nextIndex = Math.max(nextIndex, parseInt(xrefNumber) + 1);
-    }
-  }
+  const nextIndex = [...usedXrefs(gedcomDatabase)]
+    .map((xref) => new RegExp(`^@${prefix}(\\d+)@$`).exec(xref)?.[1])
+    .filter((xrefNumber) => xrefNumber !== undefined)
+    .map((xrefNumber) => parseInt(xrefNumber))
+    .reduce((acc, xrefNumber) => Math.max(acc, xrefNumber + 1), 0);
   return `@${prefix}${nextIndex}@`;
 }
