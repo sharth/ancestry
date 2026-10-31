@@ -1,7 +1,7 @@
 <div class="fields-grid">
   <div class="form-floating">
     <select class="form-control" id="tag" [formField]="form.tag">
-      @for (event of gedcomEventTags; track event.tag) {
+      @for (event of gedcomEventTags(); track event.tag) {
         <option [value]="event.tag">
           {{ event.humanReadableDescription }}
         </option>
