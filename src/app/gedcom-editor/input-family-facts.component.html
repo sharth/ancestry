@@ -11,10 +11,11 @@
         ></button>
         {{ event.tag().value() }}
       </summary>
-      <app-input-family-fact
+      <app-input-fact
         [workingDatabase]="workingDatabase()"
+        [tags]="tags"
         [formField]="event"
-      ></app-input-family-fact>
+      ></app-input-fact>
     </details>
   }
   <div

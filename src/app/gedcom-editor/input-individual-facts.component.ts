@@ -10,11 +10,12 @@ import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomFact, type GedcomFact } from "../../gedcom/gedcomFact";
-import { InputIndividualFactComponent } from "./input-individual-fact.component";
+import { gedcomIndividualFacts } from "../../gedcom/gedcomFactMetadata";
+import { InputFactComponent } from "./input-fact.component";
 
 @Component({
   selector: "app-input-individual-facts",
-  imports: [FormField, InputIndividualFactComponent],
+  imports: [FormField, InputFactComponent],
   templateUrl: "./input-individual-facts.component.html",
   styleUrl: "./input.component.css",
 })
@@ -27,6 +28,7 @@ export class InputIndividualFactsComponent implements FormValueControl<
   readonly open = input<boolean>(true);
   readonly value = model<GedcomFact[]>([]);
   readonly form = form(this.value);
+  readonly tags = gedcomIndividualFacts;
 
   appendEvent() {
     this.value.update((events) => [...events, newGedcomFact()]);

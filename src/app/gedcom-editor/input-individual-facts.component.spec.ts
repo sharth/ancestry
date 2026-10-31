@@ -5,7 +5,7 @@ import { userEvent } from "@testing-library/user-event";
 import { assert, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
-import { InputIndividualFactComponent } from "./input-individual-fact.component";
+import { InputFactComponent } from "./input-fact.component";
 import { InputIndividualFactsComponent } from "./input-individual-facts.component";
 
 describe("InputIndividualFactsComponent", () => {
@@ -35,7 +35,7 @@ describe("InputIndividualFactsComponent", () => {
   it("should open newly appended event details by default and focus the fact component", async () => {
     const user = userEvent.setup();
     const element = fixture.nativeElement as HTMLElement;
-    const focusSpy = vi.spyOn(InputIndividualFactComponent.prototype, "focus");
+    const focusSpy = vi.spyOn(InputFactComponent.prototype, "focus");
 
     const factsContainer = element.querySelector<HTMLDetailsElement>("details");
     assert.isOk(factsContainer);
