@@ -8,8 +8,8 @@ import {
 } from "./gedcomFact";
 import { newGedcomRecord } from "./gedcomRecord";
 
-// Facts get a random id when they are parsed.
-const anyId = expect.any(String) as string;
+// Facts are given an id when they are parsed.
+const anyId = expect.any(Number) as number;
 
 describe("gedcomEvent", () => {
   it("simple test case", () => {
@@ -55,7 +55,6 @@ describe("gedcomEvent", () => {
     const gedcomRecord = newGedcomRecord({ tag: "BIRT", value: "Y" });
     const first = parseGedcomIndividualFact(gedcomRecord);
     const second = parseGedcomIndividualFact(gedcomRecord);
-    expect(first.id).not.toBe("");
     expect(first.id).not.toBe(second.id);
     expect(serializeGedcomIndividualFact(first)).toEqual(gedcomRecord);
   });

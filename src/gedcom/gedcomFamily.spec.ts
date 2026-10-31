@@ -14,8 +14,8 @@ import {
   serializeGedcomRecordToText,
 } from "./gedcomRecord";
 
-// Facts get a random id when they are parsed.
-const anyId = expect.any(String) as string;
+// Facts are given an id when they are parsed.
+const anyId = expect.any(Number) as number;
 
 describe("gedcomFamily", () => {
   it("parse family with husband, no wife and two children", () => {

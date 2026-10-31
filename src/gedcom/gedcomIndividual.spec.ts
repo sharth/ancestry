@@ -15,8 +15,8 @@ import {
 } from "./gedcomRecord";
 import { newGedcomSourceCitation } from "./gedcomSourceCitation";
 
-// Facts get a random id when they are parsed.
-const anyId = expect.any(String) as string;
+// Facts are given an id when they are parsed.
+const anyId = expect.any(Number) as number;
 
 describe("gedcomIndividual", () => {
   it("no fields", () => {

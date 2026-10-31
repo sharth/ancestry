@@ -37,9 +37,9 @@ export interface GedcomFactSharedWith {
 
 export interface GedcomFact {
   // Identifies this fact within the app, e.g. to keep its row in place in the
-  // editor while it is edited or moved between records. It is generated
-  // when the fact is created or parsed, and is never part of the GEDCOM.
-  id: string;
+  // editor while it is edited or moved between records. It is assigned when
+  // the fact is created or parsed, and is never part of the GEDCOM.
+  id: number;
   tag: string;
   type: string;
   address: string;
@@ -53,11 +53,13 @@ export interface GedcomFact {
   notes: GedcomNote[];
 }
 
+let nextFactId = 0;
+
 export function newGedcomFact(
   fieldsToUpdate: Partial<GedcomFact> = {},
 ): GedcomFact {
   return {
-    id: crypto.randomUUID(),
+    id: nextFactId++,
     tag: "EVEN",
     type: "",
     address: "",
