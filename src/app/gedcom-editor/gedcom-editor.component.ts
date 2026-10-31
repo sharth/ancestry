@@ -6,13 +6,12 @@ import {
   linkedSignal,
   output,
 } from "@angular/core";
-import { FormField, form, type FieldTree } from "@angular/forms/signals";
+import { FormField, form } from "@angular/forms/signals";
 import { ActivatedRoute, Router } from "@angular/router";
 import { produce } from "immer";
 
 import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
-import type { GedcomFact } from "../../gedcom/gedcomFact";
 import { newGedcomFamily } from "../../gedcom/gedcomFamily";
 import { newGedcomIndividual } from "../../gedcom/gedcomIndividual";
 import { newGedcomMultimedia } from "../../gedcom/gedcomMultimedia";
@@ -281,36 +280,6 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
 
   openFamily(xref: string) {
     this.openTab({ type: "FAM", xref });
-  }
-
-  familyFactsField(familyXref: string): FieldTree<GedcomFact[]> | undefined {
-    return this.form.families[familyXref]?.facts;
-  }
-
-  // Creates a family with the two as husband and wife, and links both sides
-  // (HUSB/WIFE on the family, FAMS on each individual). Its facts are then
-  // in the form, through familyFactsField(). Returns the family's xref.
-  createSpouseFamily(individualXref: string, spouseXref: string): string {
-    const database = this.workingDatabase();
-    const familyXref = calculateNextFamilyXref(database);
-    const individualIsWife =
-      database.individuals[individualXref]?.sex.sex === "F";
-    const [husbandXref, wifeXref] = individualIsWife
-      ? [spouseXref, individualXref]
-      : [individualXref, spouseXref];
-
-    this.workingDatabase.update((workingDatabase) =>
-      produce(workingDatabase, (draft) => {
-        draft.families[familyXref] = newGedcomFamily({
-          xref: familyXref,
-          husbandXref,
-          wifeXref,
-        });
-        draft.individuals[individualXref]?.parentOfFamilyXrefs.push(familyXref);
-        draft.individuals[spouseXref]?.parentOfFamilyXrefs.push(familyXref);
-      }),
-    );
-    return familyXref;
   }
 
   openTab(tabInformation: TabInformation) {

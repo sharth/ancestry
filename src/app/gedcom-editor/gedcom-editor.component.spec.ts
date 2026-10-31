@@ -451,44 +451,6 @@ describe("GedcomEditorComponent Integration", () => {
     });
   });
 
-  describe("createSpouseFamily tests", () => {
-    beforeEach(() => {
-      fixture.componentRef.setInput("tabs", [{ type: "INDI", xref: "@I0@" }]);
-      component.workingDatabase.update(
-        produce((draft) => {
-          draft.individuals["@I1@"] = newGedcomIndividual({
-            xref: "@I1@",
-            sex: newGedcomSex({ sex: "F" }),
-          });
-        }),
-      );
-    });
-
-    it("creates a family and links both spouses", () => {
-      const familyXref = component.createSpouseFamily("@I0@", "@I1@");
-
-      const database = component.workingDatabase();
-      const family = database.families[familyXref];
-      expect(family?.husbandXref).toBe("@I0@");
-      expect(family?.wifeXref).toBe("@I1@");
-      expect(database.individuals["@I0@"]?.parentOfFamilyXrefs).toContain(
-        familyXref,
-      );
-      expect(database.individuals["@I1@"]?.parentOfFamilyXrefs).toContain(
-        familyXref,
-      );
-      expect(component.familyFactsField(familyXref)).toBeDefined();
-    });
-
-    it("makes the individual the wife when she is female", () => {
-      const familyXref = component.createSpouseFamily("@I1@", "@I0@");
-
-      const family = component.workingDatabase().families[familyXref];
-      expect(family?.husbandXref).toBe("@I0@");
-      expect(family?.wifeXref).toBe("@I1@");
-    });
-  });
-
   describe("submitForm tests", () => {
     it("emits finished before navigating, so the dialog is already closed by the time the reload re-checks the unsaved-changes guard", async () => {
       vi.spyOn(ancestryService, "updateGedcomDatabase").mockResolvedValue(

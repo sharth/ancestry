@@ -1,60 +1,62 @@
-<app-input-individual-names
-  [open]="true"
-  [formField]="form.names"
-  [workingDatabase]="workingDatabase()"
-></app-input-individual-names>
+@if (individual(); as individual) {
+  <app-input-individual-names
+    [open]="true"
+    [formField]="individual.names"
+    [workingDatabase]="workingDatabase()"
+  ></app-input-individual-names>
 
-<app-input-individual-sex
-  [open]="true"
-  [formField]="form.sex"
-  [workingDatabase]="workingDatabase()"
-></app-input-individual-sex>
+  <app-input-individual-sex
+    [open]="true"
+    [formField]="individual.sex"
+    [workingDatabase]="workingDatabase()"
+  ></app-input-individual-sex>
 
-<app-input-individual-facts
-  [open]="true"
-  [formField]="form.facts"
-  [workingDatabase]="workingDatabase()"
-  [individualXref]="value().xref"
-></app-input-individual-facts>
+  <app-input-individual-facts
+    [open]="true"
+    [formField]="form"
+    [workingDatabase]="workingDatabase()"
+    [individualXref]="xref()"
+  ></app-input-individual-facts>
 
-<div class="d-flex flex-wrap align-items-center gap-2 mb-3">
-  @for (xref of value().childOfFamilyXrefs; track xref) {
-    <button
-      type="button"
-      class="btn btn-sm btn-outline-secondary"
-      [disabled]="!gedcomEditor"
-      (click)="gedcomEditor?.openFamily(xref)"
-      title="Edit this family in a session tab"
-    >
-      <i class="bi bi-people me-1"></i>{{ childOfFamilyLabel(xref) }}
-    </button>
-  }
-  @for (xref of value().parentOfFamilyXrefs; track xref) {
-    <button
-      type="button"
-      class="btn btn-sm btn-outline-secondary"
-      [disabled]="!gedcomEditor"
-      (click)="gedcomEditor?.openFamily(xref)"
-      title="Edit this family in a session tab"
-    >
-      <i class="bi bi-people me-1"></i>{{ parentOfFamilyLabel(xref) }}
-    </button>
-  }
-</div>
+  <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+    @for (xref of individual().value().childOfFamilyXrefs; track xref) {
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-secondary"
+        [disabled]="!gedcomEditor"
+        (click)="gedcomEditor?.openFamily(xref)"
+        title="Edit this family in a session tab"
+      >
+        <i class="bi bi-people me-1"></i>{{ childOfFamilyLabel(xref) }}
+      </button>
+    }
+    @for (xref of individual().value().parentOfFamilyXrefs; track xref) {
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-secondary"
+        [disabled]="!gedcomEditor"
+        (click)="gedcomEditor?.openFamily(xref)"
+        title="Edit this family in a session tab"
+      >
+        <i class="bi bi-people me-1"></i>{{ parentOfFamilyLabel(xref) }}
+      </button>
+    }
+  </div>
 
-<app-input-notes
-  [open]="true"
-  [formField]="form.notes"
-  [workingDatabase]="workingDatabase()"
-></app-input-notes>
+  <app-input-notes
+    [open]="true"
+    [formField]="individual.notes"
+    [workingDatabase]="workingDatabase()"
+  ></app-input-notes>
 
-<app-input-unknown-records
-  [open]="true"
-  [formField]="form.unknownRecords"
-  [workingDatabase]="workingDatabase()"
-></app-input-unknown-records>
+  <app-input-unknown-records
+    [open]="true"
+    [formField]="individual.unknownRecords"
+    [workingDatabase]="workingDatabase()"
+  ></app-input-unknown-records>
 
-<app-input-change-date
-  [workingDatabase]="workingDatabase()"
-  [formField]="form.changeDate"
-></app-input-change-date>
+  <app-input-change-date
+    [workingDatabase]="workingDatabase()"
+    [formField]="individual.changeDate"
+  ></app-input-change-date>
+}
