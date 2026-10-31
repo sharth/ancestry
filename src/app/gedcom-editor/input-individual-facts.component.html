@@ -8,28 +8,22 @@
           type="button"
           class="btn btn-sm btn-outline-danger bi-trash"
           aria-label="Remove event"
-          (click)="
-            row.familyXref && row.facts
-              ? removeFamilyEvent(row.familyXref, row.facts, row.index)
-              : removeEvent(row.index)
-          "
+          (click)="removeEvent(row)"
         ></button>
         {{ event.tag().value() }}
       </summary>
-      @if (row.familyXref && row.facts) {
-        @let familyXref = row.familyXref;
-        @let facts = row.facts;
+      @if (row.familyXref) {
         <app-input-individual-xref
           label="Spouse"
           class="d-block mb-2"
           [workingDatabase]="workingDatabase()"
-          [value]="spouseOf(familyXref)"
-          (valueChange)="changeSpouse(familyXref, facts, row.index, $event)"
+          [value]="spouseOf(row.familyXref)"
+          (valueChange)="changeSpouse(row, $event)"
         ></app-input-individual-xref>
         <app-input-family-fact
           [workingDatabase]="workingDatabase()"
           [formField]="event"
-          (tagPicked)="familyTagPicked(familyXref, facts, row.index, $event)"
+          (tagPicked)="familyTagPicked(row, $event)"
         ></app-input-family-fact>
       } @else {
         <app-input-individual-fact
