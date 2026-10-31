@@ -1,6 +1,6 @@
 <details [open]="open()">
   <summary>Events ({{ eventCount() }})</summary>
-  @for (row of rows(); track row.token) {
+  @for (row of rows(); track row.id) {
     @let event = row.field;
     <details [open]="true">
       <summary>
