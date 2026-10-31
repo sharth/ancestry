@@ -130,6 +130,20 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     this.effectiveTabs(),
   );
 
+  // Spouse families of the individuals open in a tab. These are brought into
+  // the form (so their facts can be edited inline on the individual's own
+  // tab, e.g. a marriage) without being session tabs of their own, so they
+  // don't appear in the tab bar.
+  readonly impliedFamilyXrefs = computed<string[]>(() => {
+    const database = this.workingDatabase();
+    return this.xrefsIncludedInView()
+      .filter((tabInformation) => tabInformation.type === "INDI")
+      .flatMap(
+        (tabInformation) =>
+          database.individuals[tabInformation.xref]?.parentOfFamilyXrefs ?? [],
+      );
+  });
+
   // A GedcomDatabase made up of only the xrefs found in `xrefsIncludedInView`.
   // Any changes will be persisted in workingDatabase().
   // This will be used in the Angular Signal Forms. The indirection is required,
@@ -148,12 +162,12 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
           .filter((tabInformation) => tabInformation.type === "INDI")
           .map((tabInformation) => tabInformation.xref),
       ),
-      families: filteredProperties(
-        this.workingDatabase().families,
-        this.xrefsIncludedInView()
+      families: filteredProperties(this.workingDatabase().families, [
+        ...this.xrefsIncludedInView()
           .filter((tabInformation) => tabInformation.type === "FAM")
           .map((tabInformation) => tabInformation.xref),
-      ),
+        ...this.impliedFamilyXrefs(),
+      ]),
       sources: filteredProperties(
         this.workingDatabase().sources,
         this.xrefsIncludedInView()
