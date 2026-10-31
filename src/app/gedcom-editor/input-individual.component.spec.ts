@@ -16,7 +16,10 @@ describe("InputIndividualComponent", () => {
 
   beforeEach(async () => {
     const renderResult = await render(InputIndividualComponent, {
-      bindings: [inputBinding("workingDatabase", signal(newGedcomDatabase()))],
+      bindings: [
+        inputBinding("workingDatabase", signal(newGedcomDatabase())),
+        inputBinding("xref", signal("@I1@")),
+      ],
       waitForStableOnRender: true,
     });
 
@@ -54,7 +57,8 @@ function renderWithFamilies(providers: Provider[]) {
   return render(InputIndividualComponent, {
     bindings: [
       inputBinding("workingDatabase", signal(database)),
-      inputBinding("value", signal(john)),
+      inputBinding("value", signal(database)),
+      inputBinding("xref", signal("@I1@")),
     ],
     providers,
     waitForStableOnRender: true,

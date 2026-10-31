@@ -1,21 +1,58 @@
 <details [open]="open()">
-  <summary>Events ({{ form.length }})</summary>
-  @for (event of form; track event) {
+  <summary>Events ({{ rows().length }})</summary>
+  @for (row of rows(); track row.id) {
+    @let event = row.field;
     <details [open]="true">
       <summary>
         <button
           type="button"
           class="btn btn-sm btn-outline-danger bi-trash"
           aria-label="Remove event"
-          (click)="removeEvent($index)"
+          (click)="removeEvent(row)"
         ></button>
         {{ event.tag().value() }}
       </summary>
-      <app-input-fact
+      @if (row.familyXref) {
+        <app-input-individual-xref
+          label="Spouse"
+          class="d-block mb-2"
+          [workingDatabase]="workingDatabase()"
+          [value]="spouseOf(row.familyXref)"
+          (valueChange)="changeSpouse(row, $event)"
+        ></app-input-individual-xref>
+        <app-input-fact
+          [workingDatabase]="workingDatabase()"
+          [tags]="familyTags"
+          [formField]="event"
+          (tagPicked)="familyTagPicked(row, $event)"
+        ></app-input-fact>
+      } @else {
+        <app-input-fact
+          [workingDatabase]="workingDatabase()"
+          [tags]="individualTags"
+          [formField]="event"
+        ></app-input-fact>
+      }
+    </details>
+  }
+  @if (choosingSpouse()) {
+    <details [open]="true">
+      <summary>
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-danger bi-trash"
+          aria-label="Remove event"
+          (click)="choosingSpouse.set(false)"
+        ></button>
+        New couple event
+      </summary>
+      <app-input-individual-xref
+        #spousePicker
+        label="Spouse"
         [workingDatabase]="workingDatabase()"
-        [tags]="tags"
-        [formField]="event"
-      ></app-input-fact>
+        [value]="''"
+        (valueChange)="spouseChosen($event)"
+      ></app-input-individual-xref>
     </details>
   }
   <div
@@ -31,5 +68,19 @@
       (click)="$event.preventDefault()"
     ></button>
     Append another event
+  </div>
+  <div
+    class="details-lookalike"
+    tabindex="0"
+    (click)="appendCoupleEvent()"
+    (keydown.enter)="appendCoupleEvent()"
+  >
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-primary bi-plus"
+      aria-label="Add couple event"
+      (click)="$event.preventDefault()"
+    ></button>
+    Append a couple event (marriage, divorce, ...)
   </div>
 </details>
