@@ -1,10 +1,15 @@
-import { inputBinding, signal } from "@angular/core";
-import type { ComponentFixture } from "@angular/core/testing";
-import { render } from "@testing-library/angular/zoneless";
+import { Injector, inputBinding, signal, twoWayBinding } from "@angular/core";
+import { TestBed, type ComponentFixture } from "@angular/core/testing";
+import { form, type FieldTree } from "@angular/forms/signals";
+import { render, screen } from "@testing-library/angular/zoneless";
 import { userEvent } from "@testing-library/user-event";
 import { assert, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
+import type { GedcomFact } from "../../gedcom/gedcomFact";
+import { newGedcomIndividual } from "../../gedcom/gedcomIndividual";
+import { newGedcomName } from "../../gedcom/gedcomName";
+import { GEDCOM_EDITOR } from "./gedcom-editor-interface";
 import { InputIndividualFactComponent } from "./input-individual-fact.component";
 import { InputIndividualFactsComponent } from "./input-individual-facts.component";
 
@@ -55,5 +60,92 @@ describe("InputIndividualFactsComponent", () => {
     assert.isOk(newFactDetails);
     expect(newFactDetails.open).toBe(true);
     expect(focusSpy).toHaveBeenCalled();
+  });
+});
+
+describe("InputIndividualFactsComponent new events in the editor", () => {
+  // Stands in for the editor's form over the families' facts.
+  const families = signal<Record<string, GedcomFact[]>>({});
+  let familiesForm: FieldTree<Record<string, GedcomFact[]>>;
+  const createSpouseFamily = vi.fn(() => {
+    families.update((facts) => ({ ...facts, "@F1@": [] }));
+    return "@F1@";
+  });
+  const openNewIndividual = vi.fn(() => "@I3@");
+  const value = signal<GedcomFact[]>([]);
+
+  beforeEach(async () => {
+    families.set({});
+    createSpouseFamily.mockClear();
+    openNewIndividual.mockClear();
+    value.set([]);
+    const database = newGedcomDatabase({
+      individuals: {
+        "@I1@": newGedcomIndividual({ xref: "@I1@" }),
+        "@I2@": newGedcomIndividual({
+          xref: "@I2@",
+          names: [newGedcomName({ givenName: "Mary", surname: "Jones" })],
+        }),
+      },
+    });
+    await render(InputIndividualFactsComponent, {
+      bindings: [
+        inputBinding("workingDatabase", signal(database)),
+        inputBinding("individualXref", signal("@I1@")),
+        twoWayBinding("value", value),
+      ],
+      providers: [
+        {
+          provide: GEDCOM_EDITOR,
+          useValue: {
+            familyFactsField: (xref: string) => familiesForm[xref],
+            createSpouseFamily,
+            openNewIndividual,
+          },
+        },
+      ],
+      waitForStableOnRender: true,
+    });
+    familiesForm = form(families, { injector: TestBed.inject(Injector) });
+    await userEvent.setup().click(screen.getByText("Append another event"));
+  });
+
+  it("adds a marriage to the family shared with the chosen spouse", async () => {
+    const user = userEvent.setup();
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Tag" }),
+      "MARR",
+    );
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Spouse" }),
+      "@I2@",
+    );
+    expect(createSpouseFamily).toHaveBeenCalledWith("@I1@", "@I2@");
+    expect(families()["@F1@"]?.map((fact) => fact.tag)).toEqual(["MARR"]);
+    expect(value()).toEqual([]);
+  });
+
+  it("can create a new person as the spouse", async () => {
+    const user = userEvent.setup();
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Tag" }),
+      "MARR",
+    );
+    await user.click(screen.getByRole("button", { name: /New/ }));
+
+    expect(openNewIndividual).toHaveBeenCalled();
+    expect(createSpouseFamily).toHaveBeenCalledWith("@I1@", "@I3@");
+    expect(families()["@F1@"]?.map((fact) => fact.tag)).toEqual(["MARR"]);
+  });
+
+  it("adds an individual event to the individual's own facts", async () => {
+    const user = userEvent.setup();
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Tag" }),
+      "BIRT",
+    );
+    expect(value().map((fact) => fact.tag)).toEqual(["BIRT"]);
+    expect(screen.queryByRole("combobox", { name: "Spouse" })).toBeNull();
+    expect(createSpouseFamily).not.toHaveBeenCalled();
   });
 });

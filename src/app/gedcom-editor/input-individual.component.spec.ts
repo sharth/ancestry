@@ -67,7 +67,10 @@ describe("InputIndividualComponent family buttons", () => {
   beforeEach(async () => {
     openFamily.mockClear();
     await renderWithFamilies([
-      { provide: GEDCOM_EDITOR, useValue: { openFamily } },
+      {
+        provide: GEDCOM_EDITOR,
+        useValue: { openFamily, familyFactsField: () => undefined },
+      },
     ]);
   });
 
