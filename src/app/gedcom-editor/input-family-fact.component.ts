@@ -1,4 +1,4 @@
-import { Component, input, model } from "@angular/core";
+import { Component, input, model, output } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
@@ -23,6 +23,8 @@ export class InputFamilyFactComponent implements FormValueControl<GedcomFact> {
   readonly workingDatabase = input.required<GedcomDatabase>();
   readonly open = input<boolean>(true);
   readonly value = model<GedcomFact>(newGedcomFact());
+  // The user picked a different type in the Tag picker.
+  readonly tagPicked = output<string>();
   readonly form = form(this.value);
 
   focus(options?: FocusOptions) {

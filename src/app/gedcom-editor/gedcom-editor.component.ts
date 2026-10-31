@@ -6,12 +6,13 @@ import {
   linkedSignal,
   output,
 } from "@angular/core";
-import { FormField, form } from "@angular/forms/signals";
+import { FormField, form, type FieldTree } from "@angular/forms/signals";
 import { ActivatedRoute, Router } from "@angular/router";
 import { produce } from "immer";
 
 import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
+import type { GedcomFact } from "../../gedcom/gedcomFact";
 import { newGedcomFamily } from "../../gedcom/gedcomFamily";
 import { newGedcomIndividual } from "../../gedcom/gedcomIndividual";
 import { newGedcomMultimedia } from "../../gedcom/gedcomMultimedia";
@@ -130,6 +131,20 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     this.effectiveTabs(),
   );
 
+  // Spouse families of the individuals open in a tab. These are brought into
+  // the form (so their facts can be edited inline on the individual's own
+  // tab, e.g. a marriage) without being session tabs of their own, so they
+  // don't appear in the tab bar.
+  readonly impliedFamilyXrefs = computed<string[]>(() => {
+    const database = this.workingDatabase();
+    return this.xrefsIncludedInView()
+      .filter((tabInformation) => tabInformation.type === "INDI")
+      .flatMap(
+        (tabInformation) =>
+          database.individuals[tabInformation.xref]?.parentOfFamilyXrefs ?? [],
+      );
+  });
+
   // A GedcomDatabase made up of only the xrefs found in `xrefsIncludedInView`.
   // Any changes will be persisted in workingDatabase().
   // This will be used in the Angular Signal Forms. The indirection is required,
@@ -148,12 +163,12 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
           .filter((tabInformation) => tabInformation.type === "INDI")
           .map((tabInformation) => tabInformation.xref),
       ),
-      families: filteredProperties(
-        this.workingDatabase().families,
-        this.xrefsIncludedInView()
+      families: filteredProperties(this.workingDatabase().families, [
+        ...this.xrefsIncludedInView()
           .filter((tabInformation) => tabInformation.type === "FAM")
           .map((tabInformation) => tabInformation.xref),
-      ),
+        ...this.impliedFamilyXrefs(),
+      ]),
       sources: filteredProperties(
         this.workingDatabase().sources,
         this.xrefsIncludedInView()
@@ -266,6 +281,36 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
 
   openFamily(xref: string) {
     this.openTab({ type: "FAM", xref });
+  }
+
+  familyFactsField(familyXref: string): FieldTree<GedcomFact[]> | undefined {
+    return this.form.families[familyXref]?.facts;
+  }
+
+  // Creates a family with the two as husband and wife, and links both sides
+  // (HUSB/WIFE on the family, FAMS on each individual). Its facts are then
+  // in the form, through familyFactsField(). Returns the family's xref.
+  createSpouseFamily(individualXref: string, spouseXref: string): string {
+    const database = this.workingDatabase();
+    const familyXref = calculateNextFamilyXref(database);
+    const individualIsWife =
+      database.individuals[individualXref]?.sex.sex === "F";
+    const [husbandXref, wifeXref] = individualIsWife
+      ? [spouseXref, individualXref]
+      : [individualXref, spouseXref];
+
+    this.workingDatabase.update((workingDatabase) =>
+      produce(workingDatabase, (draft) => {
+        draft.families[familyXref] = newGedcomFamily({
+          xref: familyXref,
+          husbandXref,
+          wifeXref,
+        });
+        draft.individuals[individualXref]?.parentOfFamilyXrefs.push(familyXref);
+        draft.individuals[spouseXref]?.parentOfFamilyXrefs.push(familyXref);
+      }),
+    );
+    return familyXref;
   }
 
   openTab(tabInformation: TabInformation) {

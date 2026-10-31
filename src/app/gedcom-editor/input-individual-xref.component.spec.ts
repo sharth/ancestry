@@ -25,6 +25,10 @@ describe("InputIndividualXrefComponent", () => {
     expect(component).toBeTruthy();
   });
 
+  it("is labelled Individual by default", () => {
+    expect(screen.getByRole("combobox", { name: "Individual" })).toBeTruthy();
+  });
+
   it("disables the New button without an editor", () => {
     expect(screen.getByRole("button", { name: /New/ })).toHaveProperty(
       "disabled",
@@ -82,5 +86,18 @@ describe("InputIndividualXrefComponent with an editor", () => {
       "disabled",
       true,
     );
+  });
+});
+
+describe("InputIndividualXrefComponent with a label", () => {
+  it("uses the given label", async () => {
+    await render(InputIndividualXrefComponent, {
+      bindings: [
+        inputBinding("workingDatabase", signal(newGedcomDatabase())),
+        inputBinding("label", signal("Spouse")),
+      ],
+      waitForStableOnRender: true,
+    });
+    expect(screen.getByRole("combobox", { name: "Spouse" })).toBeTruthy();
   });
 });
