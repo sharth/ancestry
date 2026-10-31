@@ -15,6 +15,9 @@ import {
 } from "./gedcomRecord";
 import { newGedcomSourceCitation } from "./gedcomSourceCitation";
 
+// Facts are given an id when they are parsed.
+const anyId = expect.any(Number) as number;
+
 describe("gedcomIndividual", () => {
   it("no fields", () => {
     const gedcomText = [
@@ -166,11 +169,13 @@ describe("gedcomIndividual", () => {
         xref: "@I5@",
         facts: [
           newGedcomFact({
+            id: anyId,
             tag: "IDNO",
             value: "abcd",
             type: "familysearch.org",
           }),
           newGedcomFact({
+            id: anyId,
             tag: "BIRT",
             place: "place",
             address: "address",
@@ -184,6 +189,7 @@ describe("gedcomIndividual", () => {
             ],
           }),
           newGedcomFact({
+            id: anyId,
             tag: "OCCU",
             value: "Truck Driver",
             type: "Permanent",
@@ -240,6 +246,7 @@ describe("gedcomIndividual", () => {
         xref: "@I1@",
         facts: [
           newGedcomFact({
+            id: anyId,
             tag: "GRAD",
             date: newGedcomDate({ value: "15 JUN 2005" }),
             place: "Springfield",

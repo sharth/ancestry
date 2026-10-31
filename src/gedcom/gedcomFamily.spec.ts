@@ -14,6 +14,9 @@ import {
   serializeGedcomRecordToText,
 } from "./gedcomRecord";
 
+// Facts are given an id when they are parsed.
+const anyId = expect.any(Number) as number;
+
 describe("gedcomFamily", () => {
   it("parse family with husband, no wife and two children", () => {
     const gedcomText = [
@@ -104,20 +107,30 @@ describe("gedcomFamily", () => {
       newGedcomFamily({
         xref: "@F4@",
         facts: [
-          newGedcomFact({ tag: "NCHI", value: "value" }),
-          newGedcomFact({ tag: "RESI", value: "value" }),
-          newGedcomFact({ tag: "FACT", value: "value", type: "type" }),
-          newGedcomFact({ tag: "ANUL" }),
-          newGedcomFact({ tag: "CENS" }),
-          newGedcomFact({ tag: "DIV" }),
-          newGedcomFact({ tag: "DIVF" }),
-          newGedcomFact({ tag: "ENGA" }),
-          newGedcomFact({ tag: "MARB" }),
-          newGedcomFact({ tag: "MARC" }),
-          newGedcomFact({ tag: "MARL" }),
-          newGedcomFact({ tag: "MARR" }),
-          newGedcomFact({ tag: "MARS" }),
-          newGedcomFact({ tag: "EVEN", value: "value", type: "type" }),
+          newGedcomFact({ id: anyId, tag: "NCHI", value: "value" }),
+          newGedcomFact({ id: anyId, tag: "RESI", value: "value" }),
+          newGedcomFact({
+            id: anyId,
+            tag: "FACT",
+            value: "value",
+            type: "type",
+          }),
+          newGedcomFact({ id: anyId, tag: "ANUL" }),
+          newGedcomFact({ id: anyId, tag: "CENS" }),
+          newGedcomFact({ id: anyId, tag: "DIV" }),
+          newGedcomFact({ id: anyId, tag: "DIVF" }),
+          newGedcomFact({ id: anyId, tag: "ENGA" }),
+          newGedcomFact({ id: anyId, tag: "MARB" }),
+          newGedcomFact({ id: anyId, tag: "MARC" }),
+          newGedcomFact({ id: anyId, tag: "MARL" }),
+          newGedcomFact({ id: anyId, tag: "MARR" }),
+          newGedcomFact({ id: anyId, tag: "MARS" }),
+          newGedcomFact({
+            id: anyId,
+            tag: "EVEN",
+            value: "value",
+            type: "type",
+          }),
         ],
       }),
     );
