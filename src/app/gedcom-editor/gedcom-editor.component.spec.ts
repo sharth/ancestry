@@ -348,6 +348,45 @@ describe("GedcomEditorComponent Integration", () => {
     });
   });
 
+  describe("families section tests", () => {
+    it("brings the individual's families into the form without opening them as tabs", () => {
+      fixture.componentRef.setInput("tabs", [{ type: "INDI", xref: "@I0@" }]);
+      expect(component.impliedFamilyXrefs()).toEqual(["@F0@"]);
+      expect(Object.keys(component.workingDatabaseView().families)).toEqual([
+        "@F0@",
+      ]);
+      expect(
+        component.xrefsIncludedInView().some((tab) => tab.type === "FAM"),
+      ).toBe(false);
+    });
+
+    it("links a spouse who isn't open, and saves both sides", async () => {
+      fixture.componentRef.setInput("tabs", [{ type: "INDI", xref: "@I0@" }]);
+      component.workingDatabase.update(
+        produce((draft) => {
+          draft.individuals["@I1@"] = newGedcomIndividual({ xref: "@I1@" });
+        }),
+      );
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      const spouse = (
+        fixture.nativeElement as HTMLElement
+      ).querySelector<HTMLSelectElement>(
+        "app-input-individual-families app-input-individual-xref select",
+      );
+      assert.isOk(spouse);
+      await userEvent.setup().selectOptions(spouse, "@I1@");
+
+      const database = component.workingDatabase();
+      expect(database.families["@F0@"]?.wifeXref).toBe("@I1@");
+      expect(database.individuals["@I1@"]?.parentOfFamilyXrefs).toEqual([
+        "@F0@",
+      ]);
+      expect(component.hasUnsavedChanges()).toBe(true);
+    });
+  });
+
   describe("submitForm tests", () => {
     it("emits finished before navigating, so the dialog is already closed by the time the reload re-checks the unsaved-changes guard", async () => {
       vi.spyOn(ancestryService, "updateGedcomDatabase").mockResolvedValue(
