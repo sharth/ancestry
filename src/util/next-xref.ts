@@ -1,119 +1,82 @@
 import type { GedcomDatabase } from "../gedcom/gedcomDatabase";
-import type { GedcomFact } from "../gedcom/gedcomFact";
 import type { GedcomSourceCitation } from "../gedcom/gedcomSourceCitation";
 
-// Each calculator also considers xrefs that are only linked to (e.g. a
-// family's HUSB pointing at an individual with no INDI record), so a new
-// record never takes an xref that something already points at.
-
 export function calculateNextIndividualXref(gedcomDatabase: GedcomDatabase) {
-  return calculateNextXref(
-    [
-      ...Object.keys(gedcomDatabase.individuals),
-      ...linkedIndividualXrefs(gedcomDatabase),
-    ],
-    "I",
-  );
+  return calculateNextXref(gedcomDatabase, "I");
 }
 
 export function calculateNextMultimediaXref(gedcomDatabase: GedcomDatabase) {
-  return calculateNextXref(
-    [
-      ...Object.keys(gedcomDatabase.multimedias),
-      ...linkedMultimediaXrefs(gedcomDatabase),
-    ],
-    "M",
-  );
+  return calculateNextXref(gedcomDatabase, "M");
 }
 
 export function calculateNextRepositoryXref(gedcomDatabase: GedcomDatabase) {
-  return calculateNextXref(
-    [
-      ...Object.keys(gedcomDatabase.repositories),
-      ...Object.values(gedcomDatabase.sources).flatMap((source) =>
-        source.repositoryLinks.map((link) => link.repositoryXref),
-      ),
-    ],
-    "R",
-  );
+  return calculateNextXref(gedcomDatabase, "R");
 }
 
 export function calculateNextSourceXref(gedcomDatabase: GedcomDatabase) {
-  return calculateNextXref(
-    [
-      ...Object.keys(gedcomDatabase.sources),
-      ...allCitations(gedcomDatabase).map((citation) => citation.sourceXref),
-    ],
-    "S",
-  );
+  return calculateNextXref(gedcomDatabase, "S");
 }
 
 export function calculateNextFamilyXref(gedcomDatabase: GedcomDatabase) {
-  return calculateNextXref(
-    [
-      ...Object.keys(gedcomDatabase.families),
-      ...Object.values(gedcomDatabase.individuals).flatMap((individual) => [
-        ...individual.parentOfFamilyXrefs,
-        ...individual.childOfFamilyXrefs,
-      ]),
-    ],
-    "F",
-  );
+  return calculateNextXref(gedcomDatabase, "F");
 }
 
 export function calculateNextSubmitterXref(gedcomDatabase: GedcomDatabase) {
-  return calculateNextXref(Object.keys(gedcomDatabase.submitters), "U");
+  return calculateNextXref(gedcomDatabase, "U");
 }
 
-function linkedIndividualXrefs(gedcomDatabase: GedcomDatabase): string[] {
-  return [
-    ...Object.values(gedcomDatabase.families).flatMap((family) => [
-      family.husbandXref,
-      family.wifeXref,
-      ...family.childXrefs,
-    ]),
-    ...allFacts(gedcomDatabase).flatMap((fact) =>
-      fact.sharedWith.map((sharedWith) => sharedWith.xref),
-    ),
-  ];
+/** Every xref the database uses: each record's own xref, plus every xref
+ * something links to, even when no record with that xref exists. */
+function* usedXrefs(gedcomDatabase: GedcomDatabase): Generator<string> {
+  yield* Object.keys(gedcomDatabase.submitters);
+  yield* Object.keys(gedcomDatabase.individuals);
+  yield* Object.keys(gedcomDatabase.families);
+  yield* Object.keys(gedcomDatabase.sources);
+  yield* Object.keys(gedcomDatabase.repositories);
+  yield* Object.keys(gedcomDatabase.multimedias);
+
+  const citations: GedcomSourceCitation[] = [];
+  for (const individual of Object.values(gedcomDatabase.individuals)) {
+    yield* individual.parentOfFamilyXrefs;
+    yield* individual.childOfFamilyXrefs;
+    citations.push(...individual.sex.citations);
+    for (const name of individual.names) citations.push(...name.citations);
+    for (const fact of individual.facts) {
+      yield* fact.sharedWith.map((sharedWith) => sharedWith.xref);
+      citations.push(...fact.citations);
+    }
+  }
+  for (const family of Object.values(gedcomDatabase.families)) {
+    yield family.husbandXref;
+    yield family.wifeXref;
+    yield* family.childXrefs;
+    citations.push(...family.citations);
+    for (const fact of family.facts) {
+      yield* fact.sharedWith.map((sharedWith) => sharedWith.xref);
+      citations.push(...fact.citations);
+    }
+  }
+  for (const source of Object.values(gedcomDatabase.sources)) {
+    yield* source.repositoryLinks.map((link) => link.repositoryXref);
+    yield* source.multimediaLinks.map((link) => link.xref);
+  }
+  for (const citation of citations) {
+    yield citation.sourceXref;
+    yield* citation.multimediaLinks.map((link) => link.xref);
+  }
 }
 
-function linkedMultimediaXrefs(gedcomDatabase: GedcomDatabase): string[] {
-  return [
-    ...Object.values(gedcomDatabase.sources).flatMap((source) =>
-      source.multimediaLinks.map((link) => link.xref),
-    ),
-    ...allCitations(gedcomDatabase).flatMap((citation) =>
-      citation.multimediaLinks.map((link) => link.xref),
-    ),
-  ];
-}
-
-function allFacts(gedcomDatabase: GedcomDatabase): GedcomFact[] {
-  return [
-    ...Object.values(gedcomDatabase.individuals).flatMap((i) => i.facts),
-    ...Object.values(gedcomDatabase.families).flatMap((f) => f.facts),
-  ];
-}
-
-function allCitations(gedcomDatabase: GedcomDatabase): GedcomSourceCitation[] {
-  return [
-    ...Object.values(gedcomDatabase.individuals).flatMap((individual) => [
-      ...individual.sex.citations,
-      ...individual.names.flatMap((name) => name.citations),
-    ]),
-    ...Object.values(gedcomDatabase.families).flatMap(
-      (family) => family.citations,
-    ),
-    ...allFacts(gedcomDatabase).flatMap((fact) => fact.citations),
-  ];
-}
-
-function calculateNextXref(xrefs: string[], prefix: string): string {
-  const nextIndex = xrefs
-    .map((xref) => /^@[a-zA-Z]*(\d+)@/.exec(xref)?.[1])
-    .filter((xrefNumber) => xrefNumber !== undefined)
-    .map((xrefNumber) => parseInt(xrefNumber))
-    .reduce((acc, xrefNumber) => Math.max(acc, xrefNumber + 1), 0);
+function calculateNextXref(
+  gedcomDatabase: GedcomDatabase,
+  prefix: string,
+): string {
+  const pattern = new RegExp(`^@${prefix}(\\d+)@$`);
+  let nextIndex = 0;
+  for (const xref of usedXrefs(gedcomDatabase)) {
+    const xrefNumber = pattern.exec(xref)?.[1];
+    if (xrefNumber !== undefined) {
+      nextIndex = Math.max(nextIndex, parseInt(xrefNumber) + 1);
+    }
+  }
   return `@${prefix}${nextIndex}@`;
 }

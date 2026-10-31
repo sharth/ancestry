@@ -90,6 +90,14 @@ describe("GedcomEditorComponent helpers", () => {
     });
   });
 
+  it("only counts xrefs with the matching prefix", () => {
+    const gedcomDatabase = newGedcomDatabase({
+      individuals: { "@I1@": newGedcomIndividual({ xref: "@I1@" }) },
+      sources: { "@S10@": newGedcomSource({ xref: "@S10@" }) },
+    });
+    expect(calculateNextIndividualXref(gedcomDatabase)).toBe("@I2@");
+  });
+
   describe("xrefs that are only linked to", () => {
     it("individual: skips xrefs used by a family's HUSB/WIFE/CHIL", () => {
       const gedcomDatabase = newGedcomDatabase({
