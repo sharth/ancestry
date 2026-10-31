@@ -1,20 +1,91 @@
 <details [open]="open()">
-  <summary>Events ({{ form.length }})</summary>
-  @for (event of form; track event) {
+  <summary>Events ({{ eventCount() }})</summary>
+  @for (row of rows(); track row.token) {
+    @let event = row.field;
     <details [open]="true">
       <summary>
         <button
           type="button"
           class="btn btn-sm btn-outline-danger bi-trash"
           aria-label="Remove event"
-          (click)="removeEvent($index)"
+          (click)="
+            row.familyXref && row.facts
+              ? removeFamilyEvent(row.familyXref, row.facts, row.index)
+              : removeEvent(row.index)
+          "
         ></button>
         {{ event.tag().value() }}
       </summary>
-      <app-input-individual-fact
-        [workingDatabase]="workingDatabase()"
-        [formField]="event"
-      ></app-input-individual-fact>
+      @if (row.familyXref && row.facts) {
+        @let familyXref = row.familyXref;
+        @let facts = row.facts;
+        <app-input-individual-xref
+          label="Spouse"
+          class="d-block mb-2"
+          [workingDatabase]="workingDatabase()"
+          [value]="spouseOf(familyXref)"
+          (valueChange)="changeSpouse(familyXref, facts, row.index, $event)"
+        ></app-input-individual-xref>
+        <app-input-family-fact
+          [workingDatabase]="workingDatabase()"
+          [formField]="event"
+          (tagPicked)="familyTagPicked(familyXref, facts, row.index, $event)"
+        ></app-input-family-fact>
+      } @else {
+        <app-input-individual-fact
+          [workingDatabase]="workingDatabase()"
+          [formField]="event"
+        ></app-input-individual-fact>
+      }
+    </details>
+  }
+  @if (pendingTag() !== undefined) {
+    <details [open]="true">
+      <summary>
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-danger bi-trash"
+          aria-label="Remove event"
+          (click)="pendingTag.set(undefined)"
+        ></button>
+        New event
+      </summary>
+      <div class="fields-grid">
+        <div class="form-floating">
+          <select
+            #pendingTagSelect
+            class="form-control"
+            id="newTag"
+            aria-label="Tag"
+            (change)="choosePendingTag(pendingTagSelect.value)"
+          >
+            <option value="" disabled [selected]="!pendingTag()">
+              Choose…
+            </option>
+            @for (tag of individualTags; track tag.tag) {
+              <option [value]="tag.tag">
+                {{ tag.humanReadableDescription }}
+              </option>
+            }
+            <optgroup label="With a spouse">
+              @for (tag of coupleTags; track tag.tag) {
+                <option [value]="tag.tag" [selected]="tag.tag === pendingTag()">
+                  {{ tag.humanReadableDescription }}
+                </option>
+              }
+            </optgroup>
+          </select>
+          <label for="newTag">Tag</label>
+        </div>
+        @if (pendingTag()) {
+          <app-input-individual-xref
+            label="Spouse"
+            [workingDatabase]="workingDatabase()"
+            [value]="''"
+            (valueChange)="choosePendingSpouse($event)"
+          ></app-input-individual-xref>
+        }
+      </div>
     </details>
   }
   <div

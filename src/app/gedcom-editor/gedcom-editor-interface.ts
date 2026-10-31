@@ -1,4 +1,7 @@
 import { InjectionToken } from "@angular/core";
+import type { FieldTree } from "@angular/forms/signals";
+
+import type { GedcomFact } from "../../gedcom/gedcomFact";
 
 export interface TabInformation {
   type: "INDI" | "SOUR" | "FAM" | "REPO" | "OBJE" | "SUBM";
@@ -16,6 +19,8 @@ export interface GedcomEditorInterface {
   openSource(xref: string): void;
   openNewFamily(): string;
   openFamily(xref: string): void;
+  familyFactsField(familyXref: string): FieldTree<GedcomFact[]> | undefined;
+  createSpouseFamily(individualXref: string, spouseXref: string): string;
 }
 
 export const GEDCOM_EDITOR = new InjectionToken<GedcomEditorInterface>(
