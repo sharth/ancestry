@@ -267,7 +267,7 @@ export class InputIndividualFactsComponent implements FormValueControl<GedcomDat
 
 export interface Row {
   // The fact's id, which stays the same while it is edited or moved.
-  id: string;
+  id: number;
   field: FieldTree<GedcomFact>;
   index: number;
   // Set when the fact is on a spouse family rather than the individual.
