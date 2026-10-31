@@ -252,7 +252,7 @@ describe("GedcomEditorComponent Integration", () => {
             names: [newGedcomName({ givenName: "John", surname: "Doe" })],
             facts: [
               newGedcomFact({
-                id: "birth",
+                id: 1,
                 tag: "BIRT",
                 date: newGedcomDate({ value: "1 JAN 1900" }),
                 place: "Boston",
@@ -284,7 +284,7 @@ describe("GedcomEditorComponent Integration", () => {
               names: [newGedcomName({ givenName: "John", surname: "Doe" })],
               facts: [
                 newGedcomFact({
-                  id: "birth",
+                  id: 1,
                   tag: "BIRT",
                   date: newGedcomDate({ value: "1 JAN 1900" }),
                   place: "Boston",
