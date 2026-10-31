@@ -70,7 +70,7 @@ function calculateNextXref(
   gedcomDatabase: GedcomDatabase,
   prefix: string,
 ): string {
-  const nextIndex = [...usedXrefs(gedcomDatabase)]
+  const nextIndex = usedXrefs(gedcomDatabase)
     .map((xref) => new RegExp(`^@${prefix}(\\d+)@$`).exec(xref)?.[1])
     .filter((xrefNumber) => xrefNumber !== undefined)
     .map((xrefNumber) => parseInt(xrefNumber))
