@@ -108,6 +108,14 @@ div.details-lookalike {
 .form-floating > textarea.form-control {
   height: auto !important;
   min-height: calc(1.9rem + 2px);
+  padding-top: 0.9rem;
+}
+
+/* Bootstrap paints an opaque patch behind a floating textarea's label to mask
+   scrolled text. With the compact padding above it covers the first line, and
+   field-sizing: content means these textareas never scroll, so drop it. */
+.form-floating > textarea ~ label::after {
+  display: none;
 }
 
 .fields-grid {
