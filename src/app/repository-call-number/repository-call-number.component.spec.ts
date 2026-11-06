@@ -27,6 +27,11 @@ describe("RepositoryCallNumberComponent", () => {
     expect(screen.queryByRole("link")).toBeNull();
   });
 
+  it("doesn't link a URL with a username or password", async () => {
+    await renderCallNumber("https://www.familysearch.org@evil.example/");
+    expect(screen.queryByRole("link")).toBeNull();
+  });
+
   it("renders a plain call number as text", async () => {
     await renderCallNumber("Film 12345");
     expect(screen.getByText("Film 12345")).toBeTruthy();
