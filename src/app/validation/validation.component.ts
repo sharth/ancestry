@@ -106,6 +106,14 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
         });
       }
       for (const warning of sourceScenario.result.warnings) {
+        // A source with no repository at all shows its URL suggestions in
+        // the "Sources without repositories" section instead.
+        if (
+          warning.urlSuggestion !== undefined &&
+          sourceScenario.source.repositoryLinks.length === 0
+        ) {
+          continue;
+        }
         result.push({
           source: sourceScenario.source,
           severity: "Warning",

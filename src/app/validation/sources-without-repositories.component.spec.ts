@@ -1,4 +1,4 @@
-import { inputBinding, signal } from "@angular/core";
+import { inputBinding, outputBinding, signal } from "@angular/core";
 import { provideRouter } from "@angular/router";
 import { render, screen } from "@testing-library/angular/zoneless";
 import { describe, expect, it } from "vitest";
@@ -10,7 +10,10 @@ import {
 import { newGedcomRepository } from "../../gedcom/gedcomRepository";
 import { newGedcomRepositoryLink } from "../../gedcom/gedcomRepositoryLink";
 import { newGedcomSource } from "../../gedcom/gedcomSource";
-import { SourcesWithoutRepositoriesComponent } from "./sources-without-repositories.component";
+import {
+  SourcesWithoutRepositoriesComponent,
+  type SourceUrlSuggestion,
+} from "./sources-without-repositories.component";
 
 describe("SourcesWithoutRepositoriesComponent", () => {
   async function renderLinkNames(database: GedcomDatabase) {
@@ -91,5 +94,59 @@ describe("SourcesWithoutRepositoriesComponent", () => {
     expect(
       screen.getByText("(https://www.newspapers.com/clip/1/)"),
     ).toBeTruthy();
+  });
+
+  it("hands a suggestion back to review or submit", async () => {
+    const source = newGedcomSource({
+      xref: "@S1@",
+      text: "https://www.newspapers.com/clip/1/",
+    });
+    const reviewed: SourceUrlSuggestion[] = [];
+    const submitted: SourceUrlSuggestion[] = [];
+    await render(SourcesWithoutRepositoriesComponent, {
+      providers: [provideRouter([])],
+      bindings: [
+        inputBinding(
+          "ancestryDatabase",
+          signal(newGedcomDatabase({ sources: { [source.xref]: source } })),
+        ),
+        outputBinding<SourceUrlSuggestion>("reviewUrlSuggestion", (e) =>
+          reviewed.push(e),
+        ),
+        outputBinding<SourceUrlSuggestion>("submitUrlSuggestion", (e) =>
+          submitted.push(e),
+        ),
+      ],
+      waitForStableOnRender: true,
+    });
+
+    screen.getByRole("button", { name: /Create repository/ }).click();
+    screen.getByRole("button", { name: "Submit changes as proposed" }).click();
+
+    for (const events of [reviewed, submitted]) {
+      expect(events).toHaveLength(1);
+      expect(events[0]?.source).toBe(source);
+      expect(events[0]?.suggestion.url).toBe(
+        "https://www.newspapers.com/clip/1/",
+      );
+    }
+  });
+
+  it("shows the before and proposed-after GEDCOM for each suggestion", async () => {
+    await renderLinkNames(
+      newGedcomDatabase({
+        sources: {
+          "@S1@": newGedcomSource({
+            xref: "@S1@",
+            text: "Found at https://www.newspapers.com/clip/1/",
+          }),
+        },
+      }),
+    );
+    const text = document.body.textContent;
+    expect(text).toContain(
+      "1 TEXT Found at https://www.newspapers.com/clip/1/",
+    );
+    expect(text).toContain("0 @R0@ REPO");
   });
 });

@@ -69,6 +69,16 @@ describe("ValidationComponent", () => {
     expect(text).toContain("0 @R0@ REPO");
   });
 
+  it("shows a source without repositories' suggestion only in its own section", async () => {
+    await screen.findByText(/Create repository/);
+    const page = fixture.nativeElement as HTMLElement;
+    expect(page.querySelectorAll(".diff-section")).toHaveLength(0);
+    expect(
+      page.querySelectorAll("app-sources-without-repositories app-gedcom-diff")
+        .length,
+    ).toBeGreaterThan(0);
+  });
+
   it("also offers a button to submit the suggested fix directly", async () => {
     expect(await screen.findByText(/Submit changes as proposed/)).toBeTruthy();
   });
@@ -196,21 +206,30 @@ describe("ValidationComponent merge repository links suggestion", () => {
 
 describe("ValidationComponent sticky header", () => {
   it("scopes each warning's sticky row to its own section, one per diff", async () => {
+    // Each source already cites a repository; a source with none shows its
+    // URL suggestions in the "Sources without repositories" section instead.
+    const linkToLibrary = newGedcomRepositoryLink({ repositoryXref: "@R1@" });
     const ancestryDatabase = signal(
       newGedcomDatabase({
+        repositories: {
+          "@R1@": newGedcomRepository({ xref: "@R1@", name: "Library" }),
+        },
         sources: {
           S1: newGedcomSource({
             xref: "S1",
+            repositoryLinks: [linkToLibrary],
             title:
               "Newfoundland Virtal Records, 1892, Birth of Catherine Cooper https://familysearch.org/ark:/61903/3:1:S3HT-61DS-32F?cc=1790939&wc=M61G-RM3%3A144853601",
           }),
           S2: newGedcomSource({
             xref: "S2",
+            repositoryLinks: [linkToLibrary],
             title:
               "Second Source https://www.ancestry.com/discoveryui-content/view/123456:7890?tid=111&pid=181",
           }),
           S3: newGedcomSource({
             xref: "S3",
+            repositoryLinks: [linkToLibrary],
             title:
               "Jackson Daily News, Obituary, 1910 https://www.newspapers.com/clip/56286648/jackson-daily-news/",
           }),

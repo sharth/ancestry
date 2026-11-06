@@ -139,7 +139,14 @@
 
 <app-unused-sources [ancestryDatabase]="ancestryDatabase()" />
 
-<app-sources-without-repositories [ancestryDatabase]="ancestryDatabase()" />
+<app-sources-without-repositories
+  [ancestryDatabase]="ancestryDatabase()"
+  (reviewUrlSuggestion)="
+    reviewUrlSuggestion($event.source, $event.suggestion);
+    editDialog.showModal()
+  "
+  (submitUrlSuggestion)="submitUrlSuggestion($event.source, $event.suggestion)"
+/>
 
 <app-gedcom-editor-dialog
   #editDialog

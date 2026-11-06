@@ -6,7 +6,7 @@
     These sources don't cite a repository. Where a source's text contains a URL,
     the repository it suggests is listed alongside.
   </p>
-  <table class="table table-striped">
+  <table class="table">
     <thead>
       <tr>
         <th>Source</th>
@@ -24,26 +24,67 @@
           </td>
           <td>{{ row.source.title }}</td>
           <td>
-            @if (row.suggestions.length > 0) {
-              <ul class="list-unstyled mb-0">
-                @for (suggestion of row.suggestions; track $index) {
-                  <li>
-                    @if (suggestion.matchedRepository; as repository) {
-                      <a [routerLink]="['/repository', repository.xref]">
-                        {{ repository.name || repository.xref }}
-                      </a>
-                    } @else {
-                      New repository "{{ suggestion.suggestedName }}"
-                    }
-                    <span class="text-body-secondary">
-                      ({{ suggestion.url }})
-                    </span>
-                  </li>
+            @for (item of row.suggestions; track $index) {
+              <div [class.mb-2]="!$last">
+                @if (item.suggestion.matchedRepository; as repository) {
+                  <a [routerLink]="['/repository', repository.xref]">
+                    {{ repository.name || repository.xref }}
+                  </a>
+                } @else {
+                  New repository "{{ item.suggestion.suggestedName }}"
                 }
-              </ul>
+                <span class="text-body-secondary">
+                  ({{ item.suggestion.url }})
+                </span>
+                <div class="btn-group mt-1">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-primary"
+                    (click)="
+                      reviewUrlSuggestion.emit({
+                        source: row.source,
+                        suggestion: item.suggestion,
+                      })
+                    "
+                  >
+                    Open editor with proposed changes:
+                    {{
+                      item.suggestion.matchedRepository
+                        ? "Link to " +
+                          (item.suggestion.matchedRepository.name ||
+                            item.suggestion.matchedRepository.xref)
+                        : "Create repository"
+                    }}
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-success"
+                    (click)="
+                      submitUrlSuggestion.emit({
+                        source: row.source,
+                        suggestion: item.suggestion,
+                      })
+                    "
+                  >
+                    Submit changes as proposed
+                  </button>
+                </div>
+              </div>
             }
           </td>
         </tr>
+        @for (item of row.suggestions; track $index) {
+          <tr>
+            <td colspan="3">
+              @for (d of item.differences; track $index) {
+                <app-gedcom-diff
+                  [oldGedcomRecord]="d.originalGedcomRecord"
+                  [newGedcomRecord]="d.updatedGedcomRecord"
+                />
+              }
+            </td>
+          </tr>
+        }
       }
     </tbody>
   </table>
