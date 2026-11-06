@@ -3,6 +3,7 @@
   @defer (when container.open) {
     @for (multimediaLink of form; track multimediaLink) {
       @let mediaXref = multimediaLink.xref().value();
+      @let media = workingDatabase().multimedias[mediaXref];
       <details [open]="true">
         <summary>
           <button
@@ -13,7 +14,7 @@
           ></button>
           {{
             multimediaLink.title().value() ||
-              titleFor(mediaXref) ||
+              media?.title ||
               mediaXref ||
               "Untitled"
           }}
@@ -65,10 +66,10 @@
           />
           <label for="title_{{ $index }}">Custom Title</label>
         </div>
-        @if (mediaXref && isImage(mediaXref)) {
+        @if (media?.mediaType?.startsWith("image/")) {
           <h6 class="mt-2">Crop</h6>
           <app-input-multimedia-crop
-            [filePath]="filePathFor(mediaXref) ?? ''"
+            [filePath]="media.filePath"
             [value]="value()[$index]?.crop"
             (valueChange)="setCrop($index, $event)"
           />
