@@ -2,16 +2,16 @@ import { inputBinding, signal } from "@angular/core";
 import { render, screen } from "@testing-library/angular/zoneless";
 import { describe, expect, it } from "vitest";
 
-import { CallNumberComponent } from "./call-number.component";
+import { RepositoryCallNumberComponent } from "./repository-call-number.component";
 
 async function renderCallNumber(callNumber: string) {
-  await render(CallNumberComponent, {
+  await render(RepositoryCallNumberComponent, {
     bindings: [inputBinding("callNumber", signal(callNumber))],
     waitForStableOnRender: true,
   });
 }
 
-describe("CallNumberComponent", () => {
+describe("RepositoryCallNumberComponent", () => {
   it("renders a URL call number as a link opening in a new tab", async () => {
     const url = "https://www.familysearch.org/ark:/61903/1:1:ABCD";
     await renderCallNumber(url);

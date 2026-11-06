@@ -2,11 +2,11 @@ import { Component, computed, inject, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
 
 import { AncestryService } from "../../database/ancestry.service";
-import { CallNumberComponent } from "../call-number/call-number.component";
+import { RepositoryCallNumberComponent } from "../repository-call-number/repository-call-number.component";
 
 @Component({
   selector: "app-repository-sources",
-  imports: [RouterModule, CallNumberComponent],
+  imports: [RouterModule, RepositoryCallNumberComponent],
   templateUrl: "./repository-sources.component.html",
   styleUrl: "./repository.component.css",
 })

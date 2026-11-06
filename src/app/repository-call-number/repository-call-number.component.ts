@@ -8,7 +8,7 @@ import { extractUrls } from "../validation/source-url.util";
  * schemes are linked, it opens in a new tab with no opener or referrer, and
  * it's marked nofollow. */
 @Component({
-  selector: "app-call-number",
+  selector: "app-repository-call-number",
   template: `
     @if (url(); as url) {
       <a
@@ -23,7 +23,7 @@ import { extractUrls } from "../validation/source-url.util";
     }
   `,
 })
-export class CallNumberComponent {
+export class RepositoryCallNumberComponent {
   readonly callNumber = input.required<string>();
 
   readonly url = computed(() => {
