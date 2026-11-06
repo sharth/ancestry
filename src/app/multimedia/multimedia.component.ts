@@ -9,6 +9,7 @@ import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-edit
 import type { ComponentWithUnsavedChanges } from "../unsaved-changes.guard";
 import { MultimediaCitationsComponent } from "./multimedia-citations.component";
 import { MultimediaPreviewComponent } from "./multimedia-preview.component";
+import { MultimediaSourcesComponent } from "./multimedia-sources.component";
 
 @Component({
   selector: "app-multimedia",
@@ -17,6 +18,7 @@ import { MultimediaPreviewComponent } from "./multimedia-preview.component";
     GedcomEditorDialogComponent,
     MultimediaPreviewComponent,
     MultimediaCitationsComponent,
+    MultimediaSourcesComponent,
     GedcomDisplayComponent,
   ],
   templateUrl: "./multimedia.component.html",

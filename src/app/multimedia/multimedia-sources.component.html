@@ -1,0 +1,22 @@
+@if (sources().length === 0) {
+  <p class="text-body-secondary">No sources link to this multimedia.</p>
+} @else {
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Source</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (source of sources(); track source.xref) {
+        <tr>
+          <td>
+            <a [routerLink]="['/source', source.xref]">{{
+              source.abbr || source.title || source.xref
+            }}</a>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}
