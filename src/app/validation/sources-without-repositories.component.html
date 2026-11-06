@@ -1,0 +1,26 @@
+<h2 class="mt-4">Sources without repositories</h2>
+@if (sourcesWithoutRepositories().length === 0) {
+  <p>Every source cites at least one repository.</p>
+} @else {
+  <p>These sources don't cite a repository.</p>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Source</th>
+        <th>Title</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (source of sourcesWithoutRepositories(); track source.xref) {
+        <tr>
+          <td>
+            <a [routerLink]="['/source', source.xref]">
+              {{ source.abbr || source.xref }}
+            </a>
+          </td>
+          <td>{{ source.title }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

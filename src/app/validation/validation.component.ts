@@ -26,6 +26,7 @@ import {
   type MergeRepositoryLinksSuggestion,
   type UrlRepositorySuggestion,
 } from "./source-validators";
+import { SourcesWithoutRepositoriesComponent } from "./sources-without-repositories.component";
 import { UnusedMultimediaComponent } from "./unused-multimedia.component";
 import { UnusedSourcesComponent } from "./unused-sources.component";
 
@@ -59,6 +60,7 @@ interface TableRow {
     GedcomDiffComponent,
     UnusedMultimediaComponent,
     UnusedSourcesComponent,
+    SourcesWithoutRepositoriesComponent,
   ],
   templateUrl: "./validation.component.html",
   styleUrl: "./validation.component.css",
