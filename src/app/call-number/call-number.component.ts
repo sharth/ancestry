@@ -19,7 +19,7 @@ import { extractUrls } from "../validation/source-url.util";
         >{{ callNumber() }}</a
       >
     } @else {
-      {{ callNumber() }}
+      <span>{{ callNumber() }}</span>
     }
   `,
 })
