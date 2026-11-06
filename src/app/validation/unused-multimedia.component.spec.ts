@@ -1,6 +1,12 @@
+import { inputBinding, signal } from "@angular/core";
+import { provideRouter } from "@angular/router";
+import { render, screen } from "@testing-library/angular/zoneless";
 import { describe, expect, it } from "vitest";
 
-import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
+import {
+  newGedcomDatabase,
+  type GedcomDatabase,
+} from "../../gedcom/gedcomDatabase";
 import { newGedcomFamily } from "../../gedcom/gedcomFamily";
 import { newGedcomIndividual } from "../../gedcom/gedcomIndividual";
 import { newGedcomMultimedia } from "../../gedcom/gedcomMultimedia";
@@ -8,28 +14,37 @@ import { newGedcomMultimediaLink } from "../../gedcom/gedcomMultimediaLink";
 import { newGedcomRecord } from "../../gedcom/gedcomRecord";
 import { newGedcomSource } from "../../gedcom/gedcomSource";
 import { newGedcomSourceCitation } from "../../gedcom/gedcomSourceCitation";
-import { unusedMultimedia } from "./unused-multimedia.util";
+import { UnusedMultimediaComponent } from "./unused-multimedia.component";
 
-describe("unusedMultimedia", () => {
+describe("UnusedMultimediaComponent", () => {
   const multimedias = Object.fromEntries(
     ["@M1@", "@M2@", "@M3@", "@M4@", "@M5@"].map((xref) => [
       xref,
-      newGedcomMultimedia({ xref }),
+      newGedcomMultimedia({ xref, title: `Photo ${xref}` }),
     ]),
   );
 
-  it("lists every multimedia when nothing links to any of them", () => {
-    const database = newGedcomDatabase({ multimedias });
-    expect(unusedMultimedia(database).map((m) => m.xref)).toEqual([
-      "@M1@",
-      "@M2@",
-      "@M3@",
-      "@M4@",
-      "@M5@",
-    ]);
+  async function renderLinkNames(database: GedcomDatabase) {
+    await render(UnusedMultimediaComponent, {
+      providers: [provideRouter([])],
+      bindings: [inputBinding("ancestryDatabase", signal(database))],
+      waitForStableOnRender: true,
+    });
+    return screen.queryAllByRole("link").map((link) => link.textContent.trim());
+  }
+
+  it("says so when every multimedia is linked", async () => {
+    await renderLinkNames(newGedcomDatabase({}));
+    expect(screen.getByText(/Every multimedia object is linked/)).toBeTruthy();
   });
 
-  it("leaves out multimedia linked from sources, citations and unparsed OBJE records", () => {
+  it("links to each unused multimedia's page", async () => {
+    await renderLinkNames(newGedcomDatabase({ multimedias }));
+    const link = screen.getByRole("link", { name: "Photo @M1@" });
+    expect(link.getAttribute("href")).toBe("/multimedia/@M1@");
+  });
+
+  it("leaves out multimedia linked from sources, citations and unparsed OBJE records", async () => {
     const citation = (xref: string) =>
       newGedcomSourceCitation({
         sourceXref: "@S1@",
@@ -56,6 +71,6 @@ describe("unusedMultimedia", () => {
         }),
       },
     });
-    expect(unusedMultimedia(database).map((m) => m.xref)).toEqual(["@M5@"]);
+    expect(await renderLinkNames(database)).toEqual(["Photo @M5@"]);
   });
 });

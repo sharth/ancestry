@@ -1,17 +1,26 @@
+import { Component, computed, input } from "@angular/core";
+import { RouterModule } from "@angular/router";
+
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
-import type { GedcomMultimedia } from "../../gedcom/gedcomMultimedia";
 import type { GedcomRecord } from "../../gedcom/gedcomRecord";
 import type { GedcomSourceCitation } from "../../gedcom/gedcomSourceCitation";
 
-/** Multimedia records that no multimedia link anywhere in the database
- * points to. */
-export function unusedMultimedia(
-  gedcomDatabase: GedcomDatabase,
-): GedcomMultimedia[] {
-  const linked = new Set(linkedMultimediaXrefs(gedcomDatabase));
-  return Object.values(gedcomDatabase.multimedias).filter(
-    (multimedia) => !linked.has(multimedia.xref),
-  );
+/** Lists the multimedia records that no multimedia link anywhere in the
+ * database points to. */
+@Component({
+  selector: "app-unused-multimedia",
+  imports: [RouterModule],
+  templateUrl: "./unused-multimedia.component.html",
+})
+export class UnusedMultimediaComponent {
+  readonly ancestryDatabase = input.required<GedcomDatabase>();
+
+  readonly unusedMultimedia = computed(() => {
+    const linked = new Set(linkedMultimediaXrefs(this.ancestryDatabase()));
+    return Object.values(this.ancestryDatabase().multimedias).filter(
+      (multimedia) => !linked.has(multimedia.xref),
+    );
+  });
 }
 
 function* linkedMultimediaXrefs(
