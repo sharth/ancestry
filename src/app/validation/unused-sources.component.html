@@ -1,0 +1,26 @@
+<h2 class="mt-4">Unused sources</h2>
+@if (unusedSources().length === 0) {
+  <p>Every source is cited at least once.</p>
+} @else {
+  <p>No citation anywhere in the file uses these sources.</p>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Source</th>
+        <th>Title</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (source of unusedSources(); track source.xref) {
+        <tr>
+          <td>
+            <a [routerLink]="['/source', source.xref]">
+              {{ source.abbr || source.xref }}
+            </a>
+          </td>
+          <td>{{ source.title }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

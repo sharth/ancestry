@@ -27,6 +27,7 @@ import {
   type UrlRepositorySuggestion,
 } from "./source-validators";
 import { UnusedMultimediaComponent } from "./unused-multimedia.component";
+import { UnusedSourcesComponent } from "./unused-sources.component";
 
 /** Which suggestion is currently under review in the GEDCOM editor dialog,
  * and the source it applies to -- a source can have more than one
@@ -57,6 +58,7 @@ interface TableRow {
     GedcomEditorDialogComponent,
     GedcomDiffComponent,
     UnusedMultimediaComponent,
+    UnusedSourcesComponent,
   ],
   templateUrl: "./validation.component.html",
   styleUrl: "./validation.component.css",
