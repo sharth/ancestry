@@ -2,12 +2,13 @@ import { Component, computed, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
+import { RepositoryCallNumberComponent } from "../repository-call-number/repository-call-number.component";
 
 @Component({
   selector: "app-source-overview",
   templateUrl: "./source-overview.component.html",
   styleUrl: "./source.component.css",
-  imports: [RouterModule],
+  imports: [RouterModule, RepositoryCallNumberComponent],
 })
 export class SourceOverviewComponent {
   readonly ancestryDatabase = input.required<GedcomDatabase>();

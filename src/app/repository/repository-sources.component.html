@@ -16,7 +16,9 @@
           </td>
           <td>
             @for (callNumber of source.callNumbers; track callNumber) {
-              <div>{{ callNumber }}</div>
+              <div>
+                <app-repository-call-number [callNumber]="callNumber" />
+              </div>
             }
           </td>
         </tr>
