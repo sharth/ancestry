@@ -11,7 +11,12 @@
             aria-label="Remove multimedia link"
             (click)="removeMultimediaLink($index)"
           ></button>
-          {{ multimediaLink.title().value() || mediaXref || "Untitled" }}
+          {{
+            multimediaLink.title().value() ||
+              titleFor(mediaXref) ||
+              mediaXref ||
+              "Untitled"
+          }}
         </summary>
         <div class="d-flex gap-2 align-items-center mb-2">
           <div class="form-floating flex-grow-1">

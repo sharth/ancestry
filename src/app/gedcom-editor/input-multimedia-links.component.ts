@@ -46,6 +46,10 @@ export class InputMultimediaLinksComponent implements FormValueControl<
     return this.workingDatabase().multimedias[xref]?.filePath;
   }
 
+  titleFor(xref: string): string | undefined {
+    return this.workingDatabase().multimedias[xref]?.title;
+  }
+
   isImage(xref: string): boolean {
     const mediaType = this.workingDatabase().multimedias[xref]?.mediaType;
     return mediaType?.startsWith("image/") ?? false;
