@@ -26,6 +26,7 @@ import {
   type MergeRepositoryLinksSuggestion,
   type UrlRepositorySuggestion,
 } from "./source-validators";
+import { unusedMultimedia } from "./unused-multimedia.util";
 
 /** Which suggestion is currently under review in the GEDCOM editor dialog,
  * and the source it applies to -- a source can have more than one
@@ -109,6 +110,10 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
     }
     return result;
   });
+
+  readonly unusedMultimedia = computed(() =>
+    unusedMultimedia(this.ancestryDatabase()),
+  );
 
   // The suggestion currently being reviewed in the GEDCOM editor dialog, if
   // any.

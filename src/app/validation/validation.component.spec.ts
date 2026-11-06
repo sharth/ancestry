@@ -6,6 +6,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AncestryService } from "../../database/ancestry.service";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
+import { newGedcomMultimedia } from "../../gedcom/gedcomMultimedia";
+import { newGedcomMultimediaLink } from "../../gedcom/gedcomMultimediaLink";
 import { newGedcomRepository } from "../../gedcom/gedcomRepository";
 import { newGedcomRepositoryLink } from "../../gedcom/gedcomRepositoryLink";
 import { newGedcomSource } from "../../gedcom/gedcomSource";
@@ -247,5 +249,33 @@ describe("ValidationComponent sticky header", () => {
         "sticky",
       );
     }
+  });
+});
+
+describe("ValidationComponent unused multimedia", () => {
+  it("links to each multimedia that nothing links to", async () => {
+    const ancestryDatabase = signal(
+      newGedcomDatabase({
+        multimedias: {
+          "@M1@": newGedcomMultimedia({ xref: "@M1@", title: "Used photo" }),
+          "@M2@": newGedcomMultimedia({ xref: "@M2@", title: "Orphan photo" }),
+        },
+        sources: {
+          "@S1@": newGedcomSource({
+            xref: "@S1@",
+            multimediaLinks: [newGedcomMultimediaLink({ xref: "@M1@" })],
+          }),
+        },
+      }),
+    );
+    await render(ValidationComponent, {
+      providers: [provideRouter([])],
+      bindings: [inputBinding("ancestryDatabase", ancestryDatabase)],
+      waitForStableOnRender: true,
+    });
+
+    const link = await screen.findByRole("link", { name: "Orphan photo" });
+    expect(link.getAttribute("href")).toBe("/multimedia/@M2@");
+    expect(screen.queryByRole("link", { name: "Used photo" })).toBeNull();
   });
 });
