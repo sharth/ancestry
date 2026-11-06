@@ -10,3 +10,16 @@
 .working-set-tabs .tab-list {
   overflow-x: auto;
 }
+
+/* Keep the tab bar in view while the editor scrolls. The dialog is the
+   scroll container, and a sticky element sticks inside its padding, so
+   the bar reaches up over the dialog's 1em padding (top/padding/margin)
+   to keep scrolled content from showing through above it. */
+.working-set-tabs {
+  position: sticky;
+  top: -1em;
+  margin-top: -1em;
+  padding-top: 1em;
+  z-index: 1020; /* Bootstrap's sticky z-index, above floating labels */
+  background-color: var(--bs-body-bg);
+}
