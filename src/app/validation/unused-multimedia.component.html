@@ -1,0 +1,26 @@
+<h2 class="mt-4">Unused multimedia</h2>
+@if (unusedMultimedia().length === 0) {
+  <p>Every multimedia object is linked from at least one place.</p>
+} @else {
+  <p>Nothing in the file links to these multimedia objects.</p>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Multimedia</th>
+        <th>File</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (multimedia of unusedMultimedia(); track multimedia.xref) {
+        <tr>
+          <td>
+            <a [routerLink]="['/multimedia', multimedia.xref]">
+              {{ multimedia.title || multimedia.filePath || multimedia.xref }}
+            </a>
+          </td>
+          <td>{{ multimedia.filePath }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

@@ -26,6 +26,7 @@ import {
   type MergeRepositoryLinksSuggestion,
   type UrlRepositorySuggestion,
 } from "./source-validators";
+import { UnusedMultimediaComponent } from "./unused-multimedia.component";
 
 /** Which suggestion is currently under review in the GEDCOM editor dialog,
  * and the source it applies to -- a source can have more than one
@@ -51,7 +52,12 @@ interface TableRow {
 
 @Component({
   selector: "app-validation",
-  imports: [RouterModule, GedcomEditorDialogComponent, GedcomDiffComponent],
+  imports: [
+    RouterModule,
+    GedcomEditorDialogComponent,
+    GedcomDiffComponent,
+    UnusedMultimediaComponent,
+  ],
   templateUrl: "./validation.component.html",
   styleUrl: "./validation.component.css",
 })
