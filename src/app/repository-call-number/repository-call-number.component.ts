@@ -5,8 +5,8 @@ import { extractUrls } from "../validation/source-url.util";
 /** A repository call number (CALN). Rendered as a link when the whole call
  * number is an http(s) URL, and as plain text otherwise. The URL comes from
  * the GEDCOM file, so it's treated as semi-untrusted: only http/https
- * schemes without a username or password are linked, it opens in a new tab with no opener or referrer, and
- * it's marked nofollow. */
+ * schemes without a username or password are linked, it opens in a new tab
+ * with no opener or referrer, and it's marked nofollow. */
 @Component({
   selector: "app-repository-call-number",
   template: `
