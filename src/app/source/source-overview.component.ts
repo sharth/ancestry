@@ -35,6 +35,7 @@ export class SourceOverviewComponent {
           xref: multimediaLink.xref,
           // The link's TITL overrides the multimedia record's own title.
           title: multimediaLink.title || multimedia?.title,
+          crop: multimediaLink.crop,
         };
       }),
       repositoryCitations: source.repositoryLinks.map((repositoryLink) => ({
