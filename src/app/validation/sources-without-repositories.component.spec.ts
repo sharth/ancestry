@@ -7,6 +7,7 @@ import {
   newGedcomDatabase,
   type GedcomDatabase,
 } from "../../gedcom/gedcomDatabase";
+import { newGedcomRepository } from "../../gedcom/gedcomRepository";
 import { newGedcomRepositoryLink } from "../../gedcom/gedcomRepositoryLink";
 import { newGedcomSource } from "../../gedcom/gedcomSource";
 import { SourcesWithoutRepositoriesComponent } from "./sources-without-repositories.component";
@@ -63,5 +64,32 @@ describe("SourcesWithoutRepositoriesComponent", () => {
     const link = screen.getByRole("link", { name: "Orphan" });
     expect(link.getAttribute("href")).toBe("/source/@S1@");
     expect(screen.getByText("No repo")).toBeTruthy();
+  });
+
+  it("suggests a repository for each URL in a source without one", async () => {
+    await renderLinkNames(
+      newGedcomDatabase({
+        repositories: {
+          "@R1@": newGedcomRepository({
+            xref: "@R1@",
+            name: "FamilySearch",
+          }),
+        },
+        sources: {
+          "@S1@": newGedcomSource({
+            xref: "@S1@",
+            abbr: "Census",
+            title: "Census https://www.familysearch.org/ark:/61903/1:1:X",
+            text: "See https://www.newspapers.com/clip/1/",
+          }),
+        },
+      }),
+    );
+    const existing = screen.getByRole("link", { name: "FamilySearch" });
+    expect(existing.getAttribute("href")).toBe("/repository/@R1@");
+    expect(screen.getByText(/New repository "newspapers.com"/)).toBeTruthy();
+    expect(
+      screen.getByText("(https://www.newspapers.com/clip/1/)"),
+    ).toBeTruthy();
   });
 });

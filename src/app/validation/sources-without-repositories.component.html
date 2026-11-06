@@ -2,23 +2,47 @@
 @if (sourcesWithoutRepositories().length === 0) {
   <p>Every source cites at least one repository.</p>
 } @else {
-  <p>These sources don't cite a repository.</p>
+  <p>
+    These sources don't cite a repository. Where a source's text contains a URL,
+    the repository it suggests is listed alongside.
+  </p>
   <table class="table table-striped">
     <thead>
       <tr>
         <th>Source</th>
         <th>Title</th>
+        <th>Suggested repositories</th>
       </tr>
     </thead>
     <tbody>
-      @for (source of sourcesWithoutRepositories(); track source.xref) {
+      @for (row of sourcesWithoutRepositories(); track row.source.xref) {
         <tr>
           <td>
-            <a [routerLink]="['/source', source.xref]">
-              {{ source.abbr || source.xref }}
+            <a [routerLink]="['/source', row.source.xref]">
+              {{ row.source.abbr || row.source.xref }}
             </a>
           </td>
-          <td>{{ source.title }}</td>
+          <td>{{ row.source.title }}</td>
+          <td>
+            @if (row.suggestions.length > 0) {
+              <ul class="list-unstyled mb-0">
+                @for (suggestion of row.suggestions; track $index) {
+                  <li>
+                    @if (suggestion.matchedRepository; as repository) {
+                      <a [routerLink]="['/repository', repository.xref]">
+                        {{ repository.name || repository.xref }}
+                      </a>
+                    } @else {
+                      New repository "{{ suggestion.suggestedName }}"
+                    }
+                    <span class="text-body-secondary">
+                      ({{ suggestion.url }})
+                    </span>
+                  </li>
+                }
+              </ul>
+            }
+          </td>
         </tr>
       }
     </tbody>
