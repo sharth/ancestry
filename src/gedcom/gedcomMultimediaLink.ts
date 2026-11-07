@@ -1,4 +1,5 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
+import type { GedcomMultimedia } from "./gedcomMultimedia";
 import {
   filterTrivialGedcomRecords,
   newGedcomRecord,
@@ -27,6 +28,18 @@ export function newGedcomMultimediaLink(
     crop: undefined,
     ...fieldsToUpdate,
   };
+}
+
+// The name to show for a multimedia link. The link's own TITL overrides the
+// multimedia record's title; failing both, the file's name, then the xref.
+export function multimediaLinkTitle(
+  multimediaLink: Pick<GedcomMultimediaLink, "xref" | "title">,
+  multimedia: GedcomMultimedia | undefined,
+): string {
+  const fileName = multimedia?.filePath.split(/[\\/]/).pop();
+  return (
+    multimediaLink.title || multimedia?.title || fileName || multimediaLink.xref
+  );
 }
 
 function parseGedcomMultimediaCropInteger(

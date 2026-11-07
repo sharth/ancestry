@@ -15,6 +15,7 @@ import { RouterModule } from "@angular/router";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import {
+  multimediaLinkTitle,
   newGedcomMultimediaLink,
   type GedcomMultimediaCrop,
   type GedcomMultimediaLink,
@@ -37,6 +38,7 @@ export class InputMultimediaLinksComponent implements FormValueControl<
   readonly workingDatabase = input.required<GedcomDatabase>();
   readonly value = model<GedcomMultimediaLink[]>([]);
   readonly form = form(this.value);
+  readonly multimediaLinkTitle = multimediaLinkTitle;
 
   readonly multimedias = computed(() =>
     Object.values(this.workingDatabase().multimedias),

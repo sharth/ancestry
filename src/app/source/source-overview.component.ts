@@ -2,6 +2,7 @@ import { Component, computed, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
+import { multimediaLinkTitle } from "../../gedcom/gedcomMultimediaLink";
 import { MultimediaPreviewComponent } from "../multimedia/multimedia-preview.component";
 import { RepositoryCallNumberComponent } from "../repository-call-number/repository-call-number.component";
 
@@ -33,8 +34,7 @@ export class SourceOverviewComponent {
         return {
           multimedia,
           xref: multimediaLink.xref,
-          // The link's TITL overrides the multimedia record's own title.
-          title: multimediaLink.title || multimedia?.title,
+          title: multimediaLinkTitle(multimediaLink, multimedia),
         };
       }),
       repositoryCitations: source.repositoryLinks.map((repositoryLink) => ({

@@ -13,10 +13,10 @@
             (click)="removeMultimediaLink($index)"
           ></button>
           {{
-            multimediaLink.title().value() ||
-              media?.title ||
-              mediaXref ||
-              "Untitled"
+            multimediaLinkTitle(
+              { xref: mediaXref, title: multimediaLink.title().value() },
+              media
+            ) || "Untitled"
           }}
         </summary>
         <div class="d-flex gap-2 align-items-center mb-2">
