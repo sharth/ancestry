@@ -16,39 +16,13 @@
   [workingDatabase]="workingDatabase()"
 ></app-input-individual-facts>
 
-<details [open]="true">
-  <summary>
-    Families ({{
-      value().childOfFamilyXrefs.length + value().parentOfFamilyXrefs.length
-    }})
-  </summary>
-  @for (xref of value().childOfFamilyXrefs; track xref) {
-    <div class="mb-2">
-      <button
-        type="button"
-        class="btn btn-sm btn-outline-secondary"
-        [disabled]="!gedcomEditor"
-        (click)="gedcomEditor?.openFamily(xref)"
-        title="Edit this family in a session tab"
-      >
-        <i class="bi bi-people me-1"></i>{{ childOfFamilyLabel(xref) }}
-      </button>
-    </div>
-  }
-  @for (xref of value().parentOfFamilyXrefs; track xref) {
-    <div class="mb-2">
-      <button
-        type="button"
-        class="btn btn-sm btn-outline-secondary"
-        [disabled]="!gedcomEditor"
-        (click)="gedcomEditor?.openFamily(xref)"
-        title="Edit this family in a session tab"
-      >
-        <i class="bi bi-people me-1"></i>{{ parentOfFamilyLabel(xref) }}
-      </button>
-    </div>
-  }
-</details>
+@if (database(); as database) {
+  <app-input-individual-families
+    [formField]="database"
+    [workingDatabase]="workingDatabase()"
+    [individualXref]="value().xref"
+  ></app-input-individual-families>
+}
 
 <app-input-notes
   [open]="true"

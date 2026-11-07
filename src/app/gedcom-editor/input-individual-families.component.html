@@ -1,0 +1,128 @@
+<details [open]="true">
+  <summary>
+    Families ({{
+      (individual()?.childOfFamilyXrefs?.length ?? 0) +
+        (individual()?.parentOfFamilyXrefs?.length ?? 0)
+    }})
+  </summary>
+  @for (familyXref of individual()?.childOfFamilyXrefs; track familyXref) {
+    <div class="d-flex gap-2 align-items-center mb-2">
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-danger bi-trash"
+        aria-label="Remove from family"
+        title="Remove this person from the family"
+        (click)="removeFromFamily(familyXref)"
+      ></button>
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-secondary"
+        [disabled]="!gedcomEditor"
+        (click)="gedcomEditor?.openFamily(familyXref)"
+        title="Edit this family in a session tab"
+      >
+        <i class="bi bi-people me-1"></i>{{ childOfFamilyLabel(familyXref) }}
+      </button>
+    </div>
+  }
+  @for (familyXref of individual()?.parentOfFamilyXrefs; track familyXref) {
+    @if (form.families[familyXref]; as family) {
+      <details [open]="true">
+        <summary>
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-danger bi-trash"
+            aria-label="Remove from family"
+            title="Remove this person from the family"
+            (click)="removeFromFamily(familyXref)"
+          ></button>
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary"
+            [disabled]="!gedcomEditor"
+            (click)="
+              $event.preventDefault(); gedcomEditor?.openFamily(familyXref)
+            "
+            title="Edit this family in a session tab"
+          >
+            <i class="bi bi-people me-1"></i
+            >{{ parentOfFamilyLabel(familyXref) }}
+          </button>
+        </summary>
+        <app-input-individual-xref
+          label="Spouse"
+          class="d-block mb-2"
+          [workingDatabase]="workingDatabase()"
+          [value]="spouseOf(familyXref)"
+          (valueChange)="changeSpouse(familyXref, $event)"
+        ></app-input-individual-xref>
+        <details [open]="true">
+          <summary>Children ({{ family.childXrefs().value().length }})</summary>
+          @for (childXref of family.childXrefs().value(); track childXref) {
+            <div class="d-flex gap-2 align-items-center mb-2">
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-danger bi-trash"
+                aria-label="Remove child"
+                (click)="removeChild(familyXref, childXref)"
+              ></button>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary"
+                [disabled]="!gedcomEditor"
+                (click)="gedcomEditor?.openIndividual(childXref)"
+                title="Edit this individual in a session tab"
+              >
+                <i class="bi bi-person me-1"></i
+                >{{ individualLabel(childXref) }} ({{ childXref }})
+              </button>
+            </div>
+          }
+          @if (addingChildTo() === familyXref) {
+            <app-input-individual-xref
+              label="Child"
+              class="d-block mb-2"
+              [workingDatabase]="workingDatabase()"
+              [value]="''"
+              (valueChange)="addChild(familyXref, $event)"
+            ></app-input-individual-xref>
+          } @else {
+            <div
+              class="details-lookalike"
+              tabindex="0"
+              (click)="addingChildTo.set(familyXref)"
+              (keydown.enter)="addingChildTo.set(familyXref)"
+            >
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-primary bi-plus"
+                aria-label="Add child"
+                (click)="$event.preventDefault()"
+              ></button>
+              Add child
+            </div>
+          }
+        </details>
+        <app-input-family-facts
+          [open]="true"
+          [formField]="family.facts"
+          [workingDatabase]="workingDatabase()"
+        ></app-input-family-facts>
+      </details>
+    }
+  }
+  <div
+    class="details-lookalike"
+    tabindex="0"
+    (click)="addSpouseFamily()"
+    (keydown.enter)="addSpouseFamily()"
+  >
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-primary bi-plus"
+      aria-label="Add family"
+      (click)="$event.preventDefault()"
+    ></button>
+    Add a family with this person as a spouse
+  </div>
+</details>
