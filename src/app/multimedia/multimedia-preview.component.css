@@ -1,0 +1,10 @@
+.crop-container {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+}
+
+.crop-container img {
+  position: absolute;
+  max-width: none;
+}
