@@ -1,5 +1,6 @@
 import { inputBinding, signal } from "@angular/core";
 import type { ComponentFixture } from "@angular/core/testing";
+import { By } from "@angular/platform-browser";
 import { provideRouter } from "@angular/router";
 import { render } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -10,6 +11,7 @@ import { newGedcomMultimediaLink } from "../../gedcom/gedcomMultimediaLink";
 import { newGedcomRepository } from "../../gedcom/gedcomRepository";
 import { newGedcomRepositoryLink } from "../../gedcom/gedcomRepositoryLink";
 import { newGedcomSource } from "../../gedcom/gedcomSource";
+import { MultimediaPreviewComponent } from "../multimedia/multimedia-preview.component";
 import { SourceOverviewComponent } from "./source-overview.component";
 
 describe("SourceOverviewComponent", () => {
@@ -33,6 +35,7 @@ describe("SourceOverviewComponent", () => {
                     newGedcomMultimediaLink({
                       xref: "@M1@",
                       title: "Scan of record",
+                      crop: { top: 10, left: 20, height: 30, width: 40 },
                     }),
                     newGedcomMultimediaLink({ xref: "@M2@" }),
                   ],
@@ -99,6 +102,20 @@ describe("SourceOverviewComponent", () => {
     expect(link?.textContent.trim()).toBe("Scan of record");
     expect(link?.getAttribute("href")).toBe("/multimedia/@M1@");
     expect(cards[0]?.querySelector("app-multimedia-preview")).toBeTruthy();
+  });
+
+  it("passes each link's crop to its preview", () => {
+    const [cropped, uncropped] = component.vm()?.multimediaLinks ?? [];
+    expect(cropped?.crop).toEqual({ top: 10, left: 20, height: 30, width: 40 });
+    expect(uncropped?.crop).toBeUndefined();
+    const previews = fixture.debugElement.queryAll(
+      By.directive(MultimediaPreviewComponent),
+    );
+    expect(
+      previews.map((preview) =>
+        (preview.componentInstance as MultimediaPreviewComponent).crop(),
+      ),
+    ).toEqual([{ top: 10, left: 20, height: 30, width: 40 }, undefined]);
   });
 
   it("includes the repository citation in the view model", () => {

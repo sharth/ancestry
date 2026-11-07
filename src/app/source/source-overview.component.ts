@@ -35,6 +35,7 @@ export class SourceOverviewComponent {
           multimedia,
           xref: multimediaLink.xref,
           title: multimediaLinkTitle(multimediaLink, multimedia),
+          crop: multimediaLink.crop,
         };
       }),
       repositoryCitations: source.repositoryLinks.map((repositoryLink) => ({
