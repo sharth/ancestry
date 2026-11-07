@@ -33,7 +33,7 @@
                 type="button"
                 class="btn btn-sm btn-outline-primary"
                 (click)="
-                  reviewUrlSuggestion(row.source, urlSuggestion);
+                  reviewUrlSuggestion(row.source, [urlSuggestion]);
                   editDialog.showModal()
                 "
               >
@@ -49,7 +49,7 @@
               <button
                 type="button"
                 class="btn btn-sm btn-outline-success"
-                (click)="submitUrlSuggestion(row.source, urlSuggestion)"
+                (click)="submitUrlSuggestion(row.source, [urlSuggestion])"
               >
                 Submit changes as proposed
               </button>
@@ -58,7 +58,7 @@
         </div>
         <div class="diff-content" role="cell">
           @for (
-            d of differencesForUrlSuggestion(row.source, urlSuggestion);
+            d of differencesForUrlSuggestion(row.source, [urlSuggestion]);
             track $index
           ) {
             <app-gedcom-diff
@@ -142,10 +142,10 @@
 <app-sources-without-repositories
   [ancestryDatabase]="ancestryDatabase()"
   (reviewUrlSuggestion)="
-    reviewUrlSuggestion($event.source, $event.suggestion);
+    reviewUrlSuggestion($event.source, $event.suggestions);
     editDialog.showModal()
   "
-  (submitUrlSuggestion)="submitUrlSuggestion($event.source, $event.suggestion)"
+  (submitUrlSuggestion)="submitUrlSuggestion($event.source, $event.suggestions)"
 />
 
 <app-gedcom-editor-dialog

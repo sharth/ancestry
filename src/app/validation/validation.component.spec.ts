@@ -58,11 +58,13 @@ describe("ValidationComponent", () => {
   });
 
   it("lists a warning with a button to review the suggested fix", async () => {
-    expect(await screen.findByText(/Create repository/)).toBeTruthy();
+    expect(
+      await screen.findByText(/Open editor with proposed changes/),
+    ).toBeTruthy();
   });
 
   it("shows the before and proposed-after GEDCOM for the suggestion", async () => {
-    await screen.findByText(/Create repository/);
+    await screen.findByText(/Open editor with proposed changes/);
     const text = (fixture.nativeElement as HTMLElement).textContent;
     expect(text).toContain("1 TEXT Found at https://example.com/record");
     expect(text).toContain("1 REPO @R0@");
@@ -70,7 +72,7 @@ describe("ValidationComponent", () => {
   });
 
   it("shows a source without repositories' suggestion only in its own section", async () => {
-    await screen.findByText(/Create repository/);
+    await screen.findByText(/Open editor with proposed changes/);
     const page = fixture.nativeElement as HTMLElement;
     expect(page.querySelectorAll(".diff-section")).toHaveLength(0);
     expect(
@@ -89,13 +91,12 @@ describe("ValidationComponent", () => {
   // actually gets written to disk. This confirms the preview goes through
   // the same diff the save path uses.
   it("builds the preview from AncestryService.compareGedcomDatabase", async () => {
-    await screen.findByText(/Create repository/);
+    await screen.findByText(/Open editor with proposed changes/);
     const compareSpy = vi.spyOn(ancestryService, "compareGedcomDatabase");
 
-    const differences = component.differencesForUrlSuggestion(
-      source,
+    const differences = component.differencesForUrlSuggestion(source, [
       urlSuggestion,
-    );
+    ]);
 
     expect(compareSpy).toHaveBeenCalled();
     expect(differences.some((d) => d.updatedGedcomRecord?.tag === "SOUR")).toBe(
@@ -109,7 +110,7 @@ describe("ValidationComponent", () => {
       .spyOn(ancestryService, "updateGedcomDatabase")
       .mockResolvedValue(undefined);
 
-    await component.submitUrlSuggestion(source, urlSuggestion);
+    await component.submitUrlSuggestion(source, [urlSuggestion]);
 
     expect(updateGedcomDatabaseSpy).toHaveBeenCalledTimes(1);
     const savedDatabase = updateGedcomDatabaseSpy.mock.calls[0]?.[0];
@@ -125,7 +126,7 @@ describe("ValidationComponent", () => {
       "updateGedcomDatabase",
     );
 
-    await component.submitUrlSuggestion(source, urlSuggestion);
+    await component.submitUrlSuggestion(source, [urlSuggestion]);
 
     expect(updateGedcomDatabaseSpy).not.toHaveBeenCalled();
   });

@@ -6,15 +6,16 @@ import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
 import type { GedcomSource } from "../../gedcom/gedcomSource";
 import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
-import { applyUrlSuggestion } from "./apply-url-suggestion.util";
+import { applyUrlSuggestions } from "./apply-url-suggestion.util";
 import {
   sourceValidators,
   type UrlRepositorySuggestion,
 } from "./source-validators";
 
-export interface SourceUrlSuggestion {
+/** Every URL suggestion for one source, applied together as one edit. */
+export interface SourceUrlSuggestions {
   source: GedcomSource;
-  suggestion: UrlRepositorySuggestion;
+  suggestions: UrlRepositorySuggestion[];
 }
 
 /** Lists the sources that don't cite any repository (no REPO link), so
@@ -32,33 +33,36 @@ export class SourcesWithoutRepositoriesComponent {
 
   readonly ancestryDatabase = input.required<GedcomDatabase>();
 
-  readonly reviewUrlSuggestion = output<SourceUrlSuggestion>();
-  readonly submitUrlSuggestion = output<SourceUrlSuggestion>();
+  readonly reviewUrlSuggestion = output<SourceUrlSuggestions>();
+  readonly submitUrlSuggestion = output<SourceUrlSuggestions>();
 
   readonly sourcesWithoutRepositories = computed(() =>
     Object.values(this.ancestryDatabase().sources)
       .filter((source) => source.repositoryLinks.length === 0)
-      .map((source) => ({
-        source,
-        suggestions: sourceValidators(source, this.ancestryDatabase())
-          .warnings.flatMap((warning) => warning.urlSuggestion ?? [])
-          .map((suggestion) => ({
-            suggestion,
-            differences: this.differences(source, suggestion),
-          })),
-      })),
+      .map((source) => {
+        const suggestions = sourceValidators(
+          source,
+          this.ancestryDatabase(),
+        ).warnings.flatMap((warning) => warning.urlSuggestion ?? []);
+        return {
+          source,
+          suggestions,
+          differences:
+            suggestions.length > 0 ? this.differences(source, suggestions) : [],
+        };
+      }),
   );
 
-  // The records that would actually change on disk if `suggestion` is
+  // The records that would actually change on disk if `suggestions` are
   // applied and saved, built from the same diff the save path uses.
   private differences(
     source: GedcomSource,
-    suggestion: UrlRepositorySuggestion,
+    suggestions: UrlRepositorySuggestion[],
   ) {
-    const { database } = applyUrlSuggestion(
+    const { database } = applyUrlSuggestions(
       this.ancestryDatabase(),
       source,
-      suggestion,
+      suggestions,
     );
     return this.ancestryService
       .compareGedcomDatabase(database)

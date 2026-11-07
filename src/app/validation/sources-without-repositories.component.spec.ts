@@ -12,7 +12,7 @@ import { newGedcomRepositoryLink } from "../../gedcom/gedcomRepositoryLink";
 import { newGedcomSource } from "../../gedcom/gedcomSource";
 import {
   SourcesWithoutRepositoriesComponent,
-  type SourceUrlSuggestion,
+  type SourceUrlSuggestions,
 } from "./sources-without-repositories.component";
 
 describe("SourcesWithoutRepositoriesComponent", () => {
@@ -96,13 +96,13 @@ describe("SourcesWithoutRepositoriesComponent", () => {
     ).toBeTruthy();
   });
 
-  it("hands a suggestion back to review or submit", async () => {
+  it("hands every suggestion for a source back as one edit", async () => {
     const source = newGedcomSource({
       xref: "@S1@",
-      text: "https://www.newspapers.com/clip/1/",
+      text: "https://www.newspapers.com/clip/1/\nhttps://www.newspapers.com/clip/2/",
     });
-    const reviewed: SourceUrlSuggestion[] = [];
-    const submitted: SourceUrlSuggestion[] = [];
+    const reviewed: SourceUrlSuggestions[] = [];
+    const submitted: SourceUrlSuggestions[] = [];
     await render(SourcesWithoutRepositoriesComponent, {
       providers: [provideRouter([])],
       bindings: [
@@ -110,29 +110,33 @@ describe("SourcesWithoutRepositoriesComponent", () => {
           "ancestryDatabase",
           signal(newGedcomDatabase({ sources: { [source.xref]: source } })),
         ),
-        outputBinding<SourceUrlSuggestion>("reviewUrlSuggestion", (e) =>
+        outputBinding<SourceUrlSuggestions>("reviewUrlSuggestion", (e) =>
           reviewed.push(e),
         ),
-        outputBinding<SourceUrlSuggestion>("submitUrlSuggestion", (e) =>
+        outputBinding<SourceUrlSuggestions>("submitUrlSuggestion", (e) =>
           submitted.push(e),
         ),
       ],
       waitForStableOnRender: true,
     });
 
-    screen.getByRole("button", { name: /Create repository/ }).click();
+    // One pair of buttons for the source, not one per URL.
+    screen
+      .getByRole("button", { name: "Open editor with proposed changes" })
+      .click();
     screen.getByRole("button", { name: "Submit changes as proposed" }).click();
 
     for (const events of [reviewed, submitted]) {
       expect(events).toHaveLength(1);
       expect(events[0]?.source).toBe(source);
-      expect(events[0]?.suggestion.url).toBe(
+      expect(events[0]?.suggestions.map((s) => s.url)).toEqual([
         "https://www.newspapers.com/clip/1/",
-      );
+        "https://www.newspapers.com/clip/2/",
+      ]);
     }
   });
 
-  it("shows the before and proposed-after GEDCOM for each suggestion", async () => {
+  it("shows the before and proposed-after GEDCOM for the edit", async () => {
     await renderLinkNames(
       newGedcomDatabase({
         sources: {
