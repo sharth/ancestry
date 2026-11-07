@@ -78,6 +78,16 @@ describe("SourceOverviewComponent", () => {
     expect(multimediaLink?.multimedia?.filePath).toBe("scan.jpg");
   });
 
+  it("shows a card with a preview for each multimedia link", () => {
+    const element = fixture.nativeElement as HTMLElement;
+    const cards = element.querySelectorAll(".card");
+    expect(cards).toHaveLength(1);
+    const link = cards[0]?.querySelector(".card-header a");
+    expect(link?.textContent.trim()).toBe("Scan of record");
+    expect(link?.getAttribute("href")).toBe("/multimedia/@M1@");
+    expect(cards[0]?.querySelector("app-multimedia-preview")).toBeTruthy();
+  });
+
   it("includes the repository citation in the view model", () => {
     const [repositoryCitation] = component.vm()?.repositoryCitations ?? [];
     expect(repositoryCitation?.repositoryXref).toBe("@R1@");
