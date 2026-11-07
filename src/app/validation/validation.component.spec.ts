@@ -94,7 +94,7 @@ describe("ValidationComponent", () => {
     await screen.findByText(/Open editor with proposed changes/);
     const compareSpy = vi.spyOn(ancestryService, "compareGedcomDatabase");
 
-    const differences = component.differencesForUrlSuggestion(source, [
+    const differences = component.differencesForUrlSuggestions(source, [
       urlSuggestion,
     ]);
 
@@ -104,20 +104,20 @@ describe("ValidationComponent", () => {
     );
   });
 
-  it("submitUrlSuggestion applies the suggestion and saves it directly", async () => {
+  it("submitUrlSuggestions applies the suggestion and saves it directly", async () => {
     vi.spyOn(ancestryService, "requestWritePermission").mockResolvedValue(true);
     const updateGedcomDatabaseSpy = vi
       .spyOn(ancestryService, "updateGedcomDatabase")
       .mockResolvedValue(undefined);
 
-    await component.submitUrlSuggestion(source, [urlSuggestion]);
+    await component.submitUrlSuggestions(source, [urlSuggestion]);
 
     expect(updateGedcomDatabaseSpy).toHaveBeenCalledTimes(1);
     const savedDatabase = updateGedcomDatabaseSpy.mock.calls[0]?.[0];
     expect(savedDatabase?.repositories["@R0@"]).toBeDefined();
   });
 
-  it("submitUrlSuggestion does nothing when write permission is denied", async () => {
+  it("submitUrlSuggestions does nothing when write permission is denied", async () => {
     vi.spyOn(ancestryService, "requestWritePermission").mockResolvedValue(
       false,
     );
@@ -126,7 +126,7 @@ describe("ValidationComponent", () => {
       "updateGedcomDatabase",
     );
 
-    await component.submitUrlSuggestion(source, [urlSuggestion]);
+    await component.submitUrlSuggestions(source, [urlSuggestion]);
 
     expect(updateGedcomDatabaseSpy).not.toHaveBeenCalled();
   });

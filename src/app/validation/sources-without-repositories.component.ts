@@ -33,8 +33,8 @@ export class SourcesWithoutRepositoriesComponent {
 
   readonly ancestryDatabase = input.required<GedcomDatabase>();
 
-  readonly reviewUrlSuggestion = output<SourceUrlSuggestions>();
-  readonly submitUrlSuggestion = output<SourceUrlSuggestions>();
+  readonly reviewUrlSuggestions = output<SourceUrlSuggestions>();
+  readonly submitUrlSuggestions = output<SourceUrlSuggestions>();
 
   readonly sourcesWithoutRepositories = computed(() =>
     Object.values(this.ancestryDatabase().sources)

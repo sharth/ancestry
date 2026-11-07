@@ -110,10 +110,10 @@ describe("SourcesWithoutRepositoriesComponent", () => {
           "ancestryDatabase",
           signal(newGedcomDatabase({ sources: { [source.xref]: source } })),
         ),
-        outputBinding<SourceUrlSuggestions>("reviewUrlSuggestion", (e) =>
+        outputBinding<SourceUrlSuggestions>("reviewUrlSuggestions", (e) =>
           reviewed.push(e),
         ),
-        outputBinding<SourceUrlSuggestions>("submitUrlSuggestion", (e) =>
+        outputBinding<SourceUrlSuggestions>("submitUrlSuggestions", (e) =>
           submitted.push(e),
         ),
       ],

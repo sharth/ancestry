@@ -46,7 +46,7 @@
                   type="button"
                   class="btn btn-sm btn-outline-primary"
                   (click)="
-                    reviewUrlSuggestion.emit({
+                    reviewUrlSuggestions.emit({
                       source: row.source,
                       suggestions: row.suggestions,
                     })
@@ -58,7 +58,7 @@
                   type="button"
                   class="btn btn-sm btn-outline-success"
                   (click)="
-                    submitUrlSuggestion.emit({
+                    submitUrlSuggestions.emit({
                       source: row.source,
                       suggestions: row.suggestions,
                     })

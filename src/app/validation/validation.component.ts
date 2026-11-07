@@ -179,7 +179,7 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
     return tabs;
   });
 
-  reviewUrlSuggestion(
+  reviewUrlSuggestions(
     source: GedcomSource,
     suggestions: UrlRepositorySuggestion[],
   ) {
@@ -195,7 +195,7 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
 
   // Applies a suggested fix directly and saves it, without opening the
   // editor dialog for further review.
-  async submitUrlSuggestion(
+  async submitUrlSuggestions(
     source: GedcomSource,
     suggestions: UrlRepositorySuggestion[],
   ) {
@@ -242,7 +242,7 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
   // not just the source being fixed. Computed fresh each time rather than
   // reusing `reviewDatabase` so it stays correct even when nothing has been
   // selected for review yet.
-  differencesForUrlSuggestion(
+  differencesForUrlSuggestions(
     source: GedcomSource,
     suggestions: UrlRepositorySuggestion[],
   ): {
