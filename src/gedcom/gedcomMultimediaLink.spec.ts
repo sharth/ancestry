@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
+import { newGedcomMultimedia } from "./gedcomMultimedia";
 import {
+  multimediaLinkTitle,
+  newGedcomMultimediaLink,
   parseGedcomMultimediaLink,
   serializeGedcomMultimediaLink,
 } from "./gedcomMultimediaLink";
@@ -60,5 +63,46 @@ describe("gedcomMultimediaLink", () => {
         parseGedcomMultimediaLink(gedcomRecordWithCrop),
       ),
     ).toEqual(gedcomRecordWithCrop);
+  });
+});
+
+describe("multimediaLinkTitle", () => {
+  const multimedia = newGedcomMultimedia({
+    xref: "@M1@",
+    title: "Census page 12",
+    filePath: "census/1910/page-12.png",
+  });
+
+  it("prefers the link's own title", () => {
+    expect(
+      multimediaLinkTitle(
+        newGedcomMultimediaLink({ xref: "@M1@", title: "Hale household" }),
+        multimedia,
+      ),
+    ).toBe("Hale household");
+  });
+
+  it("falls back to the multimedia record's title", () => {
+    expect(
+      multimediaLinkTitle(
+        newGedcomMultimediaLink({ xref: "@M1@" }),
+        multimedia,
+      ),
+    ).toBe("Census page 12");
+  });
+
+  it("falls back to the file name, then the xref", () => {
+    const link = newGedcomMultimediaLink({ xref: "@M1@" });
+    expect(multimediaLinkTitle(link, { ...multimedia, title: "" })).toBe(
+      "page-12.png",
+    );
+    expect(
+      multimediaLinkTitle(link, {
+        ...multimedia,
+        title: "",
+        filePath: "C:\\scans\\page-12.png",
+      }),
+    ).toBe("page-12.png");
+    expect(multimediaLinkTitle(link, undefined)).toBe("@M1@");
   });
 });
