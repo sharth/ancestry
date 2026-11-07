@@ -4,7 +4,11 @@ import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomRepository } from "../../gedcom/gedcomRepository";
 import { newGedcomRepositoryLink } from "../../gedcom/gedcomRepositoryLink";
 import { newGedcomSource } from "../../gedcom/gedcomSource";
-import { applyUrlSuggestion } from "./apply-url-suggestion.util";
+import {
+  applyUrlSuggestion,
+  applyUrlSuggestions,
+} from "./apply-url-suggestion.util";
+import type { UrlRepositorySuggestion } from "./source-validators";
 
 describe("applyUrlSuggestion", () => {
   it("links to the matched repository, with the URL as its call number, and strips a standalone URL from the text", () => {
@@ -288,5 +292,64 @@ describe("applyUrlSuggestion", () => {
 
     expect(database.sources[source.xref]?.text).toBe("https://example.com");
     expect(database.sources[source.xref]?.repositoryLinks).toEqual([]);
+  });
+});
+
+describe("applyUrlSuggestions", () => {
+  const suggestion = (url: string): UrlRepositorySuggestion => ({
+    fieldName: "text",
+    url,
+    standalone: true,
+    suggestedName: new URL(url).hostname.replace(/^www\./, ""),
+    matchedRepository: undefined,
+  });
+
+  it("creates one repository for two URLs on the same site", () => {
+    const source = newGedcomSource({
+      xref: "@S1@",
+      text: "https://www.newspapers.com/clip/1/\nhttps://www.newspapers.com/clip/2/",
+    });
+    const { database, createdRepositoryXrefs } = applyUrlSuggestions(
+      newGedcomDatabase({ sources: { [source.xref]: source } }),
+      source,
+      [
+        suggestion("https://www.newspapers.com/clip/1/"),
+        suggestion("https://www.newspapers.com/clip/2/"),
+      ],
+    );
+
+    expect(createdRepositoryXrefs).toEqual(["@R0@"]);
+    expect(Object.keys(database.repositories)).toEqual(["@R0@"]);
+    expect(database.sources[source.xref]?.repositoryLinks).toEqual([
+      {
+        repositoryXref: "@R0@",
+        callNumbers: [
+          "https://www.newspapers.com/clip/1/",
+          "https://www.newspapers.com/clip/2/",
+        ],
+      },
+    ]);
+    expect(database.sources[source.xref]?.text).toBe("");
+  });
+
+  it("creates a repository per site for URLs on different sites", () => {
+    const source = newGedcomSource({
+      xref: "@S1@",
+      text: "https://www.newspapers.com/clip/1/\nhttps://www.ancestry.com/record/2",
+    });
+    const { database, createdRepositoryXrefs } = applyUrlSuggestions(
+      newGedcomDatabase({ sources: { [source.xref]: source } }),
+      source,
+      [
+        suggestion("https://www.newspapers.com/clip/1/"),
+        suggestion("https://www.ancestry.com/record/2"),
+      ],
+    );
+
+    expect(createdRepositoryXrefs).toHaveLength(2);
+    expect(
+      createdRepositoryXrefs.map((xref) => database.repositories[xref]?.name),
+    ).toEqual(["newspapers.com", "ancestry.com"]);
+    expect(database.sources[source.xref]?.repositoryLinks).toHaveLength(2);
   });
 });

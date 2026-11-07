@@ -1,0 +1,88 @@
+<h2 class="mt-4">Sources without repositories</h2>
+@if (sourcesWithoutRepositories().length === 0) {
+  <p>Every source cites at least one repository.</p>
+} @else {
+  <p>
+    These sources don't cite a repository. Where a source's text contains a URL,
+    the repository it suggests is listed alongside.
+  </p>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Source</th>
+        <th>Title</th>
+        <th>Suggested repositories</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of sourcesWithoutRepositories(); track row.source.xref) {
+        <tr>
+          <td>
+            <a [routerLink]="['/source', row.source.xref]">
+              {{ row.source.abbr || row.source.xref }}
+            </a>
+          </td>
+          <td>{{ row.source.title }}</td>
+          <td>
+            @if (row.suggestions.length > 0) {
+              <ul class="list-unstyled mb-1">
+                @for (suggestion of row.suggestions; track $index) {
+                  <li>
+                    @if (suggestion.matchedRepository; as repository) {
+                      <a [routerLink]="['/repository', repository.xref]">
+                        {{ repository.name || repository.xref }}
+                      </a>
+                    } @else {
+                      New repository "{{ suggestion.suggestedName }}"
+                    }
+                    <span class="text-body-secondary">
+                      ({{ suggestion.url }})
+                    </span>
+                  </li>
+                }
+              </ul>
+              <div class="btn-group">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-primary"
+                  (click)="
+                    reviewUrlSuggestions.emit({
+                      source: row.source,
+                      suggestions: row.suggestions,
+                    })
+                  "
+                >
+                  Open editor with proposed changes
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-success"
+                  (click)="
+                    submitUrlSuggestions.emit({
+                      source: row.source,
+                      suggestions: row.suggestions,
+                    })
+                  "
+                >
+                  Submit changes as proposed
+                </button>
+              </div>
+            }
+          </td>
+        </tr>
+        @if (row.differences.length > 0) {
+          <tr>
+            <td colspan="3">
+              @for (d of row.differences; track $index) {
+                <app-gedcom-diff
+                  [oldGedcomRecord]="d.originalGedcomRecord"
+                  [newGedcomRecord]="d.updatedGedcomRecord"
+                />
+              }
+            </td>
+          </tr>
+        }
+      }
+    </tbody>
+  </table>
+}

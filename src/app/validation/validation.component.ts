@@ -20,12 +20,13 @@ import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-edit
 import type { TabInformation } from "../gedcom-editor/gedcom-editor-interface";
 import type { ComponentWithUnsavedChanges } from "../unsaved-changes.guard";
 import { applyMergeRepositoryLinksSuggestion } from "./apply-merge-repository-links-suggestion.util";
-import { applyUrlSuggestion } from "./apply-url-suggestion.util";
+import { applyUrlSuggestions } from "./apply-url-suggestion.util";
 import {
   sourceValidators,
   type MergeRepositoryLinksSuggestion,
   type UrlRepositorySuggestion,
 } from "./source-validators";
+import { SourcesWithoutRepositoriesComponent } from "./sources-without-repositories.component";
 import { UnusedMultimediaComponent } from "./unused-multimedia.component";
 import { UnusedSourcesComponent } from "./unused-sources.component";
 
@@ -34,7 +35,11 @@ import { UnusedSourcesComponent } from "./unused-sources.component";
  * suggestion, so the source's xref alone isn't enough to identify which
  * one is being fixed. */
 type ReviewState =
-  | { kind: "url"; source: GedcomSource; suggestion: UrlRepositorySuggestion }
+  | {
+      kind: "url";
+      source: GedcomSource;
+      suggestions: UrlRepositorySuggestion[];
+    }
   | {
       kind: "merge";
       source: GedcomSource;
@@ -59,6 +64,7 @@ interface TableRow {
     GedcomDiffComponent,
     UnusedMultimediaComponent,
     UnusedSourcesComponent,
+    SourcesWithoutRepositoriesComponent,
   ],
   templateUrl: "./validation.component.html",
   styleUrl: "./validation.component.css",
@@ -104,6 +110,14 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
         });
       }
       for (const warning of sourceScenario.result.warnings) {
+        // A source with no repository at all shows its URL suggestions in
+        // the "Sources without repositories" section instead.
+        if (
+          warning.urlSuggestion !== undefined &&
+          sourceScenario.source.repositoryLinks.length === 0
+        ) {
+          continue;
+        }
         result.push({
           source: sourceScenario.source,
           severity: "Warning",
@@ -136,41 +150,40 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
         state.suggestion,
       );
     }
-    return applyUrlSuggestion(
+    return applyUrlSuggestions(
       this.ancestryDatabase(),
       state.source,
-      state.suggestion,
+      state.suggestions,
     ).database;
   });
 
   // The tabs to hand the editor dialog: the source being reviewed first
-  // (so it's the one shown by default), plus -- when the suggestion creates
-  // a new repository rather than linking to an existing one -- that
+  // (so it's the one shown by default), plus -- when the suggestions create
+  // new repositories rather than linking to existing ones -- each new
   // repository's own tab, so the user sees both without having to go find
   // the new repository themselves.
   readonly reviewTabs = computed<TabInformation[]>(() => {
     const state = this.reviewState();
     if (state === undefined) return [];
     const tabs: TabInformation[] = [{ type: "SOUR", xref: state.source.xref }];
-    if (
-      state.kind === "url" &&
-      state.suggestion.matchedRepository === undefined
-    ) {
-      const { repositoryXref } = applyUrlSuggestion(
+    if (state.kind === "url") {
+      const { createdRepositoryXrefs } = applyUrlSuggestions(
         this.ancestryDatabase(),
         state.source,
-        state.suggestion,
+        state.suggestions,
       );
-      tabs.push({ type: "REPO", xref: repositoryXref });
+      for (const xref of createdRepositoryXrefs) {
+        tabs.push({ type: "REPO", xref });
+      }
     }
     return tabs;
   });
 
-  reviewUrlSuggestion(
+  reviewUrlSuggestions(
     source: GedcomSource,
-    suggestion: UrlRepositorySuggestion,
+    suggestions: UrlRepositorySuggestion[],
   ) {
-    this.reviewState.set({ kind: "url", source, suggestion });
+    this.reviewState.set({ kind: "url", source, suggestions });
   }
 
   reviewMergeSuggestion(
@@ -182,17 +195,17 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
 
   // Applies a suggested fix directly and saves it, without opening the
   // editor dialog for further review.
-  async submitUrlSuggestion(
+  async submitUrlSuggestions(
     source: GedcomSource,
-    suggestion: UrlRepositorySuggestion,
+    suggestions: UrlRepositorySuggestion[],
   ) {
     const granted = await this.ancestryService.requestWritePermission();
     if (!granted) return;
 
-    const { database } = applyUrlSuggestion(
+    const { database } = applyUrlSuggestions(
       this.ancestryDatabase(),
       source,
-      suggestion,
+      suggestions,
     );
     await this.ancestryService.updateGedcomDatabase(database);
     await this.reload();
@@ -222,24 +235,24 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
     });
   }
 
-  // The records that would actually change on disk if `suggestion` is
+  // The records that would actually change on disk if `suggestions` are
   // applied and saved -- built from AncestryService.compareGedcomDatabase(),
   // the exact same diff serializeGedcomDatabase() writes from, so this
   // preview shows everything that would change (CHAN and HEAD included),
   // not just the source being fixed. Computed fresh each time rather than
   // reusing `reviewDatabase` so it stays correct even when nothing has been
   // selected for review yet.
-  differencesForUrlSuggestion(
+  differencesForUrlSuggestions(
     source: GedcomSource,
-    suggestion: UrlRepositorySuggestion,
+    suggestions: UrlRepositorySuggestion[],
   ): {
     originalGedcomRecord?: GedcomRecord;
     updatedGedcomRecord?: GedcomRecord;
   }[] {
-    const { database } = applyUrlSuggestion(
+    const { database } = applyUrlSuggestions(
       this.ancestryDatabase(),
       source,
-      suggestion,
+      suggestions,
     );
     return this.actualDifferences(database);
   }

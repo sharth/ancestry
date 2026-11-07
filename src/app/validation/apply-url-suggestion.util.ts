@@ -5,7 +5,10 @@ import { newGedcomRepository } from "../../gedcom/gedcomRepository";
 import { newGedcomRepositoryLink } from "../../gedcom/gedcomRepositoryLink";
 import type { GedcomSource } from "../../gedcom/gedcomSource";
 import { calculateNextRepositoryXref } from "../../util/next-xref";
-import { normalizeFamilySearchUrl } from "./source-url.util";
+import {
+  findMatchingRepository,
+  normalizeFamilySearchUrl,
+} from "./source-url.util";
 import type { UrlRepositorySuggestion } from "./source-validators";
 
 export interface ApplyUrlSuggestionResult {
@@ -73,4 +76,37 @@ export function applyUrlSuggestion(
   });
 
   return { database: updatedDatabase, repositoryXref };
+}
+
+export interface ApplyUrlSuggestionsResult {
+  database: GedcomDatabase;
+  /** The xrefs of the repositories created along the way, in order. */
+  createdRepositoryXrefs: string[];
+}
+
+/** Applies several URL suggestions for the same source as one edit, one
+ * after another. A suggestion that would create a new repository is first
+ * matched against the repositories as they stand after the earlier
+ * suggestions, so two URLs for the same site create one repository and
+ * share its citation rather than creating two. */
+export function applyUrlSuggestions(
+  database: GedcomDatabase,
+  source: GedcomSource,
+  suggestions: UrlRepositorySuggestion[],
+): ApplyUrlSuggestionsResult {
+  const createdRepositoryXrefs: string[] = [];
+  for (const suggestion of suggestions) {
+    const matchedRepository =
+      suggestion.matchedRepository ??
+      findMatchingRepository(suggestion.url, database.repositories);
+    const result = applyUrlSuggestion(database, source, {
+      ...suggestion,
+      matchedRepository,
+    });
+    database = result.database;
+    if (matchedRepository === undefined) {
+      createdRepositoryXrefs.push(result.repositoryXref);
+    }
+  }
+  return { database, createdRepositoryXrefs };
 }

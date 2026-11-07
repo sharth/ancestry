@@ -58,15 +58,27 @@ describe("ValidationComponent", () => {
   });
 
   it("lists a warning with a button to review the suggested fix", async () => {
-    expect(await screen.findByText(/Create repository/)).toBeTruthy();
+    expect(
+      await screen.findByText(/Open editor with proposed changes/),
+    ).toBeTruthy();
   });
 
   it("shows the before and proposed-after GEDCOM for the suggestion", async () => {
-    await screen.findByText(/Create repository/);
+    await screen.findByText(/Open editor with proposed changes/);
     const text = (fixture.nativeElement as HTMLElement).textContent;
     expect(text).toContain("1 TEXT Found at https://example.com/record");
     expect(text).toContain("1 REPO @R0@");
     expect(text).toContain("0 @R0@ REPO");
+  });
+
+  it("shows a source without repositories' suggestion only in its own section", async () => {
+    await screen.findByText(/Open editor with proposed changes/);
+    const page = fixture.nativeElement as HTMLElement;
+    expect(page.querySelectorAll(".diff-section")).toHaveLength(0);
+    expect(
+      page.querySelectorAll("app-sources-without-repositories app-gedcom-diff")
+        .length,
+    ).toBeGreaterThan(0);
   });
 
   it("also offers a button to submit the suggested fix directly", async () => {
@@ -79,13 +91,12 @@ describe("ValidationComponent", () => {
   // actually gets written to disk. This confirms the preview goes through
   // the same diff the save path uses.
   it("builds the preview from AncestryService.compareGedcomDatabase", async () => {
-    await screen.findByText(/Create repository/);
+    await screen.findByText(/Open editor with proposed changes/);
     const compareSpy = vi.spyOn(ancestryService, "compareGedcomDatabase");
 
-    const differences = component.differencesForUrlSuggestion(
-      source,
+    const differences = component.differencesForUrlSuggestions(source, [
       urlSuggestion,
-    );
+    ]);
 
     expect(compareSpy).toHaveBeenCalled();
     expect(differences.some((d) => d.updatedGedcomRecord?.tag === "SOUR")).toBe(
@@ -93,20 +104,20 @@ describe("ValidationComponent", () => {
     );
   });
 
-  it("submitUrlSuggestion applies the suggestion and saves it directly", async () => {
+  it("submitUrlSuggestions applies the suggestion and saves it directly", async () => {
     vi.spyOn(ancestryService, "requestWritePermission").mockResolvedValue(true);
     const updateGedcomDatabaseSpy = vi
       .spyOn(ancestryService, "updateGedcomDatabase")
       .mockResolvedValue(undefined);
 
-    await component.submitUrlSuggestion(source, urlSuggestion);
+    await component.submitUrlSuggestions(source, [urlSuggestion]);
 
     expect(updateGedcomDatabaseSpy).toHaveBeenCalledTimes(1);
     const savedDatabase = updateGedcomDatabaseSpy.mock.calls[0]?.[0];
     expect(savedDatabase?.repositories["@R0@"]).toBeDefined();
   });
 
-  it("submitUrlSuggestion does nothing when write permission is denied", async () => {
+  it("submitUrlSuggestions does nothing when write permission is denied", async () => {
     vi.spyOn(ancestryService, "requestWritePermission").mockResolvedValue(
       false,
     );
@@ -115,7 +126,7 @@ describe("ValidationComponent", () => {
       "updateGedcomDatabase",
     );
 
-    await component.submitUrlSuggestion(source, urlSuggestion);
+    await component.submitUrlSuggestions(source, [urlSuggestion]);
 
     expect(updateGedcomDatabaseSpy).not.toHaveBeenCalled();
   });
@@ -196,21 +207,30 @@ describe("ValidationComponent merge repository links suggestion", () => {
 
 describe("ValidationComponent sticky header", () => {
   it("scopes each warning's sticky row to its own section, one per diff", async () => {
+    // Each source already cites a repository; a source with none shows its
+    // URL suggestions in the "Sources without repositories" section instead.
+    const linkToLibrary = newGedcomRepositoryLink({ repositoryXref: "@R1@" });
     const ancestryDatabase = signal(
       newGedcomDatabase({
+        repositories: {
+          "@R1@": newGedcomRepository({ xref: "@R1@", name: "Library" }),
+        },
         sources: {
           S1: newGedcomSource({
             xref: "S1",
+            repositoryLinks: [linkToLibrary],
             title:
               "Newfoundland Virtal Records, 1892, Birth of Catherine Cooper https://familysearch.org/ark:/61903/3:1:S3HT-61DS-32F?cc=1790939&wc=M61G-RM3%3A144853601",
           }),
           S2: newGedcomSource({
             xref: "S2",
+            repositoryLinks: [linkToLibrary],
             title:
               "Second Source https://www.ancestry.com/discoveryui-content/view/123456:7890?tid=111&pid=181",
           }),
           S3: newGedcomSource({
             xref: "S3",
+            repositoryLinks: [linkToLibrary],
             title:
               "Jackson Daily News, Obituary, 1910 https://www.newspapers.com/clip/56286648/jackson-daily-news/",
           }),
