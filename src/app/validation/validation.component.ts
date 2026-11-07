@@ -21,6 +21,7 @@ import type { TabInformation } from "../gedcom-editor/gedcom-editor-interface";
 import type { ComponentWithUnsavedChanges } from "../unsaved-changes.guard";
 import { applyMergeRepositoryLinksSuggestion } from "./apply-merge-repository-links-suggestion.util";
 import { applyUrlSuggestion } from "./apply-url-suggestion.util";
+import { DuplicateCallNumbersComponent } from "./duplicate-call-numbers.component";
 import {
   sourceValidators,
   type MergeRepositoryLinksSuggestion,
@@ -57,6 +58,7 @@ interface TableRow {
     RouterModule,
     GedcomEditorDialogComponent,
     GedcomDiffComponent,
+    DuplicateCallNumbersComponent,
     UnusedMultimediaComponent,
     UnusedSourcesComponent,
   ],
