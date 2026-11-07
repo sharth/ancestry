@@ -23,11 +23,15 @@ export class SourceOverviewComponent {
 
     return {
       source,
-      multimediaLinks: source.multimediaLinks.map((multimediaLink) => ({
-        multimedia: ancestryDatabase.multimedias[multimediaLink.xref],
-        xref: multimediaLink.xref,
-        title: multimediaLink.title,
-      })),
+      multimediaLinks: source.multimediaLinks.map((multimediaLink) => {
+        const multimedia = ancestryDatabase.multimedias[multimediaLink.xref];
+        return {
+          multimedia,
+          xref: multimediaLink.xref,
+          // The link's TITL overrides the multimedia record's own title.
+          title: multimediaLink.title || multimedia?.title,
+        };
+      }),
       repositoryCitations: source.repositoryLinks.map((repositoryLink) => ({
         repositoryXref: repositoryLink.repositoryXref,
         callNumbers: repositoryLink.callNumbers,
