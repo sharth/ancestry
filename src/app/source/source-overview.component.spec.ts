@@ -34,6 +34,7 @@ describe("SourceOverviewComponent", () => {
                       xref: "@M1@",
                       title: "Scan of record",
                     }),
+                    newGedcomMultimediaLink({ xref: "@M2@" }),
                   ],
                   repositoryLinks: [
                     newGedcomRepositoryLink({
@@ -48,6 +49,12 @@ describe("SourceOverviewComponent", () => {
                   xref: "@M1@",
                   filePath: "scan.jpg",
                   mediaType: "image/jpeg",
+                  title: "Original record title",
+                }),
+                "@M2@": newGedcomMultimedia({
+                  xref: "@M2@",
+                  filePath: "certificate.jpg",
+                  title: "Death certificate",
                 }),
               },
               repositories: {
@@ -76,6 +83,12 @@ describe("SourceOverviewComponent", () => {
     expect(multimediaLink?.xref).toBe("@M1@");
     expect(multimediaLink?.title).toBe("Scan of record");
     expect(multimediaLink?.multimedia?.filePath).toBe("scan.jpg");
+  });
+
+  it("falls back to the multimedia record's title when the link has none", () => {
+    const [, multimediaLink] = component.vm()?.multimediaLinks ?? [];
+    expect(multimediaLink?.xref).toBe("@M2@");
+    expect(multimediaLink?.title).toBe("Death certificate");
   });
 
   it("includes the repository citation in the view model", () => {
