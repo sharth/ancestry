@@ -1,9 +1,9 @@
 <details #container open (toggle)="(true)">
   <summary>Multimedia ({{ form.length }})</summary>
   @defer (when container.open) {
-    @for (multimediaLink of form; track multimediaLink) {
-      @let mediaXref = multimediaLink.xref().value();
-      @let media = workingDatabase().multimedias[mediaXref];
+    @for (formEntry of form; track formEntry) {
+      @let multimediaLink = formEntry().value();
+      @let multimedia = workingDatabase().multimedias[multimediaLink.xref];
       <details [open]="true">
         <summary>
           <button
@@ -12,12 +12,7 @@
             aria-label="Remove multimedia link"
             (click)="removeMultimediaLink($index)"
           ></button>
-          {{
-            multimediaLinkTitle(
-              { xref: mediaXref, title: multimediaLink.title().value() },
-              media
-            ) || "Untitled"
-          }}
+          {{ multimediaLinkTitle(multimediaLink, multimedia) || "Untitled" }}
         </summary>
         <div class="d-flex gap-2 align-items-center mb-2">
           <div class="form-floating flex-grow-1">
@@ -25,7 +20,7 @@
               #focusTarget
               id="media_{{ $index }}"
               class="form-select"
-              [formField]="multimediaLink.xref"
+              [formField]="formEntry.xref"
             >
               <option selected value="">Multimedia...</option>
               @for (multimedia of multimedias(); track multimedia.xref) {
@@ -45,11 +40,11 @@
             >
               <i class="bi bi-plus"></i> New
             </button>
-            @if (mediaXref) {
+            @if (multimediaLink.xref) {
               <button
                 type="button"
                 class="btn btn-sm btn-outline-secondary text-nowrap"
-                (click)="openMultimediaInSession(mediaXref)"
+                (click)="openMultimediaInSession(multimediaLink.xref)"
                 title="Edit multimedia in a session tab"
               >
                 <i class="bi bi-pencil"></i> Edit
@@ -62,14 +57,14 @@
             class="form-control"
             type="text"
             id="title_{{ $index }}"
-            [formField]="multimediaLink.title"
+            [formField]="formEntry.title"
           />
           <label for="title_{{ $index }}">Custom Title</label>
         </div>
-        @if (media?.mediaType?.startsWith("image/")) {
+        @if (multimedia?.mediaType?.startsWith("image/")) {
           <h6 class="mt-2">Crop</h6>
           <app-input-multimedia-crop
-            [filePath]="media.filePath"
+            [filePath]="multimedia.filePath"
             [value]="value()[$index]?.crop"
             (valueChange)="setCrop($index, $event)"
           />

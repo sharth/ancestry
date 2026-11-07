@@ -33,7 +33,7 @@ export function newGedcomMultimediaLink(
 // The name to show for a multimedia link. The link's own TITL overrides the
 // multimedia record's title; failing both, the file's name, then the xref.
 export function multimediaLinkTitle(
-  multimediaLink: Pick<GedcomMultimediaLink, "xref" | "title">,
+  multimediaLink: GedcomMultimediaLink,
   multimedia: GedcomMultimedia | undefined,
 ): string {
   const fileName = multimedia?.filePath.split(/[\\/]/).pop();
