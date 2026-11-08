@@ -16,6 +16,7 @@ import {
   parseGedcomRecords,
   type GedcomRecord,
 } from "../gedcom/gedcomRecord";
+import { uniqueFileName } from "../util/multimedia-file-name";
 
 export const BUILTIN_GEDCOM_URL = "assets/samples/royal-family.ged";
 
@@ -327,6 +328,32 @@ export class AncestryService {
       );
       return undefined;
     }
+  }
+
+  // Copies a file (typically one picked from outside the loaded directory)
+  // into the root of the loaded directory as `fileName`, numbering it
+  // "<name> (2).<ext>" etc. if that name is already taken, so nothing is
+  // overwritten. Returns the name it was saved under, which is also its
+  // path relative to the directory. Needs write access to the directory.
+  async copyMultimediaFile(file: File, fileName: string): Promise<string> {
+    const directoryHandle = this.gedcomResource.value()?.directoryHandle;
+    if (!directoryHandle) {
+      throw new Error("No directory loaded");
+    }
+
+    const takenNames = new Set<string>();
+    for await (const name of directoryHandle.keys()) {
+      takenNames.add(name);
+    }
+    const savedName = uniqueFileName(fileName, takenNames);
+
+    const fileHandle = await directoryHandle.getFileHandle(savedName, {
+      create: true,
+    });
+    const writableStream = await fileHandle.createWritable();
+    await writableStream.write(file);
+    await writableStream.close();
+    return savedName;
   }
 
   async requestPermissions() {

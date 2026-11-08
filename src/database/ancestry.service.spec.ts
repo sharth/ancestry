@@ -147,3 +147,57 @@ describe("AncestryService.gedcomDatabaseDifferences", () => {
     ).toEqual([unchanged, edited, added, removed]);
   });
 });
+
+describe("AncestryService.copyMultimediaFile", () => {
+  let ancestryService: AncestryService;
+  let written: Map<string, unknown>;
+
+  beforeEach(async () => {
+    await render(StubComponent, { waitForStableOnRender: true });
+    ancestryService = TestBed.inject(AncestryService);
+
+    written = new Map<string, unknown>([["O1 Deed.png", "existing"]]);
+    const directoryHandle = {
+      keys: () => written.keys(),
+      getFileHandle: (name: string, options?: { create?: boolean }) => {
+        if (!written.has(name) && !options?.create) {
+          return Promise.reject(new DOMException("", "NotFoundError"));
+        }
+        return Promise.resolve({
+          createWritable: () =>
+            Promise.resolve({
+              write: (data: unknown) => {
+                written.set(name, data);
+                return Promise.resolve();
+              },
+              close: () => Promise.resolve(),
+            }),
+        });
+      },
+    } as unknown as FileSystemDirectoryHandle;
+    vi.spyOn(ancestryService.gedcomResource, "value").mockReturnValue({
+      directoryHandle,
+    } as ReturnType<typeof ancestryService.gedcomResource.value>);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("writes the file under the given name", async () => {
+    const file = new File(["png"], "scan.png");
+    await expect(
+      ancestryService.copyMultimediaFile(file, "O2 Will.png"),
+    ).resolves.toBe("O2 Will.png");
+    expect(written.get("O2 Will.png")).toBe(file);
+  });
+
+  it("never overwrites an existing file", async () => {
+    const file = new File(["png"], "scan.png");
+    await expect(
+      ancestryService.copyMultimediaFile(file, "O1 Deed.png"),
+    ).resolves.toBe("O1 Deed (2).png");
+    expect(written.get("O1 Deed.png")).toBe("existing");
+    expect(written.get("O1 Deed (2).png")).toBe(file);
+  });
+});

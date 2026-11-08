@@ -7,6 +7,7 @@ import {
   newGedcomMultimedia,
   type GedcomMultimedia,
 } from "../../gedcom/gedcomMultimedia";
+import { multimediaFileName } from "../../util/multimedia-file-name";
 import { MultimediaPreviewComponent } from "../multimedia/multimedia-preview.component";
 
 @Component({
@@ -28,18 +29,36 @@ export class InputMultimediaComponent implements FormValueControl<GedcomMultimed
         startIn: this.ancestryService.gedcomResource.value()?.directoryHandle,
       });
       const file = await fileHandle.getFile();
-      const relativePath = await this.ancestryService.gedcomResource
-        .value()
-        ?.directoryHandle?.resolve(fileHandle);
-
-      if (!relativePath) {
-        alert("File must be inside the multimedia directory");
+      const directoryHandle =
+        this.ancestryService.gedcomResource.value()?.directoryHandle;
+      if (!directoryHandle) {
+        alert("Multimedia files need a data folder. Open one in Settings.");
         return;
+      }
+
+      // A file already inside the data folder is linked where it is. One
+      // from elsewhere is copied in, named after this record, since GEDCOM
+      // paths are relative to the data folder.
+      let filePath = (await directoryHandle.resolve(fileHandle))?.join("/");
+      if (filePath === undefined) {
+        const { xref, title } = this.value();
+        const fileName = multimediaFileName(xref, title, file.name);
+        if (
+          !confirm(
+            `"${file.name}" is outside your data folder. Copy it into the data folder as "${fileName}"?`,
+          )
+        ) {
+          return;
+        }
+        filePath = await this.ancestryService.copyMultimediaFile(
+          file,
+          fileName,
+        );
       }
 
       this.value.update((m) => ({
         ...m,
-        filePath: relativePath.join("/"),
+        filePath,
         mediaType: file.type,
       }));
     } catch (e) {
