@@ -1,3 +1,4 @@
+import { produce } from "immer";
 import { assert, describe, expect, it } from "vitest";
 
 import { newGedcomChangeDate } from "./gedcomChangeDate";
@@ -13,6 +14,7 @@ import {
   parseGedcomRecords,
   serializeGedcomRecordToText,
 } from "./gedcomRecord";
+import { newGedcomSex } from "./gedcomSex";
 import { newGedcomSourceCitation } from "./gedcomSourceCitation";
 
 // Facts are given an id when they are parsed.
@@ -291,5 +293,68 @@ describe("gedcomIndividual", () => {
       "1 DEAT",
       "2 DATE 1950",
     ]);
+  });
+});
+
+describe("serializeGedcomIndividual cache", () => {
+  function parse(lines: string[]) {
+    const [record] = parseGedcomRecords(lines.join("\n"));
+    assert.isOk(record);
+    return { record, individual: parseGedcomIndividual(record) };
+  }
+
+  it("returns the parsed record itself when it round-trips exactly", () => {
+    const { record, individual } = parse([
+      "0 @I1@ INDI",
+      "1 NAME John /Doe/",
+      "2 GIVN John",
+      "2 SURN Doe",
+      "1 SEX M",
+    ]);
+
+    expect(serializeGedcomIndividual(individual)).toBe(record);
+  });
+
+  it("returns a fresh serialization when the parsed record doesn't round-trip", () => {
+    // SEX before NAME, the reverse of the order the app writes.
+    const { record, individual } = parse([
+      "0 @I1@ INDI",
+      "1 SEX M",
+      "1 NAME John /Doe/",
+      "2 GIVN John",
+      "2 SURN Doe",
+    ]);
+
+    const serialized = serializeGedcomIndividual(individual);
+    expect(serialized).not.toBe(record);
+    expect(serializeGedcomRecordToText(serialized)).toEqual([
+      "0 @I1@ INDI",
+      "1 NAME John /Doe/",
+      "2 GIVN John",
+      "2 SURN Doe",
+      "1 SEX M",
+    ]);
+  });
+
+  it("serializes an edited copy afresh", () => {
+    const { individual } = parse(["0 @I1@ INDI", "1 SEX M"]);
+    const edited = produce(individual, (draft) => {
+      draft.sex = newGedcomSex({ sex: "F" });
+    });
+
+    expect(
+      serializeGedcomRecordToText(serializeGedcomIndividual(edited)),
+    ).toEqual(["0 @I1@ INDI", "1 SEX F"]);
+    expect(
+      serializeGedcomRecordToText(serializeGedcomIndividual(individual)),
+    ).toEqual(["0 @I1@ INDI", "1 SEX M"]);
+  });
+
+  it("returns the same serialization each time for the same individual", () => {
+    const individual = newGedcomIndividual({ xref: "@I2@" });
+
+    expect(serializeGedcomIndividual(individual)).toBe(
+      serializeGedcomIndividual(individual),
+    );
   });
 });

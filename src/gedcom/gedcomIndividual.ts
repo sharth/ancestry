@@ -25,6 +25,7 @@ import {
 import {
   filterTrivialGedcomRecords,
   newGedcomRecord,
+  serializeGedcomRecordToText,
   type GedcomRecord,
 } from "./gedcomRecord";
 import {
@@ -133,10 +134,40 @@ export function parseGedcomIndividual(record: GedcomRecord): GedcomIndividual {
     }
   }
 
+  // Seed the serialization cache. When the individual serializes back to
+  // exactly the record it was parsed from, cache that record itself, so
+  // comparing an unedited individual against the file is an identity check.
+  const serialized = serializeGedcomIndividualUncached(gedcomIndividual);
+  serializedIndividuals.set(
+    gedcomIndividual,
+    serializeGedcomRecordToText(serialized).join("\n") ===
+      serializeGedcomRecordToText(record).join("\n")
+      ? record
+      : serialized,
+  );
+
   return gedcomIndividual;
 }
 
+// Each individual's serialization, by object. Individuals are only ever
+// changed through immer, which makes a new object for an edited individual
+// and keeps an unedited one as the same object, so a cached serialization
+// never goes stale. A WeakMap lets an entry go once its individual is no
+// longer referenced.
+const serializedIndividuals = new WeakMap<GedcomIndividual, GedcomRecord>();
+
 export function serializeGedcomIndividual(
+  gedcomIndividual: GedcomIndividual,
+): GedcomRecord {
+  let serialized = serializedIndividuals.get(gedcomIndividual);
+  if (serialized === undefined) {
+    serialized = serializeGedcomIndividualUncached(gedcomIndividual);
+    serializedIndividuals.set(gedcomIndividual, serialized);
+  }
+  return serialized;
+}
+
+function serializeGedcomIndividualUncached(
   gedcomIndividual: GedcomIndividual,
 ): GedcomRecord {
   return newGedcomRecord({
