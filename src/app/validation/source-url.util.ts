@@ -20,7 +20,11 @@ export function extractUrls(text: string): ExtractedUrl[] {
   for (const rawLine of text.split(/\r?\n/)) {
     const line = rawLine.trim();
     for (const match of line.matchAll(URL_PATTERN)) {
-      urls.push({ url: match[0], standalone: match[0] === line });
+      // A trailing colon is almost always punctuation introducing what
+      // follows (e.g. "https://example.com/foo: 1850 census"), not part of
+      // the URL.
+      const url = match[0].replace(/:+$/, "");
+      urls.push({ url, standalone: url === line });
     }
   }
   return urls;

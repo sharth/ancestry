@@ -27,6 +27,18 @@ describe("extractUrls", () => {
     ]);
   });
 
+  it("drops a trailing colon from the URL", () => {
+    expect(extractUrls("https://example.com/foo: 1850 census")).toEqual([
+      { url: "https://example.com/foo", standalone: false },
+    ]);
+  });
+
+  it("keeps a colon in the middle of the URL", () => {
+    expect(extractUrls("https://example.com:8080/a:b")).toEqual([
+      { url: "https://example.com:8080/a:b", standalone: true },
+    ]);
+  });
+
   it("returns an empty array when there is no URL", () => {
     expect(extractUrls("just some plain text")).toEqual([]);
   });
