@@ -465,9 +465,9 @@ describe("GedcomEditorComponent differences with a real, unedited family", () =>
     ) {
       throw new Error("expected both an original and an updated record");
     }
-    expect(
-      serializeGedcomRecordToText(difference.originalGedcomRecord),
-    ).toEqual(serializeGedcomRecordToText(difference.updatedGedcomRecord));
+    expect(difference.updatedGedcomRecord).toEqual(
+      difference.originalGedcomRecord,
+    );
   });
 });
 
