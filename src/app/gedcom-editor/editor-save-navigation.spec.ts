@@ -194,6 +194,12 @@ describe("saving the GEDCOM editor from every entry point", () => {
 
     await router.navigateByUrl("/validation");
 
+    // The fixture's source has no repository, so its URL suggestion is
+    // under the "Sources without repositories" tab.
+    (
+      await screen.findByRole("tab", { name: "Sources without repositories" })
+    ).click();
+
     const reviewButton = await screen.findByText(/Open editor with proposed/);
     reviewButton.click();
 

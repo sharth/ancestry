@@ -13,7 +13,11 @@
   width: 100%;
   border: 1px solid #dee2e6;
   border-top: 0;
-  --columns: 1fr 1fr 1fr 1fr 2fr 1fr;
+  /* minmax(0, ...) rather than plain `fr`: a plain `1fr` column can't
+     shrink below its longest unbreakable word, so a long URL in a message
+     used to push the row far past the page's right edge. */
+  --columns: minmax(0, 1fr) 6.5rem minmax(0, 1fr) minmax(0, 1fr) minmax(0, 3fr)
+    minmax(0, 1.5fr);
 }
 
 .grid-row {

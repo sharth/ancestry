@@ -47,6 +47,16 @@ type ReviewState =
       suggestion: MergeRepositoryLinksSuggestion;
     };
 
+const tabs = [
+  { id: "source-warnings", label: "Source warnings" },
+  { id: "sources-without-repositories", label: "Sources without repositories" },
+  { id: "duplicate-call-numbers", label: "Duplicate call numbers" },
+  { id: "unused-sources", label: "Unused sources" },
+  { id: "unused-multimedia", label: "Unused multimedia" },
+] as const;
+
+type TabId = (typeof tabs)[number]["id"];
+
 interface TableRow {
   source: GedcomSource;
   severity: "Error" | "Warning";
@@ -79,6 +89,14 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
   readonly ancestryDatabase = input.required<GedcomDatabase>();
 
   readonly editDialog = viewChild<GedcomEditorDialogComponent>("editDialog");
+
+  // Each validation check is shown in its own tab. The tabs aren't routed
+  // like the individual and source pages' tabs, because the source warnings
+  // and sources without repositories checks hand their suggested fixes back
+  // to this page's editor dialog through outputs, which a routed child
+  // can't bind.
+  readonly tabs = tabs;
+  readonly activeTab = signal<TabId>("source-warnings");
 
   hasUnsavedChanges(): boolean {
     return this.editDialog()?.hasUnsavedChanges() ?? false;

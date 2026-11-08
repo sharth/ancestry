@@ -47,6 +47,11 @@ describe("ValidationComponent", () => {
     fixture = renderResult.fixture;
     component = fixture.componentInstance;
     ancestryService = TestBed.inject(AncestryService);
+
+    // S1 has no repository, so its URL suggestion is listed in the
+    // "Sources without repositories" tab.
+    screen.getByRole("tab", { name: "Sources without repositories" }).click();
+    await fixture.whenStable();
   });
 
   it("should create", () => {
@@ -74,11 +79,30 @@ describe("ValidationComponent", () => {
   it("shows a source without repositories' suggestion only in its own section", async () => {
     await screen.findByText(/Open editor with proposed changes/);
     const page = fixture.nativeElement as HTMLElement;
-    expect(page.querySelectorAll(".diff-section")).toHaveLength(0);
     expect(
       page.querySelectorAll("app-sources-without-repositories app-gedcom-diff")
         .length,
     ).toBeGreaterThan(0);
+
+    screen.getByRole("tab", { name: "Source warnings" }).click();
+    await fixture.whenStable();
+    expect(page.querySelector("app-sources-without-repositories")).toBeNull();
+    expect(page.querySelectorAll(".diff-section")).toHaveLength(0);
+  });
+
+  it("shows only the selected tab's check", async () => {
+    const page = fixture.nativeElement as HTMLElement;
+    expect(
+      screen
+        .getByRole("tab", { name: "Sources without repositories" })
+        .getAttribute("aria-selected"),
+    ).toBe("true");
+    expect(page.querySelector("app-unused-sources")).toBeNull();
+
+    screen.getByRole("tab", { name: "Unused sources" }).click();
+    await fixture.whenStable();
+    expect(page.querySelector("app-unused-sources")).not.toBeNull();
+    expect(page.querySelector("app-sources-without-repositories")).toBeNull();
   });
 
   it("also offers a button to submit the suggested fix directly", async () => {
