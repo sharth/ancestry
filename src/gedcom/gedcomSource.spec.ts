@@ -18,10 +18,7 @@ function expectToBeDefined<T>(value: T | undefined): asserts value is T {
 
 describe("GedcomSource", () => {
   it("no fields", () => {
-    const gedcomRecord = newGedcomRecord({
-      tag: "SOUR",
-      xref: "@S1@",
-    });
+    const gedcomRecord = newGedcomRecord({ tag: "SOUR", xref: "@S1@" });
     const gedcomSource = newGedcomSource({
       xref: "@S1@",
     });
@@ -51,12 +48,7 @@ describe("GedcomSource", () => {
         unknownRecords: [
           newGedcomRecord({
             tag: "_TMPLT",
-            children: [
-              newGedcomRecord({
-                tag: "TID",
-                value: "72",
-              }),
-            ],
+            children: [newGedcomRecord({ tag: "TID", value: "72" })],
           }),
         ],
       }),

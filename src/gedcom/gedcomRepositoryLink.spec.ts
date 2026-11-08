@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { newGedcomRecord } from "./gedcomRecord";
 import {
   newGedcomRepositoryLink,
   parseGedcomRepositoryLink,
@@ -8,25 +9,16 @@ import {
 
 describe("gedcomRepositoryLink", () => {
   it("parses multiple CALN tags into callNumbers", () => {
-    const repositoryLink = parseGedcomRepositoryLink({
-      tag: "REPO",
-      xref: "",
-      value: "@R1@",
-      children: [
-        {
-          tag: "CALN",
-          xref: "",
-          value: "Call Number 1",
-          children: [],
-        },
-        {
-          tag: "CALN",
-          xref: "",
-          value: "Call Number 2",
-          children: [],
-        },
-      ],
-    });
+    const repositoryLink = parseGedcomRepositoryLink(
+      newGedcomRecord({
+        tag: "REPO",
+        value: "@R1@",
+        children: [
+          newGedcomRecord({ tag: "CALN", value: "Call Number 1" }),
+          newGedcomRecord({ tag: "CALN", value: "Call Number 2" }),
+        ],
+      }),
+    );
 
     expect(repositoryLink.repositoryXref).toBe("@R1@");
     expect(repositoryLink.callNumbers).toEqual([
@@ -36,12 +28,9 @@ describe("gedcomRepositoryLink", () => {
   });
 
   it("parses a REPO with no CALN tags into an empty array", () => {
-    const repositoryLink = parseGedcomRepositoryLink({
-      tag: "REPO",
-      xref: "",
-      value: "@R1@",
-      children: [],
-    });
+    const repositoryLink = parseGedcomRepositoryLink(
+      newGedcomRecord({ tag: "REPO", value: "@R1@" }),
+    );
 
     expect(repositoryLink.callNumbers).toEqual([]);
   });
@@ -55,18 +44,8 @@ describe("gedcomRepositoryLink", () => {
     );
 
     expect(record.children).toEqual([
-      {
-        tag: "CALN",
-        xref: "",
-        value: "Call Number 1",
-        children: [],
-      },
-      {
-        tag: "CALN",
-        xref: "",
-        value: "Call Number 2",
-        children: [],
-      },
+      newGedcomRecord({ tag: "CALN", value: "Call Number 1" }),
+      newGedcomRecord({ tag: "CALN", value: "Call Number 2" }),
     ]);
   });
 
