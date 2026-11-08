@@ -37,6 +37,7 @@ import {
   SourcesWithoutRepositoriesComponent,
 } from "./sources-without-repositories.component";
 import {
+  databaseDifferences,
   suggestionDifferences,
   type GedcomRecordDifference,
 } from "./suggestion-differences.util";
@@ -111,6 +112,12 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
   private readonly route = inject(ActivatedRoute);
 
   readonly ancestryDatabase = input.required<GedcomDatabase>();
+
+  // Every record that differs from the file before any fix is applied,
+  // computed once and shared by every suggestion's preview.
+  private readonly baselineDifferences = computed(() =>
+    databaseDifferences(this.ancestryService, this.ancestryDatabase()),
+  );
 
   readonly editDialog = viewChild<GedcomEditorDialogComponent>("editDialog");
 
@@ -344,11 +351,10 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
   }
 
   // The records that would actually change on disk if `suggestions` are
-  // applied and saved -- built by suggestionDifferences() from
-  // AncestryService.compareGedcomDatabase(), the exact same diff
-  // serializeGedcomDatabase() writes from, so this preview shows every
-  // record the fix changes (CHAN and HEAD included), not just the source
-  // being fixed. Computed fresh each time rather than
+  // applied and saved -- built from AncestryService.compareGedcomDatabase(),
+  // the exact same diff serializeGedcomDatabase() writes from, so this
+  // preview shows everything that would change (CHAN and HEAD included),
+  // not just the source being fixed. Computed fresh each time rather than
   // reusing `reviewDatabase` so it stays correct even when nothing has been
   // selected for review yet.
   differencesForUrlSuggestions(
@@ -387,6 +393,7 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
     return suggestionDifferences(
       this.ancestryService,
       this.ancestryDatabase(),
+      this.baselineDifferences(),
       database,
     );
   }

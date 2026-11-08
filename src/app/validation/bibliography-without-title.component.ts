@@ -14,7 +14,10 @@ import {
  * into the title -- together with any repository links for URLs in the
  * source, as one edit. Reviewing or submitting a suggestion is handed back
  * to the validation page, which owns the editor dialog. */
-import { suggestionDifferences } from "./suggestion-differences.util";
+import {
+  databaseDifferences,
+  suggestionDifferences,
+} from "./suggestion-differences.util";
 
 @Component({
   selector: "app-bibliography-without-title",
@@ -25,6 +28,12 @@ export class BibliographyWithoutTitleComponent {
   private readonly ancestryService = inject(AncestryService);
 
   readonly ancestryDatabase = input.required<GedcomDatabase>();
+
+  // Every record that differs from the file before any fix is applied,
+  // computed once and shared by every suggestion's preview.
+  private readonly baselineDifferences = computed(() =>
+    databaseDifferences(this.ancestryService, this.ancestryDatabase()),
+  );
 
   readonly reviewSuggestion = output<GedcomSource>();
   readonly submitSuggestion = output<GedcomSource>();
@@ -47,6 +56,7 @@ export class BibliographyWithoutTitleComponent {
     return suggestionDifferences(
       this.ancestryService,
       this.ancestryDatabase(),
+      this.baselineDifferences(),
       database,
     );
   }

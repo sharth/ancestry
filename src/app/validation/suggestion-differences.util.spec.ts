@@ -9,7 +9,11 @@ import {
 } from "../../gedcom/gedcomDatabase";
 import { parseGedcomRecords } from "../../gedcom/gedcomRecord";
 import { newGedcomRepository } from "../../gedcom/gedcomRepository";
-import { suggestionDifferences } from "./suggestion-differences.util";
+import {
+  databaseDifferences,
+  suggestionDifferences,
+  type GedcomRecordDifference,
+} from "./suggestion-differences.util";
 
 // @S2@ lists TEXT before TITL, the reverse of the order the app writes, so
 // it differs from the file even though no fix touches it.
@@ -40,30 +44,47 @@ function fakeAncestryService() {
   };
 }
 
+function labels(differences: GedcomRecordDifference[]) {
+  return differences.map((d) => {
+    const record = d.originalGedcomRecord ?? d.updatedGedcomRecord;
+    return `${record?.tag} ${record?.xref}`;
+  });
+}
+
 describe("suggestionDifferences", () => {
-  it("lists only the records the fix changed, plus HEAD", () => {
-    const { service } = fakeAncestryService();
-    const updated = produce(database, (draft) => {
-      const source = draft.sources["@S1@"];
-      if (source !== undefined) source.title = "First, retitled";
-      draft.repositories["@R1@"] = newGedcomRepository({
-        xref: "@R1@",
-        name: "Library",
-      });
+  const retitleAndAddRepository = produce(database, (draft) => {
+    const source = draft.sources["@S1@"];
+    if (source !== undefined) source.title = "First, retitled";
+    draft.repositories["@R1@"] = newGedcomRepository({
+      xref: "@R1@",
+      name: "Library",
     });
+  });
 
-    const differences = suggestionDifferences(service, database, updated);
+  it("matches the diff of the whole fixed database, untouched records included", () => {
+    const { service } = fakeAncestryService();
+    const baseline = databaseDifferences(service, database);
 
-    expect(
-      differences.map(
-        (d) =>
-          `${(d.originalGedcomRecord ?? d.updatedGedcomRecord)?.tag} ${(d.originalGedcomRecord ?? d.updatedGedcomRecord)?.xref}`,
-      ),
-    ).toEqual(["HEAD ", "SOUR @S1@", "REPO @R1@"]);
+    const differences = suggestionDifferences(
+      service,
+      database,
+      baseline,
+      retitleAndAddRepository,
+    );
+
+    // @S2@ isn't touched by the fix, but saving would still rewrite it.
+    expect(labels(differences)).toEqual([
+      "HEAD ",
+      "SOUR @S1@",
+      "SOUR @S2@",
+      "REPO @R1@",
+    ]);
+    expect(labels(differences)).toEqual(
+      labels(databaseDifferences(service, retitleAndAddRepository)),
+    );
     expect(differences[1]?.updatedGedcomRecord?.children[0]?.value).toBe(
       "First, retitled",
     );
-    expect(differences[2]?.originalGedcomRecord).toBeUndefined();
   });
 
   it("lists a record the fix removed", () => {
@@ -72,7 +93,12 @@ describe("suggestionDifferences", () => {
       delete draft.sources["@S3@"];
     });
 
-    const differences = suggestionDifferences(service, database, updated);
+    const differences = suggestionDifferences(
+      service,
+      database,
+      databaseDifferences(service, database),
+      updated,
+    );
 
     const removed = differences.filter((d) => d.updatedGedcomRecord == null);
     expect(removed.map((d) => d.originalGedcomRecord?.xref)).toEqual(["@S3@"]);
@@ -80,16 +106,14 @@ describe("suggestionDifferences", () => {
 
   it("only hands the changed records to compareGedcomDatabase", () => {
     const { service, compare } = fakeAncestryService();
-    const updated = produce(database, (draft) => {
-      const source = draft.sources["@S1@"];
-      if (source !== undefined) source.title = "First, retitled";
-    });
+    const baseline = databaseDifferences(service, database);
+    compare.mockClear();
 
-    suggestionDifferences(service, database, updated);
+    suggestionDifferences(service, database, baseline, retitleAndAddRepository);
 
     expect(compare).toHaveBeenCalledTimes(1);
-    expect(Object.keys(compare.mock.calls[0]?.[0].sources ?? {})).toEqual([
-      "@S1@",
-    ]);
+    const compared = compare.mock.calls[0]?.[0];
+    expect(Object.keys(compared?.sources ?? {})).toEqual(["@S1@"]);
+    expect(Object.keys(compared?.repositories ?? {})).toEqual(["@R1@"]);
   });
 });

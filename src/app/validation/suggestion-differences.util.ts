@@ -13,19 +13,30 @@ export interface GedcomRecordDifference {
   updatedGedcomRecord?: GedcomRecord;
 }
 
-/** The records a suggested fix would change on disk: `updatedDatabase` is
- * `database` with the fix applied. Built from
- * AncestryService.compareGedcomDatabase(), the same diff the save path
- * writes from, but only over the records the fix actually changed (plus
- * HEAD), so it doesn't re-serialize the whole database for every preview.
- * The fixes are applied with immer, which keeps every record they don't
- * touch as the same object, so a record whose object is unchanged is
- * skipped -- along with any difference it has from the file that the fix
- * didn't cause, e.g. a tag the file spells differently than the app
- * writes it. */
+/** Every record that would change on disk if `database` were saved as it
+ * is -- e.g. a tag the file spells differently than the app writes it,
+ * or HEAD's date. Built from AncestryService.compareGedcomDatabase(), the
+ * same diff the save path writes from. Computed once per database and
+ * handed to suggestionDifferences() for each suggested fix. */
+export function databaseDifferences(
+  ancestryService: AncestryService,
+  database: GedcomDatabase,
+): GedcomRecordDifference[] {
+  return ancestryService.compareGedcomDatabase(database).filter(differs);
+}
+
+/** The records that would change on disk if `updatedDatabase` -- `database`
+ * with a suggested fix applied -- were saved: the same list
+ * databaseDifferences() would give for `updatedDatabase`, in the same
+ * order, but without re-serializing the whole database for every
+ * preview. The fixes are applied with immer, which keeps every record they
+ * don't touch as the same object, so only the records whose object changed
+ * (plus HEAD) are serialized again; every other record's difference, if
+ * any, is taken from `baseline`, databaseDifferences() for `database`. */
 export function suggestionDifferences(
   ancestryService: AncestryService,
   database: GedcomDatabase,
+  baseline: GedcomRecordDifference[],
   updatedDatabase: GedcomDatabase,
 ): GedcomRecordDifference[] {
   const changedXrefs = new Set<string>();
@@ -62,24 +73,59 @@ export function suggestionDifferences(
     ),
   });
 
-  return ancestryService
-    .compareGedcomDatabase(changedDatabase)
-    .filter(({ originalGedcomRecord, updatedGedcomRecord }) => {
-      // Every record left out of `changedDatabase` comes back as an
-      // original with no update; only a record the fix removed is a real
-      // removal.
-      if (updatedGedcomRecord == undefined) {
-        return (
-          originalGedcomRecord != undefined &&
-          changedXrefs.has(originalGedcomRecord.xref)
-        );
-      }
-      return (
-        originalGedcomRecord == undefined ||
-        serializeGedcomRecordToText(originalGedcomRecord).join("\n") !==
-          serializeGedcomRecordToText(updatedGedcomRecord).join("\n")
-      );
-    });
+  const baselineByOriginal = new Map<GedcomRecord, GedcomRecordDifference>();
+  for (const difference of baseline) {
+    if (difference.originalGedcomRecord !== undefined) {
+      baselineByOriginal.set(difference.originalGedcomRecord, difference);
+    }
+  }
+
+  // compareGedcomDatabase lists every record in the file, in file order.
+  // A record left out of `changedDatabase` comes back as an original with
+  // no update: the fix didn't touch it, so it differs exactly as it does
+  // in `baseline`.
+  const result: GedcomRecordDifference[] = [];
+  for (const difference of ancestryService.compareGedcomDatabase(
+    changedDatabase,
+  )) {
+    const { originalGedcomRecord, updatedGedcomRecord } = difference;
+    if (
+      updatedGedcomRecord === undefined &&
+      originalGedcomRecord !== undefined &&
+      !changedXrefs.has(originalGedcomRecord.xref)
+    ) {
+      const untouched = baselineByOriginal.get(originalGedcomRecord);
+      if (untouched !== undefined) result.push(untouched);
+    } else if (differs(difference)) {
+      result.push(difference);
+    }
+  }
+  // Untouched records that aren't in the file at all come last, as they do
+  // in compareGedcomDatabase.
+  for (const difference of baseline) {
+    if (
+      difference.originalGedcomRecord === undefined &&
+      difference.updatedGedcomRecord !== undefined &&
+      difference.updatedGedcomRecord.tag !== "HEAD" &&
+      difference.updatedGedcomRecord.tag !== "TRLR" &&
+      !changedXrefs.has(difference.updatedGedcomRecord.xref)
+    ) {
+      result.push(difference);
+    }
+  }
+  return result;
+}
+
+function differs({
+  originalGedcomRecord,
+  updatedGedcomRecord,
+}: GedcomRecordDifference): boolean {
+  return (
+    originalGedcomRecord == undefined ||
+    updatedGedcomRecord == undefined ||
+    serializeGedcomRecordToText(originalGedcomRecord).join("\n") !==
+      serializeGedcomRecordToText(updatedGedcomRecord).join("\n")
+  );
 }
 
 /** The records in `updated` that aren't the same object as in `original`,
