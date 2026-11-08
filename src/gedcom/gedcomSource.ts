@@ -13,6 +13,7 @@ import {
 import {
   filterTrivialGedcomRecords,
   newGedcomRecord,
+  serializeGedcomRecordToText,
   type GedcomRecord,
 } from "./gedcomRecord";
 import {
@@ -96,42 +97,62 @@ export function parseGedcomSource(record: GedcomRecord): GedcomSource {
     }
   }
 
+  // Seed the serialization cache. When the source serializes back to
+  // exactly the record it was parsed from, cache that record itself, so
+  // comparing an unedited source against the file is an identity check.
+  const serialized = serializeGedcomSource(gedcomSource);
+  serializedSources.set(
+    gedcomSource,
+    serializeGedcomRecordToText(serialized).join("\n") ===
+      serializeGedcomRecordToText(record).join("\n")
+      ? record
+      : serialized,
+  );
+
   return gedcomSource;
 }
 
+// Each source's serialization, by object. Sources are only ever changed
+// through immer, which makes a new object for an edited one and keeps an
+// unedited one as the same object, so a cached serialization never goes
+// stale. See serializeGedcomIndividual.
+const serializedSources = new WeakMap<GedcomSource, GedcomRecord>();
+
 export function serializeGedcomSource(source: GedcomSource): GedcomRecord {
-  return newGedcomRecord({
-    xref: source.xref,
-    tag: "SOUR",
-    abstag: "SOUR",
-    children: filterTrivialGedcomRecords([
-      newGedcomRecord({
-        tag: "ABBR",
-        abstag: "SOUR.ABBR",
-        value: source.abbr,
-      }),
-      newGedcomRecord({
-        tag: "TITL",
-        abstag: "SOUR.TITL",
-        value: source.title,
-      }),
-      ...source.unknownRecords.filter((record) => record.tag == "_SUBQ"),
-      ...source.unknownRecords.filter((record) => record.tag == "_BIBL"),
-      newGedcomRecord({
-        tag: "TEXT",
-        abstag: "SOUR.TEXT",
-        value: source.text,
-      }),
-      serializeGedcomChangeDate(source.changeDate),
-      ...source.repositoryLinks.map((repositoryLink) =>
-        serializeGedcomRepositoryLink(repositoryLink),
-      ),
-      ...source.multimediaLinks.map((multimediaLink) =>
-        serializeGedcomMultimediaLink(multimediaLink),
-      ),
-      ...source.unknownRecords.filter(
-        (record) => record.tag != "_SUBQ" && record.tag != "_BIBL",
-      ),
-    ]),
-  });
+  return serializedSources.getOrInsertComputed(source, () =>
+    newGedcomRecord({
+      xref: source.xref,
+      tag: "SOUR",
+      abstag: "SOUR",
+      children: filterTrivialGedcomRecords([
+        newGedcomRecord({
+          tag: "ABBR",
+          abstag: "SOUR.ABBR",
+          value: source.abbr,
+        }),
+        newGedcomRecord({
+          tag: "TITL",
+          abstag: "SOUR.TITL",
+          value: source.title,
+        }),
+        ...source.unknownRecords.filter((record) => record.tag == "_SUBQ"),
+        ...source.unknownRecords.filter((record) => record.tag == "_BIBL"),
+        newGedcomRecord({
+          tag: "TEXT",
+          abstag: "SOUR.TEXT",
+          value: source.text,
+        }),
+        serializeGedcomChangeDate(source.changeDate),
+        ...source.repositoryLinks.map((repositoryLink) =>
+          serializeGedcomRepositoryLink(repositoryLink),
+        ),
+        ...source.multimediaLinks.map((multimediaLink) =>
+          serializeGedcomMultimediaLink(multimediaLink),
+        ),
+        ...source.unknownRecords.filter(
+          (record) => record.tag != "_SUBQ" && record.tag != "_BIBL",
+        ),
+      ]),
+    }),
+  );
 }

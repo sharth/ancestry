@@ -15,6 +15,7 @@ import { gedcomFamilyFacts } from "./gedcomFactMetadata";
 import {
   filterTrivialGedcomRecords,
   newGedcomRecord,
+  serializeGedcomRecordToText,
   type GedcomRecord,
 } from "./gedcomRecord";
 import {
@@ -95,44 +96,64 @@ export function parseGedcomFamily(record: GedcomRecord): GedcomFamily {
     }
   }
 
+  // Seed the serialization cache. When the family serializes back to
+  // exactly the record it was parsed from, cache that record itself, so
+  // comparing an unedited family against the file is an identity check.
+  const serialized = serializeGedcomFamily(gedcomFamily);
+  serializedFamilies.set(
+    gedcomFamily,
+    serializeGedcomRecordToText(serialized).join("\n") ===
+      serializeGedcomRecordToText(record).join("\n")
+      ? record
+      : serialized,
+  );
+
   return gedcomFamily;
 }
+
+// Each family's serialization, by object. Families are only ever changed
+// through immer, which makes a new object for an edited one and keeps an
+// unedited one as the same object, so a cached serialization never goes
+// stale. See serializeGedcomIndividual.
+const serializedFamilies = new WeakMap<GedcomFamily, GedcomRecord>();
 
 export function serializeGedcomFamily(
   gedcomFamily: GedcomFamily,
 ): GedcomRecord {
-  return newGedcomRecord({
-    tag: "FAM",
-    abstag: "FAM",
-    xref: gedcomFamily.xref,
-    children: filterTrivialGedcomRecords([
-      newGedcomRecord({
-        tag: "HUSB",
-        abstag: "FAM.HUSB",
-        value: gedcomFamily.husbandXref,
-      }),
-      newGedcomRecord({
-        tag: "WIFE",
-        abstag: "FAM.WIFE",
-        value: gedcomFamily.wifeXref,
-      }),
-      ...gedcomFamily.childXrefs.map((childXref) =>
+  return serializedFamilies.getOrInsertComputed(gedcomFamily, () =>
+    newGedcomRecord({
+      tag: "FAM",
+      abstag: "FAM",
+      xref: gedcomFamily.xref,
+      children: filterTrivialGedcomRecords([
         newGedcomRecord({
-          tag: "CHIL",
-          abstag: "FAM.CHIL",
-          value: childXref,
+          tag: "HUSB",
+          abstag: "FAM.HUSB",
+          value: gedcomFamily.husbandXref,
         }),
-      ),
-      ...gedcomFamily.citations.map((citation) =>
-        serializeGedcomSourceCitation(citation),
-      ),
-      ...sortChronologically(gedcomFamily.facts).map((event) =>
-        serializeGedcomFamilyFact(event),
-      ),
-      serializeGedcomChangeDate(gedcomFamily.changeDate),
-      ...gedcomFamily.unknownRecords,
-    ]),
-  });
+        newGedcomRecord({
+          tag: "WIFE",
+          abstag: "FAM.WIFE",
+          value: gedcomFamily.wifeXref,
+        }),
+        ...gedcomFamily.childXrefs.map((childXref) =>
+          newGedcomRecord({
+            tag: "CHIL",
+            abstag: "FAM.CHIL",
+            value: childXref,
+          }),
+        ),
+        ...gedcomFamily.citations.map((citation) =>
+          serializeGedcomSourceCitation(citation),
+        ),
+        ...sortChronologically(gedcomFamily.facts).map((event) =>
+          serializeGedcomFamilyFact(event),
+        ),
+        serializeGedcomChangeDate(gedcomFamily.changeDate),
+        ...gedcomFamily.unknownRecords,
+      ]),
+    }),
+  );
 }
 
 export function getFamilyMultimediaCitations(

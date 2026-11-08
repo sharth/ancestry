@@ -8,6 +8,7 @@ import {
 import {
   filterTrivialGedcomRecords,
   newGedcomRecord,
+  serializeGedcomRecordToText,
   type GedcomRecord,
 } from "./gedcomRecord";
 
@@ -61,28 +62,48 @@ export function parseGedcomSubmitter(
     }
   }
 
+  // Seed the serialization cache. When the submitter serializes back to
+  // exactly the record it was parsed from, cache that record itself, so
+  // comparing an unedited submitter against the file is an identity check.
+  const serialized = serializeGedcomSubmitter(gedcomSubmitter);
+  serializedSubmitters.set(
+    gedcomSubmitter,
+    serializeGedcomRecordToText(serialized).join("\n") ===
+      serializeGedcomRecordToText(gedcomRecord).join("\n")
+      ? gedcomRecord
+      : serialized,
+  );
+
   return gedcomSubmitter;
 }
+
+// Each submitter's serialization, by object. Submitters are only ever
+// changed through immer, which makes a new object for an edited one and
+// keeps an unedited one as the same object, so a cached serialization never
+// goes stale. See serializeGedcomIndividual.
+const serializedSubmitters = new WeakMap<GedcomSubmitter, GedcomRecord>();
 
 export function serializeGedcomSubmitter(
   gedcomSubmitter: GedcomSubmitter,
 ): GedcomRecord {
-  return newGedcomRecord({
-    xref: gedcomSubmitter.xref,
-    tag: "SUBM",
-    abstag: "SUBM",
-    children: filterTrivialGedcomRecords([
-      newGedcomRecord({
-        tag: "NAME",
-        abstag: "SUBM.NAME",
-        value: gedcomSubmitter.name,
-      }),
-      newGedcomRecord({
-        tag: "_EMAIL",
-        abstag: "SUBM._EMAIL",
-        value: gedcomSubmitter.email,
-      }),
-      serializeGedcomChangeDate(gedcomSubmitter.changeDate),
-    ]),
-  });
+  return serializedSubmitters.getOrInsertComputed(gedcomSubmitter, () =>
+    newGedcomRecord({
+      xref: gedcomSubmitter.xref,
+      tag: "SUBM",
+      abstag: "SUBM",
+      children: filterTrivialGedcomRecords([
+        newGedcomRecord({
+          tag: "NAME",
+          abstag: "SUBM.NAME",
+          value: gedcomSubmitter.name,
+        }),
+        newGedcomRecord({
+          tag: "_EMAIL",
+          abstag: "SUBM._EMAIL",
+          value: gedcomSubmitter.email,
+        }),
+        serializeGedcomChangeDate(gedcomSubmitter.changeDate),
+      ]),
+    }),
+  );
 }

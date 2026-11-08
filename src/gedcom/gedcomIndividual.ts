@@ -137,13 +137,14 @@ export function parseGedcomIndividual(record: GedcomRecord): GedcomIndividual {
   // Seed the serialization cache. When the individual serializes back to
   // exactly the record it was parsed from, cache that record itself, so
   // comparing an unedited individual against the file is an identity check.
-  if (
-    serializeGedcomRecordToText(
-      serializeGedcomIndividual(gedcomIndividual),
-    ).join("\n") === serializeGedcomRecordToText(record).join("\n")
-  ) {
-    serializedIndividuals.set(gedcomIndividual, record);
-  }
+  const serialized = serializeGedcomIndividual(gedcomIndividual);
+  serializedIndividuals.set(
+    gedcomIndividual,
+    serializeGedcomRecordToText(serialized).join("\n") ===
+      serializeGedcomRecordToText(record).join("\n")
+      ? record
+      : serialized,
+  );
 
   return gedcomIndividual;
 }
