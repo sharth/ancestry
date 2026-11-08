@@ -107,7 +107,7 @@ describe("SourceOverviewComponent", () => {
   it("passes each link's crop to its preview", () => {
     const [cropped, uncropped] = component.vm()?.multimediaLinks ?? [];
     expect(cropped?.crop).toEqual({ top: 10, left: 20, height: 30, width: 40 });
-    expect(uncropped?.crop).toBeUndefined();
+    expect(uncropped?.crop).toEqual({});
     const previews = fixture.debugElement.queryAll(
       By.directive(MultimediaPreviewComponent),
     );
@@ -115,7 +115,7 @@ describe("SourceOverviewComponent", () => {
       previews.map((preview) =>
         (preview.componentInstance as MultimediaPreviewComponent).crop(),
       ),
-    ).toEqual([{ top: 10, left: 20, height: 30, width: 40 }, undefined]);
+    ).toEqual([{ top: 10, left: 20, height: 30, width: 40 }, {}]);
   });
 
   it("includes the repository citation in the view model", () => {

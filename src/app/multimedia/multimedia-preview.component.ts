@@ -9,7 +9,10 @@ import {
 import { DomSanitizer } from "@angular/platform-browser";
 
 import { AncestryService } from "../../database/ancestry.service";
-import type { GedcomMultimediaCrop } from "../../gedcom/gedcomMultimediaLink";
+import {
+  hasGedcomMultimediaCrop,
+  type GedcomMultimediaCrop,
+} from "../../gedcom/gedcomMultimediaLink";
 
 interface CropRegion {
   left: number;
@@ -54,9 +57,8 @@ export class MultimediaPreviewComponent {
   private readonly sanitizer = inject(DomSanitizer);
 
   readonly filePath = input.required<string>();
-  // The CROP of the multimedia link being shown, if any. Only applies to
-  // images.
-  readonly crop = input<GedcomMultimediaCrop | undefined>(undefined);
+  // The CROP of the multimedia link being shown. Only applies to images.
+  readonly crop = input<GedcomMultimediaCrop>({});
 
   // Only known once the browser has decoded the image; CROP is in natural
   // pixels.
@@ -67,7 +69,7 @@ export class MultimediaPreviewComponent {
   readonly cropRegion = computed(() => {
     const crop = this.crop();
     const naturalSize = this.naturalSize();
-    if (!crop || !naturalSize) {
+    if (!hasGedcomMultimediaCrop(crop) || !naturalSize) {
       return undefined;
     }
     return resolveCropRegion(crop, naturalSize);
@@ -104,7 +106,8 @@ export class MultimediaPreviewComponent {
   // Until the image has loaded, the crop can't be applied yet, so a cropped
   // preview stays hidden rather than flashing the whole image.
   readonly hideUntilLoaded = computed(
-    () => this.crop() !== undefined && this.naturalSize() === undefined,
+    () =>
+      hasGedcomMultimediaCrop(this.crop()) && this.naturalSize() === undefined,
   );
 
   onImageLoad(event: Event) {

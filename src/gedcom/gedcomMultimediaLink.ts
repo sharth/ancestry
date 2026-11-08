@@ -13,10 +13,20 @@ export interface GedcomMultimediaCrop {
   width?: number;
 }
 
+// Whether any CROP value is set; an empty crop shows the whole image.
+export function hasGedcomMultimediaCrop(crop: GedcomMultimediaCrop): boolean {
+  return (
+    crop.top !== undefined ||
+    crop.left !== undefined ||
+    crop.height !== undefined ||
+    crop.width !== undefined
+  );
+}
+
 export interface GedcomMultimediaLink {
   xref: string;
   title: string;
-  crop: GedcomMultimediaCrop | undefined;
+  crop: GedcomMultimediaCrop;
 }
 
 export function newGedcomMultimediaLink(
@@ -25,7 +35,7 @@ export function newGedcomMultimediaLink(
   return {
     xref: "",
     title: "",
-    crop: undefined,
+    crop: {},
     ...fieldsToUpdate,
   };
 }
@@ -61,6 +71,7 @@ export function parseGedcomMultimediaLink(
   const gedcomMultimediaLink = newGedcomMultimediaLink({
     xref: record.value,
   });
+  let seenCrop = false;
 
   for (const childRecord of record.children) {
     switch (childRecord.tag) {
@@ -76,9 +87,9 @@ export function parseGedcomMultimediaLink(
       case "CROP":
         if (childRecord.xref != "") throw new Error();
         if (childRecord.value != "") throw new Error();
-        if (gedcomMultimediaLink.crop) throw new Error();
+        if (seenCrop) throw new Error();
+        seenCrop = true;
 
-        gedcomMultimediaLink.crop = {};
         for (const cropChildRecord of childRecord.children) {
           switch (cropChildRecord.tag) {
             case "TOP":
@@ -125,19 +136,19 @@ export function serializeGedcomMultimediaLink(
         children: filterTrivialGedcomRecords([
           newGedcomRecord({
             tag: "TOP",
-            value: gedcomMultimediaLink.crop?.top?.toString() ?? "",
+            value: gedcomMultimediaLink.crop.top?.toString() ?? "",
           }),
           newGedcomRecord({
             tag: "LEFT",
-            value: gedcomMultimediaLink.crop?.left?.toString() ?? "",
+            value: gedcomMultimediaLink.crop.left?.toString() ?? "",
           }),
           newGedcomRecord({
             tag: "HEIGHT",
-            value: gedcomMultimediaLink.crop?.height?.toString() ?? "",
+            value: gedcomMultimediaLink.crop.height?.toString() ?? "",
           }),
           newGedcomRecord({
             tag: "WIDTH",
-            value: gedcomMultimediaLink.crop?.width?.toString() ?? "",
+            value: gedcomMultimediaLink.crop.width?.toString() ?? "",
           }),
         ]),
       }),

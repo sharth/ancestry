@@ -25,6 +25,6 @@ describe("InputMultimediaCropComponent", () => {
   it("clearCrop clears the value", () => {
     component.value.set({ top: 1, left: 2, height: 3, width: 4 });
     component.clearCrop();
-    expect(component.value()).toBeUndefined();
+    expect(component.value()).toEqual({});
   });
 });

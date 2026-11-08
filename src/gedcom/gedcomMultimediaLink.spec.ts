@@ -21,6 +21,7 @@ describe("gedcomMultimediaLink", () => {
     expect(parseGedcomMultimediaLink(gedcomRecord)).toEqual({
       xref: "@M1@",
       title: "",
+      crop: {},
     });
   });
   it("serializer", () => {
@@ -66,9 +67,7 @@ describe("gedcomMultimediaLink", () => {
   });
   it("serializer drops a crop with no values", () => {
     expect(
-      serializeGedcomMultimediaLink(
-        newGedcomMultimediaLink({ xref: "@M1@", crop: {} }),
-      ),
+      serializeGedcomMultimediaLink(newGedcomMultimediaLink({ xref: "@M1@" })),
     ).toEqual(gedcomRecord);
   });
 });

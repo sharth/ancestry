@@ -20,7 +20,7 @@
     type="button"
     class="btn btn-sm btn-outline-secondary mt-1"
     (click)="clearCrop()"
-    [disabled]="!value()"
+    [disabled]="!hasCrop()"
   >
     Clear crop
   </button>

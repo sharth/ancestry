@@ -10,7 +10,10 @@ import {
 import { DomSanitizer } from "@angular/platform-browser";
 
 import { AncestryService } from "../../database/ancestry.service";
-import type { GedcomMultimediaCrop } from "../../gedcom/gedcomMultimediaLink";
+import {
+  hasGedcomMultimediaCrop,
+  type GedcomMultimediaCrop,
+} from "../../gedcom/gedcomMultimediaLink";
 
 interface DragStart {
   xPercent: number;
@@ -27,7 +30,8 @@ export class InputMultimediaCropComponent {
   private readonly sanitizer = inject(DomSanitizer);
 
   readonly filePath = input.required<string>();
-  readonly value = model<GedcomMultimediaCrop | undefined>(undefined);
+  readonly value = model<GedcomMultimediaCrop>({});
+  readonly hasCrop = computed(() => hasGedcomMultimediaCrop(this.value()));
 
   // Only known once the browser has decoded the image; a crop is stored in
   // these natural pixel dimensions so it stays correct regardless of how
@@ -60,7 +64,7 @@ export class InputMultimediaCropComponent {
     const crop = this.value();
     const naturalSize = this.naturalSize();
     if (
-      !crop ||
+      !hasGedcomMultimediaCrop(crop) ||
       !naturalSize ||
       naturalSize.width === 0 ||
       naturalSize.height === 0
@@ -101,13 +105,13 @@ export class InputMultimediaCropComponent {
   endDrag() {
     this.dragStart = undefined;
     const crop = this.value();
-    if (crop && (!crop.width || !crop.height)) {
-      this.value.set(undefined);
+    if (hasGedcomMultimediaCrop(crop) && (!crop.width || !crop.height)) {
+      this.value.set({});
     }
   }
 
   clearCrop() {
-    this.value.set(undefined);
+    this.value.set({});
   }
 
   private pointerPercent(event: PointerEvent): {

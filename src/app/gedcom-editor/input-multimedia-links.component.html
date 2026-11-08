@@ -65,7 +65,7 @@
           <h6 class="mt-2">Crop</h6>
           <app-input-multimedia-crop
             [filePath]="multimedia.filePath"
-            [value]="value()[$index]?.crop"
+            [value]="multimediaLink.crop"
             (valueChange)="setCrop($index, $event)"
           />
         }

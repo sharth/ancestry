@@ -37,7 +37,7 @@ describe("InputMultimediaLinksComponent", () => {
     component.appendMultimediaLink();
     component.appendMultimediaLink();
     component.setCrop(1, { top: 1, left: 2, height: 3, width: 4 });
-    expect(component.value()[0]?.crop).toBeUndefined();
+    expect(component.value()[0]?.crop).toEqual({});
     expect(component.value()[1]?.crop).toEqual({
       top: 1,
       left: 2,
