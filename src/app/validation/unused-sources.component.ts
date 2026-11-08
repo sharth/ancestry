@@ -15,12 +15,16 @@ import type { GedcomRecord } from "../../gedcom/gedcomRecord";
 export class UnusedSourcesComponent {
   readonly ancestryDatabase = input.required<GedcomDatabase>();
 
-  readonly unusedSources = computed(() => {
-    const cited = new Set(citedSourceXrefs(this.ancestryDatabase()));
-    return Object.values(this.ancestryDatabase().sources).filter(
-      (source) => !cited.has(source.xref),
-    );
-  });
+  readonly unusedSources = computed(() =>
+    findUnusedSources(this.ancestryDatabase()),
+  );
+}
+
+export function findUnusedSources(gedcomDatabase: GedcomDatabase) {
+  const cited = new Set(citedSourceXrefs(gedcomDatabase));
+  return Object.values(gedcomDatabase.sources).filter(
+    (source) => !cited.has(source.xref),
+  );
 }
 
 function* citedSourceXrefs(gedcomDatabase: GedcomDatabase): Generator<string> {

@@ -50,7 +50,7 @@ describe("ValidationComponent", () => {
 
     // S1 has no repository, so its URL suggestion is listed in the
     // "Sources without repositories" tab.
-    screen.getByRole("tab", { name: "Sources without repositories" }).click();
+    screen.getByRole("tab", { name: /^Sources without repositories/ }).click();
     await fixture.whenStable();
   });
 
@@ -84,22 +84,41 @@ describe("ValidationComponent", () => {
         .length,
     ).toBeGreaterThan(0);
 
-    screen.getByRole("tab", { name: "Source warnings" }).click();
+    screen.getByRole("tab", { name: /^Source warnings/ }).click();
     await fixture.whenStable();
     expect(page.querySelector("app-sources-without-repositories")).toBeNull();
     expect(page.querySelectorAll(".diff-section")).toHaveLength(0);
+  });
+
+  it("shows each tab's finding count on the tab", () => {
+    const counts = Object.fromEntries(
+      screen
+        .getAllByRole("tab")
+        .map((tab) => [
+          tab.firstChild?.textContent?.trim(),
+          tab.querySelector(".badge")?.textContent.trim(),
+        ]),
+    );
+    expect(counts).toEqual({
+      "Source warnings": "0",
+      "Sources without repositories": "1",
+      "Duplicate call numbers": "0",
+      "Unused sources": "1",
+      "Unused multimedia": "0",
+      "Bibliography without title": "0",
+    });
   });
 
   it("shows only the selected tab's check", async () => {
     const page = fixture.nativeElement as HTMLElement;
     expect(
       screen
-        .getByRole("tab", { name: "Sources without repositories" })
+        .getByRole("tab", { name: /^Sources without repositories/ })
         .getAttribute("aria-selected"),
     ).toBe("true");
     expect(page.querySelector("app-unused-sources")).toBeNull();
 
-    screen.getByRole("tab", { name: "Unused sources" }).click();
+    screen.getByRole("tab", { name: /^Unused sources/ }).click();
     await fixture.whenStable();
     expect(page.querySelector("app-unused-sources")).not.toBeNull();
     expect(page.querySelector("app-sources-without-repositories")).toBeNull();

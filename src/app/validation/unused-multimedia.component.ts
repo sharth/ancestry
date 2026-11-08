@@ -15,12 +15,16 @@ import type { GedcomSourceCitation } from "../../gedcom/gedcomSourceCitation";
 export class UnusedMultimediaComponent {
   readonly ancestryDatabase = input.required<GedcomDatabase>();
 
-  readonly unusedMultimedia = computed(() => {
-    const linked = new Set(linkedMultimediaXrefs(this.ancestryDatabase()));
-    return Object.values(this.ancestryDatabase().multimedias).filter(
-      (multimedia) => !linked.has(multimedia.xref),
-    );
-  });
+  readonly unusedMultimedia = computed(() =>
+    findUnusedMultimedia(this.ancestryDatabase()),
+  );
+}
+
+export function findUnusedMultimedia(gedcomDatabase: GedcomDatabase) {
+  const linked = new Set(linkedMultimediaXrefs(gedcomDatabase));
+  return Object.values(gedcomDatabase.multimedias).filter(
+    (multimedia) => !linked.has(multimedia.xref),
+  );
 }
 
 function* linkedMultimediaXrefs(

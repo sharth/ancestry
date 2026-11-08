@@ -22,24 +22,28 @@ interface SourceUse {
 export class DuplicateCallNumbersComponent {
   readonly ancestryDatabase = input.required<GedcomDatabase>();
 
-  readonly duplicateCallNumbers = computed(() => {
-    const uses = new Map<string, Map<string, SourceUse>>();
-    for (const source of Object.values(this.ancestryDatabase().sources)) {
-      for (const repositoryLink of source.repositoryLinks) {
-        for (const callNumber of repositoryLink.callNumbers) {
-          const sources = uses.get(callNumber) ?? new Map<string, SourceUse>();
-          uses.set(callNumber, sources);
-          const use = sources.get(source.xref) ?? { source, count: 0 };
-          sources.set(source.xref, use);
-          use.count++;
-        }
+  readonly duplicateCallNumbers = computed(() =>
+    findDuplicateCallNumbers(this.ancestryDatabase()),
+  );
+}
+
+export function findDuplicateCallNumbers(gedcomDatabase: GedcomDatabase) {
+  const uses = new Map<string, Map<string, SourceUse>>();
+  for (const source of Object.values(gedcomDatabase.sources)) {
+    for (const repositoryLink of source.repositoryLinks) {
+      for (const callNumber of repositoryLink.callNumbers) {
+        const sources = uses.get(callNumber) ?? new Map<string, SourceUse>();
+        uses.set(callNumber, sources);
+        const use = sources.get(source.xref) ?? { source, count: 0 };
+        sources.set(source.xref, use);
+        use.count++;
       }
     }
-    return Array.from(uses, ([callNumber, sources]) => ({
-      callNumber,
-      sources: Array.from(sources.values()),
-    })).filter(
-      ({ sources }) => sources.reduce((sum, use) => sum + use.count, 0) > 1,
-    );
-  });
+  }
+  return Array.from(uses, ([callNumber, sources]) => ({
+    callNumber,
+    sources: Array.from(sources.values()),
+  })).filter(
+    ({ sources }) => sources.reduce((sum, use) => sum + use.count, 0) > 1,
+  );
 }

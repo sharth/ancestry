@@ -12,6 +12,9 @@
         (click)="activeTab.set(tab.id)"
       >
         {{ tab.label }}
+        <span class="badge rounded-pill text-bg-secondary">
+          {{ tabCounts()[tab.id] }}
+        </span>
       </button>
     </li>
   }
