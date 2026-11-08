@@ -7,15 +7,10 @@ import {
   parseGedcomMultimediaLink,
   serializeGedcomMultimediaLink,
 } from "./gedcomMultimediaLink";
-import type { GedcomRecord } from "./gedcomRecord";
+import { newGedcomRecord } from "./gedcomRecord";
 
 describe("gedcomMultimediaLink", () => {
-  const gedcomRecord: GedcomRecord = {
-    tag: "OBJE",
-    xref: "",
-    value: "@M1@",
-    children: [],
-  };
+  const gedcomRecord = newGedcomRecord({ tag: "OBJE", value: "@M1@" });
   it("parser", () => {
     expect(parseGedcomMultimediaLink(gedcomRecord)).toEqual({
       xref: "@M1@",
@@ -28,25 +23,22 @@ describe("gedcomMultimediaLink", () => {
     ).toEqual(gedcomRecord);
   });
 
-  const gedcomRecordWithCrop: GedcomRecord = {
+  const gedcomRecordWithCrop = newGedcomRecord({
     tag: "OBJE",
-    xref: "",
     value: "@M1@",
     children: [
-      {
+      newGedcomRecord({
         tag: "CROP",
-        xref: "",
-        value: "",
         children: [
-          { tag: "TOP", xref: "", value: "10", children: [] },
-          { tag: "LEFT", xref: "", value: "20", children: [] },
-          { tag: "HEIGHT", xref: "", value: "30", children: [] },
-          { tag: "WIDTH", xref: "", value: "40", children: [] },
+          newGedcomRecord({ tag: "TOP", value: "10" }),
+          newGedcomRecord({ tag: "LEFT", value: "20" }),
+          newGedcomRecord({ tag: "HEIGHT", value: "30" }),
+          newGedcomRecord({ tag: "WIDTH", value: "40" }),
         ],
-      },
-      { tag: "TITL", xref: "", value: "A crop", children: [] },
+      }),
+      newGedcomRecord({ tag: "TITL", value: "A crop" }),
     ],
-  };
+  });
   it("parser with crop", () => {
     expect(parseGedcomMultimediaLink(gedcomRecordWithCrop)).toEqual({
       xref: "@M1@",

@@ -6,16 +6,11 @@ import {
   serializeGedcomDate,
   type GedcomDate,
 } from "./gedcomDate";
-import type { GedcomRecord } from "./gedcomRecord";
+import { newGedcomRecord } from "./gedcomRecord";
 
 describe("gedcomDate", () => {
   it("Exact Date", () => {
-    const gedcomRecord: GedcomRecord = {
-      tag: "DATE",
-      xref: "",
-      value: "ABT 1900",
-      children: [],
-    };
+    const gedcomRecord = newGedcomRecord({ tag: "DATE", value: "ABT 1900" });
 
     expect(parseGedcomDate(gedcomRecord)).toEqual({
       value: "ABT 1900",

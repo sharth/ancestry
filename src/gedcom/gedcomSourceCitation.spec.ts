@@ -1,27 +1,24 @@
 import { describe, expect, it } from "vitest";
 
-import type { GedcomRecord } from "./gedcomRecord";
+import { newGedcomRecord } from "./gedcomRecord";
 import {
   parseGedcomSourceCitation,
   serializeGedcomSourceCitation,
 } from "./gedcomSourceCitation";
 
 describe("gedcomSourceCitation", () => {
-  const gedcomRecord: GedcomRecord = {
+  const gedcomRecord = newGedcomRecord({
     tag: "SOUR",
-    xref: "",
     value: "@S1@",
     children: [
-      { tag: "PAGE", xref: "", value: "page 123", children: [] },
-      { tag: "QUAY", xref: "", value: "0", children: [] },
-      {
+      newGedcomRecord({ tag: "PAGE", value: "page 123" }),
+      newGedcomRecord({ tag: "QUAY", value: "0" }),
+      newGedcomRecord({
         tag: "DATA",
-        xref: "",
-        value: "",
-        children: [{ tag: "TEXT", xref: "", value: "text", children: [] }],
-      },
+        children: [newGedcomRecord({ tag: "TEXT", value: "text" })],
+      }),
     ],
-  };
+  });
   it("parser", () => {
     expect(parseGedcomSourceCitation(gedcomRecord)).toEqual({
       sourceXref: "@S1@",
