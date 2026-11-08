@@ -71,7 +71,7 @@ export function parseGedcomRecords(text: string): GedcomRecord[] {
       string,
     ];
     const level = parseInt(levelString, 10);
-    const record: GedcomRecord = { xref, tag, value, children: [] };
+    const record = newGedcomRecord({ xref, tag, value });
 
     if (level == 0) {
       ladder = [record];
