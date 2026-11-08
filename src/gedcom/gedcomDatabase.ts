@@ -1,4 +1,7 @@
-import { reportUnparsedRecord } from "../util/record-unparsed-records";
+import {
+  reportUnparsedRecord,
+  warnUnparsedRecords,
+} from "../util/record-unparsed-records";
 import {
   parseGedcomFamily,
   serializeGedcomFamily,
@@ -113,6 +116,7 @@ export function parseGedcomDatabase(gedcomRecords: GedcomRecord[]) {
         break;
     }
   }
+  warnUnparsedRecords(gedcomRecords);
 
   // For whatever reason, GEDCOM has the family references in both the FAM and INDI.
   // Ensure that these are consistent.
