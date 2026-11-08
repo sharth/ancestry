@@ -65,13 +65,14 @@ export function parseGedcomSubmitter(
   // Seed the serialization cache. When the submitter serializes back to
   // exactly the record it was parsed from, cache that record itself, so
   // comparing an unedited submitter against the file is an identity check.
-  if (
-    serializeGedcomRecordToText(serializeGedcomSubmitter(gedcomSubmitter)).join(
-      "\n",
-    ) === serializeGedcomRecordToText(gedcomRecord).join("\n")
-  ) {
-    serializedSubmitters.set(gedcomSubmitter, gedcomRecord);
-  }
+  const serialized = serializeGedcomSubmitter(gedcomSubmitter);
+  serializedSubmitters.set(
+    gedcomSubmitter,
+    serializeGedcomRecordToText(serialized).join("\n") ===
+      serializeGedcomRecordToText(gedcomRecord).join("\n")
+      ? gedcomRecord
+      : serialized,
+  );
 
   return gedcomSubmitter;
 }

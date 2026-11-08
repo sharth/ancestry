@@ -85,13 +85,14 @@ export function parseGedcomMultimedia(record: GedcomRecord): GedcomMultimedia {
   // Seed the serialization cache. When the multimedia record serializes back to
   // exactly the record it was parsed from, cache that record itself, so
   // comparing an unedited multimedia record against the file is an identity check.
-  if (
-    serializeGedcomRecordToText(
-      serializeGedcomMultimedia(gedcomMultimedia),
-    ).join("\n") === serializeGedcomRecordToText(record).join("\n")
-  ) {
-    serializedMultimedias.set(gedcomMultimedia, record);
-  }
+  const serialized = serializeGedcomMultimedia(gedcomMultimedia);
+  serializedMultimedias.set(
+    gedcomMultimedia,
+    serializeGedcomRecordToText(serialized).join("\n") ===
+      serializeGedcomRecordToText(record).join("\n")
+      ? record
+      : serialized,
+  );
 
   return gedcomMultimedia;
 }

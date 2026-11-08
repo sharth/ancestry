@@ -100,13 +100,14 @@ export function parseGedcomSource(record: GedcomRecord): GedcomSource {
   // Seed the serialization cache. When the source serializes back to
   // exactly the record it was parsed from, cache that record itself, so
   // comparing an unedited source against the file is an identity check.
-  if (
-    serializeGedcomRecordToText(serializeGedcomSource(gedcomSource)).join(
-      "\n",
-    ) === serializeGedcomRecordToText(record).join("\n")
-  ) {
-    serializedSources.set(gedcomSource, record);
-  }
+  const serialized = serializeGedcomSource(gedcomSource);
+  serializedSources.set(
+    gedcomSource,
+    serializeGedcomRecordToText(serialized).join("\n") ===
+      serializeGedcomRecordToText(record).join("\n")
+      ? record
+      : serialized,
+  );
 
   return gedcomSource;
 }

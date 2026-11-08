@@ -99,13 +99,14 @@ export function parseGedcomFamily(record: GedcomRecord): GedcomFamily {
   // Seed the serialization cache. When the family serializes back to
   // exactly the record it was parsed from, cache that record itself, so
   // comparing an unedited family against the file is an identity check.
-  if (
-    serializeGedcomRecordToText(serializeGedcomFamily(gedcomFamily)).join(
-      "\n",
-    ) === serializeGedcomRecordToText(record).join("\n")
-  ) {
-    serializedFamilies.set(gedcomFamily, record);
-  }
+  const serialized = serializeGedcomFamily(gedcomFamily);
+  serializedFamilies.set(
+    gedcomFamily,
+    serializeGedcomRecordToText(serialized).join("\n") ===
+      serializeGedcomRecordToText(record).join("\n")
+      ? record
+      : serialized,
+  );
 
   return gedcomFamily;
 }
