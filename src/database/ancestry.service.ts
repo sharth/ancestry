@@ -231,9 +231,11 @@ export class AncestryService {
   async updateGedcomDatabase(gedcomDatabase: GedcomDatabase) {
     const gedcomResource = this.gedcomResource.value();
     const originalGedcomRecords = gedcomResource?.gedcomRecords ?? [];
+    const originalGedcomDatabase =
+      this.ancestryDatabase() ?? newGedcomDatabase();
     const text = serializeGedcomDatabase(
       originalGedcomRecords,
-      this.ancestryDatabase() ?? newGedcomDatabase(),
+      originalGedcomDatabase,
       gedcomDatabase,
     );
 
