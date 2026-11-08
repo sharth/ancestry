@@ -31,7 +31,7 @@ export function newGedcomMultimedia(
 }
 
 export function parseGedcomMultimedia(record: GedcomRecord): GedcomMultimedia {
-  if (record.abstag !== "OBJE") throw new Error();
+  if (record.tag !== "OBJE") throw new Error();
   if (record.xref == "") throw new Error();
   if (record.value != "") throw new Error();
 
@@ -106,22 +106,18 @@ export function serializeGedcomMultimedia(
   return serializedMultimedias.getOrInsertComputed(gedcomMultimedia, () =>
     newGedcomRecord({
       tag: "OBJE",
-      abstag: "OBJE",
       xref: gedcomMultimedia.xref,
       children: filterTrivialGedcomRecords([
         newGedcomRecord({
           tag: "FILE",
-          abstag: "OBJE.FILE",
           value: gedcomMultimedia.filePath,
           children: filterTrivialGedcomRecords([
             newGedcomRecord({
               tag: "FORM",
-              abstag: "OBJE.FILE.FORM",
               value: gedcomMultimedia.mediaType,
             }),
             newGedcomRecord({
               tag: "TITL",
-              abstag: "OBJE.FILE.TITL",
               value: gedcomMultimedia.title,
             }),
           ]),

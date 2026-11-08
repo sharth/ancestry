@@ -186,12 +186,10 @@ describe("gedcomFamily", () => {
         unknownRecords: [
           newGedcomRecord({
             tag: "NOTE",
-            abstag: "FAM.NOTE",
             value: "Some family note",
           }),
           newGedcomRecord({
             tag: "RIN",
-            abstag: "FAM.RIN",
             value: "123",
           }),
         ],

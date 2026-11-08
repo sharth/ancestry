@@ -82,12 +82,10 @@ export function serializeGedcomRepository(
   return serializedRepositories.getOrInsertComputed(gedcomRepository, () =>
     newGedcomRecord({
       tag: "REPO",
-      abstag: "REPO",
       xref: gedcomRepository.xref,
       children: filterTrivialGedcomRecords([
         newGedcomRecord({
           tag: "NAME",
-          abstag: "REPO.NAME",
           value: gedcomRepository.name,
         }),
         serializeGedcomChangeDate(gedcomRepository.changeDate),

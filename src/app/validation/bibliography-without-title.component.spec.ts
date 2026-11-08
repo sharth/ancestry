@@ -12,7 +12,7 @@ import { newGedcomSource, type GedcomSource } from "../../gedcom/gedcomSource";
 import { BibliographyWithoutTitleComponent } from "./bibliography-without-title.component";
 
 function bibl(value: string) {
-  return newGedcomRecord({ tag: "_BIBL", abstag: "SOUR._BIBL", value });
+  return newGedcomRecord({ tag: "_BIBL", value });
 }
 
 describe("BibliographyWithoutTitleComponent", () => {

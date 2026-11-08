@@ -22,7 +22,6 @@ describe("GedcomRepository", () => {
   it("no fields", () => {
     const gedcomRecord = newGedcomRecord({
       tag: "REPO",
-      abstag: "REPO",
       xref: "@R1@",
     });
     expect(parseGedcomRepository(gedcomRecord)).toEqual(

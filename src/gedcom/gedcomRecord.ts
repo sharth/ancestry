@@ -1,7 +1,6 @@
 export interface GedcomRecord {
   xref: string;
   tag: string;
-  abstag: string;
   value: string;
   children: GedcomRecord[];
 }
@@ -10,7 +9,6 @@ export function newGedcomRecord(fieldsToOverride: Partial<GedcomRecord>) {
   return {
     xref: "",
     tag: "",
-    abstag: "",
     value: "",
     children: [],
     ...fieldsToOverride,
@@ -18,8 +16,7 @@ export function newGedcomRecord(fieldsToOverride: Partial<GedcomRecord>) {
 }
 
 // Whether two records serialize to the same text: the same tag, xref and
-// value, with equal children in the same order. abstag is ignored, as
-// serializeGedcomRecordToText ignores it. The same object is equal without
+// value, with equal children in the same order. The same object is equal without
 // a walk, which is the common case for an unedited record (see
 // serializeGedcomIndividual).
 export function gedcomRecordsEqual(a: GedcomRecord, b: GedcomRecord): boolean {
@@ -74,11 +71,7 @@ export function parseGedcomRecords(text: string): GedcomRecord[] {
       string,
     ];
     const level = parseInt(levelString, 10);
-    const abstag = [
-      ...ladder.slice(0, level).map((record) => record.tag),
-      tag,
-    ].join(".");
-    const record = newGedcomRecord({ xref, tag, abstag, value });
+    const record = newGedcomRecord({ xref, tag, value });
 
     if (level == 0) {
       ladder = [record];

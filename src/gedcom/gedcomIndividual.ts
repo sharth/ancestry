@@ -89,7 +89,7 @@ export function surname(gedcomIndividual: GedcomIndividual): string {
 }
 
 export function parseGedcomIndividual(record: GedcomRecord): GedcomIndividual {
-  if (record.abstag !== "INDI") throw new Error();
+  if (record.tag !== "INDI") throw new Error();
   if (record.xref == "") throw new Error();
   if (record.value != "") throw new Error();
 
@@ -160,7 +160,6 @@ export function serializeGedcomIndividual(
     newGedcomRecord({
       xref: gedcomIndividual.xref,
       tag: "INDI",
-      abstag: "INDI",
       children: filterTrivialGedcomRecords([
         ...gedcomIndividual.names.map((name) => serializeGedcomName(name)),
         serializeGedcomSex(gedcomIndividual.sex),

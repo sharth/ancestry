@@ -10,20 +10,17 @@ describe("gedcomRepositoryLink", () => {
   it("parses multiple CALN tags into callNumbers", () => {
     const repositoryLink = parseGedcomRepositoryLink({
       tag: "REPO",
-      abstag: "SOUR.REPO",
       xref: "",
       value: "@R1@",
       children: [
         {
           tag: "CALN",
-          abstag: "SOUR.REPO.CALN",
           xref: "",
           value: "Call Number 1",
           children: [],
         },
         {
           tag: "CALN",
-          abstag: "SOUR.REPO.CALN",
           xref: "",
           value: "Call Number 2",
           children: [],
@@ -41,7 +38,6 @@ describe("gedcomRepositoryLink", () => {
   it("parses a REPO with no CALN tags into an empty array", () => {
     const repositoryLink = parseGedcomRepositoryLink({
       tag: "REPO",
-      abstag: "SOUR.REPO",
       xref: "",
       value: "@R1@",
       children: [],
@@ -61,14 +57,12 @@ describe("gedcomRepositoryLink", () => {
     expect(record.children).toEqual([
       {
         tag: "CALN",
-        abstag: "SOUR.REPO.CALN",
         xref: "",
         value: "Call Number 1",
         children: [],
       },
       {
         tag: "CALN",
-        abstag: "SOUR.REPO.CALN",
         xref: "",
         value: "Call Number 2",
         children: [],

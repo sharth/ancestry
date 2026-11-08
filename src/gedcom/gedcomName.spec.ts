@@ -7,19 +7,6 @@ import {
 } from "./gedcomName";
 import { parseGedcomRecords, type GedcomRecord } from "./gedcomRecord";
 
-function normalize(record: GedcomRecord | null): GedcomRecord | null {
-  if (record === null) {
-    return null;
-  }
-  return {
-    tag: record.tag,
-    abstag: "",
-    xref: record.xref,
-    value: record.value,
-    children: record.children.map(normalize).filter((r) => r !== null),
-  };
-}
-
 function expectToBeDefined<T>(value: T | undefined): asserts value is T {
   expect(value).toBeDefined();
 }
@@ -49,9 +36,9 @@ describe("GedcomName", () => {
       citations: [],
       notes: [],
     });
-    expect(
-      normalize(serializeGedcomName(parseGedcomName(gedcomRecord))),
-    ).toEqual(normalize(gedcomRecord));
+    expect(serializeGedcomName(parseGedcomName(gedcomRecord))).toEqual(
+      gedcomRecord,
+    );
   });
   it("serializes to null if empty", () => {
     const gedcomName: GedcomName = {

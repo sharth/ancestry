@@ -23,13 +23,11 @@ describe("GedcomRecord", () => {
     expect(parseGedcomRecords(gedcomText)).toEqual([
       {
         tag: "SUBM",
-        abstag: "SUBM",
         xref: "@X1@",
         value: "",
         children: [
           {
             tag: "NAME",
-            abstag: "SUBM.NAME",
             xref: "",
             value: "John\nDoe",
             children: [],
@@ -38,13 +36,11 @@ describe("GedcomRecord", () => {
       },
       {
         tag: "SUBM",
-        abstag: "SUBM",
         xref: "@X2@",
         value: "",
         children: [
           {
             tag: "EMAIL",
-            abstag: "SUBM.EMAIL",
             xref: "",
             value: "johndoe@example.com",
             children: [],
@@ -70,26 +66,6 @@ describe("gedcomRecordsEqual", () => {
   it("treats the same object as equal", () => {
     const record = newGedcomRecord({ tag: "INDI", xref: "@I1@" });
     expect(gedcomRecordsEqual(record, record)).toBe(true);
-  });
-
-  it("ignores abstag", () => {
-    expect(
-      gedcomRecordsEqual(
-        newGedcomRecord({
-          tag: "INDI",
-          xref: "@I1@",
-          children: [newGedcomRecord({ tag: "SEX", value: "M" })],
-        }),
-        newGedcomRecord({
-          tag: "INDI",
-          abstag: "INDI",
-          xref: "@I1@",
-          children: [
-            newGedcomRecord({ tag: "SEX", abstag: "INDI.SEX", value: "M" }),
-          ],
-        }),
-      ),
-    ).toBe(true);
   });
 
   it("compares tag, xref, value and children", () => {
