@@ -1,5 +1,6 @@
 import { produce } from "immer";
 
+import { generateGedcomChangeDate } from "../../gedcom/gedcomChangeDate";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import type { GedcomSource } from "../../gedcom/gedcomSource";
 import { applyUrlSuggestions } from "./apply-url-suggestion.util";
@@ -35,10 +36,12 @@ export interface ApplyBibliographyTitleSuggestionResult {
 /** Moves an untitled source's `_BIBL` into its TITL and then, in the same
  * edit, applies every repository suggestion for URLs in the source as it
  * stands after the move -- so a URL that came over with the bibliography
- * becomes a repository call number too. Pure, like applyUrlSuggestions. */
+ * becomes a repository call number too. Stamps the source's CHAN with
+ * `now`, since its title changes. Pure, like applyUrlSuggestions. */
 export function applyBibliographyTitleSuggestion(
   database: GedcomDatabase,
   source: GedcomSource,
+  now = new Date(),
 ): ApplyBibliographyTitleSuggestionResult {
   const bibliography = bibliographyForMissingTitle(source);
   if (bibliography === undefined) {
@@ -52,6 +55,7 @@ export function applyBibliographyTitleSuggestion(
     draftSource.unknownRecords = draftSource.unknownRecords.filter(
       (record) => record.tag !== "_BIBL",
     );
+    draftSource.changeDate = generateGedcomChangeDate(now);
   });
 
   const movedSource = moved.sources[source.xref];

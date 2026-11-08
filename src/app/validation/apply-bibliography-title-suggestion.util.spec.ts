@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { newGedcomChangeDate } from "../../gedcom/gedcomChangeDate";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomRecord } from "../../gedcom/gedcomRecord";
 import { newGedcomRepository } from "../../gedcom/gedcomRepository";
@@ -114,6 +115,25 @@ describe("applyBibliographyTitleSuggestion", () => {
 
     expect(result.createdRepositoryXrefs).toEqual(["@R0@"]);
     expect(result.database.repositories["@R0@"]).toBeDefined();
+  });
+
+  it("stamps the source's change date", () => {
+    const source = newGedcomSource({
+      xref: "@S1@",
+      changeDate: newGedcomChangeDate({ value: "5 AUG 2020" }),
+      unknownRecords: [bibl("Parish register of St Mary.")],
+    });
+    const database = newGedcomDatabase({ sources: { "@S1@": source } });
+
+    const result = applyBibliographyTitleSuggestion(
+      database,
+      source,
+      new Date(2026, 10, 8),
+    );
+
+    expect(result.database.sources["@S1@"]?.changeDate).toEqual({
+      value: "8 NOV 2026",
+    });
   });
 
   it("leaves the database alone when there's nothing to move", () => {
