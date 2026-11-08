@@ -64,6 +64,13 @@ describe("gedcomMultimediaLink", () => {
       ),
     ).toEqual(gedcomRecordWithCrop);
   });
+  it("serializer drops a crop with no values", () => {
+    expect(
+      serializeGedcomMultimediaLink(
+        newGedcomMultimediaLink({ xref: "@M1@", crop: {} }),
+      ),
+    ).toEqual(gedcomRecord);
+  });
 });
 
 describe("multimediaLinkTitle", () => {
