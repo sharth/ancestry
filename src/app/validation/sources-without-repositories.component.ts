@@ -37,20 +37,18 @@ export class SourcesWithoutRepositoriesComponent {
   readonly submitUrlSuggestions = output<SourceUrlSuggestions>();
 
   readonly sourcesWithoutRepositories = computed(() =>
-    Object.values(this.ancestryDatabase().sources)
-      .filter((source) => source.repositoryLinks.length === 0)
-      .map((source) => {
-        const suggestions = sourceValidators(
-          source,
-          this.ancestryDatabase(),
-        ).warnings.flatMap((warning) => warning.urlSuggestion ?? []);
-        return {
-          source,
-          suggestions,
-          differences:
-            suggestions.length > 0 ? this.differences(source, suggestions) : [],
-        };
-      }),
+    findSourcesWithoutRepositories(this.ancestryDatabase()).map((source) => {
+      const suggestions = sourceValidators(
+        source,
+        this.ancestryDatabase(),
+      ).warnings.flatMap((warning) => warning.urlSuggestion ?? []);
+      return {
+        source,
+        suggestions,
+        differences:
+          suggestions.length > 0 ? this.differences(source, suggestions) : [],
+      };
+    }),
   );
 
   // The records that would actually change on disk if `suggestions` are
@@ -74,4 +72,10 @@ export class SourcesWithoutRepositoriesComponent {
             serializeGedcomRecordToText(updatedGedcomRecord).join("\n"),
       );
   }
+}
+
+export function findSourcesWithoutRepositories(gedcomDatabase: GedcomDatabase) {
+  return Object.values(gedcomDatabase.sources).filter(
+    (source) => source.repositoryLinks.length === 0,
+  );
 }

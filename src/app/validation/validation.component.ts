@@ -19,19 +19,34 @@ import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
 import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
 import type { TabInformation } from "../gedcom-editor/gedcom-editor-interface";
 import type { ComponentWithUnsavedChanges } from "../unsaved-changes.guard";
-import { applyBibliographyTitleSuggestion } from "./apply-bibliography-title-suggestion.util";
+import {
+  applyBibliographyTitleSuggestion,
+  bibliographyForMissingTitle,
+} from "./apply-bibliography-title-suggestion.util";
 import { applyMergeRepositoryLinksSuggestion } from "./apply-merge-repository-links-suggestion.util";
 import { applyUrlSuggestions } from "./apply-url-suggestion.util";
 import { BibliographyWithoutTitleComponent } from "./bibliography-without-title.component";
-import { DuplicateCallNumbersComponent } from "./duplicate-call-numbers.component";
+import {
+  DuplicateCallNumbersComponent,
+  findDuplicateCallNumbers,
+} from "./duplicate-call-numbers.component";
 import {
   sourceValidators,
   type MergeRepositoryLinksSuggestion,
   type UrlRepositorySuggestion,
 } from "./source-validators";
-import { SourcesWithoutRepositoriesComponent } from "./sources-without-repositories.component";
-import { UnusedMultimediaComponent } from "./unused-multimedia.component";
-import { UnusedSourcesComponent } from "./unused-sources.component";
+import {
+  findSourcesWithoutRepositories,
+  SourcesWithoutRepositoriesComponent,
+} from "./sources-without-repositories.component";
+import {
+  findUnusedMultimedia,
+  UnusedMultimediaComponent,
+} from "./unused-multimedia.component";
+import {
+  findUnusedSources,
+  UnusedSourcesComponent,
+} from "./unused-sources.component";
 
 /** Which suggestion is currently under review in the GEDCOM editor dialog,
  * and the source it applies to -- a source can have more than one
@@ -105,6 +120,24 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
   // can't bind.
   readonly tabs = tabs;
   readonly activeTab = signal<TabId>("source-warnings");
+
+  // How many findings each tab lists, shown on the tab itself -- computed
+  // here, not by the tab's own component, since only the active tab's
+  // component is rendered.
+  readonly tabCounts = computed<Record<TabId, number>>(() => {
+    const database = this.ancestryDatabase();
+    return {
+      "source-warnings": this.rows().length,
+      "sources-without-repositories":
+        findSourcesWithoutRepositories(database).length,
+      "duplicate-call-numbers": findDuplicateCallNumbers(database).length,
+      "unused-sources": findUnusedSources(database).length,
+      "unused-multimedia": findUnusedMultimedia(database).length,
+      "bibliography-without-title": Object.values(database.sources).filter(
+        (source) => bibliographyForMissingTitle(source) !== undefined,
+      ).length,
+    };
+  });
 
   hasUnsavedChanges(): boolean {
     return this.editDialog()?.hasUnsavedChanges() ?? false;
