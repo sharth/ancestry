@@ -4,6 +4,8 @@ import { Router, provideRouter } from "@angular/router";
 import { render } from "@testing-library/angular/zoneless";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { newGedcomDatabase } from "../gedcom/gedcomDatabase";
+import { newGedcomRecord } from "../gedcom/gedcomRecord";
 import { AncestryService, ancestryDatabaseResolver } from "./ancestry.service";
 
 @Component({ selector: "app-stub", template: "" })
@@ -91,5 +93,57 @@ describe("ancestryDatabaseResolver", () => {
     await router.navigateByUrl("/", { onSameUrlNavigation: "reload" });
 
     expect(router.url).toBe("/settings");
+  });
+});
+
+describe("AncestryService.gedcomDatabaseDifferences", () => {
+  const unchanged = {
+    originalGedcomRecord: newGedcomRecord({ xref: "@S1@", tag: "SOUR" }),
+    updatedGedcomRecord: newGedcomRecord({ xref: "@S1@", tag: "SOUR" }),
+  };
+  const edited = {
+    originalGedcomRecord: newGedcomRecord({
+      xref: "@S2@",
+      tag: "SOUR",
+      children: [newGedcomRecord({ tag: "TITL", value: "Old" })],
+    }),
+    updatedGedcomRecord: newGedcomRecord({
+      xref: "@S2@",
+      tag: "SOUR",
+      children: [newGedcomRecord({ tag: "TITL", value: "New" })],
+    }),
+  };
+  const added = {
+    updatedGedcomRecord: newGedcomRecord({ xref: "@R1@", tag: "REPO" }),
+  };
+  const removed = {
+    originalGedcomRecord: newGedcomRecord({ xref: "@S3@", tag: "SOUR" }),
+  };
+
+  let ancestryService: AncestryService;
+
+  beforeEach(() => {
+    ancestryService = TestBed.inject(AncestryService);
+    vi.spyOn(ancestryService, "compareGedcomDatabase").mockReturnValue([
+      unchanged,
+      edited,
+      added,
+      removed,
+    ]);
+  });
+
+  it("lists only the records that would be written differently", () => {
+    expect(
+      ancestryService.gedcomDatabaseDifferences(newGedcomDatabase()),
+    ).toEqual([edited, added, removed]);
+  });
+
+  it("also lists an unchanged record whose xref is always included", () => {
+    expect(
+      ancestryService.gedcomDatabaseDifferences(
+        newGedcomDatabase(),
+        new Set(["@S1@"]),
+      ),
+    ).toEqual([unchanged, edited, added, removed]);
   });
 });

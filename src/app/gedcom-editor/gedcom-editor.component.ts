@@ -16,7 +16,6 @@ import { newGedcomFamily } from "../../gedcom/gedcomFamily";
 import { newGedcomIndividual } from "../../gedcom/gedcomIndividual";
 import { newGedcomMultimedia } from "../../gedcom/gedcomMultimedia";
 import { displayGedcomName } from "../../gedcom/gedcomName";
-import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
 import { newGedcomRepository } from "../../gedcom/gedcomRepository";
 import { newGedcomSource } from "../../gedcom/gedcomSource";
 import { newGedcomSubmitter } from "../../gedcom/gedcomSubmitter";
@@ -200,18 +199,10 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     const viewXrefs = new Set(
       this.xrefsIncludedInView().map((tab) => tab.xref),
     );
-    return this.ancestryService
-      .compareGedcomDatabase(this.workingDatabase())
-      .filter(({ originalGedcomRecord, updatedGedcomRecord }) => {
-        const xref = originalGedcomRecord?.xref ?? updatedGedcomRecord?.xref;
-        return (
-          (xref != undefined && viewXrefs.has(xref)) ||
-          originalGedcomRecord == undefined ||
-          updatedGedcomRecord == undefined ||
-          serializeGedcomRecordToText(originalGedcomRecord).join("\n") !==
-            serializeGedcomRecordToText(updatedGedcomRecord).join("\n")
-        );
-      });
+    return this.ancestryService.gedcomDatabaseDifferences(
+      this.workingDatabase(),
+      viewXrefs,
+    );
   });
 
   readonly activeTab = linkedSignal<TabInformation | undefined>(
