@@ -137,14 +137,13 @@ export function parseGedcomIndividual(record: GedcomRecord): GedcomIndividual {
   // Seed the serialization cache. When the individual serializes back to
   // exactly the record it was parsed from, cache that record itself, so
   // comparing an unedited individual against the file is an identity check.
-  const serialized = serializeGedcomIndividualUncached(gedcomIndividual);
-  serializedIndividuals.set(
-    gedcomIndividual,
-    serializeGedcomRecordToText(serialized).join("\n") ===
-      serializeGedcomRecordToText(record).join("\n")
-      ? record
-      : serialized,
-  );
+  if (
+    serializeGedcomRecordToText(
+      serializeGedcomIndividual(gedcomIndividual),
+    ).join("\n") === serializeGedcomRecordToText(record).join("\n")
+  ) {
+    serializedIndividuals.set(gedcomIndividual, record);
+  }
 
   return gedcomIndividual;
 }
@@ -159,56 +158,49 @@ const serializedIndividuals = new WeakMap<GedcomIndividual, GedcomRecord>();
 export function serializeGedcomIndividual(
   gedcomIndividual: GedcomIndividual,
 ): GedcomRecord {
-  return serializedIndividuals.getOrInsertComputed(
-    gedcomIndividual,
-    serializeGedcomIndividualUncached,
+  return serializedIndividuals.getOrInsertComputed(gedcomIndividual, () =>
+    newGedcomRecord({
+      xref: gedcomIndividual.xref,
+      tag: "INDI",
+      abstag: "INDI",
+      children: filterTrivialGedcomRecords([
+        ...gedcomIndividual.names.map((name) => serializeGedcomName(name)),
+        serializeGedcomSex(gedcomIndividual.sex),
+        ...gedcomIndividual.unknownRecords.filter(
+          (record) => record.tag == "_UID",
+        ),
+        ...gedcomIndividual.unknownRecords.filter(
+          (record) => record.tag == "_FSFTID",
+        ),
+        ...gedcomIndividual.unknownRecords.filter(
+          (record) => record.tag == "_AMTID",
+        ),
+        serializeGedcomChangeDate(gedcomIndividual.changeDate),
+        ...gedcomIndividual.unknownRecords.filter(
+          (record) => record.tag == "SOUR",
+        ),
+        ...sortChronologically(gedcomIndividual.facts).map((event) =>
+          serializeGedcomIndividualFact(event),
+        ),
+        ...gedcomIndividual.parentOfFamilyXrefs.map((xref) =>
+          newGedcomRecord({ tag: "FAMS", value: xref }),
+        ),
+        ...gedcomIndividual.childOfFamilyXrefs.map((xref) =>
+          newGedcomRecord({ tag: "FAMC", value: xref }),
+        ),
+        ...gedcomIndividual.notes.map((gedcomNote) =>
+          serializeGedcomNote(gedcomNote),
+        ),
+        ...gedcomIndividual.unknownRecords.filter(
+          (record) =>
+            record.tag != "_UID" &&
+            record.tag != "_FSFTID" &&
+            record.tag != "_AMTID" &&
+            record.tag != "SOUR",
+        ),
+      ]),
+    }),
   );
-}
-
-function serializeGedcomIndividualUncached(
-  gedcomIndividual: GedcomIndividual,
-): GedcomRecord {
-  return newGedcomRecord({
-    xref: gedcomIndividual.xref,
-    tag: "INDI",
-    abstag: "INDI",
-    children: filterTrivialGedcomRecords([
-      ...gedcomIndividual.names.map((name) => serializeGedcomName(name)),
-      serializeGedcomSex(gedcomIndividual.sex),
-      ...gedcomIndividual.unknownRecords.filter(
-        (record) => record.tag == "_UID",
-      ),
-      ...gedcomIndividual.unknownRecords.filter(
-        (record) => record.tag == "_FSFTID",
-      ),
-      ...gedcomIndividual.unknownRecords.filter(
-        (record) => record.tag == "_AMTID",
-      ),
-      serializeGedcomChangeDate(gedcomIndividual.changeDate),
-      ...gedcomIndividual.unknownRecords.filter(
-        (record) => record.tag == "SOUR",
-      ),
-      ...sortChronologically(gedcomIndividual.facts).map((event) =>
-        serializeGedcomIndividualFact(event),
-      ),
-      ...gedcomIndividual.parentOfFamilyXrefs.map((xref) =>
-        newGedcomRecord({ tag: "FAMS", value: xref }),
-      ),
-      ...gedcomIndividual.childOfFamilyXrefs.map((xref) =>
-        newGedcomRecord({ tag: "FAMC", value: xref }),
-      ),
-      ...gedcomIndividual.notes.map((gedcomNote) =>
-        serializeGedcomNote(gedcomNote),
-      ),
-      ...gedcomIndividual.unknownRecords.filter(
-        (record) =>
-          record.tag != "_UID" &&
-          record.tag != "_FSFTID" &&
-          record.tag != "_AMTID" &&
-          record.tag != "SOUR",
-      ),
-    ]),
-  });
 }
 
 export function getIndividualMultimediaCitations(
