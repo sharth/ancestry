@@ -8,7 +8,6 @@ import {
 } from "../../gedcom/gedcomIndividual";
 import { displayGedcomName } from "../../gedcom/gedcomName";
 import { GEDCOM_EDITOR } from "./gedcom-editor-interface";
-import { InputChangeDateComponent } from "./input-change-date.component";
 import { InputIndividualFactsComponent } from "./input-individual-facts.component";
 import { InputIndividualNamesComponent } from "./input-individual-names.component";
 import { InputIndividualSexComponent } from "./input-individual-sex.component";
@@ -24,7 +23,6 @@ import { InputUnknownRecordsComponent } from "./input-unknown-records.component"
     InputIndividualNamesComponent,
     InputUnknownRecordsComponent,
     InputNotesComponent,
-    InputChangeDateComponent,
   ],
   templateUrl: "./input-individual.component.html",
   styleUrl: "./input.component.css",
