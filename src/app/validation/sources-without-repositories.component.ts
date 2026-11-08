@@ -7,6 +7,7 @@ import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
 import type { GedcomSource } from "../../gedcom/gedcomSource";
 import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
 import { applyUrlSuggestions } from "./apply-url-suggestion.util";
+import { normalizeFamilySearchUrl } from "./source-url.util";
 import {
   sourceValidators,
   type UrlRepositorySuggestion,
@@ -47,6 +48,7 @@ export class SourcesWithoutRepositoriesComponent {
         return {
           source,
           suggestions,
+          displayedSuggestions: uniqueByUrl(suggestions),
           differences:
             suggestions.length > 0 ? this.differences(source, suggestions) : [],
         };
@@ -74,4 +76,20 @@ export class SourcesWithoutRepositoriesComponent {
             serializeGedcomRecordToText(updatedGedcomRecord).join("\n"),
       );
   }
+}
+
+/** One entry per distinct URL, shown as the call number it would become.
+ * The same URL often appears in more than one field (e.g. both the title
+ * and the text), or as both the bare and www FamilySearch host; each
+ * occurrence stays in `suggestions` so applying them strips it from every
+ * field it's on its own line in, but the list shows it only once. */
+function uniqueByUrl(
+  suggestions: UrlRepositorySuggestion[],
+): UrlRepositorySuggestion[] {
+  const seen = new Map<string, UrlRepositorySuggestion>();
+  for (const suggestion of suggestions) {
+    const url = normalizeFamilySearchUrl(suggestion.url);
+    if (!seen.has(url)) seen.set(url, { ...suggestion, url });
+  }
+  return [...seen.values()];
 }

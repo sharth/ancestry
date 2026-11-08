@@ -96,6 +96,49 @@ describe("SourcesWithoutRepositoriesComponent", () => {
     ).toBeTruthy();
   });
 
+  it("lists a URL found in more than one field only once", async () => {
+    await renderLinkNames(
+      newGedcomDatabase({
+        repositories: {
+          "@R1@": newGedcomRepository({ xref: "@R1@", name: "Family Search" }),
+        },
+        sources: {
+          "@S1@": newGedcomSource({
+            xref: "@S1@",
+            title: "https://familysearch.org/ark:/61903/1:1:Q1FV-HHZM",
+            text: "Record\nhttps://www.familysearch.org/ark:/61903/1:1:Q1FV-HHZM",
+          }),
+        },
+      }),
+    );
+    expect(screen.getAllByRole("link", { name: "Family Search" })).toHaveLength(
+      1,
+    );
+    // Shown as the www form, which is what gets saved as the call number.
+    expect(
+      screen.getByText(
+        "(https://www.familysearch.org/ark:/61903/1:1:Q1FV-HHZM)",
+      ),
+    ).toBeTruthy();
+    // The proposed edit adds the call number once and strips both copies.
+    const proposed = [...document.querySelectorAll(".new-gedcom div")].map(
+      (line) => line.textContent.trim(),
+    );
+    expect(
+      proposed.filter((line) =>
+        line.includes(
+          "CALN https://www.familysearch.org/ark:/61903/1:1:Q1FV-HHZM",
+        ),
+      ),
+    ).toHaveLength(1);
+    expect(
+      proposed.some(
+        (line) =>
+          line.includes("familysearch.org/ark") && !line.includes("CALN"),
+      ),
+    ).toBe(false);
+  });
+
   it("hands every suggestion for a source back as one edit", async () => {
     const source = newGedcomSource({
       xref: "@S1@",

@@ -26,7 +26,10 @@
           <td>
             @if (row.suggestions.length > 0) {
               <ul class="list-unstyled mb-1">
-                @for (suggestion of row.suggestions; track $index) {
+                @for (
+                  suggestion of row.displayedSuggestions;
+                  track suggestion.url
+                ) {
                   <li>
                     @if (suggestion.matchedRepository; as repository) {
                       <a [routerLink]="['/repository', repository.xref]">
