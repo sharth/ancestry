@@ -1,156 +1,182 @@
 <h1>Validation</h1>
 
-<div class="grid-table" role="table">
-  <div class="grid-row header-row" role="row">
-    <div role="columnheader">Source</div>
-    <div role="columnheader">Severity</div>
-    <div role="columnheader">Field</div>
-    <div role="columnheader">Group</div>
-    <div role="columnheader">Message</div>
-    <div role="columnheader">Fix</div>
-  </div>
-
-  @for (row of rows(); track $index; let i = $index) {
-    @if (row.urlSuggestion; as urlSuggestion) {
-      <div class="diff-section" role="rowgroup">
-        <div
-          class="grid-row sticky-row"
-          [class.striped]="i % 2 === 1"
-          role="row"
-        >
-          <div role="cell">
-            <a [routerLink]="['/source', row.source.xref]">
-              {{ row.source.abbr || row.source.xref }}
-            </a>
-          </div>
-          <div role="cell">{{ row.severity }}</div>
-          <div role="cell">{{ row.fieldName }}</div>
-          <div role="cell">{{ row.groupName }}</div>
-          <div role="cell">{{ row.message }}</div>
-          <div role="cell">
-            <div class="btn-group">
-              <button
-                type="button"
-                class="btn btn-sm btn-outline-primary"
-                (click)="
-                  reviewUrlSuggestions(row.source, [urlSuggestion]);
-                  editDialog.showModal()
-                "
-              >
-                Open editor with proposed changes:
-                {{
-                  urlSuggestion.matchedRepository
-                    ? "Link to " +
-                      (urlSuggestion.matchedRepository.name ||
-                        urlSuggestion.matchedRepository.xref)
-                    : "Create repository"
-                }}
-              </button>
-              <button
-                type="button"
-                class="btn btn-sm btn-outline-success"
-                (click)="submitUrlSuggestions(row.source, [urlSuggestion])"
-              >
-                Submit changes as proposed
-              </button>
-            </div>
-          </div>
-        </div>
-        <div class="diff-content" role="cell">
-          @for (
-            d of differencesForUrlSuggestions(row.source, [urlSuggestion]);
-            track $index
-          ) {
-            <app-gedcom-diff
-              [oldGedcomRecord]="d.originalGedcomRecord"
-              [newGedcomRecord]="d.updatedGedcomRecord"
-            />
-          }
-        </div>
-      </div>
-    } @else if (row.mergeSuggestion; as mergeSuggestion) {
-      <div class="diff-section" role="rowgroup">
-        <div
-          class="grid-row sticky-row"
-          [class.striped]="i % 2 === 1"
-          role="row"
-        >
-          <div role="cell">
-            <a [routerLink]="['/source', row.source.xref]">
-              {{ row.source.abbr || row.source.xref }}
-            </a>
-          </div>
-          <div role="cell">{{ row.severity }}</div>
-          <div role="cell">{{ row.fieldName }}</div>
-          <div role="cell">{{ row.groupName }}</div>
-          <div role="cell">{{ row.message }}</div>
-          <div role="cell">
-            <div class="btn-group">
-              <button
-                type="button"
-                class="btn btn-sm btn-outline-primary"
-                (click)="
-                  reviewMergeSuggestion(row.source, mergeSuggestion);
-                  editDialog.showModal()
-                "
-              >
-                Open editor with proposed changes: Merge repository citations
-              </button>
-              <button
-                type="button"
-                class="btn btn-sm btn-outline-success"
-                (click)="submitMergeSuggestion(row.source, mergeSuggestion)"
-              >
-                Submit changes as proposed
-              </button>
-            </div>
-          </div>
-        </div>
-        <div class="diff-content" role="cell">
-          @for (
-            d of differencesForMergeSuggestion(row.source, mergeSuggestion);
-            track $index
-          ) {
-            <app-gedcom-diff
-              [oldGedcomRecord]="d.originalGedcomRecord"
-              [newGedcomRecord]="d.updatedGedcomRecord"
-            />
-          }
-        </div>
-      </div>
-    } @else {
-      <div class="grid-row" [class.striped]="i % 2 === 1" role="row">
-        <div role="cell">
-          <a [routerLink]="['/source', row.source.xref]">
-            {{ row.source.abbr || row.source.xref }}
-          </a>
-        </div>
-        <div role="cell">{{ row.severity }}</div>
-        <div role="cell">{{ row.fieldName }}</div>
-        <div role="cell">{{ row.groupName }}</div>
-        <div role="cell">{{ row.message }}</div>
-        <div role="cell"></div>
-      </div>
-    }
+<ul class="nav nav-tabs mb-3" role="tablist">
+  @for (tab of tabs; track tab.id) {
+    <li class="nav-item" role="presentation">
+      <button
+        type="button"
+        class="nav-link"
+        role="tab"
+        [class.active]="activeTab() === tab.id"
+        [attr.aria-selected]="activeTab() === tab.id"
+        (click)="activeTab.set(tab.id)"
+      >
+        {{ tab.label }}
+      </button>
+    </li>
   }
-</div>
+</ul>
 
-<app-duplicate-call-numbers [ancestryDatabase]="ancestryDatabase()" />
+@switch (activeTab()) {
+  @case ("source-warnings") {
+    <div class="grid-table" role="table">
+      <div class="grid-row header-row" role="row">
+        <div role="columnheader">Source</div>
+        <div role="columnheader">Severity</div>
+        <div role="columnheader">Field</div>
+        <div role="columnheader">Group</div>
+        <div role="columnheader">Message</div>
+        <div role="columnheader">Fix</div>
+      </div>
 
-<app-unused-multimedia [ancestryDatabase]="ancestryDatabase()" />
-
-<app-unused-sources [ancestryDatabase]="ancestryDatabase()" />
-
-<app-sources-without-repositories
-  [ancestryDatabase]="ancestryDatabase()"
-  (reviewUrlSuggestions)="
-    reviewUrlSuggestions($event.source, $event.suggestions);
-    editDialog.showModal()
-  "
-  (submitUrlSuggestions)="
-    submitUrlSuggestions($event.source, $event.suggestions)
-  "
-/>
+      @for (row of rows(); track $index; let i = $index) {
+        @if (row.urlSuggestion; as urlSuggestion) {
+          <div class="diff-section" role="rowgroup">
+            <div
+              class="grid-row sticky-row"
+              [class.striped]="i % 2 === 1"
+              role="row"
+            >
+              <div role="cell">
+                <a [routerLink]="['/source', row.source.xref]">
+                  {{ row.source.abbr || row.source.xref }}
+                </a>
+              </div>
+              <div role="cell">{{ row.severity }}</div>
+              <div role="cell">{{ row.fieldName }}</div>
+              <div role="cell">{{ row.groupName }}</div>
+              <div role="cell">{{ row.message }}</div>
+              <div role="cell">
+                <div class="btn-group">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-primary"
+                    (click)="
+                      reviewUrlSuggestions(row.source, [urlSuggestion]);
+                      editDialog.showModal()
+                    "
+                  >
+                    Open editor with proposed changes:
+                    {{
+                      urlSuggestion.matchedRepository
+                        ? "Link to " +
+                          (urlSuggestion.matchedRepository.name ||
+                            urlSuggestion.matchedRepository.xref)
+                        : "Create repository"
+                    }}
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-success"
+                    (click)="submitUrlSuggestions(row.source, [urlSuggestion])"
+                  >
+                    Submit changes as proposed
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="diff-content" role="cell">
+              @for (
+                d of differencesForUrlSuggestions(row.source, [urlSuggestion]);
+                track $index
+              ) {
+                <app-gedcom-diff
+                  [oldGedcomRecord]="d.originalGedcomRecord"
+                  [newGedcomRecord]="d.updatedGedcomRecord"
+                />
+              }
+            </div>
+          </div>
+        } @else if (row.mergeSuggestion; as mergeSuggestion) {
+          <div class="diff-section" role="rowgroup">
+            <div
+              class="grid-row sticky-row"
+              [class.striped]="i % 2 === 1"
+              role="row"
+            >
+              <div role="cell">
+                <a [routerLink]="['/source', row.source.xref]">
+                  {{ row.source.abbr || row.source.xref }}
+                </a>
+              </div>
+              <div role="cell">{{ row.severity }}</div>
+              <div role="cell">{{ row.fieldName }}</div>
+              <div role="cell">{{ row.groupName }}</div>
+              <div role="cell">{{ row.message }}</div>
+              <div role="cell">
+                <div class="btn-group">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-primary"
+                    (click)="
+                      reviewMergeSuggestion(row.source, mergeSuggestion);
+                      editDialog.showModal()
+                    "
+                  >
+                    Open editor with proposed changes: Merge repository
+                    citations
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-success"
+                    (click)="submitMergeSuggestion(row.source, mergeSuggestion)"
+                  >
+                    Submit changes as proposed
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="diff-content" role="cell">
+              @for (
+                d of differencesForMergeSuggestion(row.source, mergeSuggestion);
+                track $index
+              ) {
+                <app-gedcom-diff
+                  [oldGedcomRecord]="d.originalGedcomRecord"
+                  [newGedcomRecord]="d.updatedGedcomRecord"
+                />
+              }
+            </div>
+          </div>
+        } @else {
+          <div class="grid-row" [class.striped]="i % 2 === 1" role="row">
+            <div role="cell">
+              <a [routerLink]="['/source', row.source.xref]">
+                {{ row.source.abbr || row.source.xref }}
+              </a>
+            </div>
+            <div role="cell">{{ row.severity }}</div>
+            <div role="cell">{{ row.fieldName }}</div>
+            <div role="cell">{{ row.groupName }}</div>
+            <div role="cell">{{ row.message }}</div>
+            <div role="cell"></div>
+          </div>
+        }
+      }
+    </div>
+  }
+  @case ("sources-without-repositories") {
+    <app-sources-without-repositories
+      [ancestryDatabase]="ancestryDatabase()"
+      (reviewUrlSuggestions)="
+        reviewUrlSuggestions($event.source, $event.suggestions);
+        editDialog.showModal()
+      "
+      (submitUrlSuggestions)="
+        submitUrlSuggestions($event.source, $event.suggestions)
+      "
+    />
+  }
+  @case ("duplicate-call-numbers") {
+    <app-duplicate-call-numbers [ancestryDatabase]="ancestryDatabase()" />
+  }
+  @case ("unused-sources") {
+    <app-unused-sources [ancestryDatabase]="ancestryDatabase()" />
+  }
+  @case ("unused-multimedia") {
+    <app-unused-multimedia [ancestryDatabase]="ancestryDatabase()" />
+  }
+}
 
 <app-gedcom-editor-dialog
   #editDialog
