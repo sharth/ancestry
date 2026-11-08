@@ -1,29 +1,65 @@
 @if (fileResource.value(); as fileUrl) {
-  <div
-    class="crop-container"
-    (pointerdown)="startDrag($event)"
-    (pointermove)="continueDrag($event)"
-    (pointerup)="endDrag()"
-    (pointerleave)="endDrag()"
-  >
-    <img
-      [src]="fileUrl"
-      alt=""
-      (load)="onImageLoad($event)"
-      draggable="false"
-    />
-    @if (cropStyle(); as cropStyle) {
-      <div class="crop-rect" [style]="cropStyle"></div>
-    }
+  <div class="crop-viewport" #cropViewport>
+    <div
+      class="crop-container"
+      #cropContainer
+      [class.zoomed]="zoom() !== undefined"
+      (pointerdown)="startDrag($event)"
+      (pointermove)="continueDrag($event)"
+      (pointerup)="endDrag()"
+      (pointercancel)="endDrag()"
+      (lostpointercapture)="endDrag()"
+    >
+      <img
+        #cropImage
+        [src]="fileUrl"
+        alt=""
+        [style.width]="imageWidth()"
+        (load)="onImageLoad($event)"
+        draggable="false"
+      />
+      @if (cropStyle(); as cropStyle) {
+        <div class="crop-rect" [style]="cropStyle"></div>
+      }
+    </div>
   </div>
-  <button
-    type="button"
-    class="btn btn-sm btn-outline-secondary mt-1"
-    (click)="clearCrop()"
-    [disabled]="!value()"
-  >
-    Clear crop
-  </button>
+  <div class="d-flex gap-1 align-items-center mt-1">
+    <div class="btn-group btn-group-sm" role="group" aria-label="Zoom">
+      <button
+        type="button"
+        class="btn btn-outline-secondary bi-zoom-out"
+        aria-label="Zoom out"
+        title="Zoom out"
+        (click)="zoomOut()"
+        [disabled]="zoom() === undefined"
+      ></button>
+      <button
+        type="button"
+        class="btn btn-outline-secondary zoom-label"
+        title="Fit the whole image"
+        (click)="zoomToFit()"
+        [disabled]="zoom() === undefined"
+      >
+        {{ zoomLabel() }}
+      </button>
+      <button
+        type="button"
+        class="btn btn-outline-secondary bi-zoom-in"
+        aria-label="Zoom in"
+        title="Zoom in"
+        (click)="zoomIn()"
+        [disabled]="!canZoomIn()"
+      ></button>
+    </div>
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-secondary"
+      (click)="clearCrop()"
+      [disabled]="!value()"
+    >
+      Clear crop
+    </button>
+  </div>
 } @else if (fileResource.isLoading()) {
   <p>Loading image…</p>
 } @else {
