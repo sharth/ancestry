@@ -10,7 +10,11 @@ import {
   serializeGedcomDatabase,
   type GedcomDatabase,
 } from "../gedcom/gedcomDatabase";
-import { parseGedcomRecords, type GedcomRecord } from "../gedcom/gedcomRecord";
+import {
+  parseGedcomRecords,
+  serializeGedcomRecordToText,
+  type GedcomRecord,
+} from "../gedcom/gedcomRecord";
 
 export const BUILTIN_GEDCOM_URL = "assets/samples/royal-family.ged";
 
@@ -194,6 +198,32 @@ export class AncestryService {
     return compareGedcomDatabase(
       this.gedcomResource.value()?.gedcomRecords ?? [],
       gedcomDatabase,
+    );
+  }
+
+  /** The records that would actually change on disk if `gedcomDatabase`
+   * were saved: compareGedcomDatabase()'s pairs, the same diff the save
+   * path writes from, minus those that would be written exactly as they
+   * are in the file. A record whose xref is in `alwaysIncludeXrefs` is
+   * listed even when unchanged. */
+  gedcomDatabaseDifferences(
+    gedcomDatabase: GedcomDatabase,
+    alwaysIncludeXrefs: ReadonlySet<string> = new Set(),
+  ): {
+    originalGedcomRecord?: GedcomRecord;
+    updatedGedcomRecord?: GedcomRecord;
+  }[] {
+    return this.compareGedcomDatabase(gedcomDatabase).filter(
+      ({ originalGedcomRecord, updatedGedcomRecord }) => {
+        const xref = originalGedcomRecord?.xref ?? updatedGedcomRecord?.xref;
+        return (
+          (xref != undefined && alwaysIncludeXrefs.has(xref)) ||
+          originalGedcomRecord == undefined ||
+          updatedGedcomRecord == undefined ||
+          serializeGedcomRecordToText(originalGedcomRecord).join("\n") !==
+            serializeGedcomRecordToText(updatedGedcomRecord).join("\n")
+        );
+      },
     );
   }
 

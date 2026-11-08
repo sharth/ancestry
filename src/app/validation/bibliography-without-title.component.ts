@@ -3,7 +3,6 @@ import { RouterModule } from "@angular/router";
 
 import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
-import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
 import type { GedcomSource } from "../../gedcom/gedcomSource";
 import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
 import {
@@ -44,14 +43,6 @@ export class BibliographyWithoutTitleComponent {
       this.ancestryDatabase(),
       source,
     );
-    return this.ancestryService
-      .compareGedcomDatabase(database)
-      .filter(
-        ({ originalGedcomRecord, updatedGedcomRecord }) =>
-          originalGedcomRecord == undefined ||
-          updatedGedcomRecord == undefined ||
-          serializeGedcomRecordToText(originalGedcomRecord).join("\n") !==
-            serializeGedcomRecordToText(updatedGedcomRecord).join("\n"),
-      );
+    return this.ancestryService.gedcomDatabaseDifferences(database);
   }
 }

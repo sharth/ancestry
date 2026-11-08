@@ -10,10 +10,7 @@ import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 
 import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
-import {
-  serializeGedcomRecordToText,
-  type GedcomRecord,
-} from "../../gedcom/gedcomRecord";
+import type { GedcomRecord } from "../../gedcom/gedcomRecord";
 import type { GedcomSource } from "../../gedcom/gedcomSource";
 import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
 import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
@@ -383,14 +380,6 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
     originalGedcomRecord?: GedcomRecord;
     updatedGedcomRecord?: GedcomRecord;
   }[] {
-    return this.ancestryService
-      .compareGedcomDatabase(database)
-      .filter(
-        ({ originalGedcomRecord, updatedGedcomRecord }) =>
-          originalGedcomRecord == undefined ||
-          updatedGedcomRecord == undefined ||
-          serializeGedcomRecordToText(originalGedcomRecord).join("\n") !==
-            serializeGedcomRecordToText(updatedGedcomRecord).join("\n"),
-      );
+    return this.ancestryService.gedcomDatabaseDifferences(database);
   }
 }
