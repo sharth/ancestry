@@ -6,6 +6,7 @@ import { filter, firstValueFrom, from, switchMap } from "rxjs";
 
 import {
   compareGedcomDatabase,
+  newGedcomDatabase,
   parseGedcomDatabase,
   serializeGedcomDatabase,
   type GedcomDatabase,
@@ -197,6 +198,7 @@ export class AncestryService {
   }[] {
     return compareGedcomDatabase(
       this.gedcomResource.value()?.gedcomRecords ?? [],
+      this.ancestryDatabase() ?? newGedcomDatabase(),
       gedcomDatabase,
     );
   }
@@ -229,7 +231,11 @@ export class AncestryService {
   async updateGedcomDatabase(gedcomDatabase: GedcomDatabase) {
     const gedcomResource = this.gedcomResource.value();
     const originalGedcomRecords = gedcomResource?.gedcomRecords ?? [];
-    const text = serializeGedcomDatabase(originalGedcomRecords, gedcomDatabase);
+    const text = serializeGedcomDatabase(
+      originalGedcomRecords,
+      this.ancestryDatabase() ?? newGedcomDatabase(),
+      gedcomDatabase,
+    );
 
     const gedcomFileHandle = this.gedcomResource.value()?.gedcomFileHandle;
     if (gedcomFileHandle == undefined) {
