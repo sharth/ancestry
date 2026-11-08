@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  gedcomRecordsEqual,
+  newGedcomRecord,
   parseGedcomRecords,
   serializeGedcomRecordToText,
 } from "./gedcomRecord";
@@ -61,5 +63,45 @@ describe("GedcomRecord", () => {
       "0 @X2@ SUBM",
       "1 EMAIL johndoe@example.com",
     ]);
+  });
+});
+
+describe("gedcomRecordsEqual", () => {
+  it("ignores abstag", () => {
+    expect(
+      gedcomRecordsEqual(
+        newGedcomRecord({
+          tag: "INDI",
+          xref: "@I1@",
+          children: [newGedcomRecord({ tag: "SEX", value: "M" })],
+        }),
+        newGedcomRecord({
+          tag: "INDI",
+          abstag: "INDI",
+          xref: "@I1@",
+          children: [
+            newGedcomRecord({ tag: "SEX", abstag: "INDI.SEX", value: "M" }),
+          ],
+        }),
+      ),
+    ).toBe(true);
+  });
+
+  it("compares tag, xref, value and children", () => {
+    const record = newGedcomRecord({
+      tag: "INDI",
+      xref: "@I1@",
+      children: [newGedcomRecord({ tag: "SEX", value: "M" })],
+    });
+    expect(gedcomRecordsEqual(record, { ...record, tag: "FAM" })).toBe(false);
+    expect(gedcomRecordsEqual(record, { ...record, xref: "@I2@" })).toBe(false);
+    expect(gedcomRecordsEqual(record, { ...record, value: "x" })).toBe(false);
+    expect(gedcomRecordsEqual(record, { ...record, children: [] })).toBe(false);
+    expect(
+      gedcomRecordsEqual(record, {
+        ...record,
+        children: [newGedcomRecord({ tag: "SEX", value: "F" })],
+      }),
+    ).toBe(false);
   });
 });

@@ -24,8 +24,8 @@ import {
 } from "./gedcomNote";
 import {
   filterTrivialGedcomRecords,
+  gedcomRecordsEqual,
   newGedcomRecord,
-  serializeGedcomRecordToText,
   type GedcomRecord,
 } from "./gedcomRecord";
 import {
@@ -140,10 +140,7 @@ export function parseGedcomIndividual(record: GedcomRecord): GedcomIndividual {
   const serialized = serializeGedcomIndividual(gedcomIndividual);
   serializedIndividuals.set(
     gedcomIndividual,
-    serializeGedcomRecordToText(serialized).join("\n") ===
-      serializeGedcomRecordToText(record).join("\n")
-      ? record
-      : serialized,
+    gedcomRecordsEqual(serialized, record) ? record : serialized,
   );
 
   return gedcomIndividual;

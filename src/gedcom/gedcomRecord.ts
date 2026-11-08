@@ -17,6 +17,22 @@ export function newGedcomRecord(fieldsToOverride: Partial<GedcomRecord>) {
   };
 }
 
+// Whether two records serialize to the same text: the same tag, xref and
+// value, with equal children in the same order. abstag is ignored, as
+// serializeGedcomRecordToText ignores it.
+export function gedcomRecordsEqual(a: GedcomRecord, b: GedcomRecord): boolean {
+  return (
+    a.tag === b.tag &&
+    a.xref === b.xref &&
+    a.value === b.value &&
+    a.children.length === b.children.length &&
+    a.children.every((child, i) => {
+      const other = b.children[i];
+      return other !== undefined && gedcomRecordsEqual(child, other);
+    })
+  );
+}
+
 export function filterTrivialGedcomRecord(
   record: GedcomRecord,
 ): GedcomRecord | null {

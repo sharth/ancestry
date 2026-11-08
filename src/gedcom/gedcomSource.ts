@@ -12,8 +12,8 @@ import {
 } from "./gedcomMultimediaLink";
 import {
   filterTrivialGedcomRecords,
+  gedcomRecordsEqual,
   newGedcomRecord,
-  serializeGedcomRecordToText,
   type GedcomRecord,
 } from "./gedcomRecord";
 import {
@@ -103,10 +103,7 @@ export function parseGedcomSource(record: GedcomRecord): GedcomSource {
   const serialized = serializeGedcomSource(gedcomSource);
   serializedSources.set(
     gedcomSource,
-    serializeGedcomRecordToText(serialized).join("\n") ===
-      serializeGedcomRecordToText(record).join("\n")
-      ? record
-      : serialized,
+    gedcomRecordsEqual(serialized, record) ? record : serialized,
   );
 
   return gedcomSource;
