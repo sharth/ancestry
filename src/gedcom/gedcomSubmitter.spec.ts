@@ -20,10 +20,7 @@ function parseGedcomRecordsFromArray(lines: string[]): GedcomRecord[] {
 
 describe("GedcomSubmitter", () => {
   it("no fields", () => {
-    const gedcomRecord = newGedcomRecord({
-      tag: "SUBM",
-      xref: "@SUBMITTER1@",
-    });
+    const gedcomRecord = newGedcomRecord({ tag: "SUBM", xref: "@SUBMITTER1@" });
     expect(parseGedcomSubmitter(gedcomRecord)).toEqual(
       newGedcomSubmitter({
         xref: "@SUBMITTER1@",

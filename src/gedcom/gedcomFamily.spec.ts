@@ -184,14 +184,8 @@ describe("gedcomFamily", () => {
         husbandXref: "@I1@",
         wifeXref: "@I2@",
         unknownRecords: [
-          newGedcomRecord({
-            tag: "NOTE",
-            value: "Some family note",
-          }),
-          newGedcomRecord({
-            tag: "RIN",
-            value: "123",
-          }),
+          newGedcomRecord({ tag: "NOTE", value: "Some family note" }),
+          newGedcomRecord({ tag: "RIN", value: "123" }),
         ],
       }),
     );

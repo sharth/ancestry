@@ -21,32 +21,18 @@ describe("GedcomRecord", () => {
       "2 CONC johndoe@example.com",
     ].join("\n");
     expect(parseGedcomRecords(gedcomText)).toEqual([
-      {
+      newGedcomRecord({
         tag: "SUBM",
         xref: "@X1@",
-        value: "",
-        children: [
-          {
-            tag: "NAME",
-            xref: "",
-            value: "John\nDoe",
-            children: [],
-          },
-        ],
-      },
-      {
+        children: [newGedcomRecord({ tag: "NAME", value: "John\nDoe" })],
+      }),
+      newGedcomRecord({
         tag: "SUBM",
         xref: "@X2@",
-        value: "",
         children: [
-          {
-            tag: "EMAIL",
-            xref: "",
-            value: "johndoe@example.com",
-            children: [],
-          },
+          newGedcomRecord({ tag: "EMAIL", value: "johndoe@example.com" }),
         ],
-      },
+      }),
     ]);
     expect(
       parseGedcomRecords(gedcomText).flatMap((r) =>

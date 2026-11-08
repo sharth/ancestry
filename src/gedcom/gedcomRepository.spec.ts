@@ -20,10 +20,7 @@ function parseGedcomRecordsFromArray(lines: string[]): GedcomRecord[] {
 
 describe("GedcomRepository", () => {
   it("no fields", () => {
-    const gedcomRecord = newGedcomRecord({
-      tag: "REPO",
-      xref: "@R1@",
-    });
+    const gedcomRecord = newGedcomRecord({ tag: "REPO", xref: "@R1@" });
     expect(parseGedcomRepository(gedcomRecord)).toEqual(
       newGedcomRepository({
         xref: "@R1@",
