@@ -7,8 +7,8 @@ import {
 } from "./gedcomChangeDate";
 import {
   filterTrivialGedcomRecords,
+  gedcomRecordsEqual,
   newGedcomRecord,
-  serializeGedcomRecordToText,
   type GedcomRecord,
 } from "./gedcomRecord";
 
@@ -64,10 +64,7 @@ export function parseGedcomRepository(
   const serialized = serializeGedcomRepository(gedcomRepository);
   serializedRepositories.set(
     gedcomRepository,
-    serializeGedcomRecordToText(serialized).join("\n") ===
-      serializeGedcomRecordToText(gedcomRecord).join("\n")
-      ? gedcomRecord
-      : serialized,
+    gedcomRecordsEqual(serialized, gedcomRecord) ? gedcomRecord : serialized,
   );
 
   return gedcomRepository;

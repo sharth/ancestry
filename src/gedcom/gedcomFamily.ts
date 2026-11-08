@@ -14,8 +14,8 @@ import {
 import { gedcomFamilyFacts } from "./gedcomFactMetadata";
 import {
   filterTrivialGedcomRecords,
+  gedcomRecordsEqual,
   newGedcomRecord,
-  serializeGedcomRecordToText,
   type GedcomRecord,
 } from "./gedcomRecord";
 import {
@@ -102,10 +102,7 @@ export function parseGedcomFamily(record: GedcomRecord): GedcomFamily {
   const serialized = serializeGedcomFamily(gedcomFamily);
   serializedFamilies.set(
     gedcomFamily,
-    serializeGedcomRecordToText(serialized).join("\n") ===
-      serializeGedcomRecordToText(record).join("\n")
-      ? record
-      : serialized,
+    gedcomRecordsEqual(serialized, record) ? record : serialized,
   );
 
   return gedcomFamily;
