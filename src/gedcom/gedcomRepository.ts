@@ -8,6 +8,7 @@ import {
 import {
   filterTrivialGedcomRecords,
   newGedcomRecord,
+  serializeGedcomRecordToText,
   type GedcomRecord,
 } from "./gedcomRecord";
 
@@ -56,23 +57,44 @@ export function parseGedcomRepository(
         break;
     }
   }
+
+  // Seed the serialization cache. When the repository serializes back to
+  // exactly the record it was parsed from, cache that record itself, so
+  // comparing an unedited repository against the file is an identity check.
+  const serialized = serializeGedcomRepository(gedcomRepository);
+  serializedRepositories.set(
+    gedcomRepository,
+    serializeGedcomRecordToText(serialized).join("\n") ===
+      serializeGedcomRecordToText(gedcomRecord).join("\n")
+      ? gedcomRecord
+      : serialized,
+  );
+
   return gedcomRepository;
 }
+
+// Each repository's serialization, by object. Repositories are only ever
+// changed through immer, which makes a new object for an edited one and
+// keeps an unedited one as the same object, so a cached serialization never
+// goes stale. See serializeGedcomIndividual.
+const serializedRepositories = new WeakMap<GedcomRepository, GedcomRecord>();
 
 export function serializeGedcomRepository(
   gedcomRepository: GedcomRepository,
 ): GedcomRecord {
-  return newGedcomRecord({
-    tag: "REPO",
-    abstag: "REPO",
-    xref: gedcomRepository.xref,
-    children: filterTrivialGedcomRecords([
-      newGedcomRecord({
-        tag: "NAME",
-        abstag: "REPO.NAME",
-        value: gedcomRepository.name,
-      }),
-      serializeGedcomChangeDate(gedcomRepository.changeDate),
-    ]),
-  });
+  return serializedRepositories.getOrInsertComputed(gedcomRepository, () =>
+    newGedcomRecord({
+      tag: "REPO",
+      abstag: "REPO",
+      xref: gedcomRepository.xref,
+      children: filterTrivialGedcomRecords([
+        newGedcomRecord({
+          tag: "NAME",
+          abstag: "REPO.NAME",
+          value: gedcomRepository.name,
+        }),
+        serializeGedcomChangeDate(gedcomRepository.changeDate),
+      ]),
+    }),
+  );
 }
