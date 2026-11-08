@@ -74,11 +74,12 @@ export function parseGedcomRecords(text: string): GedcomRecord[] {
       string,
     ];
     const level = parseInt(levelString, 10);
-    const abstag = [
-      ...ladder.slice(0, level).map((record) => record.tag),
-      tag,
-    ].join(".");
-    const record = newGedcomRecord({ xref, tag, abstag, value });
+    const abstag =
+      level == 0 || level > ladder.length
+        ? tag
+        : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          `${ladder[level - 1]!.abstag}.${tag}`;
+    const record: GedcomRecord = { xref, tag, abstag, value, children: [] };
 
     if (level == 0) {
       ladder = [record];
