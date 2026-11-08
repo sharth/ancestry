@@ -79,10 +79,7 @@
               </div>
             </div>
             <div class="diff-content" role="cell">
-              @for (
-                d of differencesForUrlSuggestions(row.source, [urlSuggestion]);
-                track $index
-              ) {
+              @for (d of rowDifferences()[i]; track $index) {
                 <app-gedcom-diff
                   [oldGedcomRecord]="d.originalGedcomRecord"
                   [newGedcomRecord]="d.updatedGedcomRecord"
@@ -130,10 +127,7 @@
               </div>
             </div>
             <div class="diff-content" role="cell">
-              @for (
-                d of differencesForMergeSuggestion(row.source, mergeSuggestion);
-                track $index
-              ) {
+              @for (d of rowDifferences()[i]; track $index) {
                 <app-gedcom-diff
                   [oldGedcomRecord]="d.originalGedcomRecord"
                   [newGedcomRecord]="d.updatedGedcomRecord"

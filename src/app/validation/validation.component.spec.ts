@@ -177,6 +177,7 @@ describe("ValidationComponent", () => {
 
 describe("ValidationComponent merge repository links suggestion", () => {
   let component: ValidationComponent;
+  let fixture: ComponentFixture<ValidationComponent>;
   let ancestryService: AncestryService;
 
   const repository = newGedcomRepository({ xref: "@R1@", name: "Example" });
@@ -210,12 +211,27 @@ describe("ValidationComponent merge repository links suggestion", () => {
       bindings: [inputBinding("ancestryDatabase", ancestryDatabase)],
       waitForStableOnRender: true,
     });
-    component = renderResult.fixture.componentInstance;
+    fixture = renderResult.fixture;
+    component = fixture.componentInstance;
     ancestryService = TestBed.inject(AncestryService);
   });
 
   it("lists a warning with a button to review the merge suggestion", async () => {
     expect(await screen.findByText(/Merge repository citations/)).toBeTruthy();
+  });
+
+  // Each preview re-serializes the database, so it's built once per
+  // database rather than from the template on every change detection.
+  it("doesn't rebuild the preview on change detection", async () => {
+    await screen.findByText(/Merge repository citations/);
+    const differencesSpy = vi.spyOn(component, "differencesForMergeSuggestion");
+
+    // Any change to a signal the page's template reads refreshes the page,
+    // e.g. picking a suggestion to review in the editor dialog.
+    component.reviewMergeSuggestion(source, mergeSuggestion);
+    await fixture.whenStable();
+
+    expect(differencesSpy).not.toHaveBeenCalled();
   });
 
   it("submitMergeSuggestion merges the links and saves it directly", async () => {
