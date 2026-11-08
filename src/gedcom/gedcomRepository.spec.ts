@@ -1,3 +1,4 @@
+import { produce } from "immer";
 import { assert, describe, expect, it } from "vitest";
 
 import { newGedcomChangeDate } from "./gedcomChangeDate";
@@ -71,5 +72,35 @@ describe("GedcomRepository", () => {
     expect(
       serializeGedcomRecordToText(serializeGedcomRepository(gedcomRepository)),
     ).toEqual(gedcomText);
+  });
+});
+
+describe("serializeGedcomRepository cache", () => {
+  it("returns the parsed record itself when it round-trips exactly", () => {
+    const [record] = parseGedcomRecords(
+      ["0 @R1@ REPO", "1 NAME Archive"].join("\n"),
+    );
+    assert.isDefined(record);
+    const parsed = parseGedcomRepository(record);
+
+    expect(serializeGedcomRepository(parsed)).toBe(record);
+  });
+
+  it("serializes an edited copy afresh", () => {
+    const [record] = parseGedcomRecords(
+      ["0 @R1@ REPO", "1 NAME Archive"].join("\n"),
+    );
+    assert.isDefined(record);
+    const parsed = parseGedcomRepository(record);
+    const edited = produce(parsed, (draft) => {
+      draft.name = "Library";
+    });
+
+    expect(
+      serializeGedcomRecordToText(serializeGedcomRepository(edited)),
+    ).toEqual(["0 @R1@ REPO", "1 NAME Library"]);
+    expect(
+      serializeGedcomRecordToText(serializeGedcomRepository(parsed)),
+    ).toEqual(["0 @R1@ REPO", "1 NAME Archive"]);
   });
 });
