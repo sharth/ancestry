@@ -138,6 +138,17 @@ describe("AncestryService.gedcomDatabaseDifferences", () => {
     ).toEqual([edited, added, removed]);
   });
 
+  it("treats a record paired with itself as unchanged", () => {
+    const same = newGedcomRecord({ xref: "@S4@", tag: "SOUR" });
+    vi.spyOn(ancestryService, "compareGedcomDatabase").mockReturnValue([
+      { originalGedcomRecord: same, updatedGedcomRecord: same },
+    ]);
+
+    expect(
+      ancestryService.gedcomDatabaseDifferences(newGedcomDatabase()),
+    ).toEqual([]);
+  });
+
   it("also lists an unchanged record whose xref is always included", () => {
     expect(
       ancestryService.gedcomDatabaseDifferences(

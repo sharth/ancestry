@@ -8,6 +8,7 @@ import {
   compareGedcomDatabase,
   parseGedcomDatabase,
   serializeGedcomDatabase,
+  serializeGedcomDatabaseRecords,
   type GedcomDatabase,
 } from "../gedcom/gedcomDatabase";
 import {
@@ -191,6 +192,19 @@ export class AncestryService {
     return parseGedcomDatabase(gedcomResourceValue.gedcomRecords);
   });
 
+  // Every parsed record's serialization, worked out once per load so that
+  // comparing an edit against the file only re-serializes what it changed.
+  private readonly ancestrySerializations = computed<
+    Map<unknown, GedcomRecord>
+  >(() => {
+    const ancestryDatabase = this.ancestryDatabase();
+    if (ancestryDatabase === undefined) return new Map();
+    return serializeGedcomDatabaseRecords(
+      this.gedcomResource.value()?.gedcomRecords ?? [],
+      ancestryDatabase,
+    );
+  });
+
   compareGedcomDatabase(gedcomDatabase: GedcomDatabase): {
     originalGedcomRecord?: GedcomRecord;
     updatedGedcomRecord?: GedcomRecord;
@@ -198,6 +212,7 @@ export class AncestryService {
     return compareGedcomDatabase(
       this.gedcomResource.value()?.gedcomRecords ?? [],
       gedcomDatabase,
+      this.ancestrySerializations(),
     );
   }
 
@@ -220,8 +235,11 @@ export class AncestryService {
           (xref != undefined && alwaysIncludeXrefs.has(xref)) ||
           originalGedcomRecord == undefined ||
           updatedGedcomRecord == undefined ||
-          serializeGedcomRecordToText(originalGedcomRecord).join("\n") !==
-            serializeGedcomRecordToText(updatedGedcomRecord).join("\n")
+          // An untouched record that round-trips exactly is paired with
+          // the file's own record object (see ancestrySerializations).
+          (originalGedcomRecord !== updatedGedcomRecord &&
+            serializeGedcomRecordToText(originalGedcomRecord).join("\n") !==
+              serializeGedcomRecordToText(updatedGedcomRecord).join("\n"))
         );
       },
     );
@@ -230,7 +248,11 @@ export class AncestryService {
   async updateGedcomDatabase(gedcomDatabase: GedcomDatabase) {
     const gedcomResource = this.gedcomResource.value();
     const originalGedcomRecords = gedcomResource?.gedcomRecords ?? [];
-    const text = serializeGedcomDatabase(originalGedcomRecords, gedcomDatabase);
+    const text = serializeGedcomDatabase(
+      originalGedcomRecords,
+      gedcomDatabase,
+      this.ancestrySerializations(),
+    );
 
     const gedcomFileHandle = this.gedcomResource.value()?.gedcomFileHandle;
     if (gedcomFileHandle == undefined) {
