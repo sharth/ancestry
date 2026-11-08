@@ -19,8 +19,11 @@ export function newGedcomRecord(fieldsToOverride: Partial<GedcomRecord>) {
 
 // Whether two records serialize to the same text: the same tag, xref and
 // value, with equal children in the same order. abstag is ignored, as
-// serializeGedcomRecordToText ignores it.
+// serializeGedcomRecordToText ignores it. The same object is equal without
+// a walk, which is the common case for an unedited record (see
+// serializeGedcomIndividual).
 export function gedcomRecordsEqual(a: GedcomRecord, b: GedcomRecord): boolean {
+  if (a === b) return true;
   return (
     a.tag === b.tag &&
     a.xref === b.xref &&

@@ -67,6 +67,11 @@ describe("GedcomRecord", () => {
 });
 
 describe("gedcomRecordsEqual", () => {
+  it("treats the same object as equal", () => {
+    const record = newGedcomRecord({ tag: "INDI", xref: "@I1@" });
+    expect(gedcomRecordsEqual(record, record)).toBe(true);
+  });
+
   it("ignores abstag", () => {
     expect(
       gedcomRecordsEqual(
