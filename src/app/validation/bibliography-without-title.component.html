@@ -1,0 +1,58 @@
+@if (rows().length === 0) {
+  <p>Every source with a bibliography (_BIBL) also has a title.</p>
+} @else {
+  <p>
+    These sources have a bibliography (_BIBL) but no title. The suggested fix
+    moves the bibliography into the title and, in the same edit, links the
+    source to a repository for each URL in it.
+  </p>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Source</th>
+        <th>Bibliography</th>
+        <th>Fix</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of rows(); track row.source.xref) {
+        <tr>
+          <td>
+            <a [routerLink]="['/source', row.source.xref]">
+              {{ row.source.abbr || row.source.xref }}
+            </a>
+          </td>
+          <td class="text-break">{{ row.bibliography }}</td>
+          <td>
+            <div class="btn-group-vertical">
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-primary"
+                (click)="reviewSuggestion.emit(row.source)"
+              >
+                Open editor with proposed changes
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-success"
+                (click)="submitSuggestion.emit(row.source)"
+              >
+                Submit changes as proposed
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="3">
+            @for (d of row.differences; track $index) {
+              <app-gedcom-diff
+                [oldGedcomRecord]="d.originalGedcomRecord"
+                [newGedcomRecord]="d.updatedGedcomRecord"
+              />
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

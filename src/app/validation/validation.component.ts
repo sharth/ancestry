@@ -19,8 +19,10 @@ import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
 import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
 import type { TabInformation } from "../gedcom-editor/gedcom-editor-interface";
 import type { ComponentWithUnsavedChanges } from "../unsaved-changes.guard";
+import { applyBibliographyTitleSuggestion } from "./apply-bibliography-title-suggestion.util";
 import { applyMergeRepositoryLinksSuggestion } from "./apply-merge-repository-links-suggestion.util";
 import { applyUrlSuggestions } from "./apply-url-suggestion.util";
+import { BibliographyWithoutTitleComponent } from "./bibliography-without-title.component";
 import { DuplicateCallNumbersComponent } from "./duplicate-call-numbers.component";
 import {
   sourceValidators,
@@ -45,6 +47,10 @@ type ReviewState =
       kind: "merge";
       source: GedcomSource;
       suggestion: MergeRepositoryLinksSuggestion;
+    }
+  | {
+      kind: "bibliography";
+      source: GedcomSource;
     };
 
 const tabs = [
@@ -53,6 +59,7 @@ const tabs = [
   { id: "duplicate-call-numbers", label: "Duplicate call numbers" },
   { id: "unused-sources", label: "Unused sources" },
   { id: "unused-multimedia", label: "Unused multimedia" },
+  { id: "bibliography-without-title", label: "Bibliography without title" },
 ] as const;
 
 type TabId = (typeof tabs)[number]["id"];
@@ -77,6 +84,7 @@ interface TableRow {
     UnusedMultimediaComponent,
     UnusedSourcesComponent,
     SourcesWithoutRepositoriesComponent,
+    BibliographyWithoutTitleComponent,
   ],
   templateUrl: "./validation.component.html",
   styleUrl: "./validation.component.css",
@@ -163,6 +171,12 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
   readonly reviewDatabase = computed<GedcomDatabase>(() => {
     const state = this.reviewState();
     if (state === undefined) return this.ancestryDatabase();
+    if (state.kind === "bibliography") {
+      return applyBibliographyTitleSuggestion(
+        this.ancestryDatabase(),
+        state.source,
+      ).database;
+    }
     if (state.kind === "merge") {
       return applyMergeRepositoryLinksSuggestion(
         this.ancestryDatabase(),
@@ -196,6 +210,15 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
         tabs.push({ type: "REPO", xref });
       }
     }
+    if (state.kind === "bibliography") {
+      const { createdRepositoryXrefs } = applyBibliographyTitleSuggestion(
+        this.ancestryDatabase(),
+        state.source,
+      );
+      for (const xref of createdRepositoryXrefs) {
+        tabs.push({ type: "REPO", xref });
+      }
+    }
     return tabs;
   });
 
@@ -211,6 +234,10 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
     suggestion: MergeRepositoryLinksSuggestion,
   ) {
     this.reviewState.set({ kind: "merge", source, suggestion });
+  }
+
+  reviewBibliographySuggestion(source: GedcomSource) {
+    this.reviewState.set({ kind: "bibliography", source });
   }
 
   // Applies a suggested fix directly and saves it, without opening the
@@ -242,6 +269,18 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
       this.ancestryDatabase(),
       source,
       suggestion,
+    );
+    await this.ancestryService.updateGedcomDatabase(database);
+    await this.reload();
+  }
+
+  async submitBibliographySuggestion(source: GedcomSource) {
+    const granted = await this.ancestryService.requestWritePermission();
+    if (!granted) return;
+
+    const { database } = applyBibliographyTitleSuggestion(
+      this.ancestryDatabase(),
+      source,
     );
     await this.ancestryService.updateGedcomDatabase(database);
     await this.reload();

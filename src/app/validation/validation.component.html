@@ -176,6 +176,15 @@
   @case ("unused-multimedia") {
     <app-unused-multimedia [ancestryDatabase]="ancestryDatabase()" />
   }
+  @case ("bibliography-without-title") {
+    <app-bibliography-without-title
+      [ancestryDatabase]="ancestryDatabase()"
+      (reviewSuggestion)="
+        reviewBibliographySuggestion($event); editDialog.showModal()
+      "
+      (submitSuggestion)="submitBibliographySuggestion($event)"
+    />
+  }
 }
 
 <app-gedcom-editor-dialog
