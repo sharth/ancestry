@@ -7,6 +7,7 @@ import {
 import {
   filterTrivialGedcomRecords,
   newGedcomRecord,
+  serializeGedcomRecordToText,
   type GedcomRecord,
 } from "./gedcomRecord";
 
@@ -81,37 +82,56 @@ export function parseGedcomMultimedia(record: GedcomRecord): GedcomMultimedia {
     }
   }
 
+  // Seed the serialization cache. When the multimedia record serializes back to
+  // exactly the record it was parsed from, cache that record itself, so
+  // comparing an unedited multimedia record against the file is an identity check.
+  if (
+    serializeGedcomRecordToText(
+      serializeGedcomMultimedia(gedcomMultimedia),
+    ).join("\n") === serializeGedcomRecordToText(record).join("\n")
+  ) {
+    serializedMultimedias.set(gedcomMultimedia, record);
+  }
+
   return gedcomMultimedia;
 }
+
+// Each multimedia record's serialization, by object. Multimedia records are
+// only ever changed through immer, which makes a new object for an edited
+// one and keeps an unedited one as the same object, so a cached
+// serialization never goes stale. See serializeGedcomIndividual.
+const serializedMultimedias = new WeakMap<GedcomMultimedia, GedcomRecord>();
 
 export function serializeGedcomMultimedia(
   gedcomMultimedia: GedcomMultimedia,
 ): GedcomRecord {
-  return newGedcomRecord({
-    tag: "OBJE",
-    abstag: "OBJE",
-    xref: gedcomMultimedia.xref,
-    children: filterTrivialGedcomRecords([
-      newGedcomRecord({
-        tag: "FILE",
-        abstag: "OBJE.FILE",
-        value: gedcomMultimedia.filePath,
-        children: filterTrivialGedcomRecords([
-          newGedcomRecord({
-            tag: "FORM",
-            abstag: "OBJE.FILE.FORM",
-            value: gedcomMultimedia.mediaType,
-          }),
-          newGedcomRecord({
-            tag: "TITL",
-            abstag: "OBJE.FILE.TITL",
-            value: gedcomMultimedia.title,
-          }),
-        ]),
-      }),
-      gedcomMultimedia.changeDate
-        ? serializeGedcomChangeDate(gedcomMultimedia.changeDate)
-        : null,
-    ]),
-  });
+  return serializedMultimedias.getOrInsertComputed(gedcomMultimedia, () =>
+    newGedcomRecord({
+      tag: "OBJE",
+      abstag: "OBJE",
+      xref: gedcomMultimedia.xref,
+      children: filterTrivialGedcomRecords([
+        newGedcomRecord({
+          tag: "FILE",
+          abstag: "OBJE.FILE",
+          value: gedcomMultimedia.filePath,
+          children: filterTrivialGedcomRecords([
+            newGedcomRecord({
+              tag: "FORM",
+              abstag: "OBJE.FILE.FORM",
+              value: gedcomMultimedia.mediaType,
+            }),
+            newGedcomRecord({
+              tag: "TITL",
+              abstag: "OBJE.FILE.TITL",
+              value: gedcomMultimedia.title,
+            }),
+          ]),
+        }),
+        gedcomMultimedia.changeDate
+          ? serializeGedcomChangeDate(gedcomMultimedia.changeDate)
+          : null,
+      ]),
+    }),
+  );
 }

@@ -1,3 +1,4 @@
+import { produce } from "immer";
 import { assert, describe, expect, it } from "vitest";
 
 import { newGedcomChangeDate } from "./gedcomChangeDate";
@@ -231,6 +232,38 @@ describe("gedcomFamily", () => {
       "1 ENGA",
       "2 DATE ABT 1949",
       "2 SDATE 2005",
+    ]);
+  });
+});
+
+describe("serializeGedcomFamily cache", () => {
+  it("returns the parsed record itself when it round-trips exactly", () => {
+    const [record] = parseGedcomRecords(
+      ["0 @F1@ FAM", "1 HUSB @I1@"].join("\n"),
+    );
+    assert.isDefined(record);
+    const parsed = parseGedcomFamily(record);
+
+    expect(serializeGedcomFamily(parsed)).toBe(record);
+  });
+
+  it("serializes an edited copy afresh", () => {
+    const [record] = parseGedcomRecords(
+      ["0 @F1@ FAM", "1 HUSB @I1@"].join("\n"),
+    );
+    assert.isDefined(record);
+    const parsed = parseGedcomFamily(record);
+    const edited = produce(parsed, (draft) => {
+      draft.husbandXref = "@I2@";
+    });
+
+    expect(serializeGedcomRecordToText(serializeGedcomFamily(edited))).toEqual([
+      "0 @F1@ FAM",
+      "1 HUSB @I2@",
+    ]);
+    expect(serializeGedcomRecordToText(serializeGedcomFamily(parsed))).toEqual([
+      "0 @F1@ FAM",
+      "1 HUSB @I1@",
     ]);
   });
 });

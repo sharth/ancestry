@@ -1,6 +1,11 @@
-import { describe, expect, it } from "vitest";
+import { produce } from "immer";
+import { assert, describe, expect, it } from "vitest";
 
-import { newGedcomRecord, parseGedcomRecords } from "./gedcomRecord";
+import {
+  newGedcomRecord,
+  parseGedcomRecords,
+  serializeGedcomRecordToText,
+} from "./gedcomRecord";
 import {
   newGedcomSource,
   parseGedcomSource,
@@ -59,5 +64,37 @@ describe("GedcomSource", () => {
         ],
       }),
     );
+  });
+});
+
+describe("serializeGedcomSource cache", () => {
+  it("returns the parsed record itself when it round-trips exactly", () => {
+    const [record] = parseGedcomRecords(
+      ["0 @S1@ SOUR", "1 TITL Title"].join("\n"),
+    );
+    assert.isDefined(record);
+    const parsed = parseGedcomSource(record);
+
+    expect(serializeGedcomSource(parsed)).toBe(record);
+  });
+
+  it("serializes an edited copy afresh", () => {
+    const [record] = parseGedcomRecords(
+      ["0 @S1@ SOUR", "1 TITL Title"].join("\n"),
+    );
+    assert.isDefined(record);
+    const parsed = parseGedcomSource(record);
+    const edited = produce(parsed, (draft) => {
+      draft.title = "New title";
+    });
+
+    expect(serializeGedcomRecordToText(serializeGedcomSource(edited))).toEqual([
+      "0 @S1@ SOUR",
+      "1 TITL New title",
+    ]);
+    expect(serializeGedcomRecordToText(serializeGedcomSource(parsed))).toEqual([
+      "0 @S1@ SOUR",
+      "1 TITL Title",
+    ]);
   });
 });

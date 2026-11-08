@@ -1,3 +1,4 @@
+import { produce } from "immer";
 import { assert, describe, expect, it } from "vitest";
 
 import { newGedcomChangeDate } from "./gedcomChangeDate";
@@ -136,5 +137,35 @@ describe("gedcomMultimedia", () => {
       assert.isOk(gedcomRecord);
       expect(() => parseGedcomMultimedia(gedcomRecord)).toThrow();
     });
+  });
+});
+
+describe("serializeGedcomMultimedia cache", () => {
+  it("returns the parsed record itself when it round-trips exactly", () => {
+    const [record] = parseGedcomRecords(
+      ["0 @M1@ OBJE", "1 FILE a.jpg", "2 FORM jpg"].join("\n"),
+    );
+    assert.isDefined(record);
+    const parsed = parseGedcomMultimedia(record);
+
+    expect(serializeGedcomMultimedia(parsed)).toBe(record);
+  });
+
+  it("serializes an edited copy afresh", () => {
+    const [record] = parseGedcomRecords(
+      ["0 @M1@ OBJE", "1 FILE a.jpg", "2 FORM jpg"].join("\n"),
+    );
+    assert.isDefined(record);
+    const parsed = parseGedcomMultimedia(record);
+    const edited = produce(parsed, (draft) => {
+      draft.filePath = "b.jpg";
+    });
+
+    expect(
+      serializeGedcomRecordToText(serializeGedcomMultimedia(edited)),
+    ).toEqual(["0 @M1@ OBJE", "1 FILE b.jpg", "2 FORM jpg"]);
+    expect(
+      serializeGedcomRecordToText(serializeGedcomMultimedia(parsed)),
+    ).toEqual(["0 @M1@ OBJE", "1 FILE a.jpg", "2 FORM jpg"]);
   });
 });
