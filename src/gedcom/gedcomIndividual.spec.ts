@@ -297,33 +297,35 @@ describe("gedcomIndividual", () => {
 });
 
 describe("serializeGedcomIndividual cache", () => {
-  function parse(lines: string[]) {
-    const [record] = parseGedcomRecords(lines.join("\n"));
-    assert.isOk(record);
-    return { record, individual: parseGedcomIndividual(record) };
-  }
-
   it("returns the parsed record itself when it round-trips exactly", () => {
-    const { record, individual } = parse([
-      "0 @I1@ INDI",
-      "1 NAME John /Doe/",
-      "2 GIVN John",
-      "2 SURN Doe",
-      "1 SEX M",
-    ]);
+    const [record] = parseGedcomRecords(
+      [
+        "0 @I1@ INDI",
+        "1 NAME John /Doe/",
+        "2 GIVN John",
+        "2 SURN Doe",
+        "1 SEX M",
+      ].join("\n"),
+    );
+    assert.isDefined(record);
+    const individual = parseGedcomIndividual(record);
 
     expect(serializeGedcomIndividual(individual)).toBe(record);
   });
 
   it("returns a fresh serialization when the parsed record doesn't round-trip", () => {
     // SEX before NAME, the reverse of the order the app writes.
-    const { record, individual } = parse([
-      "0 @I1@ INDI",
-      "1 SEX M",
-      "1 NAME John /Doe/",
-      "2 GIVN John",
-      "2 SURN Doe",
-    ]);
+    const [record] = parseGedcomRecords(
+      [
+        "0 @I1@ INDI",
+        "1 SEX M",
+        "1 NAME John /Doe/",
+        "2 GIVN John",
+        "2 SURN Doe",
+      ].join("\n"),
+    );
+    assert.isDefined(record);
+    const individual = parseGedcomIndividual(record);
 
     const serialized = serializeGedcomIndividual(individual);
     expect(serialized).not.toBe(record);
@@ -337,7 +339,9 @@ describe("serializeGedcomIndividual cache", () => {
   });
 
   it("serializes an edited copy afresh", () => {
-    const { individual } = parse(["0 @I1@ INDI", "1 SEX M"]);
+    const [record] = parseGedcomRecords(["0 @I1@ INDI", "1 SEX M"].join("\n"));
+    assert.isDefined(record);
+    const individual = parseGedcomIndividual(record);
     const edited = produce(individual, (draft) => {
       draft.sex = newGedcomSex({ sex: "F" });
     });
