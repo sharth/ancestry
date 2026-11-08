@@ -11,8 +11,8 @@ import {
   type GedcomDatabase,
 } from "../gedcom/gedcomDatabase";
 import {
+  gedcomRecordsEqual,
   parseGedcomRecords,
-  serializeGedcomRecordToText,
   type GedcomRecord,
 } from "../gedcom/gedcomRecord";
 
@@ -223,8 +223,7 @@ export class AncestryService {
           // An unedited record that round-trips exactly serializes to the
           // file's own record object (see serializeGedcomIndividual).
           (originalGedcomRecord !== updatedGedcomRecord &&
-            serializeGedcomRecordToText(originalGedcomRecord).join("\n") !==
-              serializeGedcomRecordToText(updatedGedcomRecord).join("\n"))
+            !gedcomRecordsEqual(originalGedcomRecord, updatedGedcomRecord))
         );
       },
     );
