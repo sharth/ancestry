@@ -18,7 +18,10 @@ import {
   generateGedcomHeader,
   serializeGedcomHeader,
 } from "../../gedcom/gedcomHeader";
-import { newGedcomIndividual } from "../../gedcom/gedcomIndividual";
+import {
+  newGedcomIndividual,
+  serializeGedcomIndividual,
+} from "../../gedcom/gedcomIndividual";
 import { newGedcomName } from "../../gedcom/gedcomName";
 import {
   newGedcomRecord,
@@ -535,5 +538,57 @@ describe("GedcomEditorComponent hasUnsavedChanges with real form interaction", (
     expect(renderResult.fixture.componentInstance.hasUnsavedChanges()).toBe(
       true,
     );
+  });
+});
+
+// serializeGedcomIndividual caches by object, which is only safe as long
+// as editing an individual never mutates it in place.
+describe("GedcomEditorComponent edits leave the original individual untouched", () => {
+  it("makes a new individual object when a field is typed into", async () => {
+    const individual = newGedcomIndividual({
+      xref: "@I0@",
+      names: [newGedcomName({ givenName: "Stock", surname: "Individual" })],
+      sex: newGedcomSex({ sex: "M" }),
+    });
+    const database = newGedcomDatabase({
+      individuals: { [individual.xref]: individual },
+    });
+    const before = serializeGedcomRecordToText(
+      serializeGedcomIndividual(individual),
+    );
+
+    const renderResult = await render(GedcomEditorComponent, {
+      providers: [provideRouter([])],
+      skipDetectChanges: true,
+    });
+    renderResult.fixture.componentRef.setInput("tabs", [
+      { type: "INDI", xref: "@I0@" },
+    ]);
+    renderResult.fixture.componentRef.setInput("ancestryDatabase", database);
+    renderResult.fixture.detectChanges();
+    await renderResult.fixture.whenStable();
+
+    const givenName = screen
+      .getAllByRole<HTMLInputElement>("textbox")
+      .find((input) => input.value === "Stock");
+    assert.isOk(givenName);
+    const user = userEvent.setup();
+    await user.type(givenName, "y");
+    renderResult.fixture.detectChanges();
+    await renderResult.fixture.whenStable();
+
+    const edited =
+      renderResult.fixture.componentInstance.workingDatabase().individuals[
+        "@I0@"
+      ];
+    assert.isOk(edited);
+    expect(edited).not.toBe(individual);
+    expect(individual.names[0]?.givenName).toBe("Stock");
+    expect(
+      serializeGedcomRecordToText(serializeGedcomIndividual(individual)),
+    ).toEqual(before);
+    expect(
+      serializeGedcomRecordToText(serializeGedcomIndividual(edited)).join("\n"),
+    ).toContain("Stocky");
   });
 });
