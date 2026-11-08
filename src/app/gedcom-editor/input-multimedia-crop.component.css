@@ -1,7 +1,14 @@
+.crop-viewport {
+  max-width: 100%;
+  max-height: 60vh;
+  overflow: auto;
+  width: fit-content;
+}
+
 .crop-container {
   position: relative;
   display: inline-block;
-  max-width: 100%;
+  vertical-align: top;
   touch-action: none;
   cursor: crosshair;
 }
@@ -9,7 +16,16 @@
 .crop-container img {
   display: block;
   max-width: 100%;
-  max-height: 400px;
+  max-height: 60vh;
+}
+
+.crop-container:not(.zoomed) {
+  max-width: 100%;
+}
+
+.crop-container.zoomed img {
+  max-width: none;
+  max-height: none;
 }
 
 .crop-rect {
@@ -17,4 +33,8 @@
   border: 2px dashed #0d6efd;
   background-color: rgba(13, 110, 253, 0.2);
   pointer-events: none;
+}
+
+.zoom-label {
+  min-width: 4.5em;
 }

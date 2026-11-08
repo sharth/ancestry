@@ -27,4 +27,26 @@ describe("InputMultimediaCropComponent", () => {
     component.clearCrop();
     expect(component.value()).toBeUndefined();
   });
+
+  it("starts fitted and zooms in steps up to twice the natural size", () => {
+    component.naturalSize.set({ width: 4000, height: 3000 });
+    expect(component.zoomLabel()).toBe("Fit");
+
+    component.zoom.set(1);
+    component.zoomIn();
+    expect(component.zoom()).toBe(1.5);
+    expect(component.imageWidth()).toBe("6000px");
+    component.zoomIn();
+    expect(component.zoom()).toBe(2);
+    expect(component.zoomLabel()).toBe("200%");
+    expect(component.canZoomIn()).toBe(false);
+
+    component.zoomOut();
+    expect(component.zoom()).toBeCloseTo(4 / 3);
+    expect(component.canZoomIn()).toBe(true);
+
+    component.zoomToFit();
+    expect(component.zoom()).toBeUndefined();
+    expect(component.imageWidth()).toBeUndefined();
+  });
 });
