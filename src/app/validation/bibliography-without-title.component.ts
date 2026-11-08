@@ -3,19 +3,19 @@ import { RouterModule } from "@angular/router";
 
 import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
-import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
 import type { GedcomSource } from "../../gedcom/gedcomSource";
 import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
 import {
   applyBibliographyTitleSuggestion,
   bibliographyForMissingTitle,
 } from "./apply-bibliography-title-suggestion.util";
-
 /** Lists the sources that have a `_BIBL` (bibliography, e.g. from an
  * Ancestry.com export) but no TITL, and suggests moving the bibliography
  * into the title -- together with any repository links for URLs in the
  * source, as one edit. Reviewing or submitting a suggestion is handed back
  * to the validation page, which owns the editor dialog. */
+import { suggestionDifferences } from "./suggestion-differences.util";
+
 @Component({
   selector: "app-bibliography-without-title",
   imports: [RouterModule, GedcomDiffComponent],
@@ -44,14 +44,10 @@ export class BibliographyWithoutTitleComponent {
       this.ancestryDatabase(),
       source,
     );
-    return this.ancestryService
-      .compareGedcomDatabase(database)
-      .filter(
-        ({ originalGedcomRecord, updatedGedcomRecord }) =>
-          originalGedcomRecord == undefined ||
-          updatedGedcomRecord == undefined ||
-          serializeGedcomRecordToText(originalGedcomRecord).join("\n") !==
-            serializeGedcomRecordToText(updatedGedcomRecord).join("\n"),
-      );
+    return suggestionDifferences(
+      this.ancestryService,
+      this.ancestryDatabase(),
+      database,
+    );
   }
 }

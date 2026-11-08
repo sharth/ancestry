@@ -10,10 +10,7 @@ import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 
 import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
-import {
-  serializeGedcomRecordToText,
-  type GedcomRecord,
-} from "../../gedcom/gedcomRecord";
+import type { GedcomRecord } from "../../gedcom/gedcomRecord";
 import type { GedcomSource } from "../../gedcom/gedcomSource";
 import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
 import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
@@ -39,6 +36,10 @@ import {
   findSourcesWithoutRepositories,
   SourcesWithoutRepositoriesComponent,
 } from "./sources-without-repositories.component";
+import {
+  suggestionDifferences,
+  type GedcomRecordDifference,
+} from "./suggestion-differences.util";
 import {
   findUnusedMultimedia,
   UnusedMultimediaComponent,
@@ -343,10 +344,11 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
   }
 
   // The records that would actually change on disk if `suggestions` are
-  // applied and saved -- built from AncestryService.compareGedcomDatabase(),
-  // the exact same diff serializeGedcomDatabase() writes from, so this
-  // preview shows everything that would change (CHAN and HEAD included),
-  // not just the source being fixed. Computed fresh each time rather than
+  // applied and saved -- built by suggestionDifferences() from
+  // AncestryService.compareGedcomDatabase(), the exact same diff
+  // serializeGedcomDatabase() writes from, so this preview shows every
+  // record the fix changes (CHAN and HEAD included), not just the source
+  // being fixed. Computed fresh each time rather than
   // reusing `reviewDatabase` so it stays correct even when nothing has been
   // selected for review yet.
   differencesForUrlSuggestions(
@@ -379,18 +381,13 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
     return this.actualDifferences(database);
   }
 
-  private actualDifferences(database: GedcomDatabase): {
-    originalGedcomRecord?: GedcomRecord;
-    updatedGedcomRecord?: GedcomRecord;
-  }[] {
-    return this.ancestryService
-      .compareGedcomDatabase(database)
-      .filter(
-        ({ originalGedcomRecord, updatedGedcomRecord }) =>
-          originalGedcomRecord == undefined ||
-          updatedGedcomRecord == undefined ||
-          serializeGedcomRecordToText(originalGedcomRecord).join("\n") !==
-            serializeGedcomRecordToText(updatedGedcomRecord).join("\n"),
-      );
+  private actualDifferences(
+    database: GedcomDatabase,
+  ): GedcomRecordDifference[] {
+    return suggestionDifferences(
+      this.ancestryService,
+      this.ancestryDatabase(),
+      database,
+    );
   }
 }

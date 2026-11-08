@@ -3,7 +3,6 @@ import { RouterModule } from "@angular/router";
 
 import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
-import { serializeGedcomRecordToText } from "../../gedcom/gedcomRecord";
 import type { GedcomSource } from "../../gedcom/gedcomSource";
 import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
 import { applyUrlSuggestions } from "./apply-url-suggestion.util";
@@ -23,6 +22,8 @@ export interface SourceUrlSuggestions {
  * repositories suggested for each from URLs found in its text. Reviewing
  * or submitting a suggestion is handed back to the validation page, which
  * owns the editor dialog. */
+import { suggestionDifferences } from "./suggestion-differences.util";
+
 @Component({
   selector: "app-sources-without-repositories",
   imports: [RouterModule, GedcomDiffComponent],
@@ -62,15 +63,11 @@ export class SourcesWithoutRepositoriesComponent {
       source,
       suggestions,
     );
-    return this.ancestryService
-      .compareGedcomDatabase(database)
-      .filter(
-        ({ originalGedcomRecord, updatedGedcomRecord }) =>
-          originalGedcomRecord == undefined ||
-          updatedGedcomRecord == undefined ||
-          serializeGedcomRecordToText(originalGedcomRecord).join("\n") !==
-            serializeGedcomRecordToText(updatedGedcomRecord).join("\n"),
-      );
+    return suggestionDifferences(
+      this.ancestryService,
+      this.ancestryDatabase(),
+      database,
+    );
   }
 }
 
