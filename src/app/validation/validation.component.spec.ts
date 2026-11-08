@@ -94,9 +94,9 @@ describe("ValidationComponent", () => {
     const counts = Object.fromEntries(
       screen
         .getAllByRole("tab")
-        .map((tab) => [
-          tab.firstChild?.textContent?.trim(),
-          tab.querySelector(".badge")?.textContent.trim(),
+        .map((tab): [string, string] => [
+          tab.firstChild?.textContent?.trim() ?? "",
+          tab.querySelector(".badge")?.textContent.trim() ?? "",
         ]),
     );
     expect(counts).toEqual({
