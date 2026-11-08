@@ -51,7 +51,7 @@ export function newGedcomFamily(
 }
 
 export function parseGedcomFamily(record: GedcomRecord): GedcomFamily {
-  if (record.abstag !== "FAM") throw new Error();
+  if (record.tag !== "FAM") throw new Error();
   if (record.xref == "") throw new Error();
   if (record.value != "") throw new Error();
 
@@ -120,23 +120,19 @@ export function serializeGedcomFamily(
   return serializedFamilies.getOrInsertComputed(gedcomFamily, () =>
     newGedcomRecord({
       tag: "FAM",
-      abstag: "FAM",
       xref: gedcomFamily.xref,
       children: filterTrivialGedcomRecords([
         newGedcomRecord({
           tag: "HUSB",
-          abstag: "FAM.HUSB",
           value: gedcomFamily.husbandXref,
         }),
         newGedcomRecord({
           tag: "WIFE",
-          abstag: "FAM.WIFE",
           value: gedcomFamily.wifeXref,
         }),
         ...gedcomFamily.childXrefs.map((childXref) =>
           newGedcomRecord({
             tag: "CHIL",
-            abstag: "FAM.CHIL",
             value: childXref,
           }),
         ),

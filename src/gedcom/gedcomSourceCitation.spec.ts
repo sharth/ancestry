@@ -9,20 +9,16 @@ import {
 describe("gedcomSourceCitation", () => {
   const gedcomRecord: GedcomRecord = {
     tag: "SOUR",
-    abstag: "",
     xref: "",
     value: "@S1@",
     children: [
-      { tag: "PAGE", abstag: "", xref: "", value: "page 123", children: [] },
-      { tag: "QUAY", abstag: "", xref: "", value: "0", children: [] },
+      { tag: "PAGE", xref: "", value: "page 123", children: [] },
+      { tag: "QUAY", xref: "", value: "0", children: [] },
       {
         tag: "DATA",
-        abstag: "",
         xref: "",
         value: "",
-        children: [
-          { tag: "TEXT", abstag: "", xref: "", value: "text", children: [] },
-        ],
+        children: [{ tag: "TEXT", xref: "", value: "text", children: [] }],
       },
     ],
   };

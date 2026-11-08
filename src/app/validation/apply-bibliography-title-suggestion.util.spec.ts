@@ -10,7 +10,7 @@ import {
 } from "./apply-bibliography-title-suggestion.util";
 
 function bibl(value: string) {
-  return newGedcomRecord({ tag: "_BIBL", abstag: "SOUR._BIBL", value });
+  return newGedcomRecord({ tag: "_BIBL", value });
 }
 
 describe("bibliographyForMissingTitle", () => {

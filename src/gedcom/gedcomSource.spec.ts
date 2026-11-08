@@ -20,7 +20,6 @@ describe("GedcomSource", () => {
   it("no fields", () => {
     const gedcomRecord = newGedcomRecord({
       tag: "SOUR",
-      abstag: "SOUR",
       xref: "@S1@",
     });
     const gedcomSource = newGedcomSource({
@@ -52,11 +51,9 @@ describe("GedcomSource", () => {
         unknownRecords: [
           newGedcomRecord({
             tag: "_TMPLT",
-            abstag: "SOUR._TMPLT",
             children: [
               newGedcomRecord({
                 tag: "TID",
-                abstag: "SOUR._TMPLT.TID",
                 value: "72",
               }),
             ],

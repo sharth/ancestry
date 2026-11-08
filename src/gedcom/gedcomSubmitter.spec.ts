@@ -22,7 +22,6 @@ describe("GedcomSubmitter", () => {
   it("no fields", () => {
     const gedcomRecord = newGedcomRecord({
       tag: "SUBM",
-      abstag: "SUBM",
       xref: "@SUBMITTER1@",
     });
     expect(parseGedcomSubmitter(gedcomRecord)).toEqual(

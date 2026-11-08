@@ -108,42 +108,34 @@ export function serializeGedcomName(name: GedcomName): GedcomRecord | null {
   return filterTrivialGedcomRecord(
     newGedcomRecord({
       tag: "NAME",
-      abstag: "INDI.NAME",
       value: displayGedcomName(name),
       children: filterTrivialGedcomRecords([
         newGedcomRecord({
           tag: "NPFX",
-          abstag: "INDI.NAME.NPFX",
           value: name.prefix,
         }),
         newGedcomRecord({
           tag: "GIVN",
-          abstag: "INDI.NAME.GIVN",
           value: name.givenName,
         }),
         newGedcomRecord({
           tag: "SPFX",
-          abstag: "INDI.NAME.SPFX",
           value: name.surnamePrefix,
         }),
         newGedcomRecord({
           tag: "SURN",
-          abstag: "INDI.NAME.SURN",
           value: name.surname,
         }),
         newGedcomRecord({
           tag: "NSFX",
-          abstag: "INDI.NAME.NSFX",
           value: name.suffix,
         }),
         newGedcomRecord({
           tag: "NICK",
-          abstag: "INDI.NAME.NICK",
           value: name.nickName,
         }),
         newGedcomRecord({
           tag: "TYPE",
-          abstag: "INDI.NAME.TYPE",
           value: name.nameType,
         }),
         ...name.notes.map((n) => serializeGedcomNote(n)),

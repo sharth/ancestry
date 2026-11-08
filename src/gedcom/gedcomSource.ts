@@ -49,7 +49,7 @@ export function newGedcomSource(
 }
 
 export function parseGedcomSource(record: GedcomRecord): GedcomSource {
-  if (record.abstag !== "SOUR") throw new Error();
+  if (record.tag !== "SOUR") throw new Error();
   if (record.xref == "") throw new Error();
   if (record.value != "") throw new Error();
 
@@ -120,23 +120,19 @@ export function serializeGedcomSource(source: GedcomSource): GedcomRecord {
     newGedcomRecord({
       xref: source.xref,
       tag: "SOUR",
-      abstag: "SOUR",
       children: filterTrivialGedcomRecords([
         newGedcomRecord({
           tag: "ABBR",
-          abstag: "SOUR.ABBR",
           value: source.abbr,
         }),
         newGedcomRecord({
           tag: "TITL",
-          abstag: "SOUR.TITL",
           value: source.title,
         }),
         ...source.unknownRecords.filter((record) => record.tag == "_SUBQ"),
         ...source.unknownRecords.filter((record) => record.tag == "_BIBL"),
         newGedcomRecord({
           tag: "TEXT",
-          abstag: "SOUR.TEXT",
           value: source.text,
         }),
         serializeGedcomChangeDate(source.changeDate),

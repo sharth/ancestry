@@ -12,7 +12,6 @@ describe("gedcomDate", () => {
   it("Exact Date", () => {
     const gedcomRecord: GedcomRecord = {
       tag: "DATE",
-      abstag: "",
       xref: "",
       value: "ABT 1900",
       children: [],

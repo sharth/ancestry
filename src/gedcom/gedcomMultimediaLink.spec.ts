@@ -12,7 +12,6 @@ import type { GedcomRecord } from "./gedcomRecord";
 describe("gedcomMultimediaLink", () => {
   const gedcomRecord: GedcomRecord = {
     tag: "OBJE",
-    abstag: "",
     xref: "",
     value: "@M1@",
     children: [],
@@ -31,23 +30,21 @@ describe("gedcomMultimediaLink", () => {
 
   const gedcomRecordWithCrop: GedcomRecord = {
     tag: "OBJE",
-    abstag: "",
     xref: "",
     value: "@M1@",
     children: [
       {
         tag: "CROP",
-        abstag: "",
         xref: "",
         value: "",
         children: [
-          { tag: "TOP", abstag: "", xref: "", value: "10", children: [] },
-          { tag: "LEFT", abstag: "", xref: "", value: "20", children: [] },
-          { tag: "HEIGHT", abstag: "", xref: "", value: "30", children: [] },
-          { tag: "WIDTH", abstag: "", xref: "", value: "40", children: [] },
+          { tag: "TOP", xref: "", value: "10", children: [] },
+          { tag: "LEFT", xref: "", value: "20", children: [] },
+          { tag: "HEIGHT", xref: "", value: "30", children: [] },
+          { tag: "WIDTH", xref: "", value: "40", children: [] },
         ],
       },
-      { tag: "TITL", abstag: "", xref: "", value: "A crop", children: [] },
+      { tag: "TITL", xref: "", value: "A crop", children: [] },
     ],
   };
   it("parser with crop", () => {

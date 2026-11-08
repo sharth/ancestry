@@ -13,7 +13,6 @@ function normalize(record: GedcomRecord | null): GedcomRecord | null {
   }
   return {
     tag: record.tag,
-    abstag: "",
     xref: record.xref,
     value: record.value,
     children: record.children.map(normalize).filter((r) => r !== null),

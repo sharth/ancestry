@@ -30,7 +30,6 @@ export function parseGedcomRepositoryLink(
   for (const childRecord of gedcomRecord.children) {
     switch (childRecord.tag) {
       case "CALN":
-        if (childRecord.abstag != "SOUR.REPO.CALN") throw new Error();
         if (childRecord.xref != "") throw new Error();
         if (childRecord.value == "") throw new Error();
         if (childRecord.children.length > 0) throw new Error();
@@ -50,14 +49,12 @@ export function serializeGedcomRepositoryLink(
 ): GedcomRecord {
   return {
     tag: "REPO",
-    abstag: "",
     xref: "",
     value: repositoryLink.repositoryXref,
     children: repositoryLink.callNumbers
       .filter((callNumber) => callNumber !== "")
       .map((callNumber) => ({
         tag: "CALN",
-        abstag: "SOUR.REPO.CALN",
         xref: "",
         value: callNumber,
         children: [],

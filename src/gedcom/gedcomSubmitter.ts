@@ -87,16 +87,13 @@ export function serializeGedcomSubmitter(
     newGedcomRecord({
       xref: gedcomSubmitter.xref,
       tag: "SUBM",
-      abstag: "SUBM",
       children: filterTrivialGedcomRecords([
         newGedcomRecord({
           tag: "NAME",
-          abstag: "SUBM.NAME",
           value: gedcomSubmitter.name,
         }),
         newGedcomRecord({
           tag: "_EMAIL",
-          abstag: "SUBM._EMAIL",
           value: gedcomSubmitter.email,
         }),
         serializeGedcomChangeDate(gedcomSubmitter.changeDate),

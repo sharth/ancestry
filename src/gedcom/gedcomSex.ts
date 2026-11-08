@@ -26,7 +26,7 @@ export function newGedcomSex(
 }
 
 export function parseGedcomSex(gedcomRecord: GedcomRecord): GedcomSex {
-  if (gedcomRecord.abstag !== "INDI.SEX") throw new Error();
+  if (gedcomRecord.tag !== "SEX") throw new Error();
   if (gedcomRecord.xref != "") throw new Error();
   if (gedcomRecord.value == "") throw new Error();
 
@@ -52,7 +52,6 @@ export function serializeGedcomSex(gedcomSex: GedcomSex): GedcomRecord | null {
   return filterTrivialGedcomRecord(
     newGedcomRecord({
       tag: "SEX",
-      abstag: "INDI.SEX",
       value: gedcomSex.sex,
       children: [
         ...gedcomSex.citations.map((c) => serializeGedcomSourceCitation(c)),
