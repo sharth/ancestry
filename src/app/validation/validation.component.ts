@@ -193,6 +193,21 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
     return result;
   });
 
+  // Each row's preview of its suggested fix (empty when it has none), by
+  // row index. Computed once per database here, separately from `rows` so
+  // the tab count doesn't build every preview, rather than from the
+  // template, which would rebuild every preview on every change detection
+  // (e.g. each keystroke in the editor dialog).
+  readonly rowDifferences = computed(() =>
+    this.rows().map((row) =>
+      row.urlSuggestion !== undefined
+        ? this.differencesForUrlSuggestions(row.source, [row.urlSuggestion])
+        : row.mergeSuggestion !== undefined
+          ? this.differencesForMergeSuggestion(row.source, row.mergeSuggestion)
+          : [],
+    ),
+  );
+
   // The suggestion currently being reviewed in the GEDCOM editor dialog, if
   // any.
   readonly reviewState = signal<ReviewState | undefined>(undefined);
