@@ -28,6 +28,7 @@ import {
   type GedcomMultimedia,
 } from "./gedcomMultimedia";
 import {
+  gedcomRecordsEqual,
   newGedcomRecord,
   serializeGedcomRecordToText,
   type GedcomRecord,
@@ -176,8 +177,7 @@ function serializeStampingChanged<
     const serialized = serialize(record);
     if (
       originalRecord !== undefined &&
-      serializeGedcomRecordToText(serialize(originalRecord)).join("\n") ===
-        serializeGedcomRecordToText(serialized).join("\n")
+      gedcomRecordsEqual(serialize(originalRecord), serialized)
     ) {
       return serialized;
     }
