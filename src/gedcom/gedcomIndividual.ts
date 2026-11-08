@@ -159,12 +159,10 @@ const serializedIndividuals = new WeakMap<GedcomIndividual, GedcomRecord>();
 export function serializeGedcomIndividual(
   gedcomIndividual: GedcomIndividual,
 ): GedcomRecord {
-  let serialized = serializedIndividuals.get(gedcomIndividual);
-  if (serialized === undefined) {
-    serialized = serializeGedcomIndividualUncached(gedcomIndividual);
-    serializedIndividuals.set(gedcomIndividual, serialized);
-  }
-  return serialized;
+  return serializedIndividuals.getOrInsertComputed(
+    gedcomIndividual,
+    serializeGedcomIndividualUncached,
+  );
 }
 
 function serializeGedcomIndividualUncached(
