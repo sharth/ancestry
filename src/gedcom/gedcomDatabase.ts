@@ -171,7 +171,14 @@ function stampChangeDates(
   changeDate: GedcomChangeDate,
 ): GedcomDatabase {
   return produce(updatedGedcomDatabase, (draft) => {
-    for (const key of Object.keys(draft) as (keyof GedcomDatabase)[]) {
+    for (const key of [
+      "submitters",
+      "individuals",
+      "families",
+      "sources",
+      "repositories",
+      "multimedias",
+    ] as const) {
       const draftGedcomObjects: Record<
         string,
         { xref: string; changeDate?: GedcomChangeDate }
