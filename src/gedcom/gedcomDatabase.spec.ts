@@ -2,7 +2,11 @@ import { produce } from "immer";
 import { describe, expect, it } from "vitest";
 
 import { newGedcomChangeDate } from "./gedcomChangeDate";
-import { compareGedcomDatabase, parseGedcomDatabase } from "./gedcomDatabase";
+import {
+  compareGedcomDatabase,
+  parseGedcomDatabase,
+  serializeGedcomDatabase,
+} from "./gedcomDatabase";
 import {
   parseGedcomRecords,
   serializeGedcomRecordToText,
@@ -74,6 +78,26 @@ describe("compareGedcomDatabase change dates", () => {
         "1 CHAN",
         "2 DATE 2 JAN 2030",
       ].join("\n"),
+    );
+  });
+
+  it("serializes with the same now for HEAD and CHAN", () => {
+    const updated = produce(originalDatabase, (draft) => {
+      const source = draft.sources["@S1@"];
+      if (source) source.title = "New title";
+    });
+
+    const text = serializeGedcomDatabase(
+      originalGedcomRecords,
+      originalDatabase,
+      updated,
+      now,
+    ).join("\n");
+    expect(text).toContain("1 DATE 2 JAN 2030");
+    expect(text).toContain(
+      ["0 @S1@ SOUR", "1 TITL New title", "1 CHAN", "2 DATE 2 JAN 2030"].join(
+        "\n",
+      ),
     );
   });
 

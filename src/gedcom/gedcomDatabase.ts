@@ -248,11 +248,13 @@ export function serializeGedcomDatabase(
   originalGedcomRecords: GedcomRecord[],
   originalGedcomDatabase: GedcomDatabase,
   gedcomDatabase: GedcomDatabase,
+  now = new Date(),
 ): string[] {
   return compareGedcomDatabase(
     originalGedcomRecords,
     originalGedcomDatabase,
     gedcomDatabase,
+    now,
   )
     .map(({ updatedGedcomRecord }) => updatedGedcomRecord)
     .filter((r) => r != null)
