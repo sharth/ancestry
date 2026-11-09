@@ -160,28 +160,33 @@ export function parseGedcomDatabase(gedcomRecords: GedcomRecord[]) {
   return gedcomDatabase;
 }
 
-/** Serializes each of `updated`'s records, stamping `changeDate` on the
- * ones that are new or differ from the same xref in `original`. Both sides
- * go through the same serializer, so a record the parser doesn't round-trip
- * exactly still only gets stamped when it was actually edited. */
+/** Serializes each of `updatedGedcomObjects`, stamping `changeDate` on the
+ * ones that are new or differ from the same xref in `originalGedcomObjects`.
+ * Both sides go through the same serializer, so an object the parser
+ * doesn't round-trip exactly still only gets stamped when it was actually
+ * edited. */
 function serializeStampingChanged<
   GedcomObject extends { xref: string; changeDate?: GedcomChangeDate },
 >(
-  original: Record<string, GedcomObject>,
-  updated: Record<string, GedcomObject>,
-  serialize: (record: GedcomObject) => GedcomRecord,
+  originalGedcomObjects: Record<string, GedcomObject>,
+  updatedGedcomObjects: Record<string, GedcomObject>,
+  serializeGedcomObject: (gedcomObject: GedcomObject) => GedcomRecord,
   changeDate: GedcomChangeDate,
 ): GedcomRecord[] {
-  return Object.values(updated).map((record) => {
-    const originalRecord = original[record.xref];
-    const serialized = serialize(record);
+  return Object.values(updatedGedcomObjects).map((updatedGedcomObject) => {
+    const originalGedcomObject =
+      originalGedcomObjects[updatedGedcomObject.xref];
+    const serialized = serializeGedcomObject(updatedGedcomObject);
     if (
-      originalRecord !== undefined &&
-      gedcomRecordsEqual(serialize(originalRecord), serialized)
+      originalGedcomObject !== undefined &&
+      gedcomRecordsEqual(
+        serializeGedcomObject(originalGedcomObject),
+        serialized,
+      )
     ) {
       return serialized;
     }
-    return serialize({ ...record, changeDate });
+    return serializeGedcomObject({ ...updatedGedcomObject, changeDate });
   });
 }
 
