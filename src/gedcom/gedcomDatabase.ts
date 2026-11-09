@@ -30,7 +30,6 @@ import {
   type GedcomMultimedia,
 } from "./gedcomMultimedia";
 import {
-  gedcomRecordsEqual,
   newGedcomRecord,
   serializeGedcomRecordToText,
   type GedcomRecord,
