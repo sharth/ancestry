@@ -15,7 +15,7 @@ describe("compareGedcomDatabase change dates", () => {
     [
       "0 HEAD",
       "1 GEDC",
-      "2 VERS 7.0.14",
+      "2 VERS 7.0.18",
       "0 @I1@ INDI",
       "1 SEX M",
       "1 CHAN",
