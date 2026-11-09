@@ -22,5 +22,3 @@ export const appConfig: ApplicationConfig = {
     ),
   ],
 };
-
-console.log(USE_HASH_LOCATION);

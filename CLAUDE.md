@@ -54,10 +54,10 @@ triad:
 - `parseGedcomX(record: GedcomRecord): GedcomX` — validate and convert from the generic tree
 - `serializeGedcomX(x: GedcomX): GedcomRecord` — convert back
 
-`GedcomRecord.abstag` is the dotted path of ancestor tags (e.g. `INDI.SEX`) used to disambiguate a tag
-that means different things at different nesting depths. Parsers are intentionally strict: unexpected
-child tags call `reportUnparsedRecord` (`src/util/record-unparsed-records.ts`, warns once per abstag)
-rather than silently ignoring or guessing.
+Parsers are intentionally strict: unexpected child tags call `reportUnparsedRecord`
+(`src/util/record-unparsed-records.ts`) rather than silently ignoring or guessing. A record doesn't know
+where it sits in the file, so `warnUnparsedRecords` (called at the end of `parseGedcomDatabase`) walks the
+file afterwards and warns once per dotted tag path (e.g. `INDI.BIRT._FOO`).
 
 **Only parse/emit tags that are actually in the spec.** `specifications/gedcom-5.5.1.html` and
 `specifications/gedcom-7.0.18.html` are the local copies of record of what each GEDCOM record type may
@@ -78,9 +78,10 @@ mandatory) used by facts/events across individuals and families.
 
 There's no upload step — `AncestryService` stores a `FileSystemFileHandle`/`FileSystemDirectoryHandle`
 (File System Access API) for the GEDCOM file and multimedia directory in IndexedDB via Dexie, and re-reads
-the live file from disk through an Angular `resource()` whenever `ancestryChanges` (bumped by Dexie's
-`storagemutated` event) changes. `ancestryDatabaseResolver` is a route resolver used on every data-bearing
-route; it waits for the resource to settle and redirects to `/hello` if no GEDCOM file is loaded yet.
+the live file from disk through an Angular `rxResource()` driven by a Dexie `liveQuery` on that metadata
+row, so it reloads whenever the stored data source changes. `ancestryDatabaseResolver` is a route resolver
+used on every data-bearing route; it waits for the resource to settle and redirects to `/settings` if no
+GEDCOM file is loaded yet.
 
 ### 3. Routing and components (`src/app/`)
 
