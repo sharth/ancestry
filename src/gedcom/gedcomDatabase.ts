@@ -163,9 +163,7 @@ export function parseGedcomDatabase(gedcomRecords: GedcomRecord[]) {
  * `originalGedcomObject`. Edits go through immer, which keeps every
  * untouched object the same object, so "edited" is just "not the original
  * object". */
-function stampChangeDate<
-  GedcomObject extends { changeDate?: GedcomChangeDate },
->(
+function stampDates<GedcomObject extends { changeDate?: GedcomChangeDate }>(
   originalGedcomObject: GedcomObject | undefined,
   updatedGedcomObject: GedcomObject,
   changeDate: GedcomChangeDate,
@@ -175,14 +173,14 @@ function stampChangeDate<
     : { ...updatedGedcomObject, changeDate };
 }
 
-/** Pairs the original file's records with `updatedDatabase`'s, serialized.
- * Records that are new or edited relative to `originalDatabase` (the parse
- * of `originalRecords`) get their CHAN stamped with `now`, as HEAD gets its
- * DATE. */
+/** Pairs the original file's records with `updatedGedcomDatabase`'s,
+ * serialized. Records that are new or edited relative to
+ * `originalGedcomDatabase` (the parse of `originalGedcomRecords`) get their
+ * CHAN stamped with `now`, as HEAD gets its DATE. */
 export function compareGedcomDatabase(
-  originalRecords: GedcomRecord[],
-  originalDatabase: GedcomDatabase,
-  updatedDatabase: GedcomDatabase,
+  originalGedcomRecords: GedcomRecord[],
+  originalGedcomDatabase: GedcomDatabase,
+  updatedGedcomDatabase: GedcomDatabase,
   now = new Date(),
 ): {
   originalGedcomRecord?: GedcomRecord;
@@ -196,40 +194,40 @@ export function compareGedcomDatabase(
     string,
     { originalGedcomRecord?: GedcomRecord; updatedGedcomRecord?: GedcomRecord }
   >();
-  originalRecords.forEach((gedcomRecord) => {
+  originalGedcomRecords.forEach((gedcomRecord) => {
     recordMap.set(hash(gedcomRecord), { originalGedcomRecord: gedcomRecord });
   });
 
   [
     serializeGedcomHeader(generateGedcomHeader(now)),
-    ...Object.values(updatedDatabase.submitters).map((s) =>
+    ...Object.values(updatedGedcomDatabase.submitters).map((s) =>
       serializeGedcomSubmitter(
-        stampChangeDate(originalDatabase.submitters[s.xref], s, changeDate),
+        stampDates(originalGedcomDatabase.submitters[s.xref], s, changeDate),
       ),
     ),
-    ...Object.values(updatedDatabase.individuals).map((i) =>
+    ...Object.values(updatedGedcomDatabase.individuals).map((i) =>
       serializeGedcomIndividual(
-        stampChangeDate(originalDatabase.individuals[i.xref], i, changeDate),
+        stampDates(originalGedcomDatabase.individuals[i.xref], i, changeDate),
       ),
     ),
-    ...Object.values(updatedDatabase.families).map((f) =>
+    ...Object.values(updatedGedcomDatabase.families).map((f) =>
       serializeGedcomFamily(
-        stampChangeDate(originalDatabase.families[f.xref], f, changeDate),
+        stampDates(originalGedcomDatabase.families[f.xref], f, changeDate),
       ),
     ),
-    ...Object.values(updatedDatabase.sources).map((s) =>
+    ...Object.values(updatedGedcomDatabase.sources).map((s) =>
       serializeGedcomSource(
-        stampChangeDate(originalDatabase.sources[s.xref], s, changeDate),
+        stampDates(originalGedcomDatabase.sources[s.xref], s, changeDate),
       ),
     ),
-    ...Object.values(updatedDatabase.repositories).map((r) =>
+    ...Object.values(updatedGedcomDatabase.repositories).map((r) =>
       serializeGedcomRepository(
-        stampChangeDate(originalDatabase.repositories[r.xref], r, changeDate),
+        stampDates(originalGedcomDatabase.repositories[r.xref], r, changeDate),
       ),
     ),
-    ...Object.values(updatedDatabase.multimedias).map((m) =>
+    ...Object.values(updatedGedcomDatabase.multimedias).map((m) =>
       serializeGedcomMultimedia(
-        stampChangeDate(originalDatabase.multimedias[m.xref], m, changeDate),
+        stampDates(originalGedcomDatabase.multimedias[m.xref], m, changeDate),
       ),
     ),
     newGedcomRecord({ tag: "TRLR" }),
@@ -247,14 +245,14 @@ export function compareGedcomDatabase(
 }
 
 export function serializeGedcomDatabase(
-  originalRecords: GedcomRecord[],
-  originalDatabase: GedcomDatabase,
-  updatedDatabase: GedcomDatabase,
+  originalGedcomRecords: GedcomRecord[],
+  originalGedcomDatabase: GedcomDatabase,
+  gedcomDatabase: GedcomDatabase,
 ): string[] {
   return compareGedcomDatabase(
-    originalRecords,
-    originalDatabase,
-    updatedDatabase,
+    originalGedcomRecords,
+    originalGedcomDatabase,
+    gedcomDatabase,
   )
     .map(({ updatedGedcomRecord }) => updatedGedcomRecord)
     .filter((r) => r != null)
