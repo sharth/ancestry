@@ -165,11 +165,11 @@ export function parseGedcomDatabase(gedcomRecords: GedcomRecord[]) {
  * go through the same serializer, so a record the parser doesn't round-trip
  * exactly still only gets stamped when it was actually edited. */
 function serializeStampingChanged<
-  T extends { xref: string; changeDate?: GedcomChangeDate },
+  GedcomObject extends { xref: string; changeDate?: GedcomChangeDate },
 >(
-  original: Record<string, T>,
-  updated: Record<string, T>,
-  serialize: (record: T) => GedcomRecord,
+  original: Record<string, GedcomObject>,
+  updated: Record<string, GedcomObject>,
+  serialize: (record: GedcomObject) => GedcomRecord,
   changeDate: GedcomChangeDate,
 ): GedcomRecord[] {
   return Object.values(updated).map((record) => {
