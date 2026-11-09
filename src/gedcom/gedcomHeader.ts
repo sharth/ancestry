@@ -28,7 +28,7 @@ export function generateGedcomHeader(now = new Date()): GedcomHeader {
       children: [
         newGedcomRecord({
           tag: "GEDC",
-          children: [newGedcomRecord({ tag: "VERS", value: "7.0.14" })],
+          children: [newGedcomRecord({ tag: "VERS", value: "7.0.18" })],
         }),
         newGedcomRecord({
           tag: "SOUR",
