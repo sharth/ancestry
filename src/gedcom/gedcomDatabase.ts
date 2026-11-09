@@ -176,15 +176,15 @@ function serializeStampingChanged<
   return Object.values(updatedGedcomObjects).map((updatedGedcomObject) => {
     const originalGedcomObject =
       originalGedcomObjects[updatedGedcomObject.xref];
-    const serialized = serializeGedcomObject(updatedGedcomObject);
+    const serializedGedcomObject = serializeGedcomObject(updatedGedcomObject);
     if (
       originalGedcomObject !== undefined &&
       gedcomRecordsEqual(
         serializeGedcomObject(originalGedcomObject),
-        serialized,
+        serializedGedcomObject,
       )
     ) {
-      return serialized;
+      return serializedGedcomObject;
     }
     return serializeGedcomObject({ ...updatedGedcomObject, changeDate });
   });
