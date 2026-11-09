@@ -77,21 +77,6 @@ describe("compareGedcomDatabase change dates", () => {
     );
   });
 
-  it("doesn't stamp a record whose edit was undone", () => {
-    const edited = produce(originalDatabase, (draft) => {
-      const source = draft.sources["@S1@"];
-      if (source) source.title = "New title";
-    });
-    const undone = produce(edited, (draft) => {
-      const source = draft.sources["@S1@"];
-      if (source) source.title = "Old title";
-    });
-    // A new object, but with the same data as the original.
-    expect(undone.sources["@S1@"]).not.toBe(originalDatabase.sources["@S1@"]);
-
-    expect(updatedText(undone).join("\n")).not.toContain("2 JAN 2030");
-  });
-
   it("stamps nothing when nothing was edited", () => {
     const text = updatedText(originalDatabase).join("\n");
     expect(text).not.toContain("2 JAN 2030");

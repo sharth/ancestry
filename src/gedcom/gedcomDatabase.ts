@@ -161,24 +161,10 @@ export function parseGedcomDatabase(gedcomRecords: GedcomRecord[]) {
   return gedcomDatabase;
 }
 
-// Whether two plain data values (the parsed GEDCOM objects: objects, arrays,
-// strings, numbers, booleans, undefined) hold the same data. The same
-// object is equal without a walk, which is the common case: edits go
-// through immer, which keeps every untouched object the same object.
-function plainDataEqual(a: unknown, b: unknown): boolean {
-  if (a === b) return true;
-  if (typeof a !== "object" || typeof b !== "object") return false;
-  if (a === null || b === null) return false;
-  if (Array.isArray(a) !== Array.isArray(b)) return false;
-  const aRecord = a as Record<string, unknown>;
-  const bRecord = b as Record<string, unknown>;
-  const keys = new Set([...Object.keys(aRecord), ...Object.keys(bRecord)]);
-  return [...keys].every((key) => plainDataEqual(aRecord[key], bRecord[key]));
-}
-
 /** `updatedGedcomDatabase`, with `changeDate` as the CHAN of every object
- * that is new or holds different data from the same xref in
- * `originalGedcomDatabase`. An edit that was undone doesn't count. */
+ * that is new or edited. Edits go through immer, which keeps every
+ * untouched object the same object, so "edited" is just "not the original
+ * object". An edit that was undone still counts. */
 function stampChangeDates(
   originalGedcomDatabase: GedcomDatabase,
   updatedGedcomDatabase: GedcomDatabase,
@@ -189,12 +175,7 @@ function stampChangeDates(
       for (const [xref, updatedGedcomObject] of Object.entries(
         updatedGedcomDatabase[key],
       )) {
-        if (
-          !plainDataEqual(
-            originalGedcomDatabase[key][xref],
-            updatedGedcomObject,
-          )
-        ) {
+        if (originalGedcomDatabase[key][xref] !== updatedGedcomObject) {
           const draftGedcomObject = draft[key][xref];
           if (draftGedcomObject) draftGedcomObject.changeDate = changeDate;
         }
