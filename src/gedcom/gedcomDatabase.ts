@@ -172,12 +172,16 @@ function stampChangeDates(
 ): GedcomDatabase {
   return produce(updatedGedcomDatabase, (draft) => {
     for (const key of Object.keys(draft) as (keyof GedcomDatabase)[]) {
-      for (const [xref, updatedGedcomObject] of Object.entries(
-        updatedGedcomDatabase[key],
-      )) {
-        if (originalGedcomDatabase[key][xref] !== updatedGedcomObject) {
-          const draftGedcomObject = draft[key][xref];
-          if (draftGedcomObject) draftGedcomObject.changeDate = changeDate;
+      const draftGedcomObjects: Record<
+        string,
+        { xref: string; changeDate?: GedcomChangeDate }
+      > = draft[key];
+      for (const draftGedcomObject of Object.values(draftGedcomObjects)) {
+        const xref = draftGedcomObject.xref;
+        if (
+          originalGedcomDatabase[key][xref] !== updatedGedcomDatabase[key][xref]
+        ) {
+          draftGedcomObject.changeDate = changeDate;
         }
       }
     }
