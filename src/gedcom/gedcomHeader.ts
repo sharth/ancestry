@@ -1,4 +1,4 @@
-import { monthNames } from "./gedcomDate";
+import { generateGedcomChangeDate } from "./gedcomChangeDate";
 import { newGedcomRecord, type GedcomRecord } from "./gedcomRecord";
 
 export interface GedcomHeader {
@@ -22,9 +22,6 @@ export function serializeGedcomHeader(
 }
 
 export function generateGedcomHeader(now = new Date()): GedcomHeader {
-  const day = now.getDate();
-  const month = monthNames[now.getMonth()];
-  const year = now.getFullYear();
   return {
     record: newGedcomRecord({
       tag: "HEAD",
@@ -39,7 +36,7 @@ export function generateGedcomHeader(now = new Date()): GedcomHeader {
         }),
         newGedcomRecord({
           tag: "DATE",
-          value: `${day} ${month} ${year}`,
+          value: generateGedcomChangeDate(now).value,
         }),
       ],
     }),

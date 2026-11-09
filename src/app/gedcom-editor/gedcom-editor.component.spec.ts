@@ -448,7 +448,11 @@ describe("GedcomEditorComponent differences with a real, unedited family", () =>
       TestBed.inject(AncestryService),
       "compareGedcomDatabase",
     ).mockImplementation((gedcomDatabase) =>
-      compareGedcomDatabase(originalGedcomRecords, gedcomDatabase),
+      compareGedcomDatabase(
+        originalGedcomRecords,
+        originalDatabase,
+        gedcomDatabase,
+      ),
     );
 
     // The open family's record is always included (the point of this
