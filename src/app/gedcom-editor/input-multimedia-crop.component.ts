@@ -1,6 +1,7 @@
 import type { ElementRef } from "@angular/core";
 import {
   Component,
+  DestroyRef,
   Injector,
   afterNextRender,
   computed,
@@ -59,12 +60,31 @@ export class InputMultimediaCropComponent {
   readonly zoom = signal<number | undefined>(undefined);
   private dragStart: DragStart | undefined;
 
+  // The object URL currently handed to the template, so it can be released
+  // when the file changes or the component goes away; the browser keeps the
+  // file in memory until it is revoked.
+  private objectUrl: string | undefined;
+
+  constructor() {
+    inject(DestroyRef).onDestroy(() => {
+      this.revokeObjectUrl();
+    });
+  }
+
+  private revokeObjectUrl() {
+    if (this.objectUrl !== undefined) {
+      URL.revokeObjectURL(this.objectUrl);
+      this.objectUrl = undefined;
+    }
+  }
+
   readonly fileResource = resource({
     params: () => ({
       filePath: this.filePath(),
       gedcomResourceValue: this.ancestryService.gedcomResource.value(),
     }),
     loader: async ({ params }) => {
+      this.revokeObjectUrl();
       const fileHandle = await this.ancestryService.getMultimediaFileHandle(
         params.filePath,
       );
@@ -72,9 +92,8 @@ export class InputMultimediaCropComponent {
         return undefined;
       }
       const file = await fileHandle.getFile();
-      return this.sanitizer.bypassSecurityTrustResourceUrl(
-        URL.createObjectURL(file),
-      );
+      this.objectUrl = URL.createObjectURL(file);
+      return this.sanitizer.bypassSecurityTrustResourceUrl(this.objectUrl);
     },
   });
 
