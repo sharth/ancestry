@@ -55,24 +55,6 @@ export class MultimediaPreviewComponent {
   private readonly sanitizer = inject(DomSanitizer);
   private readonly destroyRef = inject(DestroyRef);
 
-  // The object URL currently handed to the template, so it can be released
-  // when the file changes or the component goes away; the browser keeps the
-  // file in memory until it is revoked.
-  private objectUrl: string | undefined;
-
-  constructor() {
-    this.destroyRef.onDestroy(() => {
-      this.revokeObjectUrl();
-    });
-  }
-
-  private revokeObjectUrl() {
-    if (this.objectUrl !== undefined) {
-      URL.revokeObjectURL(this.objectUrl);
-      this.objectUrl = undefined;
-    }
-  }
-
   readonly filePath = input.required<string>();
   // The CROP of the multimedia link being shown, if any. Only applies to
   // images.
@@ -147,7 +129,6 @@ export class MultimediaPreviewComponent {
       };
     },
     loader: async ({ params }) => {
-      this.revokeObjectUrl();
       if (!params) {
         return { fileUrl: undefined, mediaType: undefined };
       }
@@ -161,10 +142,12 @@ export class MultimediaPreviewComponent {
         }
 
         const file = await fileHandle.getFile();
-        this.objectUrl = URL.createObjectURL(file);
-        const fileUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-          this.objectUrl,
-        );
+        const objectUrl = URL.createObjectURL(file);
+        this.destroyRef.onDestroy(() => {
+          URL.revokeObjectURL(objectUrl);
+        });
+        const fileUrl =
+          this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
         return { fileUrl, mediaType: file.type };
       } catch (error) {
         console.error("Failed to load multimedia file:", error);

@@ -61,31 +61,12 @@ export class InputMultimediaCropComponent {
   readonly zoom = signal<number | undefined>(undefined);
   private dragStart: DragStart | undefined;
 
-  // The object URL currently handed to the template, so it can be released
-  // when the file changes or the component goes away; the browser keeps the
-  // file in memory until it is revoked.
-  private objectUrl: string | undefined;
-
-  constructor() {
-    this.destroyRef.onDestroy(() => {
-      this.revokeObjectUrl();
-    });
-  }
-
-  private revokeObjectUrl() {
-    if (this.objectUrl !== undefined) {
-      URL.revokeObjectURL(this.objectUrl);
-      this.objectUrl = undefined;
-    }
-  }
-
   readonly fileResource = resource({
     params: () => ({
       filePath: this.filePath(),
       gedcomResourceValue: this.ancestryService.gedcomResource.value(),
     }),
     loader: async ({ params }) => {
-      this.revokeObjectUrl();
       const fileHandle = await this.ancestryService.getMultimediaFileHandle(
         params.filePath,
       );
@@ -93,8 +74,11 @@ export class InputMultimediaCropComponent {
         return undefined;
       }
       const file = await fileHandle.getFile();
-      this.objectUrl = URL.createObjectURL(file);
-      return this.sanitizer.bypassSecurityTrustResourceUrl(this.objectUrl);
+      const objectUrl = URL.createObjectURL(file);
+      this.destroyRef.onDestroy(() => {
+        URL.revokeObjectURL(objectUrl);
+      });
+      return this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
     },
   });
 
