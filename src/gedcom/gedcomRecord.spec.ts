@@ -46,6 +46,36 @@ describe("GedcomRecord", () => {
       "1 EMAIL johndoe@example.com",
     ]);
   });
+
+  it("keeps spaces after the first one as part of the value", () => {
+    const gedcomText = [
+      "0 @N1@ SNOTE Robert later grew estranged from",
+      "1 CONC  de Bruce",
+      "1 CONT   indented",
+      "1 CONT",
+      "1 CONT ",
+    ].join("\n");
+    const records = parseGedcomRecords(gedcomText);
+    expect(records).toEqual([
+      newGedcomRecord({
+        tag: "SNOTE",
+        xref: "@N1@",
+        value: "Robert later grew estranged from de Bruce\n  indented\n\n",
+      }),
+    ]);
+    expect(records.flatMap((r) => serializeGedcomRecordToText(r))).toEqual([
+      "0 @N1@ SNOTE Robert later grew estranged from de Bruce",
+      "1 CONT   indented",
+      "1 CONT",
+      "1 CONT",
+    ]);
+  });
+
+  it("rejects a tag that runs straight into its value", () => {
+    expect(() => parseGedcomRecords("0 REPOasd")).toThrow(
+      "Failed to parse line number 1: 0 REPOasd",
+    );
+  });
 });
 
 describe("gedcomRecordsEqual", () => {
