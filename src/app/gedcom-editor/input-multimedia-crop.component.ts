@@ -38,6 +38,7 @@ const autoScrollMargin = 32;
 export class InputMultimediaCropComponent {
   private readonly ancestryService = inject(AncestryService);
   private readonly sanitizer = inject(DomSanitizer);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly injector = inject(Injector);
 
   readonly filePath = input.required<string>();
@@ -66,7 +67,7 @@ export class InputMultimediaCropComponent {
   private objectUrl: string | undefined;
 
   constructor() {
-    inject(DestroyRef).onDestroy(() => {
+    this.destroyRef.onDestroy(() => {
       this.revokeObjectUrl();
     });
   }

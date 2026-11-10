@@ -53,6 +53,7 @@ export function resolveCropRegion(
 export class MultimediaPreviewComponent {
   private readonly ancestryService = inject(AncestryService);
   private readonly sanitizer = inject(DomSanitizer);
+  private readonly destroyRef = inject(DestroyRef);
 
   // The object URL currently handed to the template, so it can be released
   // when the file changes or the component goes away; the browser keeps the
@@ -60,7 +61,7 @@ export class MultimediaPreviewComponent {
   private objectUrl: string | undefined;
 
   constructor() {
-    inject(DestroyRef).onDestroy(() => {
+    this.destroyRef.onDestroy(() => {
       this.revokeObjectUrl();
     });
   }
