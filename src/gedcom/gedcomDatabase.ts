@@ -176,7 +176,7 @@ function stampDates<
   date: string,
 ): GedcomObject {
   if (originalGedcomObject === updatedGedcomObject) {
-    return updatedGedcomObject;
+    return originalGedcomObject;
   } else if (originalGedcomObject === undefined) {
     const changeDate = newGedcomChangeDate({ value: date });
     const creationDate = newGedcomCreationDate({ value: date });
