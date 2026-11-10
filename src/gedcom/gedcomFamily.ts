@@ -5,6 +5,12 @@ import {
   serializeGedcomChangeDate,
   type GedcomChangeDate,
 } from "./gedcomChangeDate";
+import {
+  newGedcomCreationDate,
+  parseGedcomCreationDate,
+  serializeGedcomCreationDate,
+  type GedcomCreationDate,
+} from "./gedcomCreationDate";
 import { sortChronologically } from "./gedcomDateSort";
 import {
   parseGedcomFamilyEvent,
@@ -32,6 +38,7 @@ export interface GedcomFamily {
   facts: GedcomFact[];
   citations: GedcomSourceCitation[];
   changeDate: GedcomChangeDate;
+  creationDate: GedcomCreationDate;
   unknownRecords: GedcomRecord[];
 }
 
@@ -45,6 +52,7 @@ export function newGedcomFamily(
     facts: [],
     citations: [],
     changeDate: newGedcomChangeDate(),
+    creationDate: newGedcomCreationDate(),
     unknownRecords: [],
     ...fieldsToUpdate,
   };
@@ -89,6 +97,9 @@ export function parseGedcomFamily(record: GedcomRecord): GedcomFamily {
         break;
       case "CHAN":
         gedcomFamily.changeDate = parseGedcomChangeDate(childRecord);
+        break;
+      case "CREA":
+        gedcomFamily.creationDate = parseGedcomCreationDate(childRecord);
         break;
       default:
         gedcomFamily.unknownRecords.push(childRecord);
@@ -143,6 +154,7 @@ export function serializeGedcomFamily(
           serializeGedcomFamilyFact(event),
         ),
         serializeGedcomChangeDate(gedcomFamily.changeDate),
+        serializeGedcomCreationDate(gedcomFamily.creationDate),
         ...gedcomFamily.unknownRecords,
       ]),
     }),

@@ -1,5 +1,4 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
-import { monthNames } from "./gedcomDate";
 import {
   filterTrivialGedcomRecord,
   filterTrivialGedcomRecords,
@@ -18,15 +17,6 @@ export function newGedcomChangeDate(
     value: "",
     ...fieldsToUpdate,
   };
-}
-
-/** A change date of `now` (today, by default), for stamping a record's CHAN
- * when an edit is made to it. */
-export function generateGedcomChangeDate(now = new Date()): GedcomChangeDate {
-  const day = now.getDate();
-  const month = monthNames[now.getMonth()];
-  const year = now.getFullYear();
-  return newGedcomChangeDate({ value: `${day} ${month} ${year}` });
 }
 
 export function parseGedcomChangeDate(

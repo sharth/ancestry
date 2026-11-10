@@ -2,6 +2,7 @@ import { produce } from "immer";
 import { assert, describe, expect, it } from "vitest";
 
 import { newGedcomChangeDate } from "./gedcomChangeDate";
+import { newGedcomCreationDate } from "./gedcomCreationDate";
 import {
   newGedcomRecord,
   parseGedcomRecords,
@@ -63,6 +64,30 @@ describe("GedcomRepository", () => {
         xref: "@R3@",
         name: "Family History Library",
         changeDate: newGedcomChangeDate({ value: "1 JAN 1900" }),
+      }),
+    );
+    expect(
+      serializeGedcomRecordToText(serializeGedcomRepository(gedcomRepository)),
+    ).toEqual(gedcomText);
+  });
+  it("with a creation date", () => {
+    const gedcomText = [
+      "0 @R4@ REPO",
+      "1 NAME Family History Library",
+      "1 CHAN",
+      "2 DATE 2 JAN 1900",
+      "1 CREA",
+      "2 DATE 1 JAN 1900",
+    ];
+    const [gedcomRecord] = parseGedcomRecords(gedcomText.join("\n"));
+    assert.isDefined(gedcomRecord);
+    const gedcomRepository = parseGedcomRepository(gedcomRecord);
+    expect(gedcomRepository).toEqual(
+      newGedcomRepository({
+        xref: "@R4@",
+        name: "Family History Library",
+        changeDate: newGedcomChangeDate({ value: "2 JAN 1900" }),
+        creationDate: newGedcomCreationDate({ value: "1 JAN 1900" }),
       }),
     );
     expect(

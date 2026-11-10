@@ -1,9 +1,16 @@
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import {
+  newGedcomChangeDate,
   parseGedcomChangeDate,
   serializeGedcomChangeDate,
   type GedcomChangeDate,
 } from "./gedcomChangeDate";
+import {
+  newGedcomCreationDate,
+  parseGedcomCreationDate,
+  serializeGedcomCreationDate,
+  type GedcomCreationDate,
+} from "./gedcomCreationDate";
 import {
   filterTrivialGedcomRecords,
   gedcomRecordsEqual,
@@ -16,7 +23,8 @@ export interface GedcomMultimedia {
   filePath: string;
   mediaType: string;
   title: string;
-  changeDate?: GedcomChangeDate;
+  changeDate: GedcomChangeDate;
+  creationDate: GedcomCreationDate;
 }
 
 export function newGedcomMultimedia(
@@ -26,6 +34,8 @@ export function newGedcomMultimedia(
     filePath: "",
     mediaType: "",
     title: "",
+    changeDate: newGedcomChangeDate(),
+    creationDate: newGedcomCreationDate(),
     ...fieldsToUpdate,
   };
 }
@@ -72,9 +82,14 @@ export function parseGedcomMultimedia(record: GedcomRecord): GedcomMultimedia {
         }
         break;
       case "CHAN":
-        if (gedcomMultimedia.changeDate)
+        if (gedcomMultimedia.changeDate.value !== "")
           throw new Error("Multiple change dates are not allowed");
         gedcomMultimedia.changeDate = parseGedcomChangeDate(childRecord);
+        break;
+      case "CREA":
+        if (gedcomMultimedia.creationDate.value !== "")
+          throw new Error("Multiple creation dates are not allowed");
+        gedcomMultimedia.creationDate = parseGedcomCreationDate(childRecord);
         break;
       default:
         reportUnparsedRecord(childRecord);
@@ -122,9 +137,8 @@ export function serializeGedcomMultimedia(
             }),
           ]),
         }),
-        gedcomMultimedia.changeDate
-          ? serializeGedcomChangeDate(gedcomMultimedia.changeDate)
-          : null,
+        serializeGedcomChangeDate(gedcomMultimedia.changeDate),
+        serializeGedcomCreationDate(gedcomMultimedia.creationDate),
       ]),
     }),
   );

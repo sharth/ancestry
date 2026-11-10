@@ -6,6 +6,12 @@ import {
   type GedcomChangeDate,
 } from "./gedcomChangeDate";
 import {
+  newGedcomCreationDate,
+  parseGedcomCreationDate,
+  serializeGedcomCreationDate,
+  type GedcomCreationDate,
+} from "./gedcomCreationDate";
+import {
   filterTrivialGedcomRecords,
   gedcomRecordsEqual,
   newGedcomRecord,
@@ -16,6 +22,7 @@ export interface GedcomRepository {
   xref: string;
   name: string;
   changeDate: GedcomChangeDate;
+  creationDate: GedcomCreationDate;
 }
 
 export function newGedcomRepository(
@@ -24,6 +31,7 @@ export function newGedcomRepository(
   return {
     name: "",
     changeDate: newGedcomChangeDate(),
+    creationDate: newGedcomCreationDate(),
     ...fieldsToUpdate,
   };
 }
@@ -50,6 +58,9 @@ export function parseGedcomRepository(
 
       case "CHAN":
         gedcomRepository.changeDate = parseGedcomChangeDate(childRecord);
+        break;
+      case "CREA":
+        gedcomRepository.creationDate = parseGedcomCreationDate(childRecord);
         break;
 
       default:
@@ -89,6 +100,7 @@ export function serializeGedcomRepository(
           value: gedcomRepository.name,
         }),
         serializeGedcomChangeDate(gedcomRepository.changeDate),
+        serializeGedcomCreationDate(gedcomRepository.creationDate),
       ]),
     }),
   );

@@ -111,7 +111,9 @@ describe("gedcomMultimedia", () => {
       const gedcomText = [
         "0 @M1@ OBJE", //
         "1 CHAN",
+        "2 DATE 1 JAN 2020",
         "1 CHAN",
+        "2 DATE 2 JAN 2020",
       ];
       const [gedcomRecord] = parseGedcomRecords(gedcomText.join("\n"));
       assert.isOk(gedcomRecord);
