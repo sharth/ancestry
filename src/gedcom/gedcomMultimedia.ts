@@ -5,6 +5,11 @@ import {
   type GedcomChangeDate,
 } from "./gedcomChangeDate";
 import {
+  parseGedcomCreationDate,
+  serializeGedcomCreationDate,
+  type GedcomCreationDate,
+} from "./gedcomCreationDate";
+import {
   filterTrivialGedcomRecords,
   gedcomRecordsEqual,
   newGedcomRecord,
@@ -17,6 +22,7 @@ export interface GedcomMultimedia {
   mediaType: string;
   title: string;
   changeDate?: GedcomChangeDate;
+  creationDate?: GedcomCreationDate;
 }
 
 export function newGedcomMultimedia(
@@ -76,6 +82,11 @@ export function parseGedcomMultimedia(record: GedcomRecord): GedcomMultimedia {
           throw new Error("Multiple change dates are not allowed");
         gedcomMultimedia.changeDate = parseGedcomChangeDate(childRecord);
         break;
+      case "CREA":
+        if (gedcomMultimedia.creationDate)
+          throw new Error("Multiple creation dates are not allowed");
+        gedcomMultimedia.creationDate = parseGedcomCreationDate(childRecord);
+        break;
       default:
         reportUnparsedRecord(childRecord);
         break;
@@ -124,6 +135,9 @@ export function serializeGedcomMultimedia(
         }),
         gedcomMultimedia.changeDate
           ? serializeGedcomChangeDate(gedcomMultimedia.changeDate)
+          : null,
+        gedcomMultimedia.creationDate
+          ? serializeGedcomCreationDate(gedcomMultimedia.creationDate)
           : null,
       ]),
     }),

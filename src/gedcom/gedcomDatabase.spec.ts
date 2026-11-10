@@ -63,7 +63,7 @@ describe("compareGedcomDatabase change dates", () => {
     );
   });
 
-  it("stamps a newly added record", () => {
+  it("stamps a newly added record's change and creation dates", () => {
     const updated = produce(originalDatabase, (draft) => {
       draft.repositories["@R1@"] = newGedcomRepository({
         xref: "@R1@",
@@ -76,6 +76,8 @@ describe("compareGedcomDatabase change dates", () => {
         "0 @R1@ REPO",
         "1 NAME FamilySearch",
         "1 CHAN",
+        "2 DATE 2 JAN 2030",
+        "1 CREA",
         "2 DATE 2 JAN 2030",
       ].join("\n"),
     );

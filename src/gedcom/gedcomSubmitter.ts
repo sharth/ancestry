@@ -6,6 +6,12 @@ import {
   type GedcomChangeDate,
 } from "./gedcomChangeDate";
 import {
+  newGedcomCreationDate,
+  parseGedcomCreationDate,
+  serializeGedcomCreationDate,
+  type GedcomCreationDate,
+} from "./gedcomCreationDate";
+import {
   filterTrivialGedcomRecords,
   gedcomRecordsEqual,
   newGedcomRecord,
@@ -17,6 +23,7 @@ export interface GedcomSubmitter {
   name: string;
   email: string;
   changeDate: GedcomChangeDate;
+  creationDate: GedcomCreationDate;
 }
 
 export function newGedcomSubmitter(
@@ -26,6 +33,7 @@ export function newGedcomSubmitter(
     name: "",
     email: "",
     changeDate: newGedcomChangeDate(),
+    creationDate: newGedcomCreationDate(),
     ...fieldsToUpdate,
   };
 }
@@ -55,6 +63,9 @@ export function parseGedcomSubmitter(
         break;
       case "CHAN":
         gedcomSubmitter.changeDate = parseGedcomChangeDate(childRecord);
+        break;
+      case "CREA":
+        gedcomSubmitter.creationDate = parseGedcomCreationDate(childRecord);
         break;
       default:
         reportUnparsedRecord(childRecord);
@@ -91,6 +102,7 @@ export function serializeGedcomSubmitter(
         newGedcomRecord({ tag: "NAME", value: gedcomSubmitter.name }),
         newGedcomRecord({ tag: "_EMAIL", value: gedcomSubmitter.email }),
         serializeGedcomChangeDate(gedcomSubmitter.changeDate),
+        serializeGedcomCreationDate(gedcomSubmitter.creationDate),
       ]),
     }),
   );

@@ -6,6 +6,12 @@ import {
   type GedcomChangeDate,
 } from "./gedcomChangeDate";
 import {
+  newGedcomCreationDate,
+  parseGedcomCreationDate,
+  serializeGedcomCreationDate,
+  type GedcomCreationDate,
+} from "./gedcomCreationDate";
+import {
   parseGedcomMultimediaLink,
   serializeGedcomMultimediaLink,
   type GedcomMultimediaLink,
@@ -31,6 +37,7 @@ export interface GedcomSource {
   unknownRecords: GedcomRecord[];
   multimediaLinks: GedcomMultimediaLink[];
   changeDate: GedcomChangeDate;
+  creationDate: GedcomCreationDate;
 }
 
 export function newGedcomSource(
@@ -44,6 +51,7 @@ export function newGedcomSource(
     unknownRecords: [],
     multimediaLinks: [],
     changeDate: newGedcomChangeDate(),
+    creationDate: newGedcomCreationDate(),
     ...fieldsToUpdate,
   };
 }
@@ -91,6 +99,9 @@ export function parseGedcomSource(record: GedcomRecord): GedcomSource {
       case "CHAN":
         gedcomSource.changeDate = parseGedcomChangeDate(childRecord);
         break;
+      case "CREA":
+        gedcomSource.creationDate = parseGedcomCreationDate(childRecord);
+        break;
       default:
         gedcomSource.unknownRecords.push(childRecord);
         break;
@@ -136,6 +147,7 @@ export function serializeGedcomSource(source: GedcomSource): GedcomRecord {
           value: source.text,
         }),
         serializeGedcomChangeDate(source.changeDate),
+        serializeGedcomCreationDate(source.creationDate),
         ...source.repositoryLinks.map((repositoryLink) =>
           serializeGedcomRepositoryLink(repositoryLink),
         ),

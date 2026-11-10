@@ -7,6 +7,10 @@ import {
   type GedcomChangeDate,
 } from "./gedcomChangeDate";
 import {
+  newGedcomCreationDate,
+  type GedcomCreationDate,
+} from "./gedcomCreationDate";
+import {
   parseGedcomFamily,
   serializeGedcomFamily,
   type GedcomFamily,
@@ -160,23 +164,35 @@ export function parseGedcomDatabase(gedcomRecords: GedcomRecord[]) {
 }
 
 /** `updatedGedcomObject`, with `changeDate` as its CHAN unless it is still
- * `originalGedcomObject`. Edits go through immer, which keeps every
- * untouched object the same object, so "edited" is just "not the original
- * object". */
-function stampDates<GedcomObject extends { changeDate?: GedcomChangeDate }>(
+ * `originalGedcomObject`, and also as its CREA when there was no original
+ * (a new record). Edits go through immer, which keeps every untouched object
+ * the same object, so "edited" is just "not the original object". */
+function stampDates<
+  GedcomObject extends {
+    changeDate?: GedcomChangeDate;
+    creationDate?: GedcomCreationDate;
+  },
+>(
   originalGedcomObject: GedcomObject | undefined,
   updatedGedcomObject: GedcomObject,
   changeDate: GedcomChangeDate,
 ): GedcomObject {
-  return originalGedcomObject === updatedGedcomObject
-    ? updatedGedcomObject
-    : { ...updatedGedcomObject, changeDate };
+  if (originalGedcomObject === updatedGedcomObject) return updatedGedcomObject;
+  if (originalGedcomObject === undefined) {
+    return {
+      ...updatedGedcomObject,
+      changeDate,
+      creationDate: newGedcomCreationDate({ value: changeDate.value }),
+    };
+  }
+  return { ...updatedGedcomObject, changeDate };
 }
 
 /** Pairs the original file's records with `updatedGedcomDatabase`'s,
  * serialized. Records that are new or edited relative to
  * `originalGedcomDatabase` (the parse of `originalGedcomRecords`) get their
- * CHAN stamped with `now`, as HEAD gets its DATE. */
+ * CHAN stamped with `now`, and new ones their CREA too, as HEAD gets its
+ * DATE. */
 export function compareGedcomDatabase(
   originalGedcomRecords: GedcomRecord[],
   originalGedcomDatabase: GedcomDatabase,
