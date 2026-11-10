@@ -70,6 +70,12 @@ describe("GedcomRecord", () => {
       "1 CONT",
     ]);
   });
+
+  it("rejects a tag that runs straight into its value", () => {
+    expect(() => parseGedcomRecords("0 REPOasd")).toThrow(
+      "Failed to parse line number 1: 0 REPOasd",
+    );
+  });
 });
 
 describe("gedcomRecordsEqual", () => {

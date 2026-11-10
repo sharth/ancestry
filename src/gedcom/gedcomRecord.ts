@@ -60,7 +60,9 @@ export function parseGedcomRecords(text: string): GedcomRecord[] {
     if (line == "") {
       continue;
     }
-    const match = /^([0-9]+) *((?:@[^@]+@)?) *([A-Z0-9_]+) ?(.*)$/.exec(line);
+    const match = /^([0-9]+) *((?:@[^@]+@)?) *([A-Z0-9_]+)(?: |$)(.*)$/.exec(
+      line,
+    );
     if (match == null) {
       throw new Error(`Failed to parse line number ${lineNumber + 1}: ${line}`);
     }
