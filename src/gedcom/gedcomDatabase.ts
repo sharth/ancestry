@@ -2,14 +2,12 @@ import {
   reportUnparsedRecord,
   warnUnparsedRecords,
 } from "../util/record-unparsed-records";
-import {
-  generateGedcomChangeDate,
-  type GedcomChangeDate,
-} from "./gedcomChangeDate";
+import { newGedcomChangeDate, type GedcomChangeDate } from "./gedcomChangeDate";
 import {
   newGedcomCreationDate,
   type GedcomCreationDate,
 } from "./gedcomCreationDate";
+import { gedcomDateExact } from "./gedcomDate";
 import {
   parseGedcomFamily,
   serializeGedcomFamily,
@@ -163,7 +161,7 @@ export function parseGedcomDatabase(gedcomRecords: GedcomRecord[]) {
   return gedcomDatabase;
 }
 
-/** `updatedGedcomObject`, with `changeDate` as its CHAN unless it is still
+/** `updatedGedcomObject`, with `date` as its CHAN unless it is still
  * `originalGedcomObject`, and also as its CREA when there was no original
  * (a new record). Edits go through immer, which keeps every untouched object
  * the same object, so "edited" is just "not the original object". */
@@ -175,15 +173,13 @@ function stampDates<
 >(
   originalGedcomObject: GedcomObject | undefined,
   updatedGedcomObject: GedcomObject,
-  changeDate: GedcomChangeDate,
+  date: string,
 ): GedcomObject {
   if (originalGedcomObject === updatedGedcomObject) return updatedGedcomObject;
+  const changeDate = newGedcomChangeDate({ value: date });
   if (originalGedcomObject === undefined) {
-    return {
-      ...updatedGedcomObject,
-      changeDate,
-      creationDate: newGedcomCreationDate({ value: changeDate.value }),
-    };
+    const creationDate = newGedcomCreationDate({ value: date });
+    return { ...updatedGedcomObject, changeDate, creationDate };
   }
   return { ...updatedGedcomObject, changeDate };
 }
@@ -202,7 +198,7 @@ export function compareGedcomDatabase(
   originalGedcomRecord?: GedcomRecord;
   updatedGedcomRecord?: GedcomRecord;
 }[] {
-  const changeDate = generateGedcomChangeDate(now);
+  const date = gedcomDateExact(now);
   function hash(gedcomRecord: GedcomRecord) {
     return `${gedcomRecord.tag} ${gedcomRecord.xref} ${gedcomRecord.value}`;
   }
@@ -218,32 +214,32 @@ export function compareGedcomDatabase(
     serializeGedcomHeader(generateGedcomHeader(now)),
     ...Object.values(updatedGedcomDatabase.submitters).map((s) =>
       serializeGedcomSubmitter(
-        stampDates(originalGedcomDatabase.submitters[s.xref], s, changeDate),
+        stampDates(originalGedcomDatabase.submitters[s.xref], s, date),
       ),
     ),
     ...Object.values(updatedGedcomDatabase.individuals).map((i) =>
       serializeGedcomIndividual(
-        stampDates(originalGedcomDatabase.individuals[i.xref], i, changeDate),
+        stampDates(originalGedcomDatabase.individuals[i.xref], i, date),
       ),
     ),
     ...Object.values(updatedGedcomDatabase.families).map((f) =>
       serializeGedcomFamily(
-        stampDates(originalGedcomDatabase.families[f.xref], f, changeDate),
+        stampDates(originalGedcomDatabase.families[f.xref], f, date),
       ),
     ),
     ...Object.values(updatedGedcomDatabase.sources).map((s) =>
       serializeGedcomSource(
-        stampDates(originalGedcomDatabase.sources[s.xref], s, changeDate),
+        stampDates(originalGedcomDatabase.sources[s.xref], s, date),
       ),
     ),
     ...Object.values(updatedGedcomDatabase.repositories).map((r) =>
       serializeGedcomRepository(
-        stampDates(originalGedcomDatabase.repositories[r.xref], r, changeDate),
+        stampDates(originalGedcomDatabase.repositories[r.xref], r, date),
       ),
     ),
     ...Object.values(updatedGedcomDatabase.multimedias).map((m) =>
       serializeGedcomMultimedia(
-        stampDates(originalGedcomDatabase.multimedias[m.xref], m, changeDate),
+        stampDates(originalGedcomDatabase.multimedias[m.xref], m, date),
       ),
     ),
     newGedcomRecord({ tag: "TRLR" }),

@@ -1,4 +1,4 @@
-import { generateGedcomChangeDate } from "./gedcomChangeDate";
+import { gedcomDateExact } from "./gedcomDate";
 import { newGedcomRecord, type GedcomRecord } from "./gedcomRecord";
 
 export interface GedcomHeader {
@@ -36,7 +36,7 @@ export function generateGedcomHeader(now = new Date()): GedcomHeader {
         }),
         newGedcomRecord({
           tag: "DATE",
-          value: generateGedcomChangeDate(now).value,
+          value: gedcomDateExact(now),
         }),
       ],
     }),

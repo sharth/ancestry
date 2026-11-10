@@ -23,6 +23,12 @@ export const monthNames = [
   "DEC",
 ];
 
+/** `now` as a GEDCOM DateExact (e.g. `2 JAN 2030`), for stamping HEAD's
+ * DATE and records' CHAN and CREA. */
+export function gedcomDateExact(now: Date): string {
+  return `${now.getDate()} ${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+}
+
 export function newGedcomDate(
   fieldsToUpdate: Partial<GedcomDate> = {},
 ): GedcomDate {
