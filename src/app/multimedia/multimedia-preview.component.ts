@@ -1,5 +1,6 @@
 import {
   Component,
+  DestroyRef,
   computed,
   inject,
   input,
@@ -52,6 +53,7 @@ export function resolveCropRegion(
 export class MultimediaPreviewComponent {
   private readonly ancestryService = inject(AncestryService);
   private readonly sanitizer = inject(DomSanitizer);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly filePath = input.required<string>();
   // The CROP of the multimedia link being shown, if any. Only applies to
@@ -140,9 +142,12 @@ export class MultimediaPreviewComponent {
         }
 
         const file = await fileHandle.getFile();
-        const fileUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-          URL.createObjectURL(file),
-        );
+        const objectUrl = URL.createObjectURL(file);
+        this.destroyRef.onDestroy(() => {
+          URL.revokeObjectURL(objectUrl);
+        });
+        const fileUrl =
+          this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
         return { fileUrl, mediaType: file.type };
       } catch (error) {
         console.error("Failed to load multimedia file:", error);

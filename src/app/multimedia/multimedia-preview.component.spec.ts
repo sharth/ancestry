@@ -111,4 +111,33 @@ describe("MultimediaPreviewComponent with a crop", () => {
     expect(img.style.height).toBe("250%");
     expect(img.classList).not.toContain("invisible");
   });
+
+  it("revokes the file's object URL when destroyed", async () => {
+    const file = await pngFile(10, 10);
+    const revoke = vi.spyOn(URL, "revokeObjectURL");
+    const { fixture } = await render(MultimediaPreviewComponent, {
+      bindings: [inputBinding("filePath", signal("photo.png"))],
+      providers: [
+        {
+          provide: AncestryService,
+          useValue: {
+            gedcomResource: { value: () => undefined },
+            getMultimediaFileHandle: () =>
+              Promise.resolve({ getFile: () => Promise.resolve(file) }),
+          },
+        },
+      ],
+      waitForStableOnRender: true,
+    });
+    const img = await vi.waitFor(() => {
+      const img = (fixture.nativeElement as HTMLElement).querySelector("img");
+      if (!img) throw new Error("image not rendered yet");
+      return img;
+    });
+    expect(img.src).toMatch(/^blob:/);
+    expect(revoke).not.toHaveBeenCalled();
+
+    fixture.destroy();
+    expect(revoke).toHaveBeenCalledWith(img.src);
+  });
 });
