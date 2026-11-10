@@ -175,13 +175,16 @@ function stampDates<
   updatedGedcomObject: GedcomObject,
   date: string,
 ): GedcomObject {
-  if (originalGedcomObject === updatedGedcomObject) return updatedGedcomObject;
-  const changeDate = newGedcomChangeDate({ value: date });
-  if (originalGedcomObject === undefined) {
+  if (originalGedcomObject === updatedGedcomObject) {
+    return updatedGedcomObject;
+  } else if (originalGedcomObject === undefined) {
+    const changeDate = newGedcomChangeDate({ value: date });
     const creationDate = newGedcomCreationDate({ value: date });
     return { ...updatedGedcomObject, changeDate, creationDate };
+  } else {
+    const changeDate = newGedcomChangeDate({ value: date });
+    return { ...updatedGedcomObject, changeDate };
   }
-  return { ...updatedGedcomObject, changeDate };
 }
 
 /** Pairs the original file's records with `updatedGedcomDatabase`'s,
