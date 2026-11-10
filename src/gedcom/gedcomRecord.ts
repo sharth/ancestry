@@ -60,12 +60,7 @@ export function parseGedcomRecords(text: string): GedcomRecord[] {
     if (line == "") {
       continue;
     }
-    // A single space separates the tag from the value; any further spaces
-    // belong to the value, which matters for a CONC that continues a line in
-    // the middle of a sentence ("2 CONC  de Bruce" carries " de Bruce").
-    const match = /^([0-9]+) *((?:@[^@]+@)?) *([A-Z0-9_]+)(?: (.*))?$/.exec(
-      line,
-    );
+    const match = /^([0-9]+) *((?:@[^@]+@)?) *([A-Z0-9_]+) ?(.*)$/.exec(line);
     if (match == null) {
       throw new Error(`Failed to parse line number ${lineNumber + 1}: ${line}`);
     }
@@ -73,10 +68,10 @@ export function parseGedcomRecords(text: string): GedcomRecord[] {
       string,
       string,
       string,
-      string | undefined,
+      string,
     ];
     const level = parseInt(levelString, 10);
-    const record = newGedcomRecord({ xref, tag, value: value ?? "" });
+    const record = newGedcomRecord({ xref, tag, value });
 
     if (level == 0) {
       ladder = [record];
