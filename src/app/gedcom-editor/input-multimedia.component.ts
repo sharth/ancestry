@@ -1,13 +1,11 @@
 import {
   Component,
   computed,
-  effect,
   inject,
   input,
   model,
   resource,
   signal,
-  untracked,
 } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 
@@ -56,10 +54,9 @@ export class InputMultimediaComponent implements FormValueControl<GedcomMultimed
   // inside the data folder, otherwise just its name (the browser doesn't
   // reveal where else it lives).
   readonly sourceFileName = signal("");
-  // What the user typed as the path to copy a pending file to. Empty means
-  // the proposed name (shown as the field's placeholder), which follows the
-  // title as it's edited; clearing the field goes back to it.
-  readonly copyFileName = signal("");
+  // Whether a pending file's path is the default name ("<xref> <title>.ext"),
+  // which follows the title as it's edited, rather than one the user chose.
+  readonly useDefaultFileName = signal(true);
   readonly filePathProblem = resource({
     params: () =>
       this.pendingFile() ? { filePath: this.value().filePath } : undefined,
@@ -70,27 +67,33 @@ export class InputMultimediaComponent implements FormValueControl<GedcomMultimed
         : undefined),
   });
 
-  constructor() {
-    // While a file picked from outside the data folder is waiting to be
-    // copied in, the File Path input isn't bound to the record: it edits
-    // copyFileName, and shows proposedFileName (from the xref and title) as
-    // its placeholder. This keeps the record's real filePath (what gets
-    // saved, shown in the GEDCOM delta, and copied to on submit) in sync
-    // with what the input shows: the typed name if any, otherwise the
-    // proposed one, which changes as the title is edited.
-    effect(() => {
-      if (!this.pendingFile()) {
-        return;
-      }
-      const filePath = this.copyFileName().trim() || this.proposedFileName();
-      if (untracked(this.value).filePath !== filePath) {
-        this.value.update((m) => ({ ...m, filePath }));
-      }
-    });
+  // The title input's own handler (not an effect): while the default name
+  // is in use, renaming the record renames the file it will be copied to.
+  onTitleInput(event: Event) {
+    const file = this.pendingFile();
+    if (!file || !this.useDefaultFileName()) {
+      return;
+    }
+    const title = (event.target as HTMLInputElement).value;
+    this.form
+      .filePath()
+      .value.set(multimediaFileName(this.value().xref, title, file.name));
   }
 
-  onCopyFileNameInput(event: Event) {
-    this.copyFileName.set((event.target as HTMLInputElement).value);
+  // Typing a path of their own switches to a custom name.
+  onFilePathInput() {
+    this.useDefaultFileName.set(false);
+  }
+
+  // Switches between the default name and a custom one. Going back to the
+  // default puts the default name back and forgets the edit.
+  toggleDefaultFileName() {
+    if (this.useDefaultFileName()) {
+      this.useDefaultFileName.set(false);
+      return;
+    }
+    this.useDefaultFileName.set(true);
+    this.form.filePath().reset(this.proposedFileName());
   }
 
   async browseFile() {
@@ -116,7 +119,7 @@ export class InputMultimediaComponent implements FormValueControl<GedcomMultimed
         xref,
         relativePath ? undefined : file,
       );
-      this.copyFileName.set("");
+      this.useDefaultFileName.set(true);
       this.sourceFileName.set(relativePath?.join("/") ?? file.name);
       this.value.update((m) => ({
         ...m,

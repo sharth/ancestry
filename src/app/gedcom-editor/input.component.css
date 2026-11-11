@@ -128,3 +128,9 @@ div.details-lookalike {
 .path-label {
   width: 7.5rem;
 }
+
+/* A multimedia file path that is still the default name (it follows the
+   title), as opposed to one the user typed. */
+.default-file-name {
+  background-color: var(--bs-info-bg-subtle);
+}

@@ -107,20 +107,27 @@ describe("InputMultimediaComponent", () => {
       expect(screen.getByText(/will be copied in at this path/)).toBeTruthy();
     });
 
-    it("keeps the proposed name following the title", async () => {
+    function typeInto(label: string, text: string) {
+      const input = screen.getByLabelText<HTMLInputElement>(label);
+      input.value = text;
+      input.dispatchEvent(new Event("input"));
+    }
+
+    it("keeps the default name following the title", async () => {
       vi.spyOn(
         component.ancestryService,
         "multimediaFileExists",
       ).mockResolvedValue(false);
 
       await component.browseFile();
-      component.value.update((m) => ({ ...m, title: "1911 Census" }));
+      await fixture.whenStable();
+      typeInto("Title", "1911 Census");
       await fixture.whenStable();
 
       expect(component.value().filePath).toBe("O12 1911 Census.png");
     });
 
-    it("shows the proposed name as a placeholder, not a value", async () => {
+    it("shows the default name as a tinted value", async () => {
       vi.spyOn(
         component.ancestryService,
         "multimediaFileExists",
@@ -130,11 +137,14 @@ describe("InputMultimediaComponent", () => {
       await fixture.whenStable();
       const input = screen.getByLabelText<HTMLInputElement>("File Path");
 
-      expect(input.value).toBe("");
-      expect(input.placeholder).toBe("O12 1901 Census.png");
+      expect(input.value).toBe("O12 1901 Census.png");
+      expect(input.classList).toContain("default-file-name");
+      expect(
+        screen.getByRole("button", { name: "Use default filename" }),
+      ).toBeTruthy();
     });
 
-    it("uses a typed path, and the proposed name again once it's cleared", async () => {
+    it("switches to a custom name when the path is typed, and back with the button", async () => {
       vi.spyOn(
         component.ancestryService,
         "multimediaFileExists",
@@ -142,19 +152,38 @@ describe("InputMultimediaComponent", () => {
 
       await component.browseFile();
       await fixture.whenStable();
-      const input = screen.getByLabelText<HTMLInputElement>("File Path");
-      input.value = "Census Smith.png";
-      input.dispatchEvent(new Event("input"));
-      component.value.update((m) => ({ ...m, title: "1911 Census" }));
+      typeInto("File Path", "Census Smith.png");
+      typeInto("Title", "1911 Census");
       await fixture.whenStable();
 
       expect(component.value().filePath).toBe("Census Smith.png");
+      expect(
+        screen.getByLabelText<HTMLInputElement>("File Path").classList,
+      ).not.toContain("default-file-name");
 
-      input.value = "";
-      input.dispatchEvent(new Event("input"));
+      screen.getByRole("button", { name: "Use custom filename" }).click();
       await fixture.whenStable();
 
       expect(component.value().filePath).toBe("O12 1911 Census.png");
+      expect(component.form.filePath().dirty()).toBe(false);
+      expect(
+        screen.getByRole("button", { name: "Use default filename" }),
+      ).toBeTruthy();
+    });
+
+    it("keeps the current name when the button switches to custom", async () => {
+      vi.spyOn(
+        component.ancestryService,
+        "multimediaFileExists",
+      ).mockResolvedValue(false);
+
+      await component.browseFile();
+      await fixture.whenStable();
+      screen.getByRole("button", { name: "Use default filename" }).click();
+      typeInto("Title", "1911 Census");
+      await fixture.whenStable();
+
+      expect(component.value().filePath).toBe("O12 1901 Census.png");
     });
 
     it("reports an error if the file already exists", async () => {

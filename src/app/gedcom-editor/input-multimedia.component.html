@@ -1,5 +1,10 @@
 <div class="form-floating">
-  <input class="form-control h-auto" [formField]="form.title" id="title" />
+  <input
+    class="form-control h-auto"
+    [formField]="form.title"
+    id="title"
+    (input)="onTitleInput($event)"
+  />
   <label for="title">Title</label>
 </div>
 
@@ -25,29 +30,35 @@
 
 <div class="input-group has-validation">
   <label class="input-group-text path-label" for="filePath">File Path</label>
+  <input
+    class="form-control"
+    id="filePath"
+    [class.is-invalid]="filePathProblem.value()"
+    [class.default-file-name]="pendingFile() && useDefaultFileName()"
+    [formField]="form.filePath"
+    (input)="onFilePathInput()"
+  />
   @if (pendingFile()) {
-    <input
-      class="form-control"
-      id="filePath"
-      [class.is-invalid]="filePathProblem.value()"
-      [placeholder]="proposedFileName()"
-      [value]="copyFileName()"
-      (input)="onCopyFileNameInput($event)"
-    />
-  } @else {
-    <input
-      class="form-control"
-      id="filePath"
-      [class.is-invalid]="filePathProblem.value()"
-      [formField]="form.filePath"
-    />
+    <button
+      class="btn btn-outline-secondary"
+      type="button"
+      [attr.aria-pressed]="useDefaultFileName()"
+      (click)="toggleDefaultFileName()"
+    >
+      {{
+        useDefaultFileName() ? "Use default filename" : "Use custom filename"
+      }}
+    </button>
   }
   @if (filePathProblem.value(); as problem) {
     <div class="invalid-feedback">{{ problem }}</div>
   } @else if (pendingFile()) {
     <div class="form-text w-100">
       The source file is outside your data folder. It will be copied in at this
-      path when you submit. Leave it empty to use the name shown.
+      path when you submit.
+      @if (useDefaultFileName()) {
+        This is the default name, which follows the title.
+      }
     </div>
   }
 </div>
