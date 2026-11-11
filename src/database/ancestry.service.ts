@@ -17,10 +17,10 @@ import {
   type GedcomRecord,
 } from "../gedcom/gedcomRecord";
 import {
-  copyMultimediaFile,
-  getMultimediaFileHandle,
-  multimediaFileExists,
-} from "../util/multimedia-files";
+  copyFileToPath,
+  fileExistsAtPath,
+  getFileHandleAtPath,
+} from "../util/file-system";
 
 export const BUILTIN_GEDCOM_URL = "assets/samples/royal-family.ged";
 
@@ -306,7 +306,7 @@ export class AncestryService {
   ): Promise<FileSystemFileHandle | undefined> {
     const directoryHandle = this.gedcomResource.value()?.directoryHandle;
     return directoryHandle
-      ? getMultimediaFileHandle(directoryHandle, relativePath)
+      ? getFileHandleAtPath(directoryHandle, relativePath)
       : undefined;
   }
 
@@ -315,18 +315,18 @@ export class AncestryService {
   async multimediaFileExists(relativePath: string): Promise<boolean> {
     const directoryHandle = this.gedcomResource.value()?.directoryHandle;
     return directoryHandle
-      ? multimediaFileExists(directoryHandle, relativePath)
+      ? fileExistsAtPath(directoryHandle, relativePath)
       : false;
   }
 
   // Copies `file` to `relativePath` in the loaded directory, never
-  // overwriting (see copyMultimediaFile).
+  // overwriting (see copyFileToPath).
   async copyMultimediaFile(file: File, relativePath: string): Promise<void> {
     const directoryHandle = this.gedcomResource.value()?.directoryHandle;
     if (!directoryHandle) {
       throw new Error("No directory loaded");
     }
-    await copyMultimediaFile(directoryHandle, file, relativePath);
+    await copyFileToPath(directoryHandle, file, relativePath);
   }
 
   async requestPermissions() {

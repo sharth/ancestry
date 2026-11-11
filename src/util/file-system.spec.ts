@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
-  MultimediaFileExistsError,
-  copyMultimediaFile,
-  getMultimediaFileHandle,
-  multimediaFileExists,
-  splitMultimediaPath,
-} from "./multimedia-files";
+  FileExistsError,
+  copyFileToPath,
+  getFileHandleAtPath,
+  fileExistsAtPath,
+  splitRelativePath,
+} from "./file-system";
 
 // An in-memory stand-in for a FileSystemDirectoryHandle: each entry is
 // either file contents or a nested folder.
@@ -49,19 +49,19 @@ function fakeDirectoryHandle(folder: FakeFolder): FileSystemDirectoryHandle {
   } as unknown as FileSystemDirectoryHandle;
 }
 
-describe("splitMultimediaPath", () => {
+describe("splitRelativePath", () => {
   it("splits on either slash and drops empty parts", () => {
-    expect(splitMultimediaPath("media\\1901/O12 Census.png")).toEqual([
+    expect(splitRelativePath("media\\1901/O12 Census.png")).toEqual([
       "media",
       "1901",
       "O12 Census.png",
     ]);
-    expect(splitMultimediaPath("/a//b/")).toEqual(["a", "b"]);
-    expect(splitMultimediaPath("")).toEqual([]);
+    expect(splitRelativePath("/a//b/")).toEqual(["a", "b"]);
+    expect(splitRelativePath("")).toEqual([]);
   });
 });
 
-describe("multimedia files in a folder", () => {
+describe("files in a folder", () => {
   let folder: FakeFolder;
   let directoryHandle: FileSystemDirectoryHandle;
 
@@ -72,40 +72,40 @@ describe("multimedia files in a folder", () => {
 
   it("resolves a file handle, including in a subfolder", async () => {
     await expect(
-      getMultimediaFileHandle(directoryHandle, "media\\O3 Map.jpg"),
+      getFileHandleAtPath(directoryHandle, "media\\O3 Map.jpg"),
     ).resolves.toMatchObject({ name: "O3 Map.jpg" });
   });
 
   it("resolves nothing for a missing file or an empty path", async () => {
     vi.spyOn(console, "error").mockImplementation(() => undefined);
     await expect(
-      getMultimediaFileHandle(directoryHandle, "missing/O3 Map.jpg"),
+      getFileHandleAtPath(directoryHandle, "missing/O3 Map.jpg"),
     ).resolves.toBeUndefined();
     await expect(
-      getMultimediaFileHandle(directoryHandle, ""),
+      getFileHandleAtPath(directoryHandle, ""),
     ).resolves.toBeUndefined();
     vi.restoreAllMocks();
   });
 
   it("reports whether a file exists", async () => {
     await expect(
-      multimediaFileExists(directoryHandle, "O1 Deed.png"),
+      fileExistsAtPath(directoryHandle, "O1 Deed.png"),
     ).resolves.toBe(true);
     await expect(
-      multimediaFileExists(directoryHandle, "media/O3 Map.jpg"),
+      fileExistsAtPath(directoryHandle, "media/O3 Map.jpg"),
     ).resolves.toBe(true);
     await expect(
-      multimediaFileExists(directoryHandle, "O2 Will.png"),
+      fileExistsAtPath(directoryHandle, "O2 Will.png"),
     ).resolves.toBe(false);
     await expect(
-      multimediaFileExists(directoryHandle, "missing/O3 Map.jpg"),
+      fileExistsAtPath(directoryHandle, "missing/O3 Map.jpg"),
     ).resolves.toBe(false);
   });
 
   it("copies a file under the given name, creating folders", async () => {
     const file = new File(["png"], "scan.png");
-    await copyMultimediaFile(directoryHandle, file, "O2 Will.png");
-    await copyMultimediaFile(directoryHandle, file, "wills/O4 Will.png");
+    await copyFileToPath(directoryHandle, file, "O2 Will.png");
+    await copyFileToPath(directoryHandle, file, "wills/O4 Will.png");
     expect(folder["O2 Will.png"]).toBe(file);
     expect(folder["wills"]).toEqual({ "O4 Will.png": file });
   });
@@ -113,8 +113,8 @@ describe("multimedia files in a folder", () => {
   it("refuses to overwrite an existing file", async () => {
     const file = new File(["png"], "scan.png");
     await expect(
-      copyMultimediaFile(directoryHandle, file, "O1 Deed.png"),
-    ).rejects.toBeInstanceOf(MultimediaFileExistsError);
+      copyFileToPath(directoryHandle, file, "O1 Deed.png"),
+    ).rejects.toBeInstanceOf(FileExistsError);
     expect(folder["O1 Deed.png"]).toBe("existing");
   });
 });
