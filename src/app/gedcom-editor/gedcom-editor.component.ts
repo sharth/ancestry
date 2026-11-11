@@ -360,33 +360,31 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
 
   // Files picked from outside the data folder, by multimedia xref. They're
   // copied in on submit, so cancelling the editor leaves the folder as is.
-  private readonly pendingMultimediaFiles = signal<ReadonlyMap<string, File>>(
-    new Map(),
-  );
+  private readonly pendingMultimediaFiles = signal<
+    Readonly<Partial<Record<string, File>>>
+  >({});
 
   pendingMultimediaFile(xref: string): File | undefined {
-    return this.pendingMultimediaFiles().get(xref);
+    return this.pendingMultimediaFiles()[xref];
   }
 
   setPendingMultimediaFile(xref: string, file: File | undefined) {
-    this.pendingMultimediaFiles.update((files) => {
-      const updated = new Map(files);
-      if (file) {
-        updated.set(xref, file);
-      } else {
-        updated.delete(xref);
-      }
-      return updated;
-    });
+    this.pendingMultimediaFiles.update((files) =>
+      produce(files, (draft) => {
+        draft[xref] = file;
+      }),
+    );
   }
 
   // Each pending file with the path in the data folder it will be copied
   // to on submit (its multimedia record's current file path). Shown
   // alongside the GEDCOM delta, since it's part of what submit writes.
   readonly pendingMultimediaCopies = computed(() =>
-    [...this.pendingMultimediaFiles()].flatMap(([xref, file]) => {
+    Object.entries(this.pendingMultimediaFiles()).flatMap(([xref, file]) => {
       const filePath = this.workingDatabase().multimedias[xref]?.filePath;
-      return filePath === undefined ? [] : [{ file, filePath }];
+      return file === undefined || filePath === undefined
+        ? []
+        : [{ file, filePath }];
     }),
   );
 
@@ -429,7 +427,7 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     for (const { file, filePath } of copies) {
       await this.ancestryService.copyMultimediaFile(file, filePath);
     }
-    this.pendingMultimediaFiles.set(new Map());
+    this.pendingMultimediaFiles.set({});
     return true;
   }
 
