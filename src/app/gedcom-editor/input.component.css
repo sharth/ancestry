@@ -132,5 +132,5 @@ div.details-lookalike {
 /* A multimedia file path that is still the default name (it follows the
    title), as opposed to one the user typed. */
 .default-file-name {
-  background-color: var(--bs-info-bg-subtle);
+  background-color: var(--bs-success-bg-subtle);
 }
