@@ -29,6 +29,11 @@ import { GEDCOM_EDITOR } from "./gedcom-editor-interface";
   imports: [FormField, MultimediaPreviewComponent],
   templateUrl: "./input-multimedia.component.html",
   styleUrl: "./input.component.css",
+  host: {
+    // The data folder can change outside the app (say, in a file manager),
+    // so check the copy's path again whenever the user comes back.
+    "(window:focus)": "filePathProblem.reload()",
+  },
 })
 export class InputMultimediaComponent implements FormValueControl<GedcomMultimedia> {
   readonly ancestryService = inject(AncestryService);

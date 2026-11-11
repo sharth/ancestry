@@ -172,6 +172,26 @@ describe("InputMultimediaComponent", () => {
       });
     });
 
+    it("checks the path again when the window regains focus", async () => {
+      const exists = vi
+        .spyOn(component.ancestryService, "multimediaFileExists")
+        .mockResolvedValue(false);
+
+      await component.browseFile();
+      await vi.waitFor(() => {
+        expect(exists).toHaveBeenCalledTimes(1);
+      });
+      exists.mockResolvedValue(true);
+      window.dispatchEvent(new Event("focus"));
+
+      await vi.waitFor(() => {
+        fixture.detectChanges();
+        expect(
+          screen.getByText(/"O12 1901 Census.png" already exists/),
+        ).toBeTruthy();
+      });
+    });
+
     it("drops a queued file when a file inside the folder is picked", async () => {
       vi.spyOn(
         component.ancestryService,
