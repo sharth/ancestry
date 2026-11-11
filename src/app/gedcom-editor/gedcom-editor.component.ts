@@ -379,7 +379,9 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   // Each pending file with the path in the data folder it will be copied
   // to on submit (its multimedia record's current file path). Shown
   // alongside the GEDCOM delta, since it's part of what submit writes.
-  readonly pendingMultimediaCopies = computed(() =>
+  readonly pendingMultimediaCopies = computed<
+    { file: File; filePath: string }[]
+  >(() =>
     Object.entries(this.pendingMultimediaFiles()).flatMap(([xref, file]) => {
       const filePath = this.workingDatabase().multimedias[xref]?.filePath;
       return file === undefined || filePath === undefined
@@ -392,7 +394,9 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   // it. Submit never deletes them; they're listed alongside the GEDCOM delta
   // so it's clear they stay in the data folder, and whether any other
   // record still links to them.
-  readonly unlinkedMultimediaFiles = computed(() => {
+  readonly unlinkedMultimediaFiles = computed<
+    { xref: string; oldPath: string; stillLinkedFrom: string[] }[]
+  >(() => {
     const original = this.ancestryDatabase().multimedias;
     const working = Object.values(this.workingDatabase().multimedias);
     return Object.values(original).flatMap((multimedia) => {
