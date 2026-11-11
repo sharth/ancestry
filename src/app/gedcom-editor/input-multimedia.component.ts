@@ -32,11 +32,10 @@ import { GEDCOM_EDITOR } from "./gedcom-editor-interface";
 })
 export class InputMultimediaComponent implements FormValueControl<GedcomMultimedia> {
   readonly ancestryService = inject(AncestryService);
+  readonly gedcomEditor = inject(GEDCOM_EDITOR, { optional: true });
   readonly workingDatabase = input.required<GedcomDatabase>();
   readonly value = model<GedcomMultimedia>(newGedcomMultimedia({ xref: "" }));
   readonly form = form(this.value);
-
-  readonly gedcomEditor = inject(GEDCOM_EDITOR, { optional: true });
 
   // A file picked from outside the data folder. The editor copies it to
   // this record's file path on submit.
