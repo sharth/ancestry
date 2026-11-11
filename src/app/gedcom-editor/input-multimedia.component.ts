@@ -57,6 +57,11 @@ export class InputMultimediaComponent implements FormValueControl<GedcomMultimed
   // Whether a pending file's path is the default name ("<xref> <title>.ext"),
   // which follows the title as it's edited, rather than one the user chose.
   readonly useDefaultFileName = signal(true);
+  // Name (and id prefix) of the Default/Custom filename radio buttons,
+  // unique per record so several open editors don't share one group.
+  readonly fileNameModeName = computed(
+    () => `fileNameMode-${this.value().xref.replaceAll("@", "")}`,
+  );
   readonly filePathProblem = resource({
     params: () =>
       this.pendingFile() ? { filePath: this.value().filePath } : undefined,
@@ -85,13 +90,8 @@ export class InputMultimediaComponent implements FormValueControl<GedcomMultimed
     this.useDefaultFileName.set(false);
   }
 
-  // Switches between the default name and a custom one. Going back to the
-  // default puts the default name back and forgets the edit.
-  toggleDefaultFileName() {
-    if (this.useDefaultFileName()) {
-      this.useDefaultFileName.set(false);
-      return;
-    }
+  // Choosing the default name puts it back and forgets the edit.
+  useDefaultFileNameSelected() {
     this.useDefaultFileName.set(true);
     this.form.filePath().reset(this.proposedFileName());
   }

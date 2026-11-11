@@ -39,16 +39,34 @@
     (input)="onFilePathInput()"
   />
   @if (pendingFile()) {
-    <button
+    <input
+      type="radio"
+      class="btn-check"
+      [name]="fileNameModeName()"
+      [id]="fileNameModeName() + '-default'"
+      autocomplete="off"
+      [checked]="useDefaultFileName()"
+      (change)="useDefaultFileNameSelected()"
+    />
+    <label
       class="btn btn-outline-secondary"
-      type="button"
-      [attr.aria-pressed]="useDefaultFileName()"
-      (click)="toggleDefaultFileName()"
+      [for]="fileNameModeName() + '-default'"
+      >Default filename</label
     >
-      {{
-        useDefaultFileName() ? "Use default filename" : "Use custom filename"
-      }}
-    </button>
+    <input
+      type="radio"
+      class="btn-check"
+      [name]="fileNameModeName()"
+      [id]="fileNameModeName() + '-custom'"
+      autocomplete="off"
+      [checked]="!useDefaultFileName()"
+      (change)="useDefaultFileName.set(false)"
+    />
+    <label
+      class="btn btn-outline-secondary"
+      [for]="fileNameModeName() + '-custom'"
+      >Custom filename</label
+    >
   }
   @if (filePathProblem.value(); as problem) {
     <div class="invalid-feedback">{{ problem }}</div>

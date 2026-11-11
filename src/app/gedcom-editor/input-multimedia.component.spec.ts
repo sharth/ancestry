@@ -140,8 +140,10 @@ describe("InputMultimediaComponent", () => {
       expect(input.value).toBe("O12 1901 Census.png");
       expect(input.classList).toContain("default-file-name");
       expect(
-        screen.getByRole("button", { name: "Use default filename" }),
-      ).toBeTruthy();
+        screen.getByRole<HTMLInputElement>("radio", {
+          name: "Default filename",
+        }).checked,
+      ).toBe(true);
     });
 
     it("switches to a custom name when the path is typed, and back with the button", async () => {
@@ -161,17 +163,24 @@ describe("InputMultimediaComponent", () => {
         screen.getByLabelText<HTMLInputElement>("File Path").classList,
       ).not.toContain("default-file-name");
 
-      screen.getByRole("button", { name: "Use custom filename" }).click();
+      expect(
+        screen.getByRole<HTMLInputElement>("radio", { name: "Custom filename" })
+          .checked,
+      ).toBe(true);
+
+      screen.getByRole("radio", { name: "Default filename" }).click();
       await fixture.whenStable();
 
       expect(component.value().filePath).toBe("O12 1911 Census.png");
       expect(component.form.filePath().dirty()).toBe(false);
       expect(
-        screen.getByRole("button", { name: "Use default filename" }),
-      ).toBeTruthy();
+        screen.getByRole<HTMLInputElement>("radio", {
+          name: "Default filename",
+        }).checked,
+      ).toBe(true);
     });
 
-    it("keeps the current name when the button switches to custom", async () => {
+    it("keeps the current name when Custom filename is chosen", async () => {
       vi.spyOn(
         component.ancestryService,
         "multimediaFileExists",
@@ -179,7 +188,7 @@ describe("InputMultimediaComponent", () => {
 
       await component.browseFile();
       await fixture.whenStable();
-      screen.getByRole("button", { name: "Use default filename" }).click();
+      screen.getByRole("radio", { name: "Custom filename" }).click();
       typeInto("Title", "1911 Census");
       await fixture.whenStable();
 
