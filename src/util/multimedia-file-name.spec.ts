@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { multimediaFileName, uniqueFileName } from "./multimedia-file-name";
+import { multimediaFileName, sanitizeFileName } from "./multimedia-file-name";
 
 describe("multimediaFileName", () => {
   it("joins xref and title and keeps the extension", () => {
-    expect(multimediaFileName("O12", "1901 Census", "IMG_0042.JPG")).toBe(
+    expect(multimediaFileName("@O12@", "1901 Census", "IMG_0042.JPG")).toBe(
       "O12 1901 Census.jpg",
     );
   });
@@ -35,23 +35,16 @@ describe("multimediaFileName", () => {
   });
 });
 
-describe("uniqueFileName", () => {
-  it("keeps a name that isn't taken", () => {
-    expect(uniqueFileName("O1 Deed.png", new Set(["other.png"]))).toBe(
-      "O1 Deed.png",
-    );
+describe("sanitizeFileName", () => {
+  it("keeps a valid name as is", () => {
+    expect(sanitizeFileName("O1 Deed.png")).toBe("O1 Deed.png");
   });
 
-  it("numbers a name that is taken", () => {
-    expect(
-      uniqueFileName(
-        "O1 Deed.png",
-        new Set(["O1 Deed.png", "O1 Deed (2).png"]),
-      ),
-    ).toBe("O1 Deed (3).png");
+  it("drops invalid characters and trims", () => {
+    expect(sanitizeFileName(" a/b:c?.png. ")).toBe("abc.png");
   });
 
-  it("numbers a name without an extension", () => {
-    expect(uniqueFileName("O1", new Set(["O1"]))).toBe("O1 (2)");
+  it("can return an empty name", () => {
+    expect(sanitizeFileName(" ... ")).toBe("");
   });
 });

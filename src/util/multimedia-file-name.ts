@@ -1,5 +1,6 @@
 // Builds the file name a newly added multimedia file is given when it's
-// copied into the data folder: "<xref> <title>.<ext>", keeping the original
+// copied into the data folder: "<xref> <title>.<ext>" (e.g. "O12 1901
+// Census.png"), keeping the original
 // file's extension. Characters that aren't allowed in file names on common
 // file systems are dropped, so the result is safe to create on Windows,
 // macOS, and Linux.
@@ -10,37 +11,23 @@ export function multimediaFileName(
 ): string {
   const dot = originalFileName.lastIndexOf(".");
   const extension = dot > 0 ? originalFileName.slice(dot) : "";
-  const stem = [xref, title]
-    .map((part) =>
-      part
-        // eslint-disable-next-line no-control-regex
-        .replace(/[<>:"/\\|?*\u0000-\u001f]/g, "")
-        .replace(/\s+/g, " ")
-        .trim(),
-    )
-    .filter((part) => part.length > 0)
-    .join(" ")
-    // Windows doesn't allow a name to end with a dot or a space.
-    .replace(/[. ]+$/, "");
+  // The xref is stored with its GEDCOM @ delimiters ("@O12@"); the file
+  // name uses the bare id ("O12").
+  const id = xref.replace(/^@(.*)@$/, "$1");
+  const stem = sanitizeFileName([id, title].join(" "));
   return `${stem || "multimedia"}${extension.toLowerCase()}`;
 }
 
-// Returns `fileName` if it isn't in `takenNames`, otherwise the first of
-// "<stem> (2).<ext>", "<stem> (3).<ext>", ... that isn't.
-export function uniqueFileName(
-  fileName: string,
-  takenNames: ReadonlySet<string>,
-): string {
-  if (!takenNames.has(fileName)) {
-    return fileName;
-  }
-  const dot = fileName.lastIndexOf(".");
-  const stem = dot > 0 ? fileName.slice(0, dot) : fileName;
-  const extension = dot > 0 ? fileName.slice(dot) : "";
-  for (let n = 2; ; n++) {
-    const candidate = `${stem} (${n})${extension}`;
-    if (!takenNames.has(candidate)) {
-      return candidate;
-    }
-  }
+// Drops characters that aren't allowed in file names on common file systems
+// (and control characters), collapses whitespace, and trims leading/trailing
+// spaces and trailing dots, which Windows doesn't allow. May return "".
+export function sanitizeFileName(fileName: string): string {
+  return (
+    fileName
+      // eslint-disable-next-line no-control-regex
+      .replace(/[<>:"/\\|?*\u0000-\u001f]/g, "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .replace(/[. ]+$/, "")
+  );
 }

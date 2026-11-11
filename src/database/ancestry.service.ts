@@ -16,7 +16,13 @@ import {
   parseGedcomRecords,
   type GedcomRecord,
 } from "../gedcom/gedcomRecord";
-import { uniqueFileName } from "../util/multimedia-file-name";
+
+export class MultimediaFileExistsError extends Error {
+  constructor(readonly fileName: string) {
+    super(`"${fileName}" already exists in the data folder`);
+    this.name = "MultimediaFileExistsError";
+  }
+}
 
 export const BUILTIN_GEDCOM_URL = "assets/samples/royal-family.ged";
 
@@ -331,29 +337,27 @@ export class AncestryService {
   }
 
   // Copies a file (typically one picked from outside the loaded directory)
-  // into the root of the loaded directory as `fileName`, numbering it
-  // "<name> (2).<ext>" etc. if that name is already taken, so nothing is
-  // overwritten. Returns the name it was saved under, which is also its
-  // path relative to the directory. Needs write access to the directory.
-  async copyMultimediaFile(file: File, fileName: string): Promise<string> {
+  // into the root of the loaded directory as `fileName`. Throws
+  // MultimediaFileExistsError rather than overwrite a file already there.
+  // Needs write access to the directory.
+  async copyMultimediaFile(file: File, fileName: string): Promise<void> {
     const directoryHandle = this.gedcomResource.value()?.directoryHandle;
     if (!directoryHandle) {
       throw new Error("No directory loaded");
     }
 
-    const takenNames = new Set<string>();
     for await (const name of directoryHandle.keys()) {
-      takenNames.add(name);
+      if (name === fileName) {
+        throw new MultimediaFileExistsError(fileName);
+      }
     }
-    const savedName = uniqueFileName(fileName, takenNames);
 
-    const fileHandle = await directoryHandle.getFileHandle(savedName, {
+    const fileHandle = await directoryHandle.getFileHandle(fileName, {
       create: true,
     });
     const writableStream = await fileHandle.createWritable();
     await writableStream.write(file);
     await writableStream.close();
-    return savedName;
   }
 
   async requestPermissions() {

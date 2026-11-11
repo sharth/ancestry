@@ -1,8 +1,9 @@
 import { inputBinding, signal } from "@angular/core";
 import type { ComponentFixture } from "@angular/core/testing";
-import { render } from "@testing-library/angular/zoneless";
+import { render, screen } from "@testing-library/angular/zoneless";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { MultimediaFileExistsError } from "../../database/ancestry.service";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomMultimedia } from "../../gedcom/gedcomMultimedia";
 import { InputMultimediaComponent } from "./input-multimedia.component";
@@ -49,7 +50,7 @@ describe("InputMultimediaComponent", () => {
       >);
       vi.spyOn(window, "showOpenFilePicker").mockResolvedValue([fileHandle]);
       component.value.set(
-        newGedcomMultimedia({ xref: "O12", title: "1901 Census" }),
+        newGedcomMultimedia({ xref: "@O12@", title: "1901 Census" }),
       );
     });
 
@@ -64,29 +65,81 @@ describe("InputMultimediaComponent", () => {
       expect(component.value().mediaType).toBe("image/png");
     });
 
-    it("copies a file from outside the data folder after confirming", async () => {
-      const confirm = vi.spyOn(window, "confirm").mockReturnValue(true);
-      const copy = vi
-        .spyOn(component.ancestryService, "copyMultimediaFile")
-        .mockResolvedValue("O12 1901 Census (2).png");
-
-      await component.browseFile();
-
-      expect(confirm).toHaveBeenCalledWith(
-        expect.stringContaining('"O12 1901 Census.png"'),
-      );
-      expect(copy).toHaveBeenCalledWith(file, "O12 1901 Census.png");
-      expect(component.value().filePath).toBe("O12 1901 Census (2).png");
-    });
-
-    it("leaves the record alone if the copy is declined", async () => {
-      vi.spyOn(window, "confirm").mockReturnValue(false);
+    it("offers to copy a file from outside the data folder", async () => {
       const copy = vi.spyOn(component.ancestryService, "copyMultimediaFile");
 
       await component.browseFile();
+      await fixture.whenStable();
 
       expect(copy).not.toHaveBeenCalled();
       expect(component.value().filePath).toBe("");
+      expect(screen.getByLabelText("Copy as")).toHaveProperty(
+        "placeholder",
+        "O12 1901 Census.png",
+      );
+    });
+
+    it("proposes a name that follows the title", async () => {
+      await component.browseFile();
+      component.value.update((m) => ({ ...m, title: "1911 Census" }));
+
+      expect(component.proposedFileName()).toBe("O12 1911 Census.png");
+    });
+
+    it("copies under the proposed name when none is typed", async () => {
+      const copy = vi
+        .spyOn(component.ancestryService, "copyMultimediaFile")
+        .mockResolvedValue();
+
+      await component.browseFile();
+      await component.copyFile();
+
+      expect(copy).toHaveBeenCalledWith(file, "O12 1901 Census.png");
+      expect(component.value().filePath).toBe("O12 1901 Census.png");
+      expect(component.value().mediaType).toBe("image/png");
+      expect(component.pendingFile()).toBeUndefined();
+    });
+
+    it("copies under a typed name, sanitized", async () => {
+      const copy = vi
+        .spyOn(component.ancestryService, "copyMultimediaFile")
+        .mockResolvedValue();
+
+      await component.browseFile();
+      component.copyFileName.set(" Census: Smith.png ");
+      await component.copyFile();
+
+      expect(copy).toHaveBeenCalledWith(file, "Census Smith.png");
+      expect(component.value().filePath).toBe("Census Smith.png");
+    });
+
+    it("reports an error if the file already exists", async () => {
+      vi.spyOn(
+        component.ancestryService,
+        "copyMultimediaFile",
+      ).mockRejectedValue(new MultimediaFileExistsError("O12 1901 Census.png"));
+
+      await component.browseFile();
+      await component.copyFile();
+      await fixture.whenStable();
+
+      expect(component.value().filePath).toBe("");
+      expect(component.pendingFile()).toBe(file);
+      expect(
+        screen.getByText(/"O12 1901 Census.png" already exists/),
+      ).toBeTruthy();
+    });
+
+    it("leaves the record alone if the copy is cancelled", async () => {
+      const copy = vi.spyOn(component.ancestryService, "copyMultimediaFile");
+
+      await component.browseFile();
+      component.cancelCopy();
+      await fixture.whenStable();
+
+      expect(copy).not.toHaveBeenCalled();
+      expect(component.value().filePath).toBe("");
+      expect(screen.queryByLabelText("Copy as")).toBeNull();
     });
   });
 });

@@ -21,6 +21,38 @@
   </button>
 </div>
 
+@if (pendingFile(); as file) {
+  <div class="card card-body">
+    <p class="mb-2">
+      "{{ file.name }}" is outside your data folder. Copy it in to use it.
+    </p>
+    <div class="input-group has-validation">
+      <label class="input-group-text" for="copyFileName">Copy as</label>
+      <input
+        class="form-control"
+        id="copyFileName"
+        [class.is-invalid]="copyError()"
+        [placeholder]="proposedFileName()"
+        [value]="copyFileName()"
+        (input)="onCopyFileNameInput($event)"
+      />
+      <button class="btn btn-primary" type="button" (click)="copyFile()">
+        Copy
+      </button>
+      <button
+        class="btn btn-outline-secondary"
+        type="button"
+        (click)="cancelCopy()"
+      >
+        Cancel
+      </button>
+      @if (copyError()) {
+        <div class="invalid-feedback">{{ copyError() }}</div>
+      }
+    </div>
+  </div>
+}
+
 <div class="form-floating">
   <input
     class="form-control h-auto"

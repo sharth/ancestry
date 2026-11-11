@@ -6,7 +6,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { newGedcomDatabase } from "../gedcom/gedcomDatabase";
 import { newGedcomRecord } from "../gedcom/gedcomRecord";
-import { AncestryService, ancestryDatabaseResolver } from "./ancestry.service";
+import {
+  AncestryService,
+  MultimediaFileExistsError,
+  ancestryDatabaseResolver,
+} from "./ancestry.service";
 
 @Component({ selector: "app-stub", template: "" })
 class StubComponent {}
@@ -186,18 +190,15 @@ describe("AncestryService.copyMultimediaFile", () => {
 
   it("writes the file under the given name", async () => {
     const file = new File(["png"], "scan.png");
-    await expect(
-      ancestryService.copyMultimediaFile(file, "O2 Will.png"),
-    ).resolves.toBe("O2 Will.png");
+    await ancestryService.copyMultimediaFile(file, "O2 Will.png");
     expect(written.get("O2 Will.png")).toBe(file);
   });
 
-  it("never overwrites an existing file", async () => {
+  it("refuses to overwrite an existing file", async () => {
     const file = new File(["png"], "scan.png");
     await expect(
       ancestryService.copyMultimediaFile(file, "O1 Deed.png"),
-    ).resolves.toBe("O1 Deed (2).png");
+    ).rejects.toBeInstanceOf(MultimediaFileExistsError);
     expect(written.get("O1 Deed.png")).toBe("existing");
-    expect(written.get("O1 Deed (2).png")).toBe(file);
   });
 });
