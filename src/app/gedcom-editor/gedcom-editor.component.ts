@@ -390,6 +390,26 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     }),
   );
 
+  // Files a multimedia record linked to before this edit but won't after
+  // it. Submit never deletes them; they're listed alongside the GEDCOM delta
+  // so it's clear they stay in the data folder, and whether any other
+  // record still links to them.
+  readonly unlinkedMultimediaFiles = computed(() => {
+    const original = this.ancestryDatabase().multimedias;
+    const working = Object.values(this.workingDatabase().multimedias);
+    return Object.values(original).flatMap((multimedia) => {
+      const oldPath = multimedia.filePath;
+      const updated = working.find((m) => m.xref === multimedia.xref);
+      if (!oldPath || updated?.filePath === oldPath) {
+        return [];
+      }
+      const stillLinkedFrom = working
+        .filter((m) => m.filePath === oldPath)
+        .map((m) => m.xref.replace(/^@(.*)@$/, "$1"));
+      return [{ xref: multimedia.xref, oldPath, stillLinkedFrom }];
+    });
+  });
+
   // Copies each pending file to its record's file path. Checks them all
   // first, so a bad or taken path stops the save before anything is
   // written. Returns whether the save should go ahead.

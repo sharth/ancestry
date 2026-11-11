@@ -144,6 +144,34 @@
       </tbody>
     </table>
   }
+  @if (unlinkedMultimediaFiles().length > 0) {
+    <table class="table table-striped">
+      <caption class="caption-top">
+        Files no longer linked from their record (never deleted)
+      </caption>
+      <thead>
+        <tr>
+          <th>File</th>
+          <th>After submit</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (unlinked of unlinkedMultimediaFiles(); track unlinked.xref) {
+          <tr>
+            <td>{{ unlinked.oldPath }}</td>
+            <td>
+              @if (unlinked.stillLinkedFrom.length > 0) {
+                Stays in the data folder, still linked from
+                {{ unlinked.stillLinkedFrom.join(", ") }}.
+              } @else {
+                Stays in the data folder. Nothing will link to it.
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
   @for (r of differences(); track $index) {
     <app-gedcom-diff
       [oldGedcomRecord]="r.originalGedcomRecord"

@@ -22,6 +22,7 @@ import {
   newGedcomIndividual,
   serializeGedcomIndividual,
 } from "../../gedcom/gedcomIndividual";
+import { newGedcomMultimedia } from "../../gedcom/gedcomMultimedia";
 import { newGedcomName } from "../../gedcom/gedcomName";
 import {
   newGedcomRecord,
@@ -483,6 +484,60 @@ describe("GedcomEditorComponent Integration", () => {
 // `ancestryDatabase` after the Signal Forms field tree has already been
 // built against that initial database hits a known, unrelated
 // test-environment fragility (see [[ancestry-immer-freeze-signal-forms]]).
+describe("GedcomEditorComponent unlinked multimedia files", () => {
+  let component: GedcomEditorComponent;
+
+  beforeEach(async () => {
+    const { fixture } = await render(GedcomEditorComponent, {
+      providers: [provideRouter([])],
+      skipDetectChanges: true,
+    });
+    component = fixture.componentInstance;
+    fixture.componentRef.setInput("tabs", [{ type: "OBJE", xref: "@O1@" }]);
+    fixture.componentRef.setInput(
+      "ancestryDatabase",
+      newGedcomDatabase({
+        multimedias: {
+          "@O1@": newGedcomMultimedia({ xref: "@O1@", filePath: "old.png" }),
+          "@O2@": newGedcomMultimedia({ xref: "@O2@", filePath: "shared.png" }),
+        },
+      }),
+    );
+  });
+
+  function setFilePath(xref: string, filePath: string) {
+    component.workingDatabase.update((database) =>
+      produce(database, (draft) => {
+        const multimedia = draft.multimedias[xref];
+        assert(multimedia);
+        multimedia.filePath = filePath;
+      }),
+    );
+  }
+
+  it("lists nothing when no file path changed", () => {
+    expect(component.unlinkedMultimediaFiles()).toEqual([]);
+  });
+
+  it("lists a replaced file that nothing links to any more", () => {
+    setFilePath("@O1@", "new.png");
+
+    expect(component.unlinkedMultimediaFiles()).toEqual([
+      { xref: "@O1@", oldPath: "old.png", stillLinkedFrom: [] },
+    ]);
+  });
+
+  it("says which records still link to a replaced file", () => {
+    setFilePath("@O1@", "shared.png");
+    setFilePath("@O2@", "other.png");
+
+    expect(component.unlinkedMultimediaFiles()).toEqual([
+      { xref: "@O1@", oldPath: "old.png", stillLinkedFrom: [] },
+      { xref: "@O2@", oldPath: "shared.png", stillLinkedFrom: ["O1"] },
+    ]);
+  });
+});
+
 describe("GedcomEditorComponent differences with a real, unedited family", () => {
   it("reports the open family's unchanged Gedcom, even when it has fields the parser doesn't have a typed field for", async () => {
     // compareGedcomDatabase() always regenerates a canonical HEAD record
