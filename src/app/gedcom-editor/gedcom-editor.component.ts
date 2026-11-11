@@ -380,16 +380,21 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     });
   }
 
+  // Each pending file with the path in the data folder it will be copied
+  // to on submit (its multimedia record's current file path). Shown
+  // alongside the GEDCOM delta, since it's part of what submit writes.
+  readonly pendingMultimediaCopies = computed(() =>
+    [...this.pendingMultimediaFiles()].flatMap(([xref, file]) => {
+      const filePath = this.workingDatabase().multimedias[xref]?.filePath;
+      return filePath === undefined ? [] : [{ file, filePath }];
+    }),
+  );
+
   // Copies each pending file to its record's file path. Checks them all
   // first, so a bad or taken path stops the save before anything is
   // written. Returns whether the save should go ahead.
   private async copyPendingMultimediaFiles(): Promise<boolean> {
-    const copies = [...this.pendingMultimediaFiles()].flatMap(
-      ([xref, file]) => {
-        const filePath = this.workingDatabase().multimedias[xref]?.filePath;
-        return filePath === undefined ? [] : [{ file, filePath }];
-      },
-    );
+    const copies = this.pendingMultimediaCopies();
     for (const { filePath } of copies) {
       const problem =
         multimediaFilePathProblem(filePath) ??

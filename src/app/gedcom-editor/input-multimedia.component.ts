@@ -48,6 +48,10 @@ export class InputMultimediaComponent implements FormValueControl<GedcomMultimed
     const { xref, title } = this.value();
     return file ? multimediaFileName(xref, title, file.name) : "";
   });
+  // The file last picked with Browse..., shown read-only: its path if it's
+  // inside the data folder, otherwise just its name (the browser doesn't
+  // reveal where else it lives).
+  readonly sourceFileName = signal("");
   // Until the user types their own file path, it follows the proposed name
   // (and so the title, as it's edited).
   readonly followProposedFileName = signal(false);
@@ -98,6 +102,7 @@ export class InputMultimediaComponent implements FormValueControl<GedcomMultimed
         relativePath ? undefined : file,
       );
       this.followProposedFileName.set(!relativePath);
+      this.sourceFileName.set(relativePath?.join("/") ?? file.name);
       this.value.update((m) => ({
         ...m,
         filePath: relativePath

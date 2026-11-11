@@ -404,6 +404,21 @@ describe("GedcomEditorComponent Integration", () => {
         component.setPendingMultimediaFile(xref, file);
       });
 
+      it("lists the file to copy alongside the GEDCOM delta", async () => {
+        await fixture.whenStable();
+
+        expect(component.pendingMultimediaCopies()).toEqual([
+          { file, filePath: "O1 Census.png" },
+        ]);
+        expect(
+          screen.getByText("Files to copy into the data folder"),
+        ).toBeTruthy();
+        expect(screen.getByRole("cell", { name: "IMG_0042.PNG" })).toBeTruthy();
+        expect(
+          screen.getByRole("cell", { name: "O1 Census.png" }),
+        ).toBeTruthy();
+      });
+
       it("copies the file in before saving", async () => {
         const order: string[] = [];
         vi.spyOn(ancestryService, "multimediaFileExists").mockResolvedValue(

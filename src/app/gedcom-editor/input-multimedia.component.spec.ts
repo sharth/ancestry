@@ -48,6 +48,12 @@ describe("InputMultimediaComponent", () => {
     expect(component).toBeTruthy();
   });
 
+  it("only lets the source file be chosen with Browse...", () => {
+    expect(
+      screen.getByLabelText<HTMLInputElement>("Source File").readOnly,
+    ).toBe(true);
+  });
+
   describe("browseFile", () => {
     const file = new File(["png"], "IMG_0042.PNG", { type: "image/png" });
     const fileHandle = {
@@ -78,6 +84,7 @@ describe("InputMultimediaComponent", () => {
       await component.browseFile();
 
       expect(pendingFiles.size).toBe(0);
+      expect(component.sourceFileName()).toBe("scans/census.png");
       expect(component.value().filePath).toBe("scans/census.png");
       expect(component.value().mediaType).toBe("image/png");
     });
@@ -91,6 +98,9 @@ describe("InputMultimediaComponent", () => {
       await fixture.whenStable();
 
       expect(pendingFiles.get("@O12@")).toBe(file);
+      expect(screen.getByLabelText<HTMLInputElement>("Source File").value).toBe(
+        "IMG_0042.PNG",
+      );
       expect(component.value().filePath).toBe("O12 1901 Census.png");
       expect(component.value().mediaType).toBe("image/png");
       expect(exists).toHaveBeenCalledWith("O12 1901 Census.png");

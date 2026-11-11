@@ -3,7 +3,25 @@
   <label for="title">Title</label>
 </div>
 
-<div class="input-group has-validation">
+<div class="input-group">
+  <label class="input-group-text" for="sourceFile">Source File</label>
+  <input
+    class="form-control"
+    id="sourceFile"
+    readonly
+    [value]="sourceFileName()"
+    placeholder="Choose a file with Browse..."
+  />
+  <button
+    class="btn btn-outline-secondary"
+    type="button"
+    (click)="browseFile()"
+  >
+    Browse...
+  </button>
+</div>
+
+<div class="has-validation">
   <div class="form-floating" [class.is-invalid]="filePathProblem.value()">
     <input
       class="form-control h-auto"
@@ -14,19 +32,12 @@
     />
     <label for="filePath">File Path</label>
   </div>
-  <button
-    class="btn btn-outline-secondary"
-    type="button"
-    (click)="browseFile()"
-  >
-    Browse...
-  </button>
   @if (filePathProblem.value(); as problem) {
     <div class="invalid-feedback">{{ problem }}</div>
-  } @else if (pendingFile(); as file) {
-    <div class="form-text w-100">
-      "{{ file.name }}" is outside your data folder. It will be copied in at
-      this path when you submit.
+  } @else if (pendingFile()) {
+    <div class="form-text">
+      The source file is outside your data folder. It will be copied in at this
+      path when you submit.
     </div>
   }
 </div>
