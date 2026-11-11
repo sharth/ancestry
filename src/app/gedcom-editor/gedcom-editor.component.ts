@@ -369,8 +369,8 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   }
 
   setPendingMultimediaFile(xref: string, file: File | undefined) {
-    this.pendingMultimediaFiles.update((files) =>
-      produce(files, (draft) => {
+    this.pendingMultimediaFiles.update(
+      produce((draft) => {
         draft[xref] = file;
       }),
     );
