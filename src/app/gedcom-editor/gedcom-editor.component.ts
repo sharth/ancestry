@@ -20,6 +20,7 @@ import { displayGedcomName } from "../../gedcom/gedcomName";
 import { newGedcomRepository } from "../../gedcom/gedcomRepository";
 import { newGedcomSource } from "../../gedcom/gedcomSource";
 import { newGedcomSubmitter } from "../../gedcom/gedcomSubmitter";
+import { FileExistsError } from "../../util/file-system";
 import { multimediaFilePathProblem } from "../../util/multimedia-file-name";
 import {
   calculateNextFamilyXref,
@@ -413,26 +414,22 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   });
 
   // Copies each pending file to its record's file path. Checks them all
-  // first, so a bad or taken path stops the save before anything is
-  // written. Returns whether the save should go ahead.
-  private async copyPendingMultimediaFiles(): Promise<boolean> {
+  // first, so a bad or taken path throws before anything is written.
+  private async copyPendingMultimediaFiles(): Promise<void> {
     const copies = this.pendingMultimediaCopies();
     for (const { filePath } of copies) {
-      const problem =
-        multimediaFilePathProblem(filePath) ??
-        ((await this.ancestryService.multimediaFileExists(filePath))
-          ? `"${filePath}" already exists in the data folder.`
-          : undefined);
+      const problem = multimediaFilePathProblem(filePath);
       if (problem) {
-        alert(`Can't copy multimedia to "${filePath}": ${problem}`);
-        return false;
+        throw new Error(`Can't copy multimedia to "${filePath}": ${problem}`);
+      }
+      if (await this.ancestryService.multimediaFileExists(filePath)) {
+        throw new FileExistsError(filePath);
       }
     }
     for (const { file, filePath } of copies) {
       await this.ancestryService.copyMultimediaFile(file, filePath);
     }
     this.pendingMultimediaFiles.set({});
-    return true;
   }
 
   hasUnsavedChanges(): boolean {
@@ -455,10 +452,16 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     // beforeunload prompt (GedcomEditorDialogComponent.onBeforeUnload)
     // before the save has finished.
     event.preventDefault();
-    if (!(await this.copyPendingMultimediaFiles())) {
+    // Any failure (a taken path, a write error) leaves the dialog open with
+    // the edits intact, so the user can fix it and submit again.
+    try {
+      await this.copyPendingMultimediaFiles();
+      await this.ancestryService.updateGedcomDatabase(this.workingDatabase());
+    } catch (error) {
+      console.error(error);
+      alert(`Couldn't save: ${(error as Error).message}`);
       return;
     }
-    await this.ancestryService.updateGedcomDatabase(this.workingDatabase());
     // Close the dialog before the reload navigation below: the unsaved-changes
     // guard checks whether the dialog is still open, and the just-saved
     // database hasn't reached this component's `ancestryDatabase` input yet

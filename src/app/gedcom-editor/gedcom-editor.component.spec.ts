@@ -451,6 +451,7 @@ describe("GedcomEditorComponent Integration", () => {
         vi.spyOn(ancestryService, "multimediaFileExists").mockResolvedValue(
           true,
         );
+        vi.spyOn(console, "error").mockReturnValue();
         const alert = vi.spyOn(window, "alert").mockReturnValue();
         const copy = vi.spyOn(ancestryService, "copyMultimediaFile");
         const save = vi.spyOn(ancestryService, "updateGedcomDatabase");
@@ -461,6 +462,23 @@ describe("GedcomEditorComponent Integration", () => {
           expect.stringContaining("already exists"),
         );
         expect(copy).not.toHaveBeenCalled();
+        expect(save).not.toHaveBeenCalled();
+      });
+
+      it("reports a failed copy and doesn't save", async () => {
+        vi.spyOn(ancestryService, "multimediaFileExists").mockResolvedValue(
+          false,
+        );
+        vi.spyOn(ancestryService, "copyMultimediaFile").mockRejectedValue(
+          new Error("disk full"),
+        );
+        vi.spyOn(console, "error").mockReturnValue();
+        const alert = vi.spyOn(window, "alert").mockReturnValue();
+        const save = vi.spyOn(ancestryService, "updateGedcomDatabase");
+
+        await component.submitForm(new Event("submit"));
+
+        expect(alert).toHaveBeenCalledWith("Couldn't save: disk full");
         expect(save).not.toHaveBeenCalled();
       });
     });
