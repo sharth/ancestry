@@ -351,8 +351,8 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
     source: Immutable<GedcomSource>,
     suggestions: UrlRepositorySuggestion[],
   ): {
-    originalGedcomRecord?: GedcomRecord;
-    updatedGedcomRecord?: GedcomRecord;
+    originalGedcomRecord?: Immutable<GedcomRecord>;
+    updatedGedcomRecord?: Immutable<GedcomRecord>;
   }[] {
     const { database } = applyUrlSuggestions(
       this.ancestryDatabase(),
@@ -366,8 +366,8 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
     source: Immutable<GedcomSource>,
     suggestion: MergeRepositoryLinksSuggestion,
   ): {
-    originalGedcomRecord?: GedcomRecord;
-    updatedGedcomRecord?: GedcomRecord;
+    originalGedcomRecord?: Immutable<GedcomRecord>;
+    updatedGedcomRecord?: Immutable<GedcomRecord>;
   }[] {
     const database = applyMergeRepositoryLinksSuggestion(
       this.ancestryDatabase(),
@@ -378,8 +378,8 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
   }
 
   private actualDifferences(database: Immutable<GedcomDatabase>): {
-    originalGedcomRecord?: GedcomRecord;
-    updatedGedcomRecord?: GedcomRecord;
+    originalGedcomRecord?: Immutable<GedcomRecord>;
+    updatedGedcomRecord?: Immutable<GedcomRecord>;
   }[] {
     return this.ancestryService.gedcomDatabaseDifferences(database);
   }

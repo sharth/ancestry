@@ -197,8 +197,8 @@ export class AncestryService {
   );
 
   compareGedcomDatabase(gedcomDatabase: Immutable<GedcomDatabase>): {
-    originalGedcomRecord?: GedcomRecord;
-    updatedGedcomRecord?: GedcomRecord;
+    originalGedcomRecord?: Immutable<GedcomRecord>;
+    updatedGedcomRecord?: Immutable<GedcomRecord>;
   }[] {
     return compareGedcomDatabase(
       this.gedcomResource.value()?.gedcomRecords ?? [],
@@ -216,8 +216,8 @@ export class AncestryService {
     gedcomDatabase: Immutable<GedcomDatabase>,
     alwaysIncludeXrefs: ReadonlySet<string> = new Set(),
   ): {
-    originalGedcomRecord?: GedcomRecord;
-    updatedGedcomRecord?: GedcomRecord;
+    originalGedcomRecord?: Immutable<GedcomRecord>;
+    updatedGedcomRecord?: Immutable<GedcomRecord>;
   }[] {
     return this.compareGedcomDatabase(gedcomDatabase).filter(
       ({ originalGedcomRecord, updatedGedcomRecord }) => {

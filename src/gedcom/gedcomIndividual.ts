@@ -168,12 +168,12 @@ export function parseGedcomIndividual(record: GedcomRecord): GedcomIndividual {
 // longer referenced.
 const serializedIndividuals = new WeakMap<
   Immutable<GedcomIndividual>,
-  GedcomRecord
+  Immutable<GedcomRecord>
 >();
 
 export function serializeGedcomIndividual(
   gedcomIndividual: Immutable<GedcomIndividual>,
-): GedcomRecord {
+): Immutable<GedcomRecord> {
   return serializedIndividuals.getOrInsertComputed(gedcomIndividual, () =>
     newGedcomRecord({
       xref: gedcomIndividual.xref,

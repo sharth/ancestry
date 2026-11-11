@@ -101,33 +101,31 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   // If the user provides an xref that is not present in the database (or an empty string), we should instantiate a new object.
   readonly workingDatabase = linkedSignal<GedcomDatabase>(() => {
     const tabs = this.effectiveTabs();
+    // Signal Forms edits a mutable model, so this is where the read-only
+    // database becomes the editor's writable copy. Edits still never touch
+    // the original objects: produce() copies whatever it changes, and Signal
+    // Forms writes new objects rather than mutating in place.
     return produce(castDraft(this.ancestryDatabase()), (draft) => {
       for (const tab of tabs) {
         const xref = tab.xref;
         switch (tab.type) {
           case "INDI":
-            draft.individuals[xref] ??= castDraft(
-              newGedcomIndividual({ xref }),
-            );
+            draft.individuals[xref] ??= newGedcomIndividual({ xref });
             break;
           case "SOUR":
-            draft.sources[xref] ??= castDraft(newGedcomSource({ xref }));
+            draft.sources[xref] ??= newGedcomSource({ xref });
             break;
           case "FAM":
-            draft.families[xref] ??= castDraft(newGedcomFamily({ xref }));
+            draft.families[xref] ??= newGedcomFamily({ xref });
             break;
           case "REPO":
-            draft.repositories[xref] ??= castDraft(
-              newGedcomRepository({ xref }),
-            );
+            draft.repositories[xref] ??= newGedcomRepository({ xref });
             break;
           case "OBJE":
-            draft.multimedias[xref] ??= castDraft(
-              newGedcomMultimedia({ xref }),
-            );
+            draft.multimedias[xref] ??= newGedcomMultimedia({ xref });
             break;
           case "SUBM":
-            draft.submitters[xref] ??= castDraft(newGedcomSubmitter({ xref }));
+            draft.submitters[xref] ??= newGedcomSubmitter({ xref });
             break;
         }
       }
@@ -279,28 +277,22 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
       produce(workingDatabase, (draft) => {
         switch (tabInformation.type) {
           case "INDI":
-            draft.individuals[xref] ??= castDraft(
-              newGedcomIndividual({ xref }),
-            );
+            draft.individuals[xref] ??= newGedcomIndividual({ xref });
             break;
           case "SOUR":
-            draft.sources[xref] ??= castDraft(newGedcomSource({ xref }));
+            draft.sources[xref] ??= newGedcomSource({ xref });
             break;
           case "FAM":
-            draft.families[xref] ??= castDraft(newGedcomFamily({ xref }));
+            draft.families[xref] ??= newGedcomFamily({ xref });
             break;
           case "REPO":
-            draft.repositories[xref] ??= castDraft(
-              newGedcomRepository({ xref }),
-            );
+            draft.repositories[xref] ??= newGedcomRepository({ xref });
             break;
           case "OBJE":
-            draft.multimedias[xref] ??= castDraft(
-              newGedcomMultimedia({ xref }),
-            );
+            draft.multimedias[xref] ??= newGedcomMultimedia({ xref });
             break;
           case "SUBM":
-            draft.submitters[xref] ??= castDraft(newGedcomSubmitter({ xref }));
+            draft.submitters[xref] ??= newGedcomSubmitter({ xref });
             break;
         }
       }),

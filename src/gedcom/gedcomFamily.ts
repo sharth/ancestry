@@ -125,11 +125,14 @@ export function parseGedcomFamily(record: GedcomRecord): GedcomFamily {
 // through immer, which makes a new object for an edited one and keeps an
 // unedited one as the same object, so a cached serialization never goes
 // stale. See serializeGedcomIndividual.
-const serializedFamilies = new WeakMap<Immutable<GedcomFamily>, GedcomRecord>();
+const serializedFamilies = new WeakMap<
+  Immutable<GedcomFamily>,
+  Immutable<GedcomRecord>
+>();
 
 export function serializeGedcomFamily(
   gedcomFamily: Immutable<GedcomFamily>,
-): GedcomRecord {
+): Immutable<GedcomRecord> {
   return serializedFamilies.getOrInsertComputed(gedcomFamily, () =>
     newGedcomRecord({
       tag: "FAM",

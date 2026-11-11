@@ -106,7 +106,7 @@ function parseGedcomSourceCitationData(gedcomRecord: GedcomRecord): string {
 
 export function serializeGedcomSourceCitation(
   gedcomCitation: Immutable<GedcomSourceCitation>,
-): GedcomRecord {
+): Immutable<GedcomRecord> {
   return newGedcomRecord({
     tag: "SOUR",
     value: gedcomCitation.sourceXref,

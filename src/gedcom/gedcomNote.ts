@@ -38,6 +38,6 @@ export function parseGedcomNote(gedcomRecord: GedcomRecord): GedcomNote {
 
 export function serializeGedcomNote(
   gedcomNote: Immutable<GedcomNote>,
-): GedcomRecord {
+): Immutable<GedcomRecord> {
   return newGedcomRecord({ tag: "NOTE", value: gedcomNote.text });
 }

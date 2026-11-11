@@ -123,12 +123,12 @@ export function parseGedcomMultimedia(record: GedcomRecord): GedcomMultimedia {
 // serialization never goes stale. See serializeGedcomIndividual.
 const serializedMultimedias = new WeakMap<
   Immutable<GedcomMultimedia>,
-  GedcomRecord
+  Immutable<GedcomRecord>
 >();
 
 export function serializeGedcomMultimedia(
   gedcomMultimedia: Immutable<GedcomMultimedia>,
-): GedcomRecord {
+): Immutable<GedcomRecord> {
   return serializedMultimedias.getOrInsertComputed(gedcomMultimedia, () =>
     newGedcomRecord({
       tag: "OBJE",

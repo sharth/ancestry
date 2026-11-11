@@ -50,7 +50,7 @@ function* citedSourceXrefs(
 }
 
 function* fromUnknownRecords(
-  records: readonly GedcomRecord[],
+  records: readonly Immutable<GedcomRecord>[],
 ): Generator<string> {
   for (const record of records) {
     if (record.tag === "SOUR") yield record.value;

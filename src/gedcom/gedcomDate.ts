@@ -52,7 +52,7 @@ export function parseGedcomDate(gedcomRecord: GedcomRecord): GedcomDate {
 
 export function serializeGedcomDate(
   gedcomDate: Immutable<GedcomDate>,
-): GedcomRecord | null {
+): Immutable<GedcomRecord> | null {
   return filterTrivialGedcomRecord(
     newGedcomRecord({
       tag: "DATE",
@@ -63,7 +63,7 @@ export function serializeGedcomDate(
 
 export function serializeGedcomSortDate(
   gedcomDate: Immutable<GedcomDate>,
-): GedcomRecord | null {
+): Immutable<GedcomRecord> | null {
   return filterTrivialGedcomRecord(
     newGedcomRecord({
       tag: "SDATE",

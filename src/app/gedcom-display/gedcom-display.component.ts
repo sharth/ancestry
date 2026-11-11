@@ -1,4 +1,5 @@
 import { Component, computed, input } from "@angular/core";
+import type { Immutable } from "immer";
 
 import {
   serializeGedcomRecordToText,
@@ -12,7 +13,7 @@ import {
   imports: [],
 })
 export class GedcomDisplayComponent {
-  readonly gedcomRecord = input.required<GedcomRecord>();
+  readonly gedcomRecord = input.required<Immutable<GedcomRecord>>();
   readonly serializedGedcom = computed(() =>
     serializeGedcomRecordToText(this.gedcomRecord()),
   );

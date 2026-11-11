@@ -51,7 +51,7 @@ export function parseGedcomCreationDate(
 
 export function serializeGedcomCreationDate(
   gedcomCreationDate: Immutable<GedcomCreationDate>,
-): GedcomRecord | null {
+): Immutable<GedcomRecord> | null {
   return filterTrivialGedcomRecord(
     newGedcomRecord({
       tag: "CREA",

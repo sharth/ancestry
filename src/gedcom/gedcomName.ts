@@ -108,7 +108,7 @@ export function parseGedcomName(gedcomRecord: GedcomRecord): GedcomName {
 
 export function serializeGedcomName(
   name: Immutable<GedcomName>,
-): GedcomRecord | null {
+): Immutable<GedcomRecord> | null {
   return filterTrivialGedcomRecord(
     newGedcomRecord({
       tag: "NAME",

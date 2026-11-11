@@ -1,12 +1,16 @@
+import type { Immutable } from "immer";
+
 import type { GedcomRecord } from "../gedcom/gedcomRecord";
 
 // Records the parsers didn't understand, waiting for warnUnparsedRecords.
 // A record doesn't know where it sits in the file, so its path (such as
 // INDI.BIRT._FOO) is found afterwards by walking the file's records.
-const unparsedRecords = new Set<GedcomRecord>();
+const unparsedRecords = new Set<Immutable<GedcomRecord>>();
 const unparsedTags = new Set<string>();
 
-export function reportUnparsedRecord(gedcomRecord: GedcomRecord): void {
+export function reportUnparsedRecord(
+  gedcomRecord: Immutable<GedcomRecord>,
+): void {
   unparsedRecords.add(gedcomRecord);
 }
 

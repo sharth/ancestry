@@ -117,7 +117,7 @@ export function parseGedcomMultimediaLink(
 
 export function serializeGedcomMultimediaLink(
   gedcomMultimediaLink: Immutable<GedcomMultimediaLink>,
-): GedcomRecord {
+): Immutable<GedcomRecord> {
   return newGedcomRecord({
     tag: "OBJE",
     value: gedcomMultimediaLink.xref,

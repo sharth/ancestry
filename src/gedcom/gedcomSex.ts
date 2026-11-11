@@ -52,7 +52,7 @@ export function parseGedcomSex(gedcomRecord: GedcomRecord): GedcomSex {
 
 export function serializeGedcomSex(
   gedcomSex: Immutable<GedcomSex>,
-): GedcomRecord | null {
+): Immutable<GedcomRecord> | null {
   return filterTrivialGedcomRecord(
     newGedcomRecord({
       tag: "SEX",

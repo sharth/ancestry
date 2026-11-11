@@ -50,7 +50,7 @@ export function parseGedcomChangeDate(
 
 export function serializeGedcomChangeDate(
   gedcomChangeDate: Immutable<GedcomChangeDate>,
-): GedcomRecord | null {
+): Immutable<GedcomRecord> | null {
   return filterTrivialGedcomRecord(
     newGedcomRecord({
       tag: "CHAN",

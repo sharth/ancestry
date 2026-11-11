@@ -205,7 +205,7 @@ function parseGedcomShareFact(
 
 export function serializeGedcomIndividualFact(
   gedcomEvent: Immutable<GedcomFact>,
-): GedcomRecord {
+): Immutable<GedcomRecord> {
   const gedcomEventMetadata =
     gedcomIndividualEvents[gedcomEvent.tag] ??
     gedcomIndividualAttributes[gedcomEvent.tag];
@@ -217,7 +217,7 @@ export function serializeGedcomIndividualFact(
 
 export function serializeGedcomFamilyFact(
   gedcomEvent: Immutable<GedcomFact>,
-): GedcomRecord {
+): Immutable<GedcomRecord> {
   const gedcomEventMetadata =
     gedcomFamilyEvents[gedcomEvent.tag] ??
     gedcomFamilyAttributes[gedcomEvent.tag];
@@ -230,7 +230,7 @@ export function serializeGedcomFamilyFact(
 function serializeGedcomFact(
   gedcomEvent: Immutable<GedcomFact>,
   gedcomEventMetadata: Immutable<GedcomEventMetadata>,
-): GedcomRecord {
+): Immutable<GedcomRecord> {
   const value = gedcomEventMetadata.mandatoryValue
     ? gedcomEvent.value
     : gedcomEvent.place || gedcomEvent.date.value
@@ -257,7 +257,7 @@ function serializeGedcomFact(
 
 function serializeGedcomSharedFact(
   sharedWith: GedcomFactSharedWith,
-): GedcomRecord {
+): Immutable<GedcomRecord> {
   return newGedcomRecord({
     tag: "_SHAR",
     value: sharedWith.xref,

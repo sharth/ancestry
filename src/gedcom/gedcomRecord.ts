@@ -1,12 +1,21 @@
-import type { Draft } from "immer";
+import type { Immutable } from "immer";
+
 export interface GedcomRecord {
-  readonly xref: string;
-  readonly tag: string;
-  readonly value: string;
-  readonly children: readonly GedcomRecord[];
+  xref: string;
+  tag: string;
+  value: string;
+  children: GedcomRecord[];
 }
 
-export function newGedcomRecord(fieldsToOverride: Partial<GedcomRecord>) {
+export function newGedcomRecord(
+  fieldsToOverride: Partial<GedcomRecord>,
+): GedcomRecord;
+export function newGedcomRecord(
+  fieldsToOverride: Partial<Immutable<GedcomRecord>>,
+): Immutable<GedcomRecord>;
+export function newGedcomRecord(
+  fieldsToOverride: Partial<Immutable<GedcomRecord>>,
+): Immutable<GedcomRecord> {
   return {
     xref: "",
     tag: "",
@@ -20,7 +29,10 @@ export function newGedcomRecord(fieldsToOverride: Partial<GedcomRecord>) {
 // value, with equal children in the same order. The same object is equal without
 // a walk, which is the common case for an unedited record (see
 // serializeGedcomIndividual).
-export function gedcomRecordsEqual(a: GedcomRecord, b: GedcomRecord): boolean {
+export function gedcomRecordsEqual(
+  a: Immutable<GedcomRecord>,
+  b: Immutable<GedcomRecord>,
+): boolean {
   if (a === b) return true;
   return (
     a.tag === b.tag &&
@@ -35,8 +47,8 @@ export function gedcomRecordsEqual(a: GedcomRecord, b: GedcomRecord): boolean {
 }
 
 export function filterTrivialGedcomRecord(
-  record: GedcomRecord,
-): GedcomRecord | null {
+  record: Immutable<GedcomRecord>,
+): Immutable<GedcomRecord> | null {
   if (record.xref || record.value || record.children.length) {
     return record;
   } else {
@@ -45,8 +57,8 @@ export function filterTrivialGedcomRecord(
 }
 
 export function filterTrivialGedcomRecords(
-  records: (GedcomRecord | null)[],
-): GedcomRecord[] {
+  records: (Immutable<GedcomRecord> | null)[],
+): Immutable<GedcomRecord>[] {
   return records
     .filter((record) => record !== null)
     .filter((record) => filterTrivialGedcomRecord(record) !== null);
@@ -55,7 +67,7 @@ export function filterTrivialGedcomRecords(
 export function parseGedcomRecords(text: string): GedcomRecord[] {
   const lines = text.split(/\r?\n/);
   const records: GedcomRecord[] = [];
-  let ladder: Draft<GedcomRecord>[] = [];
+  let ladder: GedcomRecord[] = [];
 
   for (const [lineNumber, line] of lines.entries()) {
     if (line == "") {
@@ -74,7 +86,7 @@ export function parseGedcomRecords(text: string): GedcomRecord[] {
       string,
     ];
     const level = parseInt(levelString, 10);
-    const record: Draft<GedcomRecord> = { xref, tag, value, children: [] };
+    const record = newGedcomRecord({ xref, tag, value });
 
     if (level == 0) {
       ladder = [record];
@@ -103,7 +115,7 @@ export function parseGedcomRecords(text: string): GedcomRecord[] {
 }
 
 export function serializeGedcomRecordToText(
-  gedcomRecord: GedcomRecord,
+  gedcomRecord: Immutable<GedcomRecord>,
   level = 0,
 ): string[] {
   const [firstValue, ...remainingValues] = gedcomRecord.value.split("\n");

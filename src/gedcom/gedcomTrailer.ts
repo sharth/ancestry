@@ -1,3 +1,5 @@
+import type { Immutable } from "immer";
+
 import { newGedcomRecord, type GedcomRecord } from "./gedcomRecord";
 
 export interface GedcomTrailer {
@@ -18,6 +20,6 @@ export function parseGedcomTrailer(gedcomRecord: GedcomRecord): GedcomTrailer {
 export function serializeGedcomTrailer(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   gedcomTrailer: GedcomTrailer,
-): GedcomRecord {
+): Immutable<GedcomRecord> {
   return newGedcomRecord({ tag: "TRLR" });
 }

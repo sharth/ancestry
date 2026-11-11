@@ -89,12 +89,12 @@ export function parseGedcomRepository(
 // goes stale. See serializeGedcomIndividual.
 const serializedRepositories = new WeakMap<
   Immutable<GedcomRepository>,
-  GedcomRecord
+  Immutable<GedcomRecord>
 >();
 
 export function serializeGedcomRepository(
   gedcomRepository: Immutable<GedcomRepository>,
-): GedcomRecord {
+): Immutable<GedcomRecord> {
   return serializedRepositories.getOrInsertComputed(gedcomRepository, () =>
     newGedcomRecord({
       tag: "REPO",

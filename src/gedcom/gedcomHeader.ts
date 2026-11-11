@@ -1,8 +1,10 @@
+import type { Immutable } from "immer";
+
 import { gedcomDateExact } from "./gedcomDate";
 import { newGedcomRecord, type GedcomRecord } from "./gedcomRecord";
 
 export interface GedcomHeader {
-  record: GedcomRecord;
+  record: Immutable<GedcomRecord>;
 }
 
 export function parseGedcomHeader(record: GedcomRecord): GedcomHeader {
@@ -17,7 +19,7 @@ export function parseGedcomHeader(record: GedcomRecord): GedcomHeader {
 
 export function serializeGedcomHeader(
   gedcomHeader: GedcomHeader,
-): GedcomRecord {
+): Immutable<GedcomRecord> {
   return gedcomHeader.record;
 }
 

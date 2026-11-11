@@ -2,7 +2,7 @@ import { TestBed, type ComponentFixture } from "@angular/core/testing";
 import { provideRouter, Router } from "@angular/router";
 import { render, screen } from "@testing-library/angular/zoneless";
 import { userEvent } from "@testing-library/user-event";
-import { castDraft, produce } from "immer";
+import { produce } from "immer";
 import { assert, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AncestryService } from "../../database/ancestry.service";
@@ -251,20 +251,18 @@ describe("GedcomEditorComponent Integration", () => {
     it("Updates to WorkingDatabaseView are propogated to WorkingDatabase", () => {
       component.workingDatabaseView.update(
         produce((draft) => {
-          draft.individuals["@I1@"] = castDraft(
-            newGedcomIndividual({
-              xref: "@I1@",
-              names: [newGedcomName({ givenName: "John", surname: "Doe" })],
-              facts: [
-                newGedcomFact({
-                  id: 1,
-                  tag: "BIRT",
-                  date: newGedcomDate({ value: "1 JAN 1900" }),
-                  place: "Boston",
-                }),
-              ],
-            }),
-          );
+          draft.individuals["@I1@"] = newGedcomIndividual({
+            xref: "@I1@",
+            names: [newGedcomName({ givenName: "John", surname: "Doe" })],
+            facts: [
+              newGedcomFact({
+                id: 1,
+                tag: "BIRT",
+                date: newGedcomDate({ value: "1 JAN 1900" }),
+                place: "Boston",
+              }),
+            ],
+          });
         }),
       );
 

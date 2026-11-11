@@ -93,12 +93,12 @@ export function parseGedcomSubmitter(
 // goes stale. See serializeGedcomIndividual.
 const serializedSubmitters = new WeakMap<
   Immutable<GedcomSubmitter>,
-  GedcomRecord
+  Immutable<GedcomRecord>
 >();
 
 export function serializeGedcomSubmitter(
   gedcomSubmitter: Immutable<GedcomSubmitter>,
-): GedcomRecord {
+): Immutable<GedcomRecord> {
   return serializedSubmitters.getOrInsertComputed(gedcomSubmitter, () =>
     newGedcomRecord({
       xref: gedcomSubmitter.xref,

@@ -19,7 +19,7 @@ export function newGedcomRepositoryLink(
 }
 
 export function parseGedcomRepositoryLink(
-  gedcomRecord: GedcomRecord,
+  gedcomRecord: Immutable<GedcomRecord>,
 ): GedcomRepositoryLink {
   if (gedcomRecord.tag !== "REPO") throw new Error();
   if (gedcomRecord.xref != "") throw new Error();
@@ -48,7 +48,7 @@ export function parseGedcomRepositoryLink(
 
 export function serializeGedcomRepositoryLink(
   repositoryLink: Immutable<GedcomRepositoryLink>,
-): GedcomRecord {
+): Immutable<GedcomRecord> {
   return {
     tag: "REPO",
     xref: "",
