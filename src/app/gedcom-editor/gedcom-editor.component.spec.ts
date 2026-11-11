@@ -22,6 +22,7 @@ import {
   newGedcomIndividual,
   serializeGedcomIndividual,
 } from "../../gedcom/gedcomIndividual";
+import { newGedcomMultimedia } from "../../gedcom/gedcomMultimedia";
 import { newGedcomName } from "../../gedcom/gedcomName";
 import {
   newGedcomRecord,
@@ -386,6 +387,101 @@ describe("GedcomEditorComponent Integration", () => {
 
       expect(event.defaultPrevented).toBe(true);
     });
+
+    describe("with a multimedia file picked from outside the data folder", () => {
+      const file = new File(["png"], "IMG_0042.PNG", { type: "image/png" });
+      let xref: string;
+      let filePath: string;
+
+      beforeEach(() => {
+        vi.spyOn(TestBed.inject(Router), "navigate").mockResolvedValue(true);
+        xref = component.openNewMultimedia();
+        filePath = `${xref.replaceAll("@", "")} Census.png`;
+        component.workingDatabase.update((database) =>
+          produce(database, (draft) => {
+            const multimedia = draft.multimedias[xref];
+            assert(multimedia);
+            // What the multimedia input proposes for this record and file.
+            multimedia.title = "Census";
+            multimedia.filePath = filePath;
+          }),
+        );
+        component.setPendingMultimediaFile(xref, file);
+      });
+
+      it("lists the file to copy alongside the GEDCOM delta", async () => {
+        await fixture.whenStable();
+
+        expect(component.pendingMultimediaCopies()).toEqual([
+          { file, filePath: filePath },
+        ]);
+        expect(
+          screen.getByText("Files to copy into the data folder"),
+        ).toBeTruthy();
+        expect(screen.getByRole("cell", { name: "IMG_0042.PNG" })).toBeTruthy();
+        expect(screen.getByRole("cell", { name: filePath })).toBeTruthy();
+      });
+
+      it("copies the file in before saving", async () => {
+        const order: string[] = [];
+        vi.spyOn(ancestryService, "multimediaFileExists").mockResolvedValue(
+          false,
+        );
+        const copy = vi
+          .spyOn(ancestryService, "copyMultimediaFile")
+          .mockImplementation(() => {
+            order.push("copy");
+            return Promise.resolve();
+          });
+        vi.spyOn(ancestryService, "updateGedcomDatabase").mockImplementation(
+          () => {
+            order.push("save");
+            return Promise.resolve();
+          },
+        );
+
+        await component.submitForm(new Event("submit"));
+
+        expect(copy).toHaveBeenCalledWith(file, filePath);
+        expect(order).toEqual(["copy", "save"]);
+        expect(component.pendingMultimediaFile(xref)).toBeUndefined();
+      });
+
+      it("doesn't copy or save if the file already exists", async () => {
+        vi.spyOn(ancestryService, "multimediaFileExists").mockResolvedValue(
+          true,
+        );
+        vi.spyOn(console, "error").mockReturnValue();
+        const alert = vi.spyOn(window, "alert").mockReturnValue();
+        const copy = vi.spyOn(ancestryService, "copyMultimediaFile");
+        const save = vi.spyOn(ancestryService, "updateGedcomDatabase");
+
+        await component.submitForm(new Event("submit"));
+
+        expect(alert).toHaveBeenCalledWith(
+          expect.stringContaining("already exists"),
+        );
+        expect(copy).not.toHaveBeenCalled();
+        expect(save).not.toHaveBeenCalled();
+      });
+
+      it("reports a failed copy and doesn't save", async () => {
+        vi.spyOn(ancestryService, "multimediaFileExists").mockResolvedValue(
+          false,
+        );
+        vi.spyOn(ancestryService, "copyMultimediaFile").mockRejectedValue(
+          new Error("disk full"),
+        );
+        vi.spyOn(console, "error").mockReturnValue();
+        const alert = vi.spyOn(window, "alert").mockReturnValue();
+        const save = vi.spyOn(ancestryService, "updateGedcomDatabase");
+
+        await component.submitForm(new Event("submit"));
+
+        expect(alert).toHaveBeenCalledWith("Couldn't save: disk full");
+        expect(save).not.toHaveBeenCalled();
+      });
+    });
   });
 });
 
@@ -408,6 +504,60 @@ describe("GedcomEditorComponent Integration", () => {
 // `ancestryDatabase` after the Signal Forms field tree has already been
 // built against that initial database hits a known, unrelated
 // test-environment fragility (see [[ancestry-immer-freeze-signal-forms]]).
+describe("GedcomEditorComponent unlinked multimedia files", () => {
+  let component: GedcomEditorComponent;
+
+  beforeEach(async () => {
+    const { fixture } = await render(GedcomEditorComponent, {
+      providers: [provideRouter([])],
+      skipDetectChanges: true,
+    });
+    component = fixture.componentInstance;
+    fixture.componentRef.setInput("tabs", [{ type: "OBJE", xref: "@O1@" }]);
+    fixture.componentRef.setInput(
+      "ancestryDatabase",
+      newGedcomDatabase({
+        multimedias: {
+          "@O1@": newGedcomMultimedia({ xref: "@O1@", filePath: "old.png" }),
+          "@O2@": newGedcomMultimedia({ xref: "@O2@", filePath: "shared.png" }),
+        },
+      }),
+    );
+  });
+
+  function setFilePath(xref: string, filePath: string) {
+    component.workingDatabase.update((database) =>
+      produce(database, (draft) => {
+        const multimedia = draft.multimedias[xref];
+        assert(multimedia);
+        multimedia.filePath = filePath;
+      }),
+    );
+  }
+
+  it("lists nothing when no file path changed", () => {
+    expect(component.unlinkedMultimediaFiles()).toEqual([]);
+  });
+
+  it("lists a replaced file that nothing links to any more", () => {
+    setFilePath("@O1@", "new.png");
+
+    expect(component.unlinkedMultimediaFiles()).toEqual([
+      { xref: "@O1@", oldPath: "old.png", stillLinkedFrom: [] },
+    ]);
+  });
+
+  it("says which records still link to a replaced file", () => {
+    setFilePath("@O1@", "shared.png");
+    setFilePath("@O2@", "other.png");
+
+    expect(component.unlinkedMultimediaFiles()).toEqual([
+      { xref: "@O1@", oldPath: "old.png", stillLinkedFrom: [] },
+      { xref: "@O2@", oldPath: "shared.png", stillLinkedFrom: ["O1"] },
+    ]);
+  });
+});
+
 describe("GedcomEditorComponent differences with a real, unedited family", () => {
   it("reports the open family's unchanged Gedcom, even when it has fields the parser doesn't have a typed field for", async () => {
     // compareGedcomDatabase() always regenerates a canonical HEAD record

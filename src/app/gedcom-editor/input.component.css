@@ -123,3 +123,14 @@ div.details-lookalike {
   grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
   gap: 0 0.6rem;
 }
+
+/* Same width for the Source File and File Path labels, so their fields line up. */
+.path-label {
+  width: 7.5rem;
+}
+
+/* A multimedia file path that is still the default name (it follows the
+   title), as opposed to one the user typed. */
+.default-file-name {
+  background-color: var(--bs-success-bg-subtle);
+}

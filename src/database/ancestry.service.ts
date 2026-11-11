@@ -16,6 +16,11 @@ import {
   parseGedcomRecords,
   type GedcomRecord,
 } from "../gedcom/gedcomRecord";
+import {
+  copyFileToPath,
+  fileExistsAtPath,
+  getFileHandleAtPath,
+} from "../util/file-system";
 
 export const BUILTIN_GEDCOM_URL = "assets/samples/royal-family.ged";
 
@@ -295,38 +300,33 @@ export class AncestryService {
     );
   }
 
-  // Resolves a multimedia path (as stored in a GEDCOM OBJE.FILE value, using
-  // forward or backward slashes) to a file handle within the currently
-  // loaded directory. Returns undefined if no directory is loaded, or if the
-  // path doesn't resolve to a file within it.
+  // The multimedia file at `relativePath` in the loaded directory, if any.
   async getMultimediaFileHandle(
     relativePath: string,
   ): Promise<FileSystemFileHandle | undefined> {
-    let directoryHandle = this.gedcomResource.value()?.directoryHandle;
+    const directoryHandle = this.gedcomResource.value()?.directoryHandle;
+    return directoryHandle
+      ? getFileHandleAtPath(directoryHandle, relativePath)
+      : undefined;
+  }
+
+  // Whether something already exists at `relativePath` in the loaded
+  // directory.
+  async multimediaFileExists(relativePath: string): Promise<boolean> {
+    const directoryHandle = this.gedcomResource.value()?.directoryHandle;
+    return directoryHandle
+      ? fileExistsAtPath(directoryHandle, relativePath)
+      : false;
+  }
+
+  // Copies `file` to `relativePath` in the loaded directory, never
+  // overwriting (see copyFileToPath).
+  async copyMultimediaFile(file: File, relativePath: string): Promise<void> {
+    const directoryHandle = this.gedcomResource.value()?.directoryHandle;
     if (!directoryHandle) {
-      return undefined;
+      throw new Error("No directory loaded");
     }
-
-    const pathParts = relativePath
-      .split(/[/\\]/)
-      .filter((part) => part.length > 0);
-    const fileName = pathParts.at(-1);
-    if (fileName === undefined) {
-      return undefined;
-    }
-
-    try {
-      for (const part of pathParts.slice(0, -1)) {
-        directoryHandle = await directoryHandle.getDirectoryHandle(part);
-      }
-      return await directoryHandle.getFileHandle(fileName);
-    } catch (error) {
-      console.error(
-        `Failed to resolve multimedia file ${relativePath}:`,
-        error,
-      );
-      return undefined;
-    }
+    await copyFileToPath(directoryHandle, file, relativePath);
   }
 
   async requestPermissions() {

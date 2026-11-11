@@ -1,17 +1,24 @@
 <div class="form-floating">
-  <input class="form-control h-auto" [formField]="form.title" id="title" />
+  <input
+    class="form-control h-auto"
+    [formField]="form.title"
+    id="title"
+    (input)="onTitleInput($event)"
+  />
   <label for="title">Title</label>
 </div>
 
 <div class="input-group">
-  <div class="form-floating">
-    <input
-      class="form-control h-auto"
-      [formField]="form.filePath"
-      id="filePath"
-    />
-    <label for="filePath">File Path</label>
-  </div>
+  <label class="input-group-text path-label" for="sourceFile"
+    >Source File</label
+  >
+  <input
+    class="form-control"
+    id="sourceFile"
+    readonly
+    [value]="sourceFileName()"
+    placeholder="Choose a file with Browse..."
+  />
   <button
     class="btn btn-outline-secondary"
     type="button"
@@ -19,6 +26,59 @@
   >
     Browse...
   </button>
+</div>
+
+<div class="input-group has-validation">
+  <label class="input-group-text path-label" for="filePath">File Path</label>
+  <input
+    class="form-control"
+    id="filePath"
+    [class.is-invalid]="filePathProblem.value()"
+    [class.default-file-name]="pendingFile() && useDefaultFileName()"
+    [formField]="form.filePath"
+    (input)="onFilePathInput()"
+  />
+  @if (pendingFile()) {
+    <input
+      type="radio"
+      class="btn-check"
+      [name]="fileNameModeName()"
+      [id]="fileNameModeName() + '-default'"
+      autocomplete="off"
+      [checked]="useDefaultFileName()"
+      (change)="useDefaultFileNameSelected()"
+    />
+    <label
+      class="btn btn-outline-success"
+      [for]="fileNameModeName() + '-default'"
+      >Default filename</label
+    >
+    <input
+      type="radio"
+      class="btn-check"
+      [name]="fileNameModeName()"
+      [id]="fileNameModeName() + '-custom'"
+      autocomplete="off"
+      [checked]="!useDefaultFileName()"
+      (change)="useDefaultFileName.set(false)"
+    />
+    <label
+      class="btn btn-outline-success"
+      [for]="fileNameModeName() + '-custom'"
+      >Custom filename</label
+    >
+  }
+  @if (filePathProblem.value(); as problem) {
+    <div class="invalid-feedback">{{ problem }}</div>
+  } @else if (pendingFile()) {
+    <div class="form-text w-100">
+      The source file is outside your data folder. It will be copied in at this
+      path when you submit.
+      @if (useDefaultFileName()) {
+        This is the default name, which follows the title.
+      }
+    </div>
+  }
 </div>
 
 <div class="form-floating">

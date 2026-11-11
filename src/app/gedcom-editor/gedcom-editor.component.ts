@@ -5,6 +5,7 @@ import {
   input,
   linkedSignal,
   output,
+  signal,
 } from "@angular/core";
 import { FormField, form } from "@angular/forms/signals";
 import { ActivatedRoute, Router } from "@angular/router";
@@ -19,6 +20,8 @@ import { displayGedcomName } from "../../gedcom/gedcomName";
 import { newGedcomRepository } from "../../gedcom/gedcomRepository";
 import { newGedcomSource } from "../../gedcom/gedcomSource";
 import { newGedcomSubmitter } from "../../gedcom/gedcomSubmitter";
+import { FileExistsError } from "../../util/file-system";
+import { multimediaFilePathProblem } from "../../util/multimedia-file-name";
 import {
   calculateNextFamilyXref,
   calculateNextIndividualXref,
@@ -356,6 +359,79 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     }
   }
 
+  // Files picked from outside the data folder, by multimedia xref. They're
+  // copied in on submit, so cancelling the editor leaves the folder as is.
+  private readonly pendingMultimediaFiles = signal<
+    Readonly<Partial<Record<string, File>>>
+  >({});
+
+  pendingMultimediaFile(xref: string): File | undefined {
+    return this.pendingMultimediaFiles()[xref];
+  }
+
+  setPendingMultimediaFile(xref: string, file: File | undefined) {
+    this.pendingMultimediaFiles.update(
+      produce((draft) => {
+        draft[xref] = file;
+      }),
+    );
+  }
+
+  // Each pending file with the path in the data folder it will be copied
+  // to on submit (its multimedia record's current file path). Shown
+  // alongside the GEDCOM delta, since it's part of what submit writes.
+  readonly pendingMultimediaCopies = computed<
+    { file: File; filePath: string }[]
+  >(() =>
+    Object.entries(this.pendingMultimediaFiles()).flatMap(([xref, file]) => {
+      const filePath = this.workingDatabase().multimedias[xref]?.filePath;
+      return file === undefined || filePath === undefined
+        ? []
+        : [{ file, filePath }];
+    }),
+  );
+
+  // Files a multimedia record linked to before this edit but won't after
+  // it. Submit never deletes them; they're listed alongside the GEDCOM delta
+  // so it's clear they stay in the data folder, and whether any other
+  // record still links to them.
+  readonly unlinkedMultimediaFiles = computed<
+    { xref: string; oldPath: string; stillLinkedFrom: string[] }[]
+  >(() => {
+    const original = this.ancestryDatabase().multimedias;
+    const working = Object.values(this.workingDatabase().multimedias);
+    return Object.values(original).flatMap((multimedia) => {
+      const oldPath = multimedia.filePath;
+      const updated = working.find((m) => m.xref === multimedia.xref);
+      if (!oldPath || updated?.filePath === oldPath) {
+        return [];
+      }
+      const stillLinkedFrom = working
+        .filter((m) => m.filePath === oldPath)
+        .map((m) => m.xref.replace(/^@(.*)@$/, "$1"));
+      return [{ xref: multimedia.xref, oldPath, stillLinkedFrom }];
+    });
+  });
+
+  // Copies each pending file to its record's file path. Checks them all
+  // first, so a bad or taken path throws before anything is written.
+  private async copyPendingMultimediaFiles(): Promise<void> {
+    const copies = this.pendingMultimediaCopies();
+    for (const { filePath } of copies) {
+      const problem = multimediaFilePathProblem(filePath);
+      if (problem) {
+        throw new Error(`Can't copy multimedia to "${filePath}": ${problem}`);
+      }
+      if (await this.ancestryService.multimediaFileExists(filePath)) {
+        throw new FileExistsError(filePath);
+      }
+    }
+    for (const { file, filePath } of copies) {
+      await this.ancestryService.copyMultimediaFile(file, filePath);
+    }
+    this.pendingMultimediaFiles.set({});
+  }
+
   hasUnsavedChanges(): boolean {
     // Signal Forms only marks a field (and the form's own aggregate dirty
     // flag) dirty in response to a real control-originated value change --
@@ -376,7 +452,16 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     // beforeunload prompt (GedcomEditorDialogComponent.onBeforeUnload)
     // before the save has finished.
     event.preventDefault();
-    await this.ancestryService.updateGedcomDatabase(this.workingDatabase());
+    // Any failure (a taken path, a write error) leaves the dialog open with
+    // the edits intact, so the user can fix it and submit again.
+    try {
+      await this.copyPendingMultimediaFiles();
+      await this.ancestryService.updateGedcomDatabase(this.workingDatabase());
+    } catch (error) {
+      console.error(error);
+      alert(`Couldn't save: ${(error as Error).message}`);
+      return;
+    }
     // Close the dialog before the reload navigation below: the unsaved-changes
     // guard checks whether the dialog is still open, and the just-saved
     // database hasn't reached this component's `ancestryDatabase` input yet
