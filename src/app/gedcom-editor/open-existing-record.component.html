@@ -1,0 +1,27 @@
+<input
+  #search
+  type="search"
+  class="form-control form-control-sm"
+  placeholder="Search by name or xref"
+  aria-label="Search existing records"
+  [value]="query()"
+  (input)="query.set(search.value)"
+  (keydown.enter)="openFirstResult($event)"
+/>
+@if (query().trim()) {
+  <div class="list-group list-group-flush mt-1">
+    @for (record of results(); track record.tab.type + record.tab.xref) {
+      <button
+        type="button"
+        class="list-group-item list-group-item-action d-flex align-items-center gap-2 py-1 px-2 small"
+        (click)="open(record)"
+      >
+        <i class="bi" [class]="record.icon"></i>
+        <span class="flex-grow-1 text-truncate" [title]="record.label">{{ record.label }}</span>
+        <span class="text-secondary">{{ record.tab.xref }}</span>
+      </button>
+    } @empty {
+      <div class="small text-secondary px-2 py-1">No matching records</div>
+    }
+  </div>
+}

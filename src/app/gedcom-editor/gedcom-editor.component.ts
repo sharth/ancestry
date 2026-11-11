@@ -41,6 +41,7 @@ import { InputIndividualComponent } from "./input-individual.component";
 import { InputMultimediaComponent } from "./input-multimedia.component";
 import { InputRepositoryComponent } from "./input-repository.component";
 import { InputSourceComponent } from "./input-source.component";
+import { OpenExistingRecordComponent } from "./open-existing-record.component";
 
 @Component({
   selector: "app-gedcom-editor",
@@ -52,6 +53,7 @@ import { InputSourceComponent } from "./input-source.component";
     InputMultimediaComponent,
     InputRepositoryComponent,
     InputSourceComponent,
+    OpenExistingRecordComponent,
   ],
   providers: [{ provide: GEDCOM_EDITOR, useExisting: GedcomEditorComponent }],
   templateUrl: "./gedcom-editor.component.html",

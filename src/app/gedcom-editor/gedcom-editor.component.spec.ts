@@ -746,3 +746,39 @@ describe("GedcomEditorComponent edits leave the original individual untouched", 
     ).toContain("Stocky");
   });
 });
+
+describe("GedcomEditorComponent opening an existing record", () => {
+  it("opens an existing source from the Add to Session menu", async () => {
+    const source = newGedcomSource({ xref: "@S1@", abbr: "1880 Census" });
+    const database = newGedcomDatabase({ sources: { "@S1@": source } });
+    const renderResult = await render(GedcomEditorComponent, {
+      providers: [provideRouter([])],
+      skipDetectChanges: true,
+    });
+    renderResult.fixture.componentRef.setInput("tabs", [
+      { type: "OBJE", xref: "" },
+    ]);
+    renderResult.fixture.componentRef.setInput("ancestryDatabase", database);
+    renderResult.fixture.detectChanges();
+    await renderResult.fixture.whenStable();
+
+    const user = userEvent.setup();
+    await user.click(screen.getByText("Add to Session"));
+    await user.type(
+      screen.getByRole("searchbox", { name: "Search existing records" }),
+      "1880",
+    );
+    await user.click(screen.getByRole("button", { name: /1880 Census/ }));
+    renderResult.fixture.detectChanges();
+    await renderResult.fixture.whenStable();
+
+    const component = renderResult.fixture.componentInstance;
+    expect(component.xrefsIncludedInView()).toEqual([
+      { type: "OBJE", xref: "@M0@" },
+      { type: "SOUR", xref: "@S1@" },
+    ]);
+    expect(component.activeTab()).toEqual({ type: "SOUR", xref: "@S1@" });
+    // Opening it doesn't change the record.
+    expect(component.workingDatabase().sources["@S1@"]).toBe(source);
+  });
+});
