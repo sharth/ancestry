@@ -18,6 +18,17 @@
             <i class="bi me-1" [class]="tabIcon(item)"></i>
             <span>{{ tabLabel(item) }}</span>
           </button>
+          <button
+            type="button"
+            class="btn btn-sm"
+            [class.btn-primary]="activeTab()?.xref === item.xref"
+            [class.btn-outline-secondary]="activeTab()?.xref !== item.xref"
+            [attr.aria-label]="'Delete ' + deleteRecordLabel(item)"
+            title="Delete"
+            (click)="deleteRecord(item)"
+          >
+            <i class="bi bi-trash"></i>
+          </button>
         </div>
       }
     </div>
