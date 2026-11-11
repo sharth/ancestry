@@ -24,6 +24,16 @@ export class MultimediaFileExistsError extends Error {
   }
 }
 
+// The parts of the File System Observer API (not yet in TypeScript's DOM
+// types) that watchDirectory uses.
+type FileSystemObserverConstructor = new (callback: () => void) => {
+  observe(
+    handle: FileSystemDirectoryHandle,
+    options: { recursive: boolean },
+  ): Promise<void>;
+  disconnect(): void;
+};
+
 // Splits a multimedia path (as stored in a GEDCOM OBJE.FILE value, using
 // forward or backward slashes) into its non-empty parts.
 function splitMultimediaPath(relativePath: string): string[] {
@@ -369,6 +379,31 @@ export class AncestryService {
       directoryHandle = await directoryHandle.getDirectoryHandle(part);
     }
     return directoryHasEntry(directoryHandle, fileName);
+  }
+
+  // Calls `onChange` whenever anything in the loaded directory (including
+  // its subfolders) changes on disk, until the returned function is called.
+  // Uses FileSystemObserver, which not every browser has yet; where it's
+  // missing, or no directory is loaded, this watches nothing.
+  watchDirectory(onChange: () => void): () => void {
+    const Observer = (
+      globalThis as { FileSystemObserver?: FileSystemObserverConstructor }
+    ).FileSystemObserver;
+    const directoryHandle = this.gedcomResource.value()?.directoryHandle;
+    if (!Observer || !directoryHandle) {
+      return () => undefined;
+    }
+    const observer = new Observer(() => {
+      onChange();
+    });
+    observer
+      .observe(directoryHandle, { recursive: true })
+      .catch((error: unknown) => {
+        console.error("Failed to watch the data folder:", error);
+      });
+    return () => {
+      observer.disconnect();
+    };
   }
 
   // Copies a file (typically one picked from outside the loaded directory)

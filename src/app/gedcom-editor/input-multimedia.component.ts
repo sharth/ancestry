@@ -30,8 +30,9 @@ import { GEDCOM_EDITOR } from "./gedcom-editor-interface";
   templateUrl: "./input-multimedia.component.html",
   styleUrl: "./input.component.css",
   host: {
-    // The data folder can change outside the app (say, in a file manager),
-    // so check the copy's path again whenever the user comes back.
+    // The data folder can change outside the app (say, in a file manager).
+    // Besides watching it (see the constructor), check the copy's path
+    // again whenever the user comes back, for browsers that can't watch.
     "(window:focus)": "filePathProblem.reload()",
   },
 })
@@ -71,6 +72,19 @@ export class InputMultimediaComponent implements FormValueControl<GedcomMultimed
   });
 
   constructor() {
+    // While a file is pending, recheck its path whenever the data folder
+    // changes on disk, so "already exists" stays accurate.
+    effect((onCleanup) => {
+      if (!this.pendingFile()) {
+        return;
+      }
+      onCleanup(
+        this.ancestryService.watchDirectory(() => {
+          this.filePathProblem.reload();
+        }),
+      );
+    });
+
     // While a file is pending, the record's file path is whatever the copy
     // will be saved as, so the GEDCOM delta shows it.
     effect(() => {
