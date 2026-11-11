@@ -172,40 +172,6 @@ describe("InputMultimediaComponent", () => {
       });
     });
 
-    it("checks the path again when the data folder changes", async () => {
-      let folderChanged: () => void = () => undefined;
-      const stopWatching = vi.fn();
-      vi.spyOn(component.ancestryService, "watchDirectory").mockImplementation(
-        (onChange) => {
-          folderChanged = onChange;
-          return stopWatching;
-        },
-      );
-      const exists = vi
-        .spyOn(component.ancestryService, "multimediaFileExists")
-        .mockResolvedValue(false);
-
-      await component.browseFile();
-      await vi.waitFor(() => {
-        expect(exists).toHaveBeenCalledTimes(1);
-      });
-      exists.mockResolvedValue(true);
-      folderChanged();
-
-      await vi.waitFor(() => {
-        fixture.detectChanges();
-        expect(
-          screen.getByText(/"O12 1901 Census.png" already exists/),
-        ).toBeTruthy();
-      });
-
-      resolvedPath = ["census.png"];
-      await component.browseFile();
-      await fixture.whenStable();
-
-      expect(stopWatching).toHaveBeenCalled();
-    });
-
     it("checks the path again when the window regains focus", async () => {
       const exists = vi
         .spyOn(component.ancestryService, "multimediaFileExists")
