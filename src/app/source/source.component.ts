@@ -1,5 +1,6 @@
 import { Component, computed, input, viewChild } from "@angular/core";
 import { RouterModule } from "@angular/router";
+import type { Immutable } from "immer";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
@@ -12,7 +13,7 @@ import type { ComponentWithUnsavedChanges } from "../unsaved-changes.guard";
   imports: [RouterModule, GedcomEditorDialogComponent],
 })
 export class SourceComponent implements ComponentWithUnsavedChanges {
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly ancestryDatabase = input.required<Immutable<GedcomDatabase>>();
   readonly xref = input.required<string>();
 
   readonly editDialog = viewChild<GedcomEditorDialogComponent>("editDialog");

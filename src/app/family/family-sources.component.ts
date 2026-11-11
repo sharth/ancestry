@@ -1,5 +1,6 @@
 import { Component, computed, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
+import type { Immutable } from "immer";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { gedcomFamilyFacts } from "../../gedcom/gedcomFactMetadata";
@@ -13,7 +14,7 @@ import type { GedcomSourceCitation } from "../../gedcom/gedcomSourceCitation";
   styleUrl: "./family.component.css",
 })
 export class FamilySourcesComponent {
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly ancestryDatabase = input.required<Immutable<GedcomDatabase>>();
   readonly xref = input.required<string>();
 
   readonly vm = computed(() => {
@@ -28,7 +29,7 @@ export class FamilySourcesComponent {
       {
         event: string;
         eventDescription: string;
-        citation: GedcomSourceCitation;
+        citation: Immutable<GedcomSourceCitation>;
       }[]
     >();
     const citations = getFamilySourceCitations(family).map((citation) => ({

@@ -1,3 +1,5 @@
+import type { Immutable } from "immer";
+
 // A Gedcom Fact is an event or attribute.
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import {
@@ -202,7 +204,7 @@ function parseGedcomShareFact(
 }
 
 export function serializeGedcomIndividualFact(
-  gedcomEvent: GedcomFact,
+  gedcomEvent: Immutable<GedcomFact>,
 ): GedcomRecord {
   const gedcomEventMetadata =
     gedcomIndividualEvents[gedcomEvent.tag] ??
@@ -214,7 +216,7 @@ export function serializeGedcomIndividualFact(
 }
 
 export function serializeGedcomFamilyFact(
-  gedcomEvent: GedcomFact,
+  gedcomEvent: Immutable<GedcomFact>,
 ): GedcomRecord {
   const gedcomEventMetadata =
     gedcomFamilyEvents[gedcomEvent.tag] ??
@@ -226,8 +228,8 @@ export function serializeGedcomFamilyFact(
 }
 
 function serializeGedcomFact(
-  gedcomEvent: GedcomFact,
-  gedcomEventMetadata: GedcomEventMetadata,
+  gedcomEvent: Immutable<GedcomFact>,
+  gedcomEventMetadata: Immutable<GedcomEventMetadata>,
 ): GedcomRecord {
   const value = gedcomEventMetadata.mandatoryValue
     ? gedcomEvent.value

@@ -6,6 +6,7 @@ import {
   type QueryList,
 } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
+import type { Immutable } from "immer";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import {
@@ -30,7 +31,7 @@ import { InputSourceXrefComponent } from "./input-source-xref.component";
 export class InputSourceCitationsComponent implements FormValueControl<
   GedcomSourceCitation[]
 > {
-  readonly workingDatabase = input.required<GedcomDatabase>();
+  readonly workingDatabase = input.required<Immutable<GedcomDatabase>>();
   readonly value = model<GedcomSourceCitation[]>([]);
   readonly form = form(this.value);
 

@@ -8,6 +8,7 @@ import {
   signal,
 } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
+import type { Immutable } from "immer";
 
 import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
@@ -36,7 +37,7 @@ import { GEDCOM_EDITOR } from "./gedcom-editor-interface";
 export class InputMultimediaComponent implements FormValueControl<GedcomMultimedia> {
   readonly ancestryService = inject(AncestryService);
   readonly gedcomEditor = inject(GEDCOM_EDITOR, { optional: true });
-  readonly workingDatabase = input.required<GedcomDatabase>();
+  readonly workingDatabase = input.required<Immutable<GedcomDatabase>>();
   readonly value = model<GedcomMultimedia>(newGedcomMultimedia({ xref: "" }));
   readonly form = form(this.value);
 

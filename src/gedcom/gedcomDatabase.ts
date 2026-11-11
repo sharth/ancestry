@@ -1,3 +1,5 @@
+import type { Immutable } from "immer";
+
 import {
   reportUnparsedRecord,
   warnUnparsedRecords,
@@ -193,9 +195,9 @@ function stampDates<
  * CHAN stamped with `now`, and new ones their CREA too, as HEAD gets its
  * DATE. */
 export function compareGedcomDatabase(
-  originalGedcomRecords: GedcomRecord[],
-  originalGedcomDatabase: GedcomDatabase,
-  updatedGedcomDatabase: GedcomDatabase,
+  originalGedcomRecords: Immutable<GedcomRecord>[],
+  originalGedcomDatabase: Immutable<GedcomDatabase>,
+  updatedGedcomDatabase: Immutable<GedcomDatabase>,
   now = new Date(),
 ): {
   originalGedcomRecord?: GedcomRecord;
@@ -260,9 +262,9 @@ export function compareGedcomDatabase(
 }
 
 export function serializeGedcomDatabase(
-  originalGedcomRecords: GedcomRecord[],
-  originalGedcomDatabase: GedcomDatabase,
-  gedcomDatabase: GedcomDatabase,
+  originalGedcomRecords: Immutable<GedcomRecord>[],
+  originalGedcomDatabase: Immutable<GedcomDatabase>,
+  gedcomDatabase: Immutable<GedcomDatabase>,
   now = new Date(),
 ): string[] {
   return compareGedcomDatabase(

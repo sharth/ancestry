@@ -10,6 +10,7 @@ import {
   type QueryList,
 } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
+import type { Immutable } from "immer";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomName, type GedcomName } from "../../gedcom/gedcomName";
@@ -26,7 +27,7 @@ export class InputIndividualNamesComponent implements FormValueControl<
 > {
   private readonly _injector = inject(Injector);
 
-  readonly workingDatabase = input.required<GedcomDatabase>();
+  readonly workingDatabase = input.required<Immutable<GedcomDatabase>>();
 
   // Set true to expand the details by default.
 

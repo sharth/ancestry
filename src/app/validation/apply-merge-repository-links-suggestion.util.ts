@@ -1,4 +1,4 @@
-import { produce } from "immer";
+import { produce, type Immutable } from "immer";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import type { GedcomSource } from "../../gedcom/gedcomSource";
@@ -11,10 +11,10 @@ import type { MergeRepositoryLinksSuggestion } from "./source-validators";
  * preview and as the database handed to the GEDCOM editor for further
  * review before saving. */
 export function applyMergeRepositoryLinksSuggestion(
-  database: GedcomDatabase,
-  source: GedcomSource,
+  database: Immutable<GedcomDatabase>,
+  source: Immutable<GedcomSource>,
   suggestion: MergeRepositoryLinksSuggestion,
-): GedcomDatabase {
+): Immutable<GedcomDatabase> {
   return produce(database, (draft) => {
     const draftSource = draft.sources[source.xref];
     if (draftSource === undefined) return;

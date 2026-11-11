@@ -8,7 +8,7 @@ import {
 } from "@angular/core";
 import { FormField, form } from "@angular/forms/signals";
 import { ActivatedRoute, Router } from "@angular/router";
-import { produce } from "immer";
+import { castDraft, produce, type Immutable } from "immer";
 
 import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
@@ -70,7 +70,7 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   // default; an empty xref on any of them means "create a new record of
   // this type" (its xref is calculated once resolved).
   readonly tabs = input.required<TabInformation[]>();
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly ancestryDatabase = input.required<Immutable<GedcomDatabase>>();
   readonly finished = output();
 
   // `tabs()` with each xref resolved: an empty xref means "create a new
@@ -101,27 +101,33 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   // If the user provides an xref that is not present in the database (or an empty string), we should instantiate a new object.
   readonly workingDatabase = linkedSignal<GedcomDatabase>(() => {
     const tabs = this.effectiveTabs();
-    return produce(this.ancestryDatabase(), (draft) => {
+    return produce(castDraft(this.ancestryDatabase()), (draft) => {
       for (const tab of tabs) {
         const xref = tab.xref;
         switch (tab.type) {
           case "INDI":
-            draft.individuals[xref] ??= newGedcomIndividual({ xref });
+            draft.individuals[xref] ??= castDraft(
+              newGedcomIndividual({ xref }),
+            );
             break;
           case "SOUR":
-            draft.sources[xref] ??= newGedcomSource({ xref });
+            draft.sources[xref] ??= castDraft(newGedcomSource({ xref }));
             break;
           case "FAM":
-            draft.families[xref] ??= newGedcomFamily({ xref });
+            draft.families[xref] ??= castDraft(newGedcomFamily({ xref }));
             break;
           case "REPO":
-            draft.repositories[xref] ??= newGedcomRepository({ xref });
+            draft.repositories[xref] ??= castDraft(
+              newGedcomRepository({ xref }),
+            );
             break;
           case "OBJE":
-            draft.multimedias[xref] ??= newGedcomMultimedia({ xref });
+            draft.multimedias[xref] ??= castDraft(
+              newGedcomMultimedia({ xref }),
+            );
             break;
           case "SUBM":
-            draft.submitters[xref] ??= newGedcomSubmitter({ xref });
+            draft.submitters[xref] ??= castDraft(newGedcomSubmitter({ xref }));
             break;
         }
       }
@@ -273,22 +279,28 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
       produce(workingDatabase, (draft) => {
         switch (tabInformation.type) {
           case "INDI":
-            draft.individuals[xref] ??= newGedcomIndividual({ xref });
+            draft.individuals[xref] ??= castDraft(
+              newGedcomIndividual({ xref }),
+            );
             break;
           case "SOUR":
-            draft.sources[xref] ??= newGedcomSource({ xref });
+            draft.sources[xref] ??= castDraft(newGedcomSource({ xref }));
             break;
           case "FAM":
-            draft.families[xref] ??= newGedcomFamily({ xref });
+            draft.families[xref] ??= castDraft(newGedcomFamily({ xref }));
             break;
           case "REPO":
-            draft.repositories[xref] ??= newGedcomRepository({ xref });
+            draft.repositories[xref] ??= castDraft(
+              newGedcomRepository({ xref }),
+            );
             break;
           case "OBJE":
-            draft.multimedias[xref] ??= newGedcomMultimedia({ xref });
+            draft.multimedias[xref] ??= castDraft(
+              newGedcomMultimedia({ xref }),
+            );
             break;
           case "SUBM":
-            draft.submitters[xref] ??= newGedcomSubmitter({ xref });
+            draft.submitters[xref] ??= castDraft(newGedcomSubmitter({ xref }));
             break;
         }
       }),

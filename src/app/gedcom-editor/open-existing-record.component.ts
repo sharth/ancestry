@@ -1,3 +1,4 @@
+import type { Immutable } from "immer";
 import { Component, computed, input, output, signal } from "@angular/core";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
@@ -21,7 +22,7 @@ const maxResults = 10;
   templateUrl: "./open-existing-record.component.html",
 })
 export class OpenExistingRecordComponent {
-  readonly workingDatabase = input.required<GedcomDatabase>();
+  readonly workingDatabase = input.required<Immutable<GedcomDatabase>>();
   readonly opened = output<TabInformation>();
 
   readonly query = signal("");

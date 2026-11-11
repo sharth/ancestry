@@ -1,3 +1,5 @@
+import type { Immutable } from "immer";
+
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import {
   filterTrivialGedcomRecord,
@@ -48,7 +50,9 @@ export function parseGedcomSex(gedcomRecord: GedcomRecord): GedcomSex {
   return gedcomSex;
 }
 
-export function serializeGedcomSex(gedcomSex: GedcomSex): GedcomRecord | null {
+export function serializeGedcomSex(
+  gedcomSex: Immutable<GedcomSex>,
+): GedcomRecord | null {
   return filterTrivialGedcomRecord(
     newGedcomRecord({
       tag: "SEX",

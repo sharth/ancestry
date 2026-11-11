@@ -1,4 +1,4 @@
-import { produce } from "immer";
+import { produce, type Immutable } from "immer";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import type { GedcomSource } from "../../gedcom/gedcomSource";
@@ -11,7 +11,7 @@ import { sourceValidators } from "./source-validators";
  * own (CONC/CONT are already folded into the value by the parser) that a
  * plain TITL has nowhere to keep. */
 export function bibliographyForMissingTitle(
-  source: GedcomSource,
+  source: Immutable<GedcomSource>,
 ): string | undefined {
   if (source.title !== "") return undefined;
   const bibliographies = source.unknownRecords.filter(
@@ -27,7 +27,7 @@ export function bibliographyForMissingTitle(
 }
 
 export interface ApplyBibliographyTitleSuggestionResult {
-  database: GedcomDatabase;
+  database: Immutable<GedcomDatabase>;
   /** The xrefs of the repositories created by the URL suggestions. */
   createdRepositoryXrefs: string[];
 }
@@ -37,8 +37,8 @@ export interface ApplyBibliographyTitleSuggestionResult {
  * stands after the move -- so a URL that came over with the bibliography
  * becomes a repository call number too. Pure, like applyUrlSuggestions. */
 export function applyBibliographyTitleSuggestion(
-  database: GedcomDatabase,
-  source: GedcomSource,
+  database: Immutable<GedcomDatabase>,
+  source: Immutable<GedcomSource>,
 ): ApplyBibliographyTitleSuggestionResult {
   const bibliography = bibliographyForMissingTitle(source);
   if (bibliography === undefined) {

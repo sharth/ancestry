@@ -1,3 +1,5 @@
+import type { Immutable } from "immer";
+
 import type { GedcomRepository } from "../../gedcom/gedcomRepository";
 
 const URL_PATTERN = /\bhttps?:\/\/[^\s<>"')\]]+/gi;
@@ -77,8 +79,8 @@ function normalizeForMatch(text: string): string {
  * undefined when no repository's name overlaps with the domain at all. */
 export function findMatchingRepository(
   url: string,
-  repositories: Record<string, GedcomRepository>,
-): GedcomRepository | undefined {
+  repositories: Immutable<Record<string, Immutable<GedcomRepository>>>,
+): Immutable<GedcomRepository> | undefined {
   const domainLabel = urlDomainLabel(url);
   if (domainLabel === undefined || domainLabel === "") return undefined;
   const normalizedDomainLabel = normalizeForMatch(domainLabel);

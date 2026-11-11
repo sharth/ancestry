@@ -1,5 +1,6 @@
 import { Component, computed, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
+import type { Immutable } from "immer";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import {
@@ -16,7 +17,7 @@ interface SourceCitationRow {
   eventDescription: string;
   spouseXref?: string;
   nameText?: string;
-  citation: GedcomSourceCitation;
+  citation: Immutable<GedcomSourceCitation>;
 }
 
 @Component({
@@ -26,7 +27,7 @@ interface SourceCitationRow {
   styleUrl: "./individual.component.css",
 })
 export class IndividualSourcesComponent {
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly ancestryDatabase = input.required<Immutable<GedcomDatabase>>();
   readonly xref = input.required<string>();
 
   readonly vm = computed(() => {

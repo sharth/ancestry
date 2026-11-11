@@ -1,4 +1,5 @@
 import { Component, computed, input } from "@angular/core";
+import type { Immutable } from "immer";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import type { GedcomIndividual } from "../../gedcom/gedcomIndividual";
@@ -17,7 +18,7 @@ import { IndividualSunburstComponent } from "./individual-sunburst.component";
   styleUrl: "./individual.component.css",
 })
 export class IndividualAncestorsComponent {
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly ancestryDatabase = input.required<Immutable<GedcomDatabase>>();
   readonly xref = input.required<string>();
 
   readonly vm = computed(() => {
@@ -27,7 +28,7 @@ export class IndividualAncestorsComponent {
       return undefined;
     }
 
-    const ancestors: (GedcomIndividual | undefined)[] = [];
+    const ancestors: (Immutable<GedcomIndividual> | undefined)[] = [];
     ancestors[1] = individual;
     for (let i = 1; i < ancestors.length && i < 16384; i++) {
       const child = ancestors[i];

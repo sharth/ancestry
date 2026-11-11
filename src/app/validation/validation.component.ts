@@ -7,6 +7,7 @@ import {
   viewChild,
 } from "@angular/core";
 import { ActivatedRoute, Router, RouterModule } from "@angular/router";
+import type { Immutable } from "immer";
 
 import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
@@ -52,17 +53,17 @@ import {
 type ReviewState =
   | {
       kind: "url";
-      source: GedcomSource;
+      source: Immutable<GedcomSource>;
       suggestions: UrlRepositorySuggestion[];
     }
   | {
       kind: "merge";
-      source: GedcomSource;
+      source: Immutable<GedcomSource>;
       suggestion: MergeRepositoryLinksSuggestion;
     }
   | {
       kind: "bibliography";
-      source: GedcomSource;
+      source: Immutable<GedcomSource>;
     };
 
 const tabs = [
@@ -77,7 +78,7 @@ const tabs = [
 type TabId = (typeof tabs)[number]["id"];
 
 interface TableRow {
-  source: GedcomSource;
+  source: Immutable<GedcomSource>;
   severity: "Error" | "Warning";
   fieldName: string;
   groupName: string;
@@ -106,7 +107,7 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly ancestryDatabase = input.required<Immutable<GedcomDatabase>>();
 
   readonly editDialog = viewChild<GedcomEditorDialogComponent>("editDialog");
 
@@ -213,7 +214,7 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
   // `reviewState`'s source pre-applied, so the dialog opens already
   // showing it -- the user can then review it (alongside the editor's own
   // before/after diff) and keep editing before saving, or cancel.
-  readonly reviewDatabase = computed<GedcomDatabase>(() => {
+  readonly reviewDatabase = computed<Immutable<GedcomDatabase>>(() => {
     const state = this.reviewState();
     if (state === undefined) return this.ancestryDatabase();
     if (state.kind === "bibliography") {
@@ -268,27 +269,27 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
   });
 
   reviewUrlSuggestions(
-    source: GedcomSource,
+    source: Immutable<GedcomSource>,
     suggestions: UrlRepositorySuggestion[],
   ) {
     this.reviewState.set({ kind: "url", source, suggestions });
   }
 
   reviewMergeSuggestion(
-    source: GedcomSource,
+    source: Immutable<GedcomSource>,
     suggestion: MergeRepositoryLinksSuggestion,
   ) {
     this.reviewState.set({ kind: "merge", source, suggestion });
   }
 
-  reviewBibliographySuggestion(source: GedcomSource) {
+  reviewBibliographySuggestion(source: Immutable<GedcomSource>) {
     this.reviewState.set({ kind: "bibliography", source });
   }
 
   // Applies a suggested fix directly and saves it, without opening the
   // editor dialog for further review.
   async submitUrlSuggestions(
-    source: GedcomSource,
+    source: Immutable<GedcomSource>,
     suggestions: UrlRepositorySuggestion[],
   ) {
     const granted = await this.ancestryService.requestWritePermission();
@@ -304,7 +305,7 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
   }
 
   async submitMergeSuggestion(
-    source: GedcomSource,
+    source: Immutable<GedcomSource>,
     suggestion: MergeRepositoryLinksSuggestion,
   ) {
     const granted = await this.ancestryService.requestWritePermission();
@@ -319,7 +320,7 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
     await this.reload();
   }
 
-  async submitBibliographySuggestion(source: GedcomSource) {
+  async submitBibliographySuggestion(source: Immutable<GedcomSource>) {
     const granted = await this.ancestryService.requestWritePermission();
     if (!granted) return;
 
@@ -347,7 +348,7 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
   // reusing `reviewDatabase` so it stays correct even when nothing has been
   // selected for review yet.
   differencesForUrlSuggestions(
-    source: GedcomSource,
+    source: Immutable<GedcomSource>,
     suggestions: UrlRepositorySuggestion[],
   ): {
     originalGedcomRecord?: GedcomRecord;
@@ -362,7 +363,7 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
   }
 
   differencesForMergeSuggestion(
-    source: GedcomSource,
+    source: Immutable<GedcomSource>,
     suggestion: MergeRepositoryLinksSuggestion,
   ): {
     originalGedcomRecord?: GedcomRecord;
@@ -376,7 +377,7 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
     return this.actualDifferences(database);
   }
 
-  private actualDifferences(database: GedcomDatabase): {
+  private actualDifferences(database: Immutable<GedcomDatabase>): {
     originalGedcomRecord?: GedcomRecord;
     updatedGedcomRecord?: GedcomRecord;
   }[] {

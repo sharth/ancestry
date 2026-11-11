@@ -1,8 +1,9 @@
+import type { Draft } from "immer";
 export interface GedcomRecord {
-  xref: string;
-  tag: string;
-  value: string;
-  children: GedcomRecord[];
+  readonly xref: string;
+  readonly tag: string;
+  readonly value: string;
+  readonly children: readonly GedcomRecord[];
 }
 
 export function newGedcomRecord(fieldsToOverride: Partial<GedcomRecord>) {
@@ -54,7 +55,7 @@ export function filterTrivialGedcomRecords(
 export function parseGedcomRecords(text: string): GedcomRecord[] {
   const lines = text.split(/\r?\n/);
   const records: GedcomRecord[] = [];
-  let ladder: GedcomRecord[] = [];
+  let ladder: Draft<GedcomRecord>[] = [];
 
   for (const [lineNumber, line] of lines.entries()) {
     if (line == "") {
@@ -73,7 +74,7 @@ export function parseGedcomRecords(text: string): GedcomRecord[] {
       string,
     ];
     const level = parseInt(levelString, 10);
-    const record = newGedcomRecord({ xref, tag, value });
+    const record: Draft<GedcomRecord> = { xref, tag, value, children: [] };
 
     if (level == 0) {
       ladder = [record];

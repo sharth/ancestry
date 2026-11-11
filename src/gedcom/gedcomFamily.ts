@@ -1,3 +1,5 @@
+import type { Immutable } from "immer";
+
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import {
   newGedcomChangeDate,
@@ -123,10 +125,10 @@ export function parseGedcomFamily(record: GedcomRecord): GedcomFamily {
 // through immer, which makes a new object for an edited one and keeps an
 // unedited one as the same object, so a cached serialization never goes
 // stale. See serializeGedcomIndividual.
-const serializedFamilies = new WeakMap<GedcomFamily, GedcomRecord>();
+const serializedFamilies = new WeakMap<Immutable<GedcomFamily>, GedcomRecord>();
 
 export function serializeGedcomFamily(
-  gedcomFamily: GedcomFamily,
+  gedcomFamily: Immutable<GedcomFamily>,
 ): GedcomRecord {
   return serializedFamilies.getOrInsertComputed(gedcomFamily, () =>
     newGedcomRecord({
@@ -162,10 +164,13 @@ export function serializeGedcomFamily(
 }
 
 export function getFamilyMultimediaCitations(
-  family: GedcomFamily,
+  family: Immutable<GedcomFamily>,
   multimediaXref: string,
-): { event: string; citation: GedcomSourceCitation }[] {
-  const references: { event: string; citation: GedcomSourceCitation }[] = [];
+): { event: string; citation: Immutable<GedcomSourceCitation> }[] {
+  const references: {
+    event: string;
+    citation: Immutable<GedcomSourceCitation>;
+  }[] = [];
 
   for (const event of family.facts) {
     for (const citation of event.citations) {
@@ -187,9 +192,12 @@ export function getFamilyMultimediaCitations(
 }
 
 export function getFamilySourceCitations(
-  family: GedcomFamily,
-): { event: string; citation: GedcomSourceCitation }[] {
-  const references: { event: string; citation: GedcomSourceCitation }[] = [];
+  family: Immutable<GedcomFamily>,
+): { event: string; citation: Immutable<GedcomSourceCitation> }[] {
+  const references: {
+    event: string;
+    citation: Immutable<GedcomSourceCitation>;
+  }[] = [];
 
   for (const event of family.facts) {
     for (const citation of event.citations) {

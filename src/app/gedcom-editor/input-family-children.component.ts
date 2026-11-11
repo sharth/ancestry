@@ -1,5 +1,6 @@
 import { Component, input, model } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
+import type { Immutable } from "immer";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { InputIndividualXrefComponent } from "./input-individual-xref.component";
@@ -13,7 +14,7 @@ import { InputIndividualXrefComponent } from "./input-individual-xref.component"
 export class InputFamilyChildrenComponent implements FormValueControl<
   string[]
 > {
-  readonly workingDatabase = input.required<GedcomDatabase>();
+  readonly workingDatabase = input.required<Immutable<GedcomDatabase>>();
 
   readonly value = model<string[]>([]);
   readonly form = form(this.value);

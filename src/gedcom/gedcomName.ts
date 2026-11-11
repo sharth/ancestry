@@ -1,3 +1,5 @@
+import type { Immutable } from "immer";
+
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import {
   parseGedcomNote,
@@ -104,7 +106,9 @@ export function parseGedcomName(gedcomRecord: GedcomRecord): GedcomName {
   return gedcomName;
 }
 
-export function serializeGedcomName(name: GedcomName): GedcomRecord | null {
+export function serializeGedcomName(
+  name: Immutable<GedcomName>,
+): GedcomRecord | null {
   return filterTrivialGedcomRecord(
     newGedcomRecord({
       tag: "NAME",
@@ -147,7 +151,7 @@ export function serializeGedcomName(name: GedcomName): GedcomRecord | null {
   );
 }
 
-export function displayGedcomName(gedcomName: GedcomName) {
+export function displayGedcomName(gedcomName: Immutable<GedcomName>) {
   const name = [
     // gedcomName.prefix,
     gedcomName.givenName,

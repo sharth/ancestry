@@ -1,12 +1,13 @@
 import { Component, computed, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
+import type { Immutable } from "immer";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import type { GedcomSource } from "../../gedcom/gedcomSource";
 import { RepositoryCallNumberComponent } from "../repository-call-number/repository-call-number.component";
 
 interface SourceUse {
-  source: GedcomSource;
+  source: Immutable<GedcomSource>;
   count: number;
 }
 
@@ -20,14 +21,16 @@ interface SourceUse {
   templateUrl: "./duplicate-call-numbers.component.html",
 })
 export class DuplicateCallNumbersComponent {
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly ancestryDatabase = input.required<Immutable<GedcomDatabase>>();
 
   readonly duplicateCallNumbers = computed(() =>
     findDuplicateCallNumbers(this.ancestryDatabase()),
   );
 }
 
-export function findDuplicateCallNumbers(gedcomDatabase: GedcomDatabase) {
+export function findDuplicateCallNumbers(
+  gedcomDatabase: Immutable<GedcomDatabase>,
+) {
   const uses = new Map<string, Map<string, SourceUse>>();
   for (const source of Object.values(gedcomDatabase.sources)) {
     for (const repositoryLink of source.repositoryLinks) {

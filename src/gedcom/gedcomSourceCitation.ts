@@ -1,3 +1,5 @@
+import type { Immutable } from "immer";
+
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import {
   parseGedcomMultimediaLink,
@@ -103,7 +105,7 @@ function parseGedcomSourceCitationData(gedcomRecord: GedcomRecord): string {
 }
 
 export function serializeGedcomSourceCitation(
-  gedcomCitation: GedcomSourceCitation,
+  gedcomCitation: Immutable<GedcomSourceCitation>,
 ): GedcomRecord {
   return newGedcomRecord({
     tag: "SOUR",

@@ -1,5 +1,6 @@
 import { Component, computed, inject, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
+import type { Immutable } from "immer";
 
 import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomDate } from "../../gedcom/gedcomDate";
@@ -19,7 +20,7 @@ import {
 import { IndividualLinkComponent } from "../individual-link/individual-link.component";
 
 export interface TimelineEvent {
-  fact: GedcomFact;
+  fact: Immutable<GedcomFact>;
   owner: "individual" | "family";
   // For family events shown on an individual's timeline, the family the event
   // belongs to and the individual's spouse in that family. Every family event

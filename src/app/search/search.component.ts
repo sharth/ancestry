@@ -1,5 +1,6 @@
 import { Component, computed, input } from "@angular/core";
 import { RouterLink } from "@angular/router";
+import type { Immutable } from "immer";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { fullname } from "../../gedcom/gedcomIndividual";
@@ -41,7 +42,7 @@ interface PlaceResult extends SearchResult {
   styleUrl: "./search.component.css",
 })
 export class SearchComponent {
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly ancestryDatabase = input.required<Immutable<GedcomDatabase>>();
   readonly q = input<string>("");
 
   readonly vm = computed(() => {
@@ -97,7 +98,7 @@ export class SearchComponent {
   });
 
   private searchIndividuals(
-    database: GedcomDatabase,
+    database: Immutable<GedcomDatabase>,
     query: string,
   ): IndividualResult[] {
     const results: IndividualResult[] = [];
@@ -128,7 +129,7 @@ export class SearchComponent {
   }
 
   private searchFamilies(
-    database: GedcomDatabase,
+    database: Immutable<GedcomDatabase>,
     query: string,
   ): FamilyResult[] {
     const nameOf = (xref: string) => {
@@ -168,7 +169,10 @@ export class SearchComponent {
     return this.sortResults(results);
   }
 
-  private searchPlaces(database: GedcomDatabase, query: string): PlaceResult[] {
+  private searchPlaces(
+    database: Immutable<GedcomDatabase>,
+    query: string,
+  ): PlaceResult[] {
     const results: PlaceResult[] = [];
     for (const place of computePlaceGroups(database)) {
       const rank = matchRank(place.name, query);

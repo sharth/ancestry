@@ -1,33 +1,49 @@
+import type { Immutable } from "immer";
+
 import type { GedcomDatabase } from "../gedcom/gedcomDatabase";
 import type { GedcomSourceCitation } from "../gedcom/gedcomSourceCitation";
 
-export function calculateNextIndividualXref(gedcomDatabase: GedcomDatabase) {
+export function calculateNextIndividualXref(
+  gedcomDatabase: Immutable<GedcomDatabase>,
+) {
   return calculateNextXref(gedcomDatabase, "I");
 }
 
-export function calculateNextMultimediaXref(gedcomDatabase: GedcomDatabase) {
+export function calculateNextMultimediaXref(
+  gedcomDatabase: Immutable<GedcomDatabase>,
+) {
   return calculateNextXref(gedcomDatabase, "M");
 }
 
-export function calculateNextRepositoryXref(gedcomDatabase: GedcomDatabase) {
+export function calculateNextRepositoryXref(
+  gedcomDatabase: Immutable<GedcomDatabase>,
+) {
   return calculateNextXref(gedcomDatabase, "R");
 }
 
-export function calculateNextSourceXref(gedcomDatabase: GedcomDatabase) {
+export function calculateNextSourceXref(
+  gedcomDatabase: Immutable<GedcomDatabase>,
+) {
   return calculateNextXref(gedcomDatabase, "S");
 }
 
-export function calculateNextFamilyXref(gedcomDatabase: GedcomDatabase) {
+export function calculateNextFamilyXref(
+  gedcomDatabase: Immutable<GedcomDatabase>,
+) {
   return calculateNextXref(gedcomDatabase, "F");
 }
 
-export function calculateNextSubmitterXref(gedcomDatabase: GedcomDatabase) {
+export function calculateNextSubmitterXref(
+  gedcomDatabase: Immutable<GedcomDatabase>,
+) {
   return calculateNextXref(gedcomDatabase, "U");
 }
 
 /** Every xref the database uses: each record's own xref, plus every xref
  * something links to, even when no record with that xref exists. */
-function* usedXrefs(gedcomDatabase: GedcomDatabase): Generator<string> {
+function* usedXrefs(
+  gedcomDatabase: Immutable<GedcomDatabase>,
+): Generator<string> {
   yield* Object.keys(gedcomDatabase.submitters);
   yield* Object.keys(gedcomDatabase.individuals);
   yield* Object.keys(gedcomDatabase.families);
@@ -64,7 +80,7 @@ function* usedXrefs(gedcomDatabase: GedcomDatabase): Generator<string> {
 }
 
 function* usedXrefsFromSourceCitations(
-  citations: GedcomSourceCitation[],
+  citations: readonly Immutable<GedcomSourceCitation>[],
 ): Generator<string> {
   for (const citation of citations) {
     yield citation.sourceXref;
@@ -73,7 +89,7 @@ function* usedXrefsFromSourceCitations(
 }
 
 function calculateNextXref(
-  gedcomDatabase: GedcomDatabase,
+  gedcomDatabase: Immutable<GedcomDatabase>,
   prefix: string,
 ): string {
   const pattern = new RegExp(`^@${prefix}(\\d+)@$`);

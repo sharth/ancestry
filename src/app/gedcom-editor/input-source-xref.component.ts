@@ -8,6 +8,7 @@ import {
   type ElementRef,
 } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
+import type { Immutable } from "immer";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { displayGedcomName } from "../../gedcom/gedcomName";
@@ -22,7 +23,7 @@ import { GEDCOM_EDITOR } from "./gedcom-editor-interface";
 export class InputSourceXrefComponent implements FormValueControl<string> {
   readonly gedcomEditor = inject(GEDCOM_EDITOR, { optional: true });
 
-  readonly workingDatabase = input.required<GedcomDatabase>();
+  readonly workingDatabase = input.required<Immutable<GedcomDatabase>>();
   readonly value = model<string>("");
   readonly form = form(this.value);
 
