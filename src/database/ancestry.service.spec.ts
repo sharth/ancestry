@@ -194,6 +194,15 @@ describe("AncestryService.copyMultimediaFile", () => {
     expect(written.get("O2 Will.png")).toBe(file);
   });
 
+  it("reports whether a file exists", async () => {
+    await expect(
+      ancestryService.multimediaFileExists("O1 Deed.png"),
+    ).resolves.toBe(true);
+    await expect(
+      ancestryService.multimediaFileExists("O2 Will.png"),
+    ).resolves.toBe(false);
+  });
+
   it("refuses to overwrite an existing file", async () => {
     const file = new File(["png"], "scan.png");
     await expect(

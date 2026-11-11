@@ -31,3 +31,19 @@ export function sanitizeFileName(fileName: string): string {
       .replace(/[. ]+$/, "")
   );
 }
+
+// Why `filePath` can't be used as the path to copy a multimedia file to, or
+// undefined if it can. Each folder and file name in it must already be
+// sanitized (see sanitizeFileName).
+export function multimediaFilePathProblem(
+  filePath: string,
+): string | undefined {
+  const parts = filePath.split(/[/\\]/);
+  if (parts.some((part) => part.length === 0)) {
+    return "Enter a file name.";
+  }
+  if (parts.some((part) => part !== sanitizeFileName(part))) {
+    return "File names can't contain < > : \" | ? * or end with a dot or space.";
+  }
+  return undefined;
+}

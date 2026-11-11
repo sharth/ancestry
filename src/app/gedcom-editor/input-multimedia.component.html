@@ -3,11 +3,13 @@
   <label for="title">Title</label>
 </div>
 
-<div class="input-group">
-  <div class="form-floating">
+<div class="input-group has-validation">
+  <div class="form-floating" [class.is-invalid]="filePathProblem.value()">
     <input
       class="form-control h-auto"
+      [class.is-invalid]="filePathProblem.value()"
       [formField]="form.filePath"
+      (input)="followProposedFileName.set(false)"
       id="filePath"
     />
     <label for="filePath">File Path</label>
@@ -19,39 +21,15 @@
   >
     Browse...
   </button>
-</div>
-
-@if (pendingFile(); as file) {
-  <div class="card card-body">
-    <p class="mb-2">
-      "{{ file.name }}" is outside your data folder. Copy it in to use it.
-    </p>
-    <div class="input-group has-validation">
-      <label class="input-group-text" for="copyFileName">Copy as</label>
-      <input
-        class="form-control"
-        id="copyFileName"
-        [class.is-invalid]="copyError()"
-        [placeholder]="proposedFileName()"
-        [value]="copyFileName()"
-        (input)="onCopyFileNameInput($event)"
-      />
-      <button class="btn btn-primary" type="button" (click)="copyFile()">
-        Copy
-      </button>
-      <button
-        class="btn btn-outline-secondary"
-        type="button"
-        (click)="cancelCopy()"
-      >
-        Cancel
-      </button>
-      @if (copyError()) {
-        <div class="invalid-feedback">{{ copyError() }}</div>
-      }
+  @if (filePathProblem.value(); as problem) {
+    <div class="invalid-feedback">{{ problem }}</div>
+  } @else if (pendingFile(); as file) {
+    <div class="form-text w-100">
+      "{{ file.name }}" is outside your data folder. It will be copied in at
+      this path when you submit.
     </div>
-  </div>
-}
+  }
+</div>
 
 <div class="form-floating">
   <input

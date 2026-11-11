@@ -5,6 +5,7 @@ import {
   input,
   linkedSignal,
   output,
+  signal,
 } from "@angular/core";
 import { FormField, form } from "@angular/forms/signals";
 import { ActivatedRoute, Router } from "@angular/router";
@@ -19,6 +20,7 @@ import { displayGedcomName } from "../../gedcom/gedcomName";
 import { newGedcomRepository } from "../../gedcom/gedcomRepository";
 import { newGedcomSource } from "../../gedcom/gedcomSource";
 import { newGedcomSubmitter } from "../../gedcom/gedcomSubmitter";
+import { multimediaFilePathProblem } from "../../util/multimedia-file-name";
 import {
   calculateNextFamilyXref,
   calculateNextIndividualXref,
@@ -356,6 +358,56 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     }
   }
 
+  // Files picked from outside the data folder, by multimedia xref. They're
+  // copied in on submit, so cancelling the editor leaves the folder as is.
+  private readonly pendingMultimediaFiles = signal<ReadonlyMap<string, File>>(
+    new Map(),
+  );
+
+  pendingMultimediaFile(xref: string): File | undefined {
+    return this.pendingMultimediaFiles().get(xref);
+  }
+
+  setPendingMultimediaFile(xref: string, file: File | undefined) {
+    this.pendingMultimediaFiles.update((files) => {
+      const updated = new Map(files);
+      if (file) {
+        updated.set(xref, file);
+      } else {
+        updated.delete(xref);
+      }
+      return updated;
+    });
+  }
+
+  // Copies each pending file to its record's file path. Checks them all
+  // first, so a bad or taken path stops the save before anything is
+  // written. Returns whether the save should go ahead.
+  private async copyPendingMultimediaFiles(): Promise<boolean> {
+    const copies = [...this.pendingMultimediaFiles()].flatMap(
+      ([xref, file]) => {
+        const filePath = this.workingDatabase().multimedias[xref]?.filePath;
+        return filePath === undefined ? [] : [{ file, filePath }];
+      },
+    );
+    for (const { filePath } of copies) {
+      const problem =
+        multimediaFilePathProblem(filePath) ??
+        ((await this.ancestryService.multimediaFileExists(filePath))
+          ? `"${filePath}" already exists in the data folder.`
+          : undefined);
+      if (problem) {
+        alert(`Can't copy multimedia to "${filePath}": ${problem}`);
+        return false;
+      }
+    }
+    for (const { file, filePath } of copies) {
+      await this.ancestryService.copyMultimediaFile(file, filePath);
+    }
+    this.pendingMultimediaFiles.set(new Map());
+    return true;
+  }
+
   hasUnsavedChanges(): boolean {
     // Signal Forms only marks a field (and the form's own aggregate dirty
     // flag) dirty in response to a real control-originated value change --
@@ -376,6 +428,9 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     // beforeunload prompt (GedcomEditorDialogComponent.onBeforeUnload)
     // before the save has finished.
     event.preventDefault();
+    if (!(await this.copyPendingMultimediaFiles())) {
+      return;
+    }
     await this.ancestryService.updateGedcomDatabase(this.workingDatabase());
     // Close the dialog before the reload navigation below: the unsaved-changes
     // guard checks whether the dialog is still open, and the just-saved

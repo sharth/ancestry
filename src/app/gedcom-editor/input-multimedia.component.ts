@@ -1,17 +1,17 @@
 import {
   Component,
   computed,
+  effect,
   inject,
   input,
   model,
+  resource,
   signal,
+  untracked,
 } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 
-import {
-  AncestryService,
-  MultimediaFileExistsError,
-} from "../../database/ancestry.service";
+import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import {
   newGedcomMultimedia,
@@ -19,9 +19,10 @@ import {
 } from "../../gedcom/gedcomMultimedia";
 import {
   multimediaFileName,
-  sanitizeFileName,
+  multimediaFilePathProblem,
 } from "../../util/multimedia-file-name";
 import { MultimediaPreviewComponent } from "../multimedia/multimedia-preview.component";
+import { GEDCOM_EDITOR } from "./gedcom-editor-interface";
 
 @Component({
   selector: "app-input-multimedia",
@@ -35,17 +36,43 @@ export class InputMultimediaComponent implements FormValueControl<GedcomMultimed
   readonly value = model<GedcomMultimedia>(newGedcomMultimedia({ xref: "" }));
   readonly form = form(this.value);
 
-  // A file picked from outside the data folder, waiting to be copied in.
-  readonly pendingFile = signal<File | undefined>(undefined);
-  // What the user typed for the copy's name; empty means use the proposed
-  // name, which follows the record's xref and title as they're edited.
-  readonly copyFileName = signal("");
+  readonly gedcomEditor = inject(GEDCOM_EDITOR, { optional: true });
+
+  // A file picked from outside the data folder. The editor copies it to
+  // this record's file path on submit.
+  readonly pendingFile = computed(() =>
+    this.gedcomEditor?.pendingMultimediaFile(this.value().xref),
+  );
   readonly proposedFileName = computed(() => {
     const file = this.pendingFile();
     const { xref, title } = this.value();
     return file ? multimediaFileName(xref, title, file.name) : "";
   });
-  readonly copyError = signal("");
+  // Until the user types their own file path, it follows the proposed name
+  // (and so the title, as it's edited).
+  readonly followProposedFileName = signal(false);
+  readonly filePathProblem = resource({
+    params: () =>
+      this.pendingFile() ? { filePath: this.value().filePath } : undefined,
+    loader: async ({ params: { filePath } }) =>
+      multimediaFilePathProblem(filePath) ??
+      ((await this.ancestryService.multimediaFileExists(filePath))
+        ? `"${filePath}" already exists in the data folder. Choose another name.`
+        : undefined),
+  });
+
+  constructor() {
+    effect(() => {
+      const proposedFileName = this.proposedFileName();
+      if (
+        this.followProposedFileName() &&
+        proposedFileName &&
+        untracked(this.value).filePath !== proposedFileName
+      ) {
+        this.value.update((m) => ({ ...m, filePath: proposedFileName }));
+      }
+    });
+  }
 
   async browseFile() {
     try {
@@ -56,66 +83,33 @@ export class InputMultimediaComponent implements FormValueControl<GedcomMultimed
       const file = await fileHandle.getFile();
       const directoryHandle =
         this.ancestryService.gedcomResource.value()?.directoryHandle;
-      if (!directoryHandle) {
+      if (!directoryHandle || !this.gedcomEditor) {
         alert("Multimedia files need a data folder. Open one in Settings.");
         return;
       }
 
-      this.cancelCopy();
       // A file already inside the data folder is linked where it is. One
-      // from elsewhere has to be copied in first (see copyFile), since
-      // GEDCOM paths are relative to the data folder.
+      // from elsewhere is copied in on submit, since GEDCOM paths are
+      // relative to the data folder.
       const relativePath = await directoryHandle.resolve(fileHandle);
-      if (relativePath) {
-        this.value.update((m) => ({
-          ...m,
-          filePath: relativePath.join("/"),
-          mediaType: file.type,
-        }));
-      } else {
-        this.pendingFile.set(file);
-      }
+      const xref = this.value().xref;
+      this.gedcomEditor.setPendingMultimediaFile(
+        xref,
+        relativePath ? undefined : file,
+      );
+      this.followProposedFileName.set(!relativePath);
+      this.value.update((m) => ({
+        ...m,
+        filePath: relativePath
+          ? relativePath.join("/")
+          : multimediaFileName(xref, m.title, file.name),
+        mediaType: file.type,
+      }));
     } catch (e) {
       // User cancelled or error
       if ((e as Error).name !== "AbortError") {
         console.error(e);
       }
     }
-  }
-
-  async copyFile() {
-    const file = this.pendingFile();
-    if (!file) {
-      return;
-    }
-    const fileName =
-      sanitizeFileName(this.copyFileName()) || this.proposedFileName();
-    try {
-      await this.ancestryService.copyMultimediaFile(file, fileName);
-    } catch (e) {
-      this.copyError.set(
-        e instanceof MultimediaFileExistsError
-          ? `"${fileName}" already exists in the data folder. Choose another name.`
-          : `Couldn't copy the file: ${(e as Error).message}`,
-      );
-      return;
-    }
-    this.value.update((m) => ({
-      ...m,
-      filePath: fileName,
-      mediaType: file.type,
-    }));
-    this.cancelCopy();
-  }
-
-  onCopyFileNameInput(event: Event) {
-    this.copyFileName.set((event.target as HTMLInputElement).value);
-    this.copyError.set("");
-  }
-
-  cancelCopy() {
-    this.pendingFile.set(undefined);
-    this.copyFileName.set("");
-    this.copyError.set("");
   }
 }

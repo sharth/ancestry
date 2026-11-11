@@ -386,6 +386,66 @@ describe("GedcomEditorComponent Integration", () => {
 
       expect(event.defaultPrevented).toBe(true);
     });
+
+    describe("with a multimedia file picked from outside the data folder", () => {
+      const file = new File(["png"], "IMG_0042.PNG", { type: "image/png" });
+      let xref: string;
+
+      beforeEach(() => {
+        vi.spyOn(TestBed.inject(Router), "navigate").mockResolvedValue(true);
+        xref = component.openNewMultimedia();
+        component.workingDatabase.update((database) =>
+          produce(database, (draft) => {
+            const multimedia = draft.multimedias[xref];
+            assert(multimedia);
+            multimedia.filePath = "O1 Census.png";
+          }),
+        );
+        component.setPendingMultimediaFile(xref, file);
+      });
+
+      it("copies the file in before saving", async () => {
+        const order: string[] = [];
+        vi.spyOn(ancestryService, "multimediaFileExists").mockResolvedValue(
+          false,
+        );
+        const copy = vi
+          .spyOn(ancestryService, "copyMultimediaFile")
+          .mockImplementation(() => {
+            order.push("copy");
+            return Promise.resolve();
+          });
+        vi.spyOn(ancestryService, "updateGedcomDatabase").mockImplementation(
+          () => {
+            order.push("save");
+            return Promise.resolve();
+          },
+        );
+
+        await component.submitForm(new Event("submit"));
+
+        expect(copy).toHaveBeenCalledWith(file, "O1 Census.png");
+        expect(order).toEqual(["copy", "save"]);
+        expect(component.pendingMultimediaFile(xref)).toBeUndefined();
+      });
+
+      it("doesn't copy or save if the file already exists", async () => {
+        vi.spyOn(ancestryService, "multimediaFileExists").mockResolvedValue(
+          true,
+        );
+        const alert = vi.spyOn(window, "alert").mockReturnValue();
+        const copy = vi.spyOn(ancestryService, "copyMultimediaFile");
+        const save = vi.spyOn(ancestryService, "updateGedcomDatabase");
+
+        await component.submitForm(new Event("submit"));
+
+        expect(alert).toHaveBeenCalledWith(
+          expect.stringContaining("already exists"),
+        );
+        expect(copy).not.toHaveBeenCalled();
+        expect(save).not.toHaveBeenCalled();
+      });
+    });
   });
 });
 

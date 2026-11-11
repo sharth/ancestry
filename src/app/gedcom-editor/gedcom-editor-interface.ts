@@ -16,6 +16,10 @@ export interface GedcomEditorInterface {
   openSource(xref: string): void;
   openNewFamily(): string;
   openFamily(xref: string): void;
+  // A file picked for a multimedia record from outside the data folder,
+  // copied into the folder (at the record's file path) only on submit.
+  pendingMultimediaFile(xref: string): File | undefined;
+  setPendingMultimediaFile(xref: string, file: File | undefined): void;
 }
 
 export const GEDCOM_EDITOR = new InjectionToken<GedcomEditorInterface>(

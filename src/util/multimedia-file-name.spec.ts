@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { multimediaFileName, sanitizeFileName } from "./multimedia-file-name";
+import {
+  multimediaFileName,
+  multimediaFilePathProblem,
+  sanitizeFileName,
+} from "./multimedia-file-name";
 
 describe("multimediaFileName", () => {
   it("joins xref and title and keeps the extension", () => {
@@ -46,5 +50,22 @@ describe("sanitizeFileName", () => {
 
   it("can return an empty name", () => {
     expect(sanitizeFileName(" ... ")).toBe("");
+  });
+});
+
+describe("multimediaFilePathProblem", () => {
+  it("accepts a file name or a relative path", () => {
+    expect(multimediaFilePathProblem("O1 Deed.png")).toBeUndefined();
+    expect(multimediaFilePathProblem("scans/O1 Deed.png")).toBeUndefined();
+  });
+
+  it("rejects an empty name or path part", () => {
+    expect(multimediaFilePathProblem("")).toBe("Enter a file name.");
+    expect(multimediaFilePathProblem("scans/")).toBe("Enter a file name.");
+  });
+
+  it("rejects characters that aren't allowed in file names", () => {
+    expect(multimediaFilePathProblem("Deed?.png")).toMatch(/can't contain/);
+    expect(multimediaFilePathProblem("Deed.")).toMatch(/can't contain/);
   });
 });
