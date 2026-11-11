@@ -52,9 +52,10 @@ export class InputMultimediaComponent implements FormValueControl<GedcomMultimed
   // inside the data folder, otherwise just its name (the browser doesn't
   // reveal where else it lives).
   readonly sourceFileName = signal("");
-  // Until the user types their own file path, it follows the proposed name
-  // (and so the title, as it's edited).
-  readonly followProposedFileName = signal(false);
+  // What the user typed as the path to copy a pending file to. Empty means
+  // the proposed name (shown as the field's placeholder), which follows the
+  // title as it's edited; clearing the field goes back to it.
+  readonly copyFileName = signal("");
   readonly filePathProblem = resource({
     params: () =>
       this.pendingFile() ? { filePath: this.value().filePath } : undefined,
@@ -66,16 +67,21 @@ export class InputMultimediaComponent implements FormValueControl<GedcomMultimed
   });
 
   constructor() {
+    // While a file is pending, the record's file path is whatever the copy
+    // will be saved as, so the GEDCOM delta shows it.
     effect(() => {
-      const proposedFileName = this.proposedFileName();
-      if (
-        this.followProposedFileName() &&
-        proposedFileName &&
-        untracked(this.value).filePath !== proposedFileName
-      ) {
-        this.value.update((m) => ({ ...m, filePath: proposedFileName }));
+      if (!this.pendingFile()) {
+        return;
+      }
+      const filePath = this.copyFileName().trim() || this.proposedFileName();
+      if (untracked(this.value).filePath !== filePath) {
+        this.value.update((m) => ({ ...m, filePath }));
       }
     });
+  }
+
+  onCopyFileNameInput(event: Event) {
+    this.copyFileName.set((event.target as HTMLInputElement).value);
   }
 
   async browseFile() {
@@ -101,7 +107,7 @@ export class InputMultimediaComponent implements FormValueControl<GedcomMultimed
         xref,
         relativePath ? undefined : file,
       );
-      this.followProposedFileName.set(!relativePath);
+      this.copyFileName.set("");
       this.sourceFileName.set(relativePath?.join("/") ?? file.name);
       this.value.update((m) => ({
         ...m,

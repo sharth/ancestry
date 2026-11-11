@@ -391,15 +391,19 @@ describe("GedcomEditorComponent Integration", () => {
     describe("with a multimedia file picked from outside the data folder", () => {
       const file = new File(["png"], "IMG_0042.PNG", { type: "image/png" });
       let xref: string;
+      let filePath: string;
 
       beforeEach(() => {
         vi.spyOn(TestBed.inject(Router), "navigate").mockResolvedValue(true);
         xref = component.openNewMultimedia();
+        filePath = `${xref.replaceAll("@", "")} Census.png`;
         component.workingDatabase.update((database) =>
           produce(database, (draft) => {
             const multimedia = draft.multimedias[xref];
             assert(multimedia);
-            multimedia.filePath = "O1 Census.png";
+            // What the multimedia input proposes for this record and file.
+            multimedia.title = "Census";
+            multimedia.filePath = filePath;
           }),
         );
         component.setPendingMultimediaFile(xref, file);
@@ -409,15 +413,13 @@ describe("GedcomEditorComponent Integration", () => {
         await fixture.whenStable();
 
         expect(component.pendingMultimediaCopies()).toEqual([
-          { file, filePath: "O1 Census.png" },
+          { file, filePath: filePath },
         ]);
         expect(
           screen.getByText("Files to copy into the data folder"),
         ).toBeTruthy();
         expect(screen.getByRole("cell", { name: "IMG_0042.PNG" })).toBeTruthy();
-        expect(
-          screen.getByRole("cell", { name: "O1 Census.png" }),
-        ).toBeTruthy();
+        expect(screen.getByRole("cell", { name: filePath })).toBeTruthy();
       });
 
       it("copies the file in before saving", async () => {
@@ -440,7 +442,7 @@ describe("GedcomEditorComponent Integration", () => {
 
         await component.submitForm(new Event("submit"));
 
-        expect(copy).toHaveBeenCalledWith(file, "O1 Census.png");
+        expect(copy).toHaveBeenCalledWith(file, filePath);
         expect(order).toEqual(["copy", "save"]);
         expect(component.pendingMultimediaFile(xref)).toBeUndefined();
       });

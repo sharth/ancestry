@@ -120,7 +120,21 @@ describe("InputMultimediaComponent", () => {
       expect(component.value().filePath).toBe("O12 1911 Census.png");
     });
 
-    it("stops following the title once the user types a path", async () => {
+    it("shows the proposed name as a placeholder, not a value", async () => {
+      vi.spyOn(
+        component.ancestryService,
+        "multimediaFileExists",
+      ).mockResolvedValue(false);
+
+      await component.browseFile();
+      await fixture.whenStable();
+      const input = screen.getByLabelText<HTMLInputElement>("File Path");
+
+      expect(input.value).toBe("");
+      expect(input.placeholder).toBe("O12 1901 Census.png");
+    });
+
+    it("uses a typed path, and the proposed name again once it's cleared", async () => {
       vi.spyOn(
         component.ancestryService,
         "multimediaFileExists",
@@ -135,6 +149,12 @@ describe("InputMultimediaComponent", () => {
       await fixture.whenStable();
 
       expect(component.value().filePath).toBe("Census Smith.png");
+
+      input.value = "";
+      input.dispatchEvent(new Event("input"));
+      await fixture.whenStable();
+
+      expect(component.value().filePath).toBe("O12 1911 Census.png");
     });
 
     it("reports an error if the file already exists", async () => {

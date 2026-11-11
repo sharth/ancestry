@@ -4,7 +4,9 @@
 </div>
 
 <div class="input-group">
-  <label class="input-group-text" for="sourceFile">Source File</label>
+  <label class="input-group-text path-label" for="sourceFile"
+    >Source File</label
+  >
   <input
     class="form-control"
     id="sourceFile"
@@ -21,23 +23,31 @@
   </button>
 </div>
 
-<div class="has-validation">
-  <div class="form-floating" [class.is-invalid]="filePathProblem.value()">
+<div class="input-group has-validation">
+  <label class="input-group-text path-label" for="filePath">File Path</label>
+  @if (pendingFile()) {
     <input
-      class="form-control h-auto"
+      class="form-control"
+      id="filePath"
+      [class.is-invalid]="filePathProblem.value()"
+      [placeholder]="proposedFileName()"
+      [value]="copyFileName()"
+      (input)="onCopyFileNameInput($event)"
+    />
+  } @else {
+    <input
+      class="form-control"
+      id="filePath"
       [class.is-invalid]="filePathProblem.value()"
       [formField]="form.filePath"
-      (input)="followProposedFileName.set(false)"
-      id="filePath"
     />
-    <label for="filePath">File Path</label>
-  </div>
+  }
   @if (filePathProblem.value(); as problem) {
     <div class="invalid-feedback">{{ problem }}</div>
   } @else if (pendingFile()) {
-    <div class="form-text">
+    <div class="form-text w-100">
       The source file is outside your data folder. It will be copied in at this
-      path when you submit.
+      path when you submit. Leave it empty to use the name shown.
     </div>
   }
 </div>
