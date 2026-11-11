@@ -17,7 +17,9 @@
         (click)="open(record)"
       >
         <i class="bi" [class]="record.icon"></i>
-        <span class="flex-grow-1 text-truncate" [title]="record.label">{{ record.label }}</span>
+        <span class="flex-grow-1 text-truncate" [title]="record.label">{{
+          record.label
+        }}</span>
         <span class="text-secondary">{{ record.tab.xref }}</span>
       </button>
     } @empty {
