@@ -71,8 +71,13 @@ export class InputMultimediaComponent implements FormValueControl<GedcomMultimed
   });
 
   constructor() {
-    // While a file is pending, the record's file path is whatever the copy
-    // will be saved as, so the GEDCOM delta shows it.
+    // While a file picked from outside the data folder is waiting to be
+    // copied in, the File Path input isn't bound to the record: it edits
+    // copyFileName, and shows proposedFileName (from the xref and title) as
+    // its placeholder. This keeps the record's real filePath (what gets
+    // saved, shown in the GEDCOM delta, and copied to on submit) in sync
+    // with what the input shows: the typed name if any, otherwise the
+    // proposed one, which changes as the title is edited.
     effect(() => {
       if (!this.pendingFile()) {
         return;
