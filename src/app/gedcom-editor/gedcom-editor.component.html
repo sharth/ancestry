@@ -130,7 +130,7 @@
   }
 
   <h2>Gedcom Delta</h2>
-  @if (pendingMultimediaCopies().length > 0) {
+  @if (pendingMultimedias().length > 0) {
     <table class="table table-striped">
       <caption class="caption-top">
         Files to copy into the data folder
@@ -142,10 +142,10 @@
         </tr>
       </thead>
       <tbody>
-        @for (copy of pendingMultimediaCopies(); track copy.filePath) {
+        @for (multimedia of pendingMultimedias(); track multimedia.xref) {
           <tr>
-            <td>{{ copy.file.name }}</td>
-            <td>{{ copy.filePath }}</td>
+            <td>{{ multimedia.pendingFile.name }}</td>
+            <td>{{ multimedia.filePath }}</td>
           </tr>
         }
       </tbody>

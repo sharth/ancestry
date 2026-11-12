@@ -412,9 +412,11 @@ describe("GedcomEditorComponent Integration", () => {
       it("lists the file to copy alongside the GEDCOM delta", async () => {
         await fixture.whenStable();
 
-        expect(component.pendingMultimediaCopies()).toEqual([
-          { file, filePath: filePath },
-        ]);
+        expect(
+          component
+            .pendingMultimedias()
+            .map(({ pendingFile, filePath }) => ({ pendingFile, filePath })),
+        ).toEqual([{ pendingFile: file, filePath }]);
         expect(
           screen.getByText("Files to copy into the data folder"),
         ).toBeTruthy();
