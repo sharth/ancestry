@@ -14,22 +14,10 @@ import { InputMultimediaComponent } from "./input-multimedia.component";
 describe("InputMultimediaComponent", () => {
   let fixture: ComponentFixture<InputMultimediaComponent>;
   let component: InputMultimediaComponent;
-  let pendingFiles: Map<string, File>;
 
   beforeEach(async () => {
-    pendingFiles = new Map();
-    const pendingFilesVersion = signal(0);
-    const gedcomEditor: Partial<GedcomEditorInterface> = {
-      pendingMultimediaFile: (xref) => {
-        pendingFilesVersion();
-        return pendingFiles.get(xref);
-      },
-      setPendingMultimediaFile: (xref, file) => {
-        if (file) pendingFiles.set(xref, file);
-        else pendingFiles.delete(xref);
-        pendingFilesVersion.update((v) => v + 1);
-      },
-    };
+    // Browse... needs an editor to copy the picked file in on submit.
+    const gedcomEditor: Partial<GedcomEditorInterface> = {};
     const renderResult = await render(InputMultimediaComponent, {
       bindings: [inputBinding("workingDatabase", signal(newGedcomDatabase()))],
       providers: [{ provide: GEDCOM_EDITOR, useValue: gedcomEditor }],
@@ -83,7 +71,7 @@ describe("InputMultimediaComponent", () => {
 
       await component.browseFile();
 
-      expect(pendingFiles.size).toBe(0);
+      expect(component.value().pendingFile).toBeUndefined();
       expect(component.sourceFileName()).toBe("scans/census.png");
       expect(component.value().filePath).toBe("scans/census.png");
       expect(component.value().mediaType).toBe("image/png");
@@ -97,7 +85,7 @@ describe("InputMultimediaComponent", () => {
       await component.browseFile();
       await fixture.whenStable();
 
-      expect(pendingFiles.get("@O12@")).toBe(file);
+      expect(component.value().pendingFile).toBe(file);
       expect(screen.getByLabelText<HTMLInputElement>("Source File").value).toBe(
         "IMG_0042.PNG",
       );
@@ -240,7 +228,7 @@ describe("InputMultimediaComponent", () => {
       resolvedPath = ["census.png"];
       await component.browseFile();
 
-      expect(pendingFiles.size).toBe(0);
+      expect(component.value().pendingFile).toBeUndefined();
       expect(component.value().filePath).toBe("census.png");
     });
   });

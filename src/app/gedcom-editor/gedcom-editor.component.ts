@@ -5,7 +5,6 @@ import {
   input,
   linkedSignal,
   output,
-  signal,
 } from "@angular/core";
 import { FormField, form } from "@angular/forms/signals";
 import { ActivatedRoute, Router } from "@angular/router";
@@ -361,36 +360,16 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     }
   }
 
-  // Files picked from outside the data folder, by multimedia xref. They're
-  // copied in on submit, so cancelling the editor leaves the folder as is.
-  private readonly pendingMultimediaFiles = signal<
-    Readonly<Partial<Record<string, File>>>
-  >({});
-
-  pendingMultimediaFile(xref: string): File | undefined {
-    return this.pendingMultimediaFiles()[xref];
-  }
-
-  setPendingMultimediaFile(xref: string, file: File | undefined) {
-    this.pendingMultimediaFiles.update(
-      produce((draft) => {
-        draft[xref] = file;
-      }),
-    );
-  }
-
-  // Each pending file with the path in the data folder it will be copied
-  // to on submit (its multimedia record's current file path). Shown
+  // Each multimedia record's pending file (see GedcomMultimedia.pendingFile)
+  // with the path in the data folder it will be copied to on submit. Shown
   // alongside the GEDCOM delta, since it's part of what submit writes.
   readonly pendingMultimediaCopies = computed<
     { file: File; filePath: string }[]
   >(() =>
-    Object.entries(this.pendingMultimediaFiles()).flatMap(([xref, file]) => {
-      const filePath = this.workingDatabase().multimedias[xref]?.filePath;
-      return file === undefined || filePath === undefined
-        ? []
-        : [{ file, filePath }];
-    }),
+    Object.values(this.workingDatabase().multimedias).flatMap(
+      ({ pendingFile, filePath }) =>
+        pendingFile ? [{ file: pendingFile, filePath }] : [],
+    ),
   );
 
   // Files a multimedia record linked to before this edit but won't after
@@ -431,7 +410,15 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     for (const { file, filePath } of copies) {
       await this.ancestryService.copyMultimediaFile(file, filePath);
     }
-    this.pendingMultimediaFiles.set({});
+    // They're in the data folder now, so don't copy them again (say, if
+    // saving fails and the user submits again).
+    this.workingDatabase.update((database) =>
+      produce(database, (draft) => {
+        for (const multimedia of Object.values(draft.multimedias)) {
+          delete multimedia.pendingFile;
+        }
+      }),
+    );
   }
 
   hasUnsavedChanges(): boolean {

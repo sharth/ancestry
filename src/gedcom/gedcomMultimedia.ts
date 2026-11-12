@@ -25,6 +25,12 @@ export interface GedcomMultimedia {
   title: string;
   changeDate: GedcomChangeDate;
   creationDate: GedcomCreationDate;
+  // Not part of GEDCOM: never parsed or serialized. Only the editor's
+  // working copy sets it, for a file picked from outside the data folder
+  // that hasn't been copied in yet. Submit copies it to `filePath` before
+  // saving, and cancelling the editor discards it with the rest of the
+  // working copy.
+  pendingFile?: File;
 }
 
 export function newGedcomMultimedia(
