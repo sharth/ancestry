@@ -65,6 +65,24 @@ describe("gedcomMultimedia", () => {
     ).toEqual(gedcomText);
   });
 
+  it("never serializes a pending file", () => {
+    const multimedia = newGedcomMultimedia({
+      xref: "@M1@",
+      filePath: "M1 Census.png",
+      mediaType: "image/png",
+    });
+    const withPendingFile = {
+      ...multimedia,
+      pendingFile: new File(["png"], "IMG_0042.PNG", { type: "image/png" }),
+    };
+
+    expect(
+      serializeGedcomRecordToText(serializeGedcomMultimedia(withPendingFile)),
+    ).toEqual(
+      serializeGedcomRecordToText(serializeGedcomMultimedia(multimedia)),
+    );
+  });
+
   describe("error conditions", () => {
     it("throws on multiple file paths", () => {
       const gedcomText = [

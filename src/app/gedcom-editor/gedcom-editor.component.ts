@@ -5,7 +5,6 @@ import {
   input,
   linkedSignal,
   output,
-  signal,
 } from "@angular/core";
 import { FormField, form } from "@angular/forms/signals";
 import { ActivatedRoute, Router } from "@angular/router";
@@ -15,7 +14,10 @@ import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomFamily } from "../../gedcom/gedcomFamily";
 import { newGedcomIndividual } from "../../gedcom/gedcomIndividual";
-import { newGedcomMultimedia } from "../../gedcom/gedcomMultimedia";
+import {
+  type GedcomMultimedia,
+  newGedcomMultimedia,
+} from "../../gedcom/gedcomMultimedia";
 import { displayGedcomName } from "../../gedcom/gedcomName";
 import { newGedcomRepository } from "../../gedcom/gedcomRepository";
 import { newGedcomSource } from "../../gedcom/gedcomSource";
@@ -361,36 +363,14 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     }
   }
 
-  // Files picked from outside the data folder, by multimedia xref. They're
-  // copied in on submit, so cancelling the editor leaves the folder as is.
-  private readonly pendingMultimediaFiles = signal<
-    Readonly<Partial<Record<string, File>>>
-  >({});
-
-  pendingMultimediaFile(xref: string): File | undefined {
-    return this.pendingMultimediaFiles()[xref];
-  }
-
-  setPendingMultimediaFile(xref: string, file: File | undefined) {
-    this.pendingMultimediaFiles.update(
-      produce((draft) => {
-        draft[xref] = file;
-      }),
-    );
-  }
-
-  // Each pending file with the path in the data folder it will be copied
-  // to on submit (its multimedia record's current file path). Shown
-  // alongside the GEDCOM delta, since it's part of what submit writes.
-  readonly pendingMultimediaCopies = computed<
-    { file: File; filePath: string }[]
-  >(() =>
-    Object.entries(this.pendingMultimediaFiles()).flatMap(([xref, file]) => {
-      const filePath = this.workingDatabase().multimedias[xref]?.filePath;
-      return file === undefined || filePath === undefined
-        ? []
-        : [{ file, filePath }];
-    }),
+  // Multimedia records with a pending file (see GedcomMultimedia.pendingFile)
+  // that submit will copy to their file path. Shown alongside the GEDCOM
+  // delta, since it's part of what submit writes.
+  readonly pendingMultimedias = computed(() =>
+    Object.values(this.workingDatabase().multimedias).filter(
+      (multimedia): multimedia is GedcomMultimedia & { pendingFile: File } =>
+        multimedia.pendingFile !== undefined,
+    ),
   );
 
   // Files a multimedia record linked to before this edit but won't after
@@ -418,8 +398,8 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   // Copies each pending file to its record's file path. Checks them all
   // first, so a bad or taken path throws before anything is written.
   private async copyPendingMultimediaFiles(): Promise<void> {
-    const copies = this.pendingMultimediaCopies();
-    for (const { filePath } of copies) {
+    const pending = this.pendingMultimedias();
+    for (const { filePath } of pending) {
       const problem = multimediaFilePathProblem(filePath);
       if (problem) {
         throw new Error(`Can't copy multimedia to "${filePath}": ${problem}`);
@@ -428,10 +408,18 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
         throw new FileExistsError(filePath);
       }
     }
-    for (const { file, filePath } of copies) {
-      await this.ancestryService.copyMultimediaFile(file, filePath);
+    for (const { pendingFile, filePath } of pending) {
+      await this.ancestryService.copyMultimediaFile(pendingFile, filePath);
     }
-    this.pendingMultimediaFiles.set({});
+    // They're in the data folder now, so don't copy them again (say, if
+    // saving fails and the user submits again).
+    this.workingDatabase.update((database) =>
+      produce(database, (draft) => {
+        for (const multimedia of Object.values(draft.multimedias)) {
+          delete multimedia.pendingFile;
+        }
+      }),
+    );
   }
 
   hasUnsavedChanges(): boolean {

@@ -42,9 +42,7 @@ export class InputMultimediaComponent implements FormValueControl<GedcomMultimed
 
   // A file picked from outside the data folder. The editor copies it to
   // this record's file path on submit.
-  readonly pendingFile = computed(() =>
-    this.gedcomEditor?.pendingMultimediaFile(this.value().xref),
-  );
+  readonly pendingFile = computed(() => this.value().pendingFile);
   readonly proposedFileName = computed(() => {
     const file = this.pendingFile();
     const { xref, title } = this.value();
@@ -114,19 +112,15 @@ export class InputMultimediaComponent implements FormValueControl<GedcomMultimed
       // from elsewhere is copied in on submit, since GEDCOM paths are
       // relative to the data folder.
       const relativePath = await directoryHandle.resolve(fileHandle);
-      const xref = this.value().xref;
-      this.gedcomEditor.setPendingMultimediaFile(
-        xref,
-        relativePath ? undefined : file,
-      );
       this.useDefaultFileName.set(true);
       this.sourceFileName.set(relativePath?.join("/") ?? file.name);
       this.value.update((m) => ({
         ...m,
         filePath: relativePath
           ? relativePath.join("/")
-          : multimediaFileName(xref, m.title, file.name),
+          : multimediaFileName(m.xref, m.title, file.name),
         mediaType: file.type,
+        pendingFile: relativePath ? undefined : file,
       }));
     } catch (e) {
       // User cancelled or error

@@ -404,17 +404,19 @@ describe("GedcomEditorComponent Integration", () => {
             // What the multimedia input proposes for this record and file.
             multimedia.title = "Census";
             multimedia.filePath = filePath;
+            multimedia.pendingFile = file;
           }),
         );
-        component.setPendingMultimediaFile(xref, file);
       });
 
       it("lists the file to copy alongside the GEDCOM delta", async () => {
         await fixture.whenStable();
 
-        expect(component.pendingMultimediaCopies()).toEqual([
-          { file, filePath: filePath },
-        ]);
+        expect(
+          component
+            .pendingMultimedias()
+            .map(({ pendingFile, filePath }) => ({ pendingFile, filePath })),
+        ).toEqual([{ pendingFile: file, filePath }]);
         expect(
           screen.getByText("Files to copy into the data folder"),
         ).toBeTruthy();
@@ -444,7 +446,9 @@ describe("GedcomEditorComponent Integration", () => {
 
         expect(copy).toHaveBeenCalledWith(file, filePath);
         expect(order).toEqual(["copy", "save"]);
-        expect(component.pendingMultimediaFile(xref)).toBeUndefined();
+        expect(
+          component.workingDatabase().multimedias[xref]?.pendingFile,
+        ).toBeUndefined();
       });
 
       it("doesn't copy or save if the file already exists", async () => {
