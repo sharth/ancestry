@@ -5,6 +5,7 @@ import {
   input,
   linkedSignal,
   output,
+  resource,
 } from "@angular/core";
 import { FormField, form } from "@angular/forms/signals";
 import { ActivatedRoute, Router } from "@angular/router";
@@ -12,8 +13,14 @@ import { produce } from "immer";
 
 import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
-import { newGedcomFamily } from "../../gedcom/gedcomFamily";
-import { newGedcomIndividual } from "../../gedcom/gedcomIndividual";
+import {
+  getFamilySourceCitations,
+  newGedcomFamily,
+} from "../../gedcom/gedcomFamily";
+import {
+  getIndividualSourceCitations,
+  newGedcomIndividual,
+} from "../../gedcom/gedcomIndividual";
 import {
   type GedcomMultimedia,
   newGedcomMultimedia,
@@ -361,6 +368,160 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
         return submitter?.name || `Submitter ${xref}`;
       }
     }
+  }
+
+  // Every multimedia record the open tabs can show, with what decides its
+  // contents: the record itself (a multimedia tab), and every record linked
+  // from a source, or from a citation on an individual, a family, or (on
+  // an individual's tab) one of their families. Only changes when one of
+  // those changes, not on every edit.
+  private readonly multimediaInView = computed(
+    () => {
+      const database = this.workingDatabase();
+      const xrefs = new Set<string>();
+      const addLinks = (links: { xref: string }[]) => {
+        for (const link of links) {
+          if (link.xref) {
+            xrefs.add(link.xref);
+          }
+        }
+      };
+      const addCitations = (
+        references: { citation: { multimediaLinks: { xref: string }[] } }[],
+      ) => {
+        for (const { citation } of references) {
+          addLinks(citation.multimediaLinks);
+        }
+      };
+      const addFamily = (familyXref: string) => {
+        const family = database.families[familyXref];
+        if (family) {
+          addCitations(getFamilySourceCitations(family));
+        }
+      };
+      for (const tab of this.xrefsIncludedInView()) {
+        switch (tab.type) {
+          case "OBJE":
+            xrefs.add(tab.xref);
+            break;
+          case "SOUR":
+            addLinks(database.sources[tab.xref]?.multimediaLinks ?? []);
+            break;
+          case "FAM":
+            addFamily(tab.xref);
+            break;
+          case "INDI": {
+            const individual = database.individuals[tab.xref];
+            if (individual) {
+              addCitations(getIndividualSourceCitations(individual));
+              individual.parentOfFamilyXrefs.forEach(addFamily);
+              individual.childOfFamilyXrefs.forEach(addFamily);
+            }
+            break;
+          }
+          case "REPO":
+          case "SUBM":
+            break;
+        }
+      }
+      return [...xrefs].sort().map((xref) => ({
+        xref,
+        filePath: database.multimedias[xref]?.filePath ?? "",
+        pendingFile: database.multimedias[xref]?.pendingFile,
+      }));
+    },
+    {
+      equal: (a, b) =>
+        a.length === b.length &&
+        a.every((entry, i) => {
+          const other = b[i];
+          return (
+            entry.xref === other?.xref &&
+            entry.filePath === other.filePath &&
+            entry.pendingFile === other.pendingFile
+          );
+        }),
+    },
+  );
+
+  // What each multimedia record in view was last loaded from, and the read
+  // of its contents (finished or not). A reload (say, after opening another
+  // tab) reuses the read of every record whose pending file and path haven't
+  // changed, even one still in flight, instead of reading it again.
+  private loadedMultimedia = new Map<
+    string,
+    {
+      filePath: string;
+      pendingFile: File | undefined;
+      gedcomResourceValue: unknown;
+      blob: Promise<Blob | undefined>;
+    }
+  >();
+
+  private readonly multimediaBlobsResource = resource({
+    // A computed() comparing its parts, so the resource only reloads when one
+    // of them actually changes.
+    params: computed(
+      () => ({
+        multimedia: this.multimediaInView(),
+        gedcomResourceValue: this.ancestryService.gedcomResource.value(),
+      }),
+      {
+        equal: (a, b) =>
+          a.multimedia === b.multimedia &&
+          a.gedcomResourceValue === b.gedcomResourceValue,
+      },
+    ),
+    loader: async ({ params: { multimedia, gedcomResourceValue } }) => {
+      const previous = this.loadedMultimedia;
+      this.loadedMultimedia = new Map(
+        multimedia.map(({ xref, filePath, pendingFile }) => {
+          const before = previous.get(xref);
+          if (
+            before?.filePath === filePath &&
+            before.pendingFile === pendingFile &&
+            before.gedcomResourceValue === gedcomResourceValue
+          ) {
+            return [xref, before];
+          }
+          const blob: Promise<Blob | undefined> = pendingFile
+            ? Promise.resolve(pendingFile)
+            : filePath
+              ? this.ancestryService.getMultimediaFile(filePath)
+              : Promise.resolve(undefined);
+          return [xref, { filePath, pendingFile, gedcomResourceValue, blob }];
+        }),
+      );
+      const blobs = await Promise.all(
+        [...this.loadedMultimedia].map(
+          async ([xref, { blob }]) => [xref, await blob] as const,
+        ),
+      );
+      return new Map(
+        blobs.flatMap(([xref, blob]) => (blob ? [[xref, blob] as const] : [])),
+      );
+    },
+  });
+
+  // The last loaded contents, kept while a reload is in flight so previews
+  // don't blank out in the meantime.
+  private readonly multimediaBlobs = linkedSignal<
+    ReadonlyMap<string, Blob> | undefined,
+    ReadonlyMap<string, Blob>
+  >({
+    source: () =>
+      this.multimediaBlobsResource.hasValue()
+        ? this.multimediaBlobsResource.value()
+        : undefined,
+    computation: (blobs, previous) => blobs ?? previous?.value ?? new Map(),
+  });
+
+  multimediaBlob(xref: string): Blob | undefined {
+    return this.multimediaBlobs().get(xref);
+  }
+
+  multimediaBlobsLoading(): boolean {
+    return this.multimediaBlobsResource.isLoading();
   }
 
   // Multimedia records with a pending file (see GedcomMultimedia.pendingFile)

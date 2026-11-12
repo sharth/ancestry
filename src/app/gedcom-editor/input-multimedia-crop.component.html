@@ -1,4 +1,4 @@
-@if (fileResource.value(); as fileUrl) {
+@if (fileUrl(); as fileUrl) {
   <div class="crop-viewport" #cropViewport>
     <div
       class="crop-container"
@@ -60,7 +60,7 @@
       Clear crop
     </button>
   </div>
-} @else if (fileResource.isLoading()) {
+} @else if (loading()) {
   <p>Loading image…</p>
 } @else {
   <p>No image available to crop.</p>

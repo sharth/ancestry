@@ -64,7 +64,8 @@
         @if (multimedia?.mediaType?.startsWith("image/")) {
           <h6 class="mt-2">Crop</h6>
           <app-input-multimedia-crop
-            [filePath]="multimedia.filePath"
+            [blob]="gedcomEditor?.multimediaBlob(multimedia.xref)"
+            [loading]="gedcomEditor?.multimediaBlobsLoading() ?? false"
             [value]="value()[$index]?.crop"
             (valueChange)="setCrop($index, $event)"
           />

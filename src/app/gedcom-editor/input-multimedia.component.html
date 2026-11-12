@@ -91,5 +91,8 @@
 </div>
 
 @if (form.filePath().value()) {
-  <app-multimedia-preview [filePath]="form.filePath().value()" />
+  <app-multimedia-preview
+    [blob]="gedcomEditor?.multimediaBlob(value().xref)"
+    [alt]="form.filePath().value()"
+  />
 }

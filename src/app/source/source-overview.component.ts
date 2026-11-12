@@ -3,6 +3,7 @@ import { RouterModule } from "@angular/router";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { multimediaLinkTitle } from "../../gedcom/gedcomMultimediaLink";
+import { multimediaBlobsResource } from "../../util/multimedia-blobs";
 import { MultimediaPreviewComponent } from "../multimedia/multimedia-preview.component";
 import { RepositoryCallNumberComponent } from "../repository-call-number/repository-call-number.component";
 
@@ -46,4 +47,10 @@ export class SourceOverviewComponent {
       })),
     };
   });
+
+  readonly blobs = multimediaBlobsResource(() =>
+    (this.vm()?.multimediaLinks ?? []).flatMap((link) =>
+      link.multimedia?.filePath ? [link.multimedia.filePath] : [],
+    ),
+  );
 }

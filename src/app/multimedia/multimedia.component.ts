@@ -4,6 +4,7 @@ import { RouterModule } from "@angular/router";
 import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { serializeGedcomMultimedia } from "../../gedcom/gedcomMultimedia";
+import { multimediaBlobsResource } from "../../util/multimedia-blobs";
 import { GedcomDisplayComponent } from "../gedcom-display/gedcom-display.component";
 import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
 import type { ComponentWithUnsavedChanges } from "../unsaved-changes.guard";
@@ -34,6 +35,11 @@ export class MultimediaComponent implements ComponentWithUnsavedChanges {
   hasUnsavedChanges(): boolean {
     return this.editDialog()?.hasUnsavedChanges() ?? false;
   }
+
+  readonly blobs = multimediaBlobsResource(() => {
+    const filePath = this.vm()?.multimedia.filePath;
+    return filePath ? [filePath] : [];
+  });
 
   readonly vm = computed(() => {
     const ancestryDatabase = this.ancestryDatabase();

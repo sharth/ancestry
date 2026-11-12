@@ -1,16 +1,7 @@
-import {
-  Component,
-  DestroyRef,
-  computed,
-  inject,
-  input,
-  resource,
-  signal,
-} from "@angular/core";
-import { DomSanitizer } from "@angular/platform-browser";
+import { Component, computed, input, signal } from "@angular/core";
 
-import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomMultimediaCrop } from "../../gedcom/gedcomMultimediaLink";
+import { fileObjectUrl } from "../../util/object-url";
 
 interface CropRegion {
   left: number;
@@ -51,11 +42,15 @@ export function resolveCropRegion(
   styleUrl: "./multimedia-preview.component.css",
 })
 export class MultimediaPreviewComponent {
-  private readonly ancestryService = inject(AncestryService);
-  private readonly sanitizer = inject(DomSanitizer);
-  private readonly destroyRef = inject(DestroyRef);
+  // The multimedia's contents, already read by whoever knows where they
+  // live (the data folder, or a file picked in the editor but not yet copied
+  // in).
+  readonly blob = input.required<Blob | undefined>();
+  // Shown as the image's alt text.
+  readonly alt = input<string>("");
+  readonly fileUrl = fileObjectUrl(this.blob);
+  readonly mediaType = computed(() => this.blob()?.type ?? "");
 
-  readonly filePath = input.required<string>();
   // The CROP of the multimedia link being shown, if any. Only applies to
   // images.
   readonly crop = input<GedcomMultimediaCrop | undefined>(undefined);
@@ -116,43 +111,4 @@ export class MultimediaPreviewComponent {
       height: img.naturalHeight,
     });
   }
-
-  readonly fileResource = resource({
-    params: () => {
-      const filePath = this.filePath();
-      if (!filePath) {
-        return null;
-      }
-      return {
-        filePath,
-        gedcomResourceValue: this.ancestryService.gedcomResource.value(),
-      };
-    },
-    loader: async ({ params }) => {
-      if (!params) {
-        return { fileUrl: undefined, mediaType: undefined };
-      }
-
-      try {
-        const fileHandle = await this.ancestryService.getMultimediaFileHandle(
-          params.filePath,
-        );
-        if (!fileHandle) {
-          return { fileUrl: undefined, mediaType: undefined };
-        }
-
-        const file = await fileHandle.getFile();
-        const objectUrl = URL.createObjectURL(file);
-        this.destroyRef.onDestroy(() => {
-          URL.revokeObjectURL(objectUrl);
-        });
-        const fileUrl =
-          this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
-        return { fileUrl, mediaType: file.type };
-      } catch (error) {
-        console.error("Failed to load multimedia file:", error);
-        return { fileUrl: undefined, mediaType: undefined };
-      }
-    },
-  });
 }

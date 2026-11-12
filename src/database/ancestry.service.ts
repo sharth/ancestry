@@ -310,6 +310,18 @@ export class AncestryService {
       : undefined;
   }
 
+  // The multimedia file at `relativePath` in the loaded directory, read as a
+  // File, or undefined if there's none (or it can't be read).
+  async getMultimediaFile(relativePath: string): Promise<File | undefined> {
+    try {
+      const fileHandle = await this.getMultimediaFileHandle(relativePath);
+      return await fileHandle?.getFile();
+    } catch (error) {
+      console.error(`Failed to read multimedia file ${relativePath}:`, error);
+      return undefined;
+    }
+  }
+
   // Whether something already exists at `relativePath` in the loaded
   // directory.
   async multimediaFileExists(relativePath: string): Promise<boolean> {

@@ -409,6 +409,63 @@ describe("GedcomEditorComponent Integration", () => {
         );
       });
 
+      it("shows the picked file, not what's at its path, until it's copied in", async () => {
+        const onDisk = new File(["old"], "old.png", { type: "image/png" });
+        const getMultimediaFile = vi
+          .spyOn(ancestryService, "getMultimediaFile")
+          .mockResolvedValue(onDisk);
+
+        await vi.waitFor(() => {
+          expect(component.multimediaBlob(xref)).toBe(file);
+        });
+        expect(getMultimediaFile).not.toHaveBeenCalled();
+
+        component.workingDatabase.update((database) =>
+          produce(database, (draft) => {
+            const multimedia = draft.multimedias[xref];
+            assert(multimedia);
+            delete multimedia.pendingFile;
+          }),
+        );
+        await vi.waitFor(() => {
+          expect(component.multimediaBlob(xref)).toBe(onDisk);
+        });
+        expect(getMultimediaFile).toHaveBeenCalledWith(filePath);
+      });
+
+      it("doesn't reread a file when other fields of its record change", async () => {
+        component.workingDatabase.update((database) =>
+          produce(database, (draft) => {
+            const multimedia = draft.multimedias[xref];
+            assert(multimedia);
+            delete multimedia.pendingFile;
+          }),
+        );
+        const onDisk = new File(["old"], "old.png", { type: "image/png" });
+        const getMultimediaFile = vi
+          .spyOn(ancestryService, "getMultimediaFile")
+          .mockResolvedValue(onDisk);
+        await vi.waitFor(() => {
+          expect(component.multimediaBlobsLoading()).toBe(false);
+          expect(component.multimediaBlob(xref)).toBe(onDisk);
+        });
+        const reads = getMultimediaFile.mock.calls.length;
+
+        component.workingDatabase.update((database) =>
+          produce(database, (draft) => {
+            const multimedia = draft.multimedias[xref];
+            assert(multimedia);
+            multimedia.title = "Census, page 2";
+          }),
+        );
+        TestBed.tick();
+
+        await fixture.whenStable();
+
+        expect(component.multimediaBlob(xref)).toBe(onDisk);
+        expect(getMultimediaFile).toHaveBeenCalledTimes(reads);
+      });
+
       it("lists the file to copy alongside the GEDCOM delta", async () => {
         await fixture.whenStable();
 
