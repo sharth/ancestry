@@ -15,6 +15,7 @@ import {
 import { DomSanitizer } from "@angular/platform-browser";
 
 import { AncestryService } from "../../database/ancestry.service";
+import type { GedcomMultimedia } from "../../gedcom/gedcomMultimedia";
 import type { GedcomMultimediaCrop } from "../../gedcom/gedcomMultimediaLink";
 
 interface DragStart {
@@ -41,7 +42,11 @@ export class InputMultimediaCropComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly injector = inject(Injector);
 
-  readonly filePath = input.required<string>();
+  readonly multimedia = input.required<GedcomMultimedia>();
+  // Separate signals, so editing other fields of the record (say, its
+  // title) doesn't reload the file.
+  private readonly filePath = computed(() => this.multimedia().filePath);
+  private readonly pendingFile = computed(() => this.multimedia().pendingFile);
   readonly value = model<GedcomMultimediaCrop | undefined>(undefined);
 
   private readonly viewport =
@@ -64,16 +69,20 @@ export class InputMultimediaCropComponent {
   readonly fileResource = resource({
     params: () => ({
       filePath: this.filePath(),
+      pendingFile: this.pendingFile(),
       gedcomResourceValue: this.ancestryService.gedcomResource.value(),
     }),
     loader: async ({ params }) => {
-      const fileHandle = await this.ancestryService.getMultimediaFileHandle(
-        params.filePath,
-      );
-      if (!fileHandle) {
+      // A file picked in the editor that hasn't been copied into the data
+      // folder yet isn't at its path, so crop the picked file itself.
+      const file =
+        params.pendingFile ??
+        (await (
+          await this.ancestryService.getMultimediaFileHandle(params.filePath)
+        )?.getFile());
+      if (!file) {
         return undefined;
       }
-      const file = await fileHandle.getFile();
       const objectUrl = URL.createObjectURL(file);
       this.destroyRef.onDestroy(() => {
         URL.revokeObjectURL(objectUrl);
