@@ -35,14 +35,14 @@ export function multimediaFileResource(
     }),
     loader: async ({ params }) => {
       try {
-        const file =
-          params.pendingFile ??
-          (params.filePath
-            ? await (
-                await ancestryService.getMultimediaFileHandle(params.filePath)
-              )?.getFile()
-            : undefined);
-        if (!file) {
+        let file = params.pendingFile;
+        if (file === undefined) {
+          const fileHandle = await ancestryService.getMultimediaFileHandle(
+            params.filePath,
+          );
+          file = await fileHandle?.getFile();
+        }
+        if (file === undefined) {
           return undefined;
         }
         const objectUrl = URL.createObjectURL(file);
