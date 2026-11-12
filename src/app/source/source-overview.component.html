@@ -16,7 +16,7 @@
       @if (multimediaLink.multimedia; as multimedia) {
         <div class="card-body">
           <app-multimedia-preview
-            [filePath]="multimedia.filePath"
+            [multimedia]="multimedia"
             [crop]="multimediaLink.crop"
           />
         </div>

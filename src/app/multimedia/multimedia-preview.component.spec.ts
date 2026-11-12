@@ -4,6 +4,7 @@ import { render } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AncestryService } from "../../database/ancestry.service";
+import { newGedcomMultimedia } from "../../gedcom/gedcomMultimedia";
 import {
   MultimediaPreviewComponent,
   resolveCropRegion,
@@ -15,7 +16,12 @@ describe("MultimediaPreviewComponent", () => {
 
   beforeEach(async () => {
     const renderResult = await render(MultimediaPreviewComponent, {
-      bindings: [inputBinding("filePath", signal("photo.jpg"))],
+      bindings: [
+        inputBinding(
+          "multimedia",
+          signal(newGedcomMultimedia({ xref: "@M1@", filePath: "photo.jpg" })),
+        ),
+      ],
       waitForStableOnRender: true,
     });
     fixture = renderResult.fixture;
@@ -71,7 +77,10 @@ describe("MultimediaPreviewComponent with a crop", () => {
     const file = await pngFile(100, 50);
     const { fixture } = await render(MultimediaPreviewComponent, {
       bindings: [
-        inputBinding("filePath", signal("photo.png")),
+        inputBinding(
+          "multimedia",
+          signal(newGedcomMultimedia({ xref: "@M1@", filePath: "photo.png" })),
+        ),
         inputBinding(
           "crop",
           signal({ left: 10, top: 5, width: 40, height: 20 }),
@@ -116,7 +125,12 @@ describe("MultimediaPreviewComponent with a crop", () => {
     const file = await pngFile(10, 10);
     const revoke = vi.spyOn(URL, "revokeObjectURL");
     const { fixture } = await render(MultimediaPreviewComponent, {
-      bindings: [inputBinding("filePath", signal("photo.png"))],
+      bindings: [
+        inputBinding(
+          "multimedia",
+          signal(newGedcomMultimedia({ xref: "@M1@", filePath: "photo.png" })),
+        ),
+      ],
       providers: [
         {
           provide: AncestryService,
@@ -139,5 +153,44 @@ describe("MultimediaPreviewComponent with a crop", () => {
 
     fixture.destroy();
     expect(revoke).toHaveBeenCalledWith(img.src);
+  });
+
+  it("shows a pending file without reading the data folder", async () => {
+    const file = await pngFile(10, 10);
+    const getMultimediaFileHandle = vi.fn();
+    const { fixture } = await render(MultimediaPreviewComponent, {
+      bindings: [
+        inputBinding(
+          "multimedia",
+          signal(
+            newGedcomMultimedia({
+              xref: "@M1@",
+              filePath: "not-copied-yet.png",
+              pendingFile: file,
+            }),
+          ),
+        ),
+      ],
+      providers: [
+        {
+          provide: AncestryService,
+          useValue: {
+            gedcomResource: { value: () => undefined },
+            getMultimediaFileHandle,
+          },
+        },
+      ],
+      waitForStableOnRender: true,
+    });
+
+    const img = await vi.waitFor(() => {
+      const img = (fixture.nativeElement as HTMLElement).querySelector("img");
+      if (!img?.complete || img.naturalWidth === 0) {
+        throw new Error("image not loaded yet");
+      }
+      return img;
+    });
+    expect(img.naturalWidth).toBe(10);
+    expect(getMultimediaFileHandle).not.toHaveBeenCalled();
   });
 });
