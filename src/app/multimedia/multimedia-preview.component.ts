@@ -1,17 +1,8 @@
-import {
-  Component,
-  DestroyRef,
-  computed,
-  inject,
-  input,
-  resource,
-  signal,
-} from "@angular/core";
-import { DomSanitizer } from "@angular/platform-browser";
+import { Component, computed, input, signal } from "@angular/core";
 
-import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomMultimedia } from "../../gedcom/gedcomMultimedia";
 import type { GedcomMultimediaCrop } from "../../gedcom/gedcomMultimediaLink";
+import { multimediaFileResource } from "../../util/multimedia-file-resource";
 
 interface CropRegion {
   left: number;
@@ -52,15 +43,8 @@ export function resolveCropRegion(
   styleUrl: "./multimedia-preview.component.css",
 })
 export class MultimediaPreviewComponent {
-  private readonly ancestryService = inject(AncestryService);
-  private readonly sanitizer = inject(DomSanitizer);
-  private readonly destroyRef = inject(DestroyRef);
-
   readonly multimedia = input.required<GedcomMultimedia>();
-  // Separate signals, so editing other fields of the record (say, its
-  // title) doesn't reload the file.
   readonly filePath = computed(() => this.multimedia().filePath);
-  private readonly pendingFile = computed(() => this.multimedia().pendingFile);
   // The CROP of the multimedia link being shown, if any. Only applies to
   // images.
   readonly crop = input<GedcomMultimediaCrop | undefined>(undefined);
@@ -122,46 +106,5 @@ export class MultimediaPreviewComponent {
     });
   }
 
-  readonly fileResource = resource({
-    params: () => {
-      const filePath = this.filePath();
-      const pendingFile = this.pendingFile();
-      if (!filePath && !pendingFile) {
-        return null;
-      }
-      return {
-        filePath,
-        pendingFile,
-        gedcomResourceValue: this.ancestryService.gedcomResource.value(),
-      };
-    },
-    loader: async ({ params }) => {
-      if (!params) {
-        return { fileUrl: undefined, mediaType: undefined };
-      }
-
-      try {
-        // A file picked in the editor that hasn't been copied into the data
-        // folder yet isn't at its path, so show the picked file itself.
-        const file =
-          params.pendingFile ??
-          (await (
-            await this.ancestryService.getMultimediaFileHandle(params.filePath)
-          )?.getFile());
-        if (!file) {
-          return { fileUrl: undefined, mediaType: undefined };
-        }
-        const objectUrl = URL.createObjectURL(file);
-        this.destroyRef.onDestroy(() => {
-          URL.revokeObjectURL(objectUrl);
-        });
-        const fileUrl =
-          this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
-        return { fileUrl, mediaType: file.type };
-      } catch (error) {
-        console.error("Failed to load multimedia file:", error);
-        return { fileUrl: undefined, mediaType: undefined };
-      }
-    },
-  });
+  readonly fileResource = multimediaFileResource(this.multimedia);
 }
