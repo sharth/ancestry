@@ -1,32 +1,30 @@
-<details #container (toggle)="(true)" [open]="open()">
+<details [open]="open()">
   <summary>Unknown Records ({{ value().length }})</summary>
-  @defer (when container.open) {
-    <table>
-      <thead>
+  <table>
+    <thead>
+      <tr>
+        <th></th>
+        <th>Unknown Gedcom Record</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (unknownRecord of value(); track unknownRecord) {
         <tr>
-          <th></th>
-          <th>Unknown Gedcom Record</th>
+          <td>
+            <button
+              class="btn btn-outline-secondary bi bi-trash"
+              type="button"
+              aria-label="Remove unknown record"
+              (click)="removeUnknownRecord($index)"
+            ></button>
+          </td>
+          <td>
+            <pre>{{
+              serializeGedcomRecordToText(unknownRecord).join("\n")
+            }}</pre>
+          </td>
         </tr>
-      </thead>
-      <tbody>
-        @for (unknownRecord of value(); track unknownRecord) {
-          <tr>
-            <td>
-              <button
-                class="btn btn-outline-secondary bi bi-trash"
-                type="button"
-                aria-label="Remove unknown record"
-                (click)="removeUnknownRecord($index)"
-              ></button>
-            </td>
-            <td>
-              <pre>{{
-                serializeGedcomRecordToText(unknownRecord).join("\n")
-              }}</pre>
-            </td>
-          </tr>
-        }
-      </tbody>
-    </table>
-  }
+      }
+    </tbody>
+  </table>
 </details>

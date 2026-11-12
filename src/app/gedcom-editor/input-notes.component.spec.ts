@@ -1,8 +1,5 @@
 import { inputBinding, signal } from "@angular/core";
-import {
-  DeferBlockBehavior,
-  type ComponentFixture,
-} from "@angular/core/testing";
+import type { ComponentFixture } from "@angular/core/testing";
 import { render } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it } from "vitest";
 
@@ -16,11 +13,6 @@ describe("InputNotesComponent", () => {
   beforeEach(async () => {
     const renderResult = await render(InputNotesComponent, {
       bindings: [inputBinding("workingDatabase", signal(newGedcomDatabase()))],
-      configureTestBed: (testBed) => {
-        testBed.configureTestingModule({
-          deferBlockBehavior: DeferBlockBehavior.Playthrough,
-        });
-      },
     });
 
     fixture = renderResult.fixture;

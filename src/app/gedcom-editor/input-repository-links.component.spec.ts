@@ -1,8 +1,5 @@
 import { inputBinding, signal } from "@angular/core";
-import {
-  DeferBlockBehavior,
-  type ComponentFixture,
-} from "@angular/core/testing";
+import type { ComponentFixture } from "@angular/core/testing";
 import { provideRouter } from "@angular/router";
 import { render } from "@testing-library/angular/zoneless";
 import { userEvent } from "@testing-library/user-event";
@@ -33,11 +30,6 @@ describe("InputRepositoryLinksComponent", () => {
         inputBinding("workingDatabase", workingDatabase),
         inputBinding("value", value),
       ],
-      configureTestBed: (testBed) => {
-        testBed.configureTestingModule({
-          deferBlockBehavior: DeferBlockBehavior.Playthrough,
-        });
-      },
       waitForStableOnRender: true,
     });
 

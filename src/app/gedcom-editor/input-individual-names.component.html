@@ -1,91 +1,89 @@
-<details #container (toggle)="(true)" [open]="open()">
+<details [open]="open()">
   <summary>Names ({{ form.length }})</summary>
-  @defer (when container.open) {
-    @for (name of form; track name) {
-      <details [open]="true">
-        <summary>
-          <button
-            type="button"
-            class="btn btn-sm btn-outline-danger bi-trash"
-            aria-label="Remove name"
-            (click)="removeName($index)"
-          ></button>
-          {{ name.prefix().value() }}
-          {{ name.givenName().value() }}
-          {{ name.surnamePrefix().value() }}
-          {{ name.surname().value() }}
-          {{ name.suffix().value() }}
-        </summary>
-        <div class="fields-grid">
-          <div class="form-floating">
-            <input
-              #focusTarget
-              class="form-control"
-              id="prefix_{{ $index }}"
-              [formField]="name.prefix"
-            />
-            <label for="prefix_{{ $index }}">Prefix</label>
-          </div>
-          <div class="form-floating">
-            <input
-              class="form-control"
-              id="given_{{ $index }}"
-              [formField]="name.givenName"
-            />
-            <label for="given_{{ $index }}">Given Name</label>
-          </div>
-          <div class="form-floating">
-            <input
-              class="form-control"
-              id="nick_{{ $index }}"
-              [formField]="name.nickName"
-            />
-            <label for="nick_{{ $index }}">Nickname</label>
-          </div>
-          <div class="form-floating">
-            <input
-              class="form-control"
-              id="surnamePrefix_{{ $index }}"
-              [formField]="name.surnamePrefix"
-            />
-            <label for="surnamePrefix_{{ $index }}">Surname Prefix</label>
-          </div>
-          <div class="form-floating">
-            <input
-              class="form-control"
-              id="surname_{{ $index }}"
-              [formField]="name.surname"
-            />
-            <label for="surname_{{ $index }}">Surname</label>
-          </div>
-          <div class="form-floating">
-            <input
-              class="form-control"
-              id="suffix_{{ $index }}"
-              [formField]="name.suffix"
-            />
-            <label for="suffix_{{ $index }}">Suffix</label>
-          </div>
+  @for (name of form; track name) {
+    <details [open]="true">
+      <summary>
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-danger bi-trash"
+          aria-label="Remove name"
+          (click)="removeName($index)"
+        ></button>
+        {{ name.prefix().value() }}
+        {{ name.givenName().value() }}
+        {{ name.surnamePrefix().value() }}
+        {{ name.surname().value() }}
+        {{ name.suffix().value() }}
+      </summary>
+      <div class="fields-grid">
+        <div class="form-floating">
+          <input
+            #focusTarget
+            class="form-control"
+            id="prefix_{{ $index }}"
+            [formField]="name.prefix"
+          />
+          <label for="prefix_{{ $index }}">Prefix</label>
         </div>
-        <app-input-source-citations
-          [formField]="name.citations"
-          [workingDatabase]="workingDatabase()"
-        ></app-input-source-citations>
-      </details>
-    }
-    <div
-      class="details-lookalike"
-      tabindex="0"
-      (click)="appendName()"
-      (keydown.enter)="appendName()"
-    >
-      <button
-        type="button"
-        class="btn btn-sm btn-outline-primary bi-plus"
-        aria-label="Add name"
-        (click)="$event.preventDefault()"
-      ></button>
-      Append another name
-    </div>
+        <div class="form-floating">
+          <input
+            class="form-control"
+            id="given_{{ $index }}"
+            [formField]="name.givenName"
+          />
+          <label for="given_{{ $index }}">Given Name</label>
+        </div>
+        <div class="form-floating">
+          <input
+            class="form-control"
+            id="nick_{{ $index }}"
+            [formField]="name.nickName"
+          />
+          <label for="nick_{{ $index }}">Nickname</label>
+        </div>
+        <div class="form-floating">
+          <input
+            class="form-control"
+            id="surnamePrefix_{{ $index }}"
+            [formField]="name.surnamePrefix"
+          />
+          <label for="surnamePrefix_{{ $index }}">Surname Prefix</label>
+        </div>
+        <div class="form-floating">
+          <input
+            class="form-control"
+            id="surname_{{ $index }}"
+            [formField]="name.surname"
+          />
+          <label for="surname_{{ $index }}">Surname</label>
+        </div>
+        <div class="form-floating">
+          <input
+            class="form-control"
+            id="suffix_{{ $index }}"
+            [formField]="name.suffix"
+          />
+          <label for="suffix_{{ $index }}">Suffix</label>
+        </div>
+      </div>
+      <app-input-source-citations
+        [formField]="name.citations"
+        [workingDatabase]="workingDatabase()"
+      ></app-input-source-citations>
+    </details>
   }
+  <div
+    class="details-lookalike"
+    tabindex="0"
+    (click)="appendName()"
+    (keydown.enter)="appendName()"
+  >
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-primary bi-plus"
+      aria-label="Add name"
+      (click)="$event.preventDefault()"
+    ></button>
+    Append another name
+  </div>
 </details>
