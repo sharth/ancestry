@@ -1,5 +1,5 @@
 import { DestroyRef, computed, inject, resource } from "@angular/core";
-import type { ResourceRef } from "@angular/core";
+import type { ResourceRef, Signal } from "@angular/core";
 import { DomSanitizer } from "@angular/platform-browser";
 import type { SafeResourceUrl } from "@angular/platform-browser";
 
@@ -17,7 +17,7 @@ export interface MultimediaFileUrl {
 // context (a component field). The URL is revoked when the caller is
 // destroyed.
 export function multimediaFileResource(
-  multimedia: () => GedcomMultimedia,
+  multimedia: Signal<GedcomMultimedia>,
 ): ResourceRef<MultimediaFileUrl | undefined> {
   const ancestryService = inject(AncestryService);
   const sanitizer = inject(DomSanitizer);
