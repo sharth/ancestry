@@ -27,6 +27,7 @@ import {
   DuplicateCallNumbersComponent,
   findDuplicateCallNumbers,
 } from "./duplicate-call-numbers.component";
+import { GedcomProblemsComponent } from "./gedcom-problems.component";
 import {
   sourceValidators,
   type MergeRepositoryLinksSuggestion,
@@ -72,6 +73,7 @@ const tabs = [
   { id: "unused-sources", label: "Unused sources" },
   { id: "unused-multimedia", label: "Unused multimedia" },
   { id: "bibliography-without-title", label: "Bibliography without title" },
+  { id: "gedcom-problems", label: "GEDCOM problems" },
 ] as const;
 
 type TabId = (typeof tabs)[number]["id"];
@@ -97,6 +99,7 @@ interface TableRow {
     UnusedSourcesComponent,
     SourcesWithoutRepositoriesComponent,
     BibliographyWithoutTitleComponent,
+    GedcomProblemsComponent,
   ],
   templateUrl: "./validation.component.html",
   styleUrl: "./validation.component.css",
@@ -107,6 +110,8 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
   private readonly route = inject(ActivatedRoute);
 
   readonly ancestryDatabase = input.required<GedcomDatabase>();
+
+  readonly gedcomProblems = this.ancestryService.gedcomProblems;
 
   readonly editDialog = viewChild<GedcomEditorDialogComponent>("editDialog");
 
@@ -133,6 +138,7 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
       "bibliography-without-title": Object.values(database.sources).filter(
         (source) => bibliographyForMissingTitle(source) !== undefined,
       ).length,
+      "gedcom-problems": this.gedcomProblems().length,
     };
   });
 
