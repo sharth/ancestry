@@ -9,20 +9,20 @@ import { multimediaFileResource } from "./multimedia-file-resource";
 describe("multimediaFileResource", () => {
   function setUp(fields: { filePath: string; pendingFile?: File }) {
     const folderFile = new File(["png"], "scan.png", { type: "image/png" });
-    const getMultimediaFileHandle = vi.fn((filePath: string) =>
-      Promise.resolve(
-        filePath === "scan.png"
-          ? { getFile: () => Promise.resolve(folderFile) }
-          : undefined,
-      ),
+    // A data folder holding only scan.png.
+    const getFileHandle = vi.fn((name: string) =>
+      name === "scan.png"
+        ? Promise.resolve({ getFile: () => Promise.resolve(folderFile) })
+        : Promise.reject(new DOMException("Not found", "NotFoundError")),
     );
     TestBed.configureTestingModule({
       providers: [
         {
           provide: AncestryService,
           useValue: {
-            gedcomResource: { value: () => undefined },
-            getMultimediaFileHandle,
+            gedcomResource: {
+              value: () => ({ directoryHandle: { getFileHandle } }),
+            },
           },
         },
       ],
@@ -31,25 +31,25 @@ describe("multimediaFileResource", () => {
     const fileResource = TestBed.runInInjectionContext(() =>
       multimediaFileResource(multimedia),
     );
-    return { folderFile, getMultimediaFileHandle, multimedia, fileResource };
+    return { folderFile, getFileHandle, multimedia, fileResource };
   }
 
   it("loads the file at the record's path from the data folder", async () => {
-    const { fileResource, getMultimediaFileHandle } = setUp({
+    const { fileResource, getFileHandle } = setUp({
       filePath: "scan.png",
     });
 
     await vi.waitFor(() => {
       expect(fileResource.value()?.mediaType).toBe("image/png");
     });
-    expect(getMultimediaFileHandle).toHaveBeenCalledWith("scan.png");
+    expect(getFileHandle).toHaveBeenCalledWith("scan.png");
   });
 
   it("uses a pending file without reading the data folder", async () => {
     const pendingFile = new File(["pdf"], "picked.pdf", {
       type: "application/pdf",
     });
-    const { fileResource, getMultimediaFileHandle } = setUp({
+    const { fileResource, getFileHandle } = setUp({
       filePath: "not-copied-yet.pdf",
       pendingFile,
     });
@@ -57,23 +57,23 @@ describe("multimediaFileResource", () => {
     await vi.waitFor(() => {
       expect(fileResource.value()?.mediaType).toBe("application/pdf");
     });
-    expect(getMultimediaFileHandle).not.toHaveBeenCalled();
+    expect(getFileHandle).not.toHaveBeenCalled();
   });
 
   it("gives undefined when there's no file at the path", async () => {
-    const { fileResource, getMultimediaFileHandle } = setUp({
+    const { fileResource, getFileHandle } = setUp({
       filePath: "missing.png",
     });
 
     await vi.waitFor(() => {
-      expect(getMultimediaFileHandle).toHaveBeenCalledWith("missing.png");
+      expect(getFileHandle).toHaveBeenCalledWith("missing.png");
     });
     await TestBed.inject(ApplicationRef).whenStable();
     expect(fileResource.value()).toBeUndefined();
   });
 
   it("doesn't reload the file when another field changes", async () => {
-    const { fileResource, getMultimediaFileHandle, multimedia } = setUp({
+    const { fileResource, getFileHandle, multimedia } = setUp({
       filePath: "scan.png",
     });
     await vi.waitFor(() => {
@@ -83,7 +83,7 @@ describe("multimediaFileResource", () => {
     multimedia.update((m) => ({ ...m, title: "Census" }));
     await TestBed.inject(ApplicationRef).whenStable();
 
-    expect(getMultimediaFileHandle).toHaveBeenCalledTimes(1);
+    expect(getFileHandle).toHaveBeenCalledTimes(1);
     expect(fileResource.isLoading()).toBe(false);
   });
 });

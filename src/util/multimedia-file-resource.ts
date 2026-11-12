@@ -5,6 +5,7 @@ import type { SafeResourceUrl } from "@angular/platform-browser";
 
 import { AncestryService } from "../database/ancestry.service";
 import type { GedcomMultimedia } from "../gedcom/gedcomMultimedia";
+import { getFileHandleAtPath } from "./file-system";
 
 export interface MultimediaFileUrl {
   fileUrl: SafeResourceUrl;
@@ -31,13 +32,14 @@ export function multimediaFileResource(
     params: () => ({
       filePath: filePath(),
       pendingFile: pendingFile(),
-      gedcomResourceValue: ancestryService.gedcomResource.value(),
+      directoryHandle: ancestryService.gedcomResource.value()?.directoryHandle,
     }),
     loader: async ({ params }) => {
       try {
         let file = params.pendingFile;
-        if (file === undefined) {
-          const fileHandle = await ancestryService.getMultimediaFileHandle(
+        if (file === undefined && params.directoryHandle !== undefined) {
+          const fileHandle = await getFileHandleAtPath(
+            params.directoryHandle,
             params.filePath,
           );
           file = await fileHandle?.getFile();

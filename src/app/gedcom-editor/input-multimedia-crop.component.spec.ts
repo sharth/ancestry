@@ -68,7 +68,7 @@ describe("InputMultimediaCropComponent with a pending file", () => {
     });
     if (!blob) throw new Error("canvas.toBlob failed");
     const file = new File([blob], "photo.png", { type: "image/png" });
-    const getMultimediaFileHandle = vi.fn();
+    const getFileHandle = vi.fn();
     const { fixture } = await render(InputMultimediaCropComponent, {
       bindings: [
         inputBinding(
@@ -86,8 +86,9 @@ describe("InputMultimediaCropComponent with a pending file", () => {
         {
           provide: AncestryService,
           useValue: {
-            gedcomResource: { value: () => undefined },
-            getMultimediaFileHandle,
+            gedcomResource: {
+              value: () => ({ directoryHandle: { getFileHandle } }),
+            },
           },
         },
       ],
@@ -102,6 +103,6 @@ describe("InputMultimediaCropComponent with a pending file", () => {
       return img;
     });
     expect(img.naturalWidth).toBe(10);
-    expect(getMultimediaFileHandle).not.toHaveBeenCalled();
+    expect(getFileHandle).not.toHaveBeenCalled();
   });
 });

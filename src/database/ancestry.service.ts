@@ -16,11 +16,7 @@ import {
   parseGedcomRecords,
   type GedcomRecord,
 } from "../gedcom/gedcomRecord";
-import {
-  copyFileToPath,
-  fileExistsAtPath,
-  getFileHandleAtPath,
-} from "../util/file-system";
+import { copyFileToPath, fileExistsAtPath } from "../util/file-system";
 
 export const BUILTIN_GEDCOM_URL = "assets/samples/royal-family.ged";
 
@@ -298,16 +294,6 @@ export class AncestryService {
         await this.dexieDatabase.metadata.clear();
       },
     );
-  }
-
-  // The multimedia file at `relativePath` in the loaded directory, if any.
-  async getMultimediaFileHandle(
-    relativePath: string,
-  ): Promise<FileSystemFileHandle | undefined> {
-    const directoryHandle = this.gedcomResource.value()?.directoryHandle;
-    return directoryHandle
-      ? getFileHandleAtPath(directoryHandle, relativePath)
-      : undefined;
   }
 
   // Whether something already exists at `relativePath` in the loaded
