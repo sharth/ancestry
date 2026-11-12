@@ -1,27 +1,25 @@
 @if (fileResource.value(); as fileData) {
-  @if (fileData.fileUrl) {
-    @if (fileData.mediaType.startsWith("image/")) {
-      <div [class.crop-container]="cropRegion()" [style]="cropContainerStyle()">
-        <img
-          [src]="fileData.fileUrl"
-          [alt]="filePath()"
-          [class.img-fluid]="!cropRegion()"
-          [class.invisible]="hideUntilLoaded()"
-          [style]="cropImageStyle()"
-          (load)="onImageLoad($event)"
-        />
-      </div>
-    } @else if (fileData.mediaType === "application/pdf") {
-      <iframe
+  @if (fileData.mediaType.startsWith("image/")) {
+    <div [class.crop-container]="cropRegion()" [style]="cropContainerStyle()">
+      <img
         [src]="fileData.fileUrl"
-        class="w-100"
-        style="height: 600px"
-      ></iframe>
-    } @else {
-      <p>
-        Preview not available for this file type.
-        <a [href]="fileData.fileUrl" download>Download file</a>
-      </p>
-    }
+        [alt]="filePath()"
+        [class.img-fluid]="!cropRegion()"
+        [class.invisible]="hideUntilLoaded()"
+        [style]="cropImageStyle()"
+        (load)="onImageLoad($event)"
+      />
+    </div>
+  } @else if (fileData.mediaType === "application/pdf") {
+    <iframe
+      [src]="fileData.fileUrl"
+      class="w-100"
+      style="height: 600px"
+    ></iframe>
+  } @else {
+    <p>
+      Preview not available for this file type.
+      <a [href]="fileData.fileUrl" download>Download file</a>
+    </p>
   }
 }

@@ -1,4 +1,4 @@
-@if (fileResource.value(); as fileUrl) {
+@if (fileResource.value(); as file) {
   <div class="crop-viewport" #cropViewport>
     <div
       class="crop-container"
@@ -12,7 +12,7 @@
     >
       <img
         #cropImage
-        [src]="fileUrl"
+        [src]="file.fileUrl"
         alt=""
         [style.width]="imageWidth()"
         (load)="onImageLoad($event)"
