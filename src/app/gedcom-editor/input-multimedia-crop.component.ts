@@ -1,21 +1,18 @@
 import type { ElementRef } from "@angular/core";
 import {
   Component,
-  DestroyRef,
   Injector,
   afterNextRender,
   computed,
   inject,
   input,
   model,
-  resource,
   signal,
   viewChild,
 } from "@angular/core";
-import { DomSanitizer } from "@angular/platform-browser";
 
-import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomMultimediaCrop } from "../../gedcom/gedcomMultimediaLink";
+import { fileObjectUrl } from "../../util/object-url";
 
 interface DragStart {
   xPercent: number;
@@ -36,12 +33,11 @@ const autoScrollMargin = 32;
   styleUrl: "./input-multimedia-crop.component.css",
 })
 export class InputMultimediaCropComponent {
-  private readonly ancestryService = inject(AncestryService);
-  private readonly sanitizer = inject(DomSanitizer);
-  private readonly destroyRef = inject(DestroyRef);
   private readonly injector = inject(Injector);
 
-  readonly filePath = input.required<string>();
+  // The image to crop, already read by whoever knows where it lives (the
+  // data folder, or a file picked in the editor but not yet copied in).
+  readonly file = input.required<File | undefined>();
   readonly value = model<GedcomMultimediaCrop | undefined>(undefined);
 
   private readonly viewport =
@@ -61,26 +57,7 @@ export class InputMultimediaCropComponent {
   readonly zoom = signal<number | undefined>(undefined);
   private dragStart: DragStart | undefined;
 
-  readonly fileResource = resource({
-    params: () => ({
-      filePath: this.filePath(),
-      gedcomResourceValue: this.ancestryService.gedcomResource.value(),
-    }),
-    loader: async ({ params }) => {
-      const fileHandle = await this.ancestryService.getMultimediaFileHandle(
-        params.filePath,
-      );
-      if (!fileHandle) {
-        return undefined;
-      }
-      const file = await fileHandle.getFile();
-      const objectUrl = URL.createObjectURL(file);
-      this.destroyRef.onDestroy(() => {
-        URL.revokeObjectURL(objectUrl);
-      });
-      return this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
-    },
-  });
+  readonly fileUrl = fileObjectUrl(this.file);
 
   readonly imageWidth = computed(() => {
     const zoom = this.zoom();

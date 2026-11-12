@@ -1,7 +1,7 @@
 import { inputBinding, signal } from "@angular/core";
 import type { ComponentFixture } from "@angular/core/testing";
 import { render } from "@testing-library/angular/zoneless";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { InputMultimediaCropComponent } from "./input-multimedia-crop.component";
 
@@ -11,7 +11,7 @@ describe("InputMultimediaCropComponent", () => {
 
   beforeEach(async () => {
     const renderResult = await render(InputMultimediaCropComponent, {
-      bindings: [inputBinding("filePath", signal("photo.jpg"))],
+      bindings: [inputBinding("file", signal(undefined))],
       waitForStableOnRender: true,
     });
     fixture = renderResult.fixture;
@@ -48,5 +48,29 @@ describe("InputMultimediaCropComponent", () => {
     component.zoomToFit();
     expect(component.zoom()).toBeUndefined();
     expect(component.imageWidth()).toBeUndefined();
+  });
+});
+
+describe("InputMultimediaCropComponent with a file", () => {
+  it("shows the image to crop", async () => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 30;
+    canvas.height = 20;
+    const blob = await new Promise<Blob | null>((resolve) => {
+      canvas.toBlob(resolve, "image/png");
+    });
+    const file = new File([blob ?? ""], "scan.png", { type: "image/png" });
+
+    const { fixture, container } = await render(InputMultimediaCropComponent, {
+      bindings: [inputBinding("file", signal(file))],
+    });
+
+    await vi.waitFor(() => {
+      expect(fixture.componentInstance.naturalSize()).toEqual({
+        width: 30,
+        height: 20,
+      });
+    });
+    expect(container.textContent).not.toContain("No image available to crop");
   });
 });

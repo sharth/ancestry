@@ -3,6 +3,7 @@ import { RouterModule } from "@angular/router";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { multimediaLinkTitle } from "../../gedcom/gedcomMultimediaLink";
+import { multimediaFiles } from "../../util/multimedia-files";
 import { MultimediaPreviewComponent } from "../multimedia/multimedia-preview.component";
 import { RepositoryCallNumberComponent } from "../repository-call-number/repository-call-number.component";
 
@@ -17,6 +18,7 @@ import { RepositoryCallNumberComponent } from "../repository-call-number/reposit
   ],
 })
 export class SourceOverviewComponent {
+  readonly files = multimediaFiles();
   readonly ancestryDatabase = input.required<GedcomDatabase>();
   readonly xref = input.required<string>();
 

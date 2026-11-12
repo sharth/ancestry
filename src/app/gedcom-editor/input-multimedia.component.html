@@ -91,5 +91,5 @@
 </div>
 
 @if (form.filePath().value()) {
-  <app-multimedia-preview [filePath]="form.filePath().value()" />
+  <app-multimedia-preview [file]="file()" [alt]="form.filePath().value()" />
 }

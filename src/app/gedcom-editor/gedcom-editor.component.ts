@@ -24,6 +24,7 @@ import { newGedcomSource } from "../../gedcom/gedcomSource";
 import { newGedcomSubmitter } from "../../gedcom/gedcomSubmitter";
 import { FileExistsError } from "../../util/file-system";
 import { multimediaFilePathProblem } from "../../util/multimedia-file-name";
+import { multimediaFiles } from "../../util/multimedia-files";
 import {
   calculateNextFamilyXref,
   calculateNextIndividualXref,
@@ -361,6 +362,18 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
         return submitter?.name || `Submitter ${xref}`;
       }
     }
+  }
+
+  private readonly filesInDataFolder = multimediaFiles();
+
+  multimediaFile(xref: string): File | undefined {
+    const multimedia = this.workingDatabase().multimedias[xref];
+    if (multimedia?.pendingFile) {
+      return multimedia.pendingFile;
+    }
+    return multimedia?.filePath
+      ? this.filesInDataFolder(multimedia.filePath)
+      : undefined;
   }
 
   // Multimedia records with a pending file (see GedcomMultimedia.pendingFile)

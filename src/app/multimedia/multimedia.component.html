@@ -9,7 +9,10 @@
   <pre>{{ vm.multimedia.mediaType }}</pre>
 
   <h2>Preview</h2>
-  <app-multimedia-preview [filePath]="vm.multimedia.filePath" />
+  <app-multimedia-preview
+    [file]="files(vm.multimedia.filePath)"
+    [alt]="vm.multimedia.filePath"
+  />
 
   <h2>Sources</h2>
   <app-multimedia-sources

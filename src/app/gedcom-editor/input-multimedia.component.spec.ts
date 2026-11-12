@@ -1,4 +1,4 @@
-import { inputBinding, signal } from "@angular/core";
+import { inputBinding, signal, type WritableSignal } from "@angular/core";
 import type { ComponentFixture } from "@angular/core/testing";
 import { render, screen } from "@testing-library/angular/zoneless";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -14,10 +14,14 @@ import { InputMultimediaComponent } from "./input-multimedia.component";
 describe("InputMultimediaComponent", () => {
   let fixture: ComponentFixture<InputMultimediaComponent>;
   let component: InputMultimediaComponent;
+  let editorFiles: WritableSignal<Map<string, File>>;
 
   beforeEach(async () => {
+    editorFiles = signal(new Map<string, File>());
     // Browse... needs an editor to copy the picked file in on submit.
-    const gedcomEditor: Partial<GedcomEditorInterface> = {};
+    const gedcomEditor: Partial<GedcomEditorInterface> = {
+      multimediaFile: (xref) => editorFiles().get(xref),
+    };
     const renderResult = await render(InputMultimediaComponent, {
       bindings: [inputBinding("workingDatabase", signal(newGedcomDatabase()))],
       providers: [{ provide: GEDCOM_EDITOR, useValue: gedcomEditor }],
@@ -230,6 +234,31 @@ describe("InputMultimediaComponent", () => {
 
       expect(component.value().pendingFile).toBeUndefined();
       expect(component.value().filePath).toBe("census.png");
+    });
+  });
+
+  it("previews the file the editor has for the record", async () => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 30;
+    canvas.height = 20;
+    const blob = await new Promise<Blob | null>((resolve) => {
+      canvas.toBlob(resolve, "image/png");
+    });
+    const file = new File([blob ?? ""], "scan.png", { type: "image/png" });
+    editorFiles.set(new Map([["@O12@", file]]));
+    component.value.set(
+      newGedcomMultimedia({
+        xref: "@O12@",
+        filePath: "O12 Scan.png",
+        mediaType: "image/png",
+      }),
+    );
+
+    await vi.waitFor(() => {
+      const img = (
+        fixture.nativeElement as HTMLElement
+      ).querySelector<HTMLImageElement>("app-multimedia-preview img");
+      expect(img?.naturalWidth).toBe(30);
     });
   });
 });

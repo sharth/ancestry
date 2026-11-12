@@ -409,6 +409,31 @@ describe("GedcomEditorComponent Integration", () => {
         );
       });
 
+      it("shows the picked file, not what's at its path, until it's copied in", async () => {
+        const onDisk = new File(["old"], "old.png", { type: "image/png" });
+        const getMultimediaFile = vi
+          .spyOn(ancestryService, "getMultimediaFile")
+          .mockResolvedValue(onDisk);
+        const multimediaFile = () => component.multimediaFile(xref);
+
+        await vi.waitFor(() => {
+          expect(multimediaFile()).toBe(file);
+        });
+        expect(getMultimediaFile).not.toHaveBeenCalled();
+
+        component.workingDatabase.update((database) =>
+          produce(database, (draft) => {
+            const multimedia = draft.multimedias[xref];
+            assert(multimedia);
+            delete multimedia.pendingFile;
+          }),
+        );
+        await vi.waitFor(() => {
+          expect(multimediaFile()).toBe(onDisk);
+        });
+        expect(getMultimediaFile).toHaveBeenCalledWith(filePath);
+      });
+
       it("lists the file to copy alongside the GEDCOM delta", async () => {
         await fixture.whenStable();
 

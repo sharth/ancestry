@@ -3,7 +3,6 @@ import type { ComponentFixture } from "@angular/core/testing";
 import { render } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { AncestryService } from "../../database/ancestry.service";
 import {
   MultimediaPreviewComponent,
   resolveCropRegion,
@@ -15,7 +14,7 @@ describe("MultimediaPreviewComponent", () => {
 
   beforeEach(async () => {
     const renderResult = await render(MultimediaPreviewComponent, {
-      bindings: [inputBinding("filePath", signal("photo.jpg"))],
+      bindings: [inputBinding("file", signal(undefined))],
       waitForStableOnRender: true,
     });
     fixture = renderResult.fixture;
@@ -71,21 +70,11 @@ describe("MultimediaPreviewComponent with a crop", () => {
     const file = await pngFile(100, 50);
     const { fixture } = await render(MultimediaPreviewComponent, {
       bindings: [
-        inputBinding("filePath", signal("photo.png")),
+        inputBinding("file", signal(file)),
         inputBinding(
           "crop",
           signal({ left: 10, top: 5, width: 40, height: 20 }),
         ),
-      ],
-      providers: [
-        {
-          provide: AncestryService,
-          useValue: {
-            gedcomResource: { value: () => undefined },
-            getMultimediaFileHandle: () =>
-              Promise.resolve({ getFile: () => Promise.resolve(file) }),
-          },
-        },
       ],
       waitForStableOnRender: true,
     });
@@ -116,17 +105,7 @@ describe("MultimediaPreviewComponent with a crop", () => {
     const file = await pngFile(10, 10);
     const revoke = vi.spyOn(URL, "revokeObjectURL");
     const { fixture } = await render(MultimediaPreviewComponent, {
-      bindings: [inputBinding("filePath", signal("photo.png"))],
-      providers: [
-        {
-          provide: AncestryService,
-          useValue: {
-            gedcomResource: { value: () => undefined },
-            getMultimediaFileHandle: () =>
-              Promise.resolve({ getFile: () => Promise.resolve(file) }),
-          },
-        },
-      ],
+      bindings: [inputBinding("file", signal(file))],
       waitForStableOnRender: true,
     });
     const img = await vi.waitFor(() => {
