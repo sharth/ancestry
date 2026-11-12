@@ -1,6 +1,7 @@
 import { produce } from "immer";
 import { describe, expect, it } from "vitest";
 
+import type { GedcomProblem } from "../util/record-unparsed-records";
 import { newGedcomChangeDate } from "./gedcomChangeDate";
 import {
   compareGedcomDatabase,
@@ -109,5 +110,24 @@ describe("compareGedcomDatabase change dates", () => {
     expect(originalDatabase.sources["@S1@"]?.changeDate).toEqual(
       newGedcomChangeDate({ value: "5 AUG 2020" }),
     );
+  });
+});
+
+describe("parseGedcomDatabase problems", () => {
+  it("appends a warning for each tag it doesn't understand", () => {
+    const problems: GedcomProblem[] = [];
+    parseGedcomDatabase(
+      parseGedcomRecords(["0 HEAD", "0 _FOO bar", "0 TRLR"].join("\n")),
+      problems,
+    );
+    expect(problems).toEqual([
+      {
+        severity: "warning",
+        message: "Tag not understood by this app",
+        path: "_FOO",
+        xref: "",
+        line: 2,
+      },
+    ]);
   });
 });

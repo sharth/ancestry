@@ -1,0 +1,41 @@
+<h2 class="mt-4">GEDCOM problems</h2>
+@if (problems().length === 0) {
+  <p>Parsing the file found no problems.</p>
+} @else {
+  <p>
+    Parsing the file found these problems. Problems at the same path are counted
+    together, with where the first one is.
+  </p>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Path</th>
+        <th>Severity</th>
+        <th>Message</th>
+        <th>Count</th>
+        <th>First line</th>
+        <th>First record</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (group of groups(); track $index) {
+        <tr>
+          <td>{{ group.first.path }}</td>
+          <td>{{ group.first.severity === "error" ? "Error" : "Warning" }}</td>
+          <td>{{ group.first.message }}</td>
+          <td>{{ group.count }}</td>
+          <td>{{ group.first.line }}</td>
+          <td>
+            @if (group.recordPage; as page) {
+              <a [routerLink]="[page, group.first.xref]">
+                {{ group.first.xref }}
+              </a>
+            } @else {
+              {{ group.first.xref }}
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

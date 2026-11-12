@@ -17,6 +17,7 @@ import {
   type GedcomRecord,
 } from "../gedcom/gedcomRecord";
 import { copyFileToPath, fileExistsAtPath } from "../util/file-system";
+import type { GedcomProblem } from "../util/record-unparsed-records";
 
 export const BUILTIN_GEDCOM_URL = "assets/samples/royal-family.ged";
 
@@ -181,7 +182,9 @@ export class AncestryService {
       ),
   });
 
-  readonly ancestryDatabase = computed<GedcomDatabase | undefined>(() => {
+  private readonly parsedGedcom = computed<
+    { gedcomDatabase: GedcomDatabase; problems: GedcomProblem[] } | undefined
+  >(() => {
     const gedcomResourceValue = this.gedcomResource.value();
     if (
       gedcomResourceValue === undefined ||
@@ -190,8 +193,22 @@ export class AncestryService {
       return undefined;
     }
 
-    return parseGedcomDatabase(gedcomResourceValue.gedcomRecords);
+    const problems: GedcomProblem[] = [];
+    const gedcomDatabase = parseGedcomDatabase(
+      gedcomResourceValue.gedcomRecords,
+      problems,
+    );
+    return { gedcomDatabase, problems };
   });
+
+  readonly ancestryDatabase = computed<GedcomDatabase | undefined>(
+    () => this.parsedGedcom()?.gedcomDatabase,
+  );
+
+  /** What parsing found wrong with the loaded file, short of failing. */
+  readonly gedcomProblems = computed<GedcomProblem[]>(
+    () => this.parsedGedcom()?.problems ?? [],
+  );
 
   compareGedcomDatabase(gedcomDatabase: GedcomDatabase): {
     originalGedcomRecord?: GedcomRecord;
