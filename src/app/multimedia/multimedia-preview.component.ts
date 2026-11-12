@@ -9,7 +9,7 @@ import {
 } from "@angular/core";
 import { DomSanitizer } from "@angular/platform-browser";
 
-import { AncestryService } from "../../database/ancestry.service";
+import { MULTIMEDIA_FILE_SOURCE } from "../../database/multimedia-file-source";
 import type { GedcomMultimediaCrop } from "../../gedcom/gedcomMultimediaLink";
 
 interface CropRegion {
@@ -51,7 +51,7 @@ export function resolveCropRegion(
   styleUrl: "./multimedia-preview.component.css",
 })
 export class MultimediaPreviewComponent {
-  private readonly ancestryService = inject(AncestryService);
+  private readonly fileSource = inject(MULTIMEDIA_FILE_SOURCE);
   private readonly sanitizer = inject(DomSanitizer);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -125,7 +125,7 @@ export class MultimediaPreviewComponent {
       }
       return {
         filePath,
-        gedcomResourceValue: this.ancestryService.gedcomResource.value(),
+        filesVersion: this.fileSource.multimediaFilesVersion(),
       };
     },
     loader: async ({ params }) => {
@@ -134,14 +134,11 @@ export class MultimediaPreviewComponent {
       }
 
       try {
-        const fileHandle = await this.ancestryService.getMultimediaFileHandle(
-          params.filePath,
-        );
-        if (!fileHandle) {
+        const file = await this.fileSource.getMultimediaFile(params.filePath);
+        if (!file) {
           return { fileUrl: undefined, mediaType: undefined };
         }
 
-        const file = await fileHandle.getFile();
         const objectUrl = URL.createObjectURL(file);
         this.destroyRef.onDestroy(() => {
           URL.revokeObjectURL(objectUrl);

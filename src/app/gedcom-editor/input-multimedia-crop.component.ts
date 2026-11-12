@@ -14,7 +14,7 @@ import {
 } from "@angular/core";
 import { DomSanitizer } from "@angular/platform-browser";
 
-import { AncestryService } from "../../database/ancestry.service";
+import { MULTIMEDIA_FILE_SOURCE } from "../../database/multimedia-file-source";
 import type { GedcomMultimediaCrop } from "../../gedcom/gedcomMultimediaLink";
 
 interface DragStart {
@@ -36,7 +36,7 @@ const autoScrollMargin = 32;
   styleUrl: "./input-multimedia-crop.component.css",
 })
 export class InputMultimediaCropComponent {
-  private readonly ancestryService = inject(AncestryService);
+  private readonly fileSource = inject(MULTIMEDIA_FILE_SOURCE);
   private readonly sanitizer = inject(DomSanitizer);
   private readonly destroyRef = inject(DestroyRef);
   private readonly injector = inject(Injector);
@@ -64,16 +64,13 @@ export class InputMultimediaCropComponent {
   readonly fileResource = resource({
     params: () => ({
       filePath: this.filePath(),
-      gedcomResourceValue: this.ancestryService.gedcomResource.value(),
+      filesVersion: this.fileSource.multimediaFilesVersion(),
     }),
     loader: async ({ params }) => {
-      const fileHandle = await this.ancestryService.getMultimediaFileHandle(
-        params.filePath,
-      );
-      if (!fileHandle) {
+      const file = await this.fileSource.getMultimediaFile(params.filePath);
+      if (!file) {
         return undefined;
       }
-      const file = await fileHandle.getFile();
       const objectUrl = URL.createObjectURL(file);
       this.destroyRef.onDestroy(() => {
         URL.revokeObjectURL(objectUrl);

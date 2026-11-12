@@ -11,6 +11,10 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { produce } from "immer";
 
 import { AncestryService } from "../../database/ancestry.service";
+import {
+  MULTIMEDIA_FILE_SOURCE,
+  type MultimediaFileSource,
+} from "../../database/multimedia-file-source";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomFamily } from "../../gedcom/gedcomFamily";
 import { newGedcomIndividual } from "../../gedcom/gedcomIndividual";
@@ -57,11 +61,17 @@ import { OpenExistingRecordComponent } from "./open-existing-record.component";
     InputSourceComponent,
     OpenExistingRecordComponent,
   ],
-  providers: [{ provide: GEDCOM_EDITOR, useExisting: GedcomEditorComponent }],
+  providers: [
+    { provide: GEDCOM_EDITOR, useExisting: GedcomEditorComponent },
+    // Previews inside the editor also see the files it will copy in.
+    { provide: MULTIMEDIA_FILE_SOURCE, useExisting: GedcomEditorComponent },
+  ],
   templateUrl: "./gedcom-editor.component.html",
   styleUrl: "./gedcom-editor.component.css",
 })
-export class GedcomEditorComponent implements GedcomEditorInterface {
+export class GedcomEditorComponent
+  implements GedcomEditorInterface, MultimediaFileSource
+{
   private readonly ancestryService = inject(AncestryService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
@@ -372,6 +382,41 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
         multimedia.pendingFile !== undefined,
     ),
   );
+
+  // The pending files by the path they'll be copied to. Only changes when
+  // a pending file or its path does, not on every edit.
+  private readonly pendingFilesByPath = computed(
+    () =>
+      new Map(
+        this.pendingMultimedias().map(({ pendingFile, filePath }) => [
+          filePath,
+          pendingFile,
+        ]),
+      ),
+    {
+      equal: (a, b) =>
+        a.size === b.size &&
+        [...a].every(([filePath, file]) => b.get(filePath) === file),
+    },
+  );
+
+  // MultimediaFileSource for previews inside the editor: a pending file is
+  // shown at the path it will be copied to, as if it were already there.
+  private readonly filesVersion = computed(() => ({
+    folder: this.ancestryService.multimediaFilesVersion(),
+    pending: this.pendingFilesByPath(),
+  }));
+
+  multimediaFilesVersion(): unknown {
+    return this.filesVersion();
+  }
+
+  async getMultimediaFile(relativePath: string): Promise<File | undefined> {
+    return (
+      this.pendingFilesByPath().get(relativePath) ??
+      this.ancestryService.getMultimediaFile(relativePath)
+    );
+  }
 
   // Files a multimedia record linked to before this edit but won't after
   // it. Submit never deletes them; they're listed alongside the GEDCOM delta

@@ -3,7 +3,7 @@ import type { ComponentFixture } from "@angular/core/testing";
 import { render } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { AncestryService } from "../../database/ancestry.service";
+import { MULTIMEDIA_FILE_SOURCE } from "../../database/multimedia-file-source";
 import {
   MultimediaPreviewComponent,
   resolveCropRegion,
@@ -79,11 +79,10 @@ describe("MultimediaPreviewComponent with a crop", () => {
       ],
       providers: [
         {
-          provide: AncestryService,
+          provide: MULTIMEDIA_FILE_SOURCE,
           useValue: {
-            gedcomResource: { value: () => undefined },
-            getMultimediaFileHandle: () =>
-              Promise.resolve({ getFile: () => Promise.resolve(file) }),
+            multimediaFilesVersion: () => undefined,
+            getMultimediaFile: () => Promise.resolve(file),
           },
         },
       ],
@@ -119,11 +118,10 @@ describe("MultimediaPreviewComponent with a crop", () => {
       bindings: [inputBinding("filePath", signal("photo.png"))],
       providers: [
         {
-          provide: AncestryService,
+          provide: MULTIMEDIA_FILE_SOURCE,
           useValue: {
-            gedcomResource: { value: () => undefined },
-            getMultimediaFileHandle: () =>
-              Promise.resolve({ getFile: () => Promise.resolve(file) }),
+            multimediaFilesVersion: () => undefined,
+            getMultimediaFile: () => Promise.resolve(file),
           },
         },
       ],

@@ -310,6 +310,17 @@ export class AncestryService {
       : undefined;
   }
 
+  // For MultimediaFileSource: the files change when other data is loaded.
+  multimediaFilesVersion(): unknown {
+    return this.gedcomResource.value();
+  }
+
+  // The multimedia file at `relativePath` in the loaded directory, read as a
+  // File, or undefined if there's none.
+  async getMultimediaFile(relativePath: string): Promise<File | undefined> {
+    return (await this.getMultimediaFileHandle(relativePath))?.getFile();
+  }
+
   // Whether something already exists at `relativePath` in the loaded
   // directory.
   async multimediaFileExists(relativePath: string): Promise<boolean> {
