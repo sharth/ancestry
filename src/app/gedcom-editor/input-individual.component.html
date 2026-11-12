@@ -1,22 +1,19 @@
 <app-input-individual-names
-  [open]="true"
   [formField]="form.names"
   [workingDatabase]="workingDatabase()"
 ></app-input-individual-names>
 
 <app-input-individual-sex
-  [open]="true"
   [formField]="form.sex"
   [workingDatabase]="workingDatabase()"
 ></app-input-individual-sex>
 
 <app-input-individual-facts
-  [open]="true"
   [formField]="form.facts"
   [workingDatabase]="workingDatabase()"
 ></app-input-individual-facts>
 
-<details [open]="true">
+<details open>
   <summary>
     Families ({{
       value().childOfFamilyXrefs.length + value().parentOfFamilyXrefs.length
@@ -51,13 +48,11 @@
 </details>
 
 <app-input-notes
-  [open]="true"
   [formField]="form.notes"
   [workingDatabase]="workingDatabase()"
 ></app-input-notes>
 
 <app-input-unknown-records
-  [open]="true"
   [formField]="form.unknownRecords"
   [workingDatabase]="workingDatabase()"
 ></app-input-unknown-records>

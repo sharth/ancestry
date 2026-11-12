@@ -3,7 +3,7 @@
   @for (formEntry of form; track formEntry) {
     @let multimediaLink = formEntry().value();
     @let multimedia = workingDatabase().multimedias[multimediaLink.xref];
-    <details [open]="true">
+    <details open>
       <summary>
         <button
           class="btn btn-sm btn-outline-danger bi-trash"

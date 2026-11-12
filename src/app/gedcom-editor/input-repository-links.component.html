@@ -2,7 +2,7 @@
   <summary>Repositories ({{ form.length }})</summary>
   @for (formGroup of form; track formGroup) {
     @let repositoryXref = formGroup.repositoryXref().value();
-    <details [open]="true">
+    <details open>
       <summary>
         <button
           class="btn btn-sm btn-outline-danger bi-trash"

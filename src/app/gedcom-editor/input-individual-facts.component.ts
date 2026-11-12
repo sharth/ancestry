@@ -25,7 +25,6 @@ export class InputIndividualFactsComponent implements FormValueControl<
   private readonly _injector = inject(Injector);
 
   readonly workingDatabase = input.required<GedcomDatabase>();
-  readonly open = input<boolean>(true);
   readonly value = model<GedcomFact[]>([]);
   readonly form = form(this.value);
   readonly tags = gedcomIndividualFacts;

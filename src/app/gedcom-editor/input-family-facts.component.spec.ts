@@ -14,7 +14,6 @@ describe("InputFamilyFactsComponent", () => {
   let component: InputFamilyFactsComponent;
 
   const workingDatabase = signal(newGedcomDatabase());
-  const open = signal(true);
   const value = signal<GedcomFact[]>([]);
 
   beforeEach(async () => {
@@ -22,7 +21,6 @@ describe("InputFamilyFactsComponent", () => {
     const renderResult = await render(InputFamilyFactsComponent, {
       bindings: [
         inputBinding("workingDatabase", workingDatabase),
-        inputBinding("open", open),
         inputBinding("value", value),
       ],
       waitForStableOnRender: true,

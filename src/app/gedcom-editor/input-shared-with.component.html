@@ -1,7 +1,7 @@
 <details open>
   <summary>Shared With ({{ form.length }})</summary>
   @for (formGroup of form; track formGroup) {
-    <details [open]="true">
+    <details open>
       <summary>
         {{ formGroup.xref().value() }}
         <button

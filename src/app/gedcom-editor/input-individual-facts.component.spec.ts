@@ -13,14 +13,10 @@ describe("InputIndividualFactsComponent", () => {
   let component: InputIndividualFactsComponent;
 
   const workingDatabase = signal(newGedcomDatabase());
-  const open = signal(true);
 
   beforeEach(async () => {
     const renderResult = await render(InputIndividualFactsComponent, {
-      bindings: [
-        inputBinding("workingDatabase", workingDatabase),
-        inputBinding("open", open),
-      ],
+      bindings: [inputBinding("workingDatabase", workingDatabase)],
       waitForStableOnRender: true,
     });
 
