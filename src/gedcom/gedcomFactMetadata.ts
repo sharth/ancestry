@@ -113,7 +113,7 @@ export const gedcomIndividualAttributes: Record<string, GedcomEventMetadata> = {
   //   +1 TYPE <Text>                           {1:1}  g7:TYPE
   //   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
   FACT: {
-    humanReadableDescription: "Fact",
+    humanReadableDescription: "Custom Fact",
     mandatoryValue: true,
     mandatoryType: true,
   },
@@ -305,7 +305,7 @@ export const gedcomIndividualEvents: Record<string, GedcomEventMetadata> = {
   //   +1 TYPE <Text>                           {1:1}  g7:TYPE
   //   +1 <<INDIVIDUAL_EVENT_DETAIL>>           {0:1}
   EVEN: {
-    humanReadableDescription: "Event",
+    humanReadableDescription: "Custom Event",
     mandatoryValue: true,
     mandatoryType: true,
   },
@@ -332,7 +332,7 @@ export const gedcomFamilyAttributes: Record<string, GedcomEventMetadata> = {
   //   +1 TYPE <Text>                           {1:1}  g7:TYPE
   //   +1 <<FAMILY_EVENT_DETAIL>>               {0:1}
   FACT: {
-    humanReadableDescription: "Fact",
+    humanReadableDescription: "Custom Fact",
     mandatoryValue: true,
     mandatoryType: true,
   },
@@ -428,7 +428,7 @@ export const gedcomFamilyEvents: Record<string, GedcomEventMetadata> = {
   //   +1 TYPE <Text>                           {1:1}  g7:TYPE
   //   +1 <<FAMILY_EVENT_DETAIL>>               {0:1}
   EVEN: {
-    humanReadableDescription: "Event",
+    humanReadableDescription: "Custom Event",
     mandatoryValue: true,
     mandatoryType: true,
   },
