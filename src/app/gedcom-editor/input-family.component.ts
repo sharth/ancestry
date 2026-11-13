@@ -21,8 +21,12 @@ import { InputSourceCitationsComponent } from "./input-source-citations.componen
   templateUrl: "./input-family.component.html",
   styleUrl: "./input.component.css",
 })
-export class InputFamilyComponent implements FormValueControl<GedcomFamily> {
+export class InputFamilyComponent implements FormValueControl<
+  Immutable<GedcomFamily>
+> {
   readonly workingDatabase = input.required<Immutable<GedcomDatabase>>();
-  readonly value = model<GedcomFamily>(newGedcomFamily({ xref: "" }));
+  readonly value = model<Immutable<GedcomFamily>>(
+    newGedcomFamily({ xref: "" }),
+  );
   readonly form = form(this.value);
 }

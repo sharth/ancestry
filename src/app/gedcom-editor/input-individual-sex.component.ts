@@ -12,9 +12,11 @@ import { InputSourceCitationsComponent } from "./input-source-citations.componen
   templateUrl: "./input-individual-sex.component.html",
   styleUrl: "./input.component.css",
 })
-export class InputIndividualSexComponent implements FormValueControl<GedcomSex> {
+export class InputIndividualSexComponent implements FormValueControl<
+  Immutable<GedcomSex>
+> {
   readonly workingDatabase = input.required<Immutable<GedcomDatabase>>();
 
-  readonly value = model<GedcomSex>(newGedcomSex());
+  readonly value = model<Immutable<GedcomSex>>(newGedcomSex());
   readonly form = form(this.value);
 }

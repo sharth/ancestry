@@ -31,13 +31,13 @@ import { InputMultimediaCropComponent } from "./input-multimedia-crop.component"
   imports: [RouterModule, FormField, InputMultimediaCropComponent],
 })
 export class InputMultimediaLinksComponent implements FormValueControl<
-  GedcomMultimediaLink[]
+  readonly Immutable<GedcomMultimediaLink>[]
 > {
   private readonly _injector = inject(Injector);
   readonly gedcomEditor = inject(GEDCOM_EDITOR, { optional: true });
 
   readonly workingDatabase = input.required<Immutable<GedcomDatabase>>();
-  readonly value = model<GedcomMultimediaLink[]>([]);
+  readonly value = model<readonly Immutable<GedcomMultimediaLink>[]>([]);
   readonly form = form(this.value);
   readonly multimediaLinkTitle = multimediaLinkTitle;
 

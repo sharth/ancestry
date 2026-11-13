@@ -23,7 +23,7 @@ import { InputSourceCitationsComponent } from "./input-source-citations.componen
   styleUrl: "./input.component.css",
 })
 export class InputIndividualNamesComponent implements FormValueControl<
-  GedcomName[]
+  readonly Immutable<GedcomName>[]
 > {
   private readonly _injector = inject(Injector);
 
@@ -31,7 +31,7 @@ export class InputIndividualNamesComponent implements FormValueControl<
 
   // Set true to expand the details by default.
 
-  readonly value = model<GedcomName[]>([]);
+  readonly value = model<readonly Immutable<GedcomName>[]>([]);
   readonly form = form(this.value);
 
   @ViewChildren("focusTarget") private focusTargets!: QueryList<

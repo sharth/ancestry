@@ -29,10 +29,10 @@ import { InputSourceXrefComponent } from "./input-source-xref.component";
   styleUrl: "./input.component.css",
 })
 export class InputSourceCitationsComponent implements FormValueControl<
-  GedcomSourceCitation[]
+  readonly Immutable<GedcomSourceCitation>[]
 > {
   readonly workingDatabase = input.required<Immutable<GedcomDatabase>>();
-  readonly value = model<GedcomSourceCitation[]>([]);
+  readonly value = model<readonly Immutable<GedcomSourceCitation>[]>([]);
   readonly form = form(this.value);
 
   @ViewChildren("focusTarget")

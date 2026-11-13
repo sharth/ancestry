@@ -11,9 +11,11 @@ import { newGedcomNote, type GedcomNote } from "../../gedcom/gedcomNote";
   templateUrl: "./input-notes.component.html",
   styleUrl: "./input.component.css",
 })
-export class InputNotesComponent implements FormValueControl<GedcomNote[]> {
+export class InputNotesComponent implements FormValueControl<
+  readonly Immutable<GedcomNote>[]
+> {
   readonly workingDatabase = input.required<Immutable<GedcomDatabase>>();
-  readonly value = model<GedcomNote[]>([]);
+  readonly value = model<readonly Immutable<GedcomNote>[]>([]);
   readonly form = form(this.value);
 
   appendNote() {

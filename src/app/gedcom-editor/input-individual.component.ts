@@ -28,11 +28,15 @@ import { InputUnknownRecordsComponent } from "./input-unknown-records.component"
   templateUrl: "./input-individual.component.html",
   styleUrl: "./input.component.css",
 })
-export class InputIndividualComponent implements FormValueControl<GedcomIndividual> {
+export class InputIndividualComponent implements FormValueControl<
+  Immutable<GedcomIndividual>
+> {
   readonly gedcomEditor = inject(GEDCOM_EDITOR, { optional: true });
 
   readonly workingDatabase = input.required<Immutable<GedcomDatabase>>();
-  readonly value = model<GedcomIndividual>(newGedcomIndividual({ xref: "" }));
+  readonly value = model<Immutable<GedcomIndividual>>(
+    newGedcomIndividual({ xref: "" }),
+  );
   readonly form = form(this.value);
 
   childOfFamilyLabel(familyXref: string): string {

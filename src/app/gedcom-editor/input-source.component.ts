@@ -19,8 +19,12 @@ import { InputUnknownRecordsComponent } from "./input-unknown-records.component"
   templateUrl: "./input-source.component.html",
   styleUrl: "./input.component.css",
 })
-export class InputSourceComponent implements FormValueControl<GedcomSource> {
+export class InputSourceComponent implements FormValueControl<
+  Immutable<GedcomSource>
+> {
   readonly workingDatabase = input.required<Immutable<GedcomDatabase>>();
-  readonly value = model<GedcomSource>(newGedcomSource({ xref: "" }));
+  readonly value = model<Immutable<GedcomSource>>(
+    newGedcomSource({ xref: "" }),
+  );
   readonly form = form(this.value);
 }

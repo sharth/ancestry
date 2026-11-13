@@ -21,12 +21,12 @@ import { InputFactComponent } from "./input-fact.component";
   styleUrl: "./input.component.css",
 })
 export class InputIndividualFactsComponent implements FormValueControl<
-  GedcomFact[]
+  readonly Immutable<GedcomFact>[]
 > {
   private readonly _injector = inject(Injector);
 
   readonly workingDatabase = input.required<Immutable<GedcomDatabase>>();
-  readonly value = model<GedcomFact[]>([]);
+  readonly value = model<readonly Immutable<GedcomFact>[]>([]);
   readonly form = form(this.value);
   readonly tags = gedcomIndividualFacts;
 

@@ -12,11 +12,11 @@ import { InputIndividualXrefComponent } from "./input-individual-xref.component"
   styleUrl: "./input.component.css",
 })
 export class InputFamilyChildrenComponent implements FormValueControl<
-  string[]
+  readonly string[]
 > {
   readonly workingDatabase = input.required<Immutable<GedcomDatabase>>();
 
-  readonly value = model<string[]>([]);
+  readonly value = model<readonly string[]>([]);
   readonly form = form(this.value);
 
   appendChild() {

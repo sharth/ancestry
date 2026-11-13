@@ -14,8 +14,12 @@ import {
   templateUrl: "./input-repository.component.html",
   styleUrl: "./input.component.css",
 })
-export class InputRepositoryComponent implements FormValueControl<GedcomRepository> {
+export class InputRepositoryComponent implements FormValueControl<
+  Immutable<GedcomRepository>
+> {
   readonly workingDatabase = input.required<Immutable<GedcomDatabase>>();
-  readonly value = model<GedcomRepository>(newGedcomRepository({ xref: "" }));
+  readonly value = model<Immutable<GedcomRepository>>(
+    newGedcomRepository({ xref: "" }),
+  );
   readonly form = form(this.value);
 }

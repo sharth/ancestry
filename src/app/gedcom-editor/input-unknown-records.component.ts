@@ -15,10 +15,10 @@ import {
   imports: [],
 })
 export class InputUnknownRecordsComponent implements FormValueControl<
-  GedcomRecord[]
+  readonly Immutable<GedcomRecord>[]
 > {
   readonly workingDatabase = input.required<Immutable<GedcomDatabase>>();
-  readonly value = model<GedcomRecord[]>([]);
+  readonly value = model<readonly Immutable<GedcomRecord>[]>([]);
 
   removeUnknownRecord(index: number) {
     this.value.update((unknownRecords) => unknownRecords.toSpliced(index, 1));

@@ -19,10 +19,10 @@ import { InputIndividualXrefComponent } from "./input-individual-xref.component"
   styleUrl: "./input.component.css",
 })
 export class InputSharedWithComponent implements FormValueControl<
-  GedcomFactSharedWith[]
+  readonly Immutable<GedcomFactSharedWith>[]
 > {
   readonly workingDatabase = input.required<Immutable<GedcomDatabase>>();
-  readonly value = model<GedcomFactSharedWith[]>([]);
+  readonly value = model<readonly Immutable<GedcomFactSharedWith>[]>([]);
   readonly form = form(this.value);
 
   @ViewChildren("focusTarget")

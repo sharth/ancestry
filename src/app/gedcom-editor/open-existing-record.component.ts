@@ -1,5 +1,5 @@
-import type { Immutable } from "immer";
 import { Component, computed, input, output, signal } from "@angular/core";
+import type { Immutable } from "immer";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { fullname } from "../../gedcom/gedcomIndividual";

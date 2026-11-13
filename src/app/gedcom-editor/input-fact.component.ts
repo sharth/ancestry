@@ -22,10 +22,12 @@ import { InputSourceCitationsComponent } from "./input-source-citations.componen
   templateUrl: "./input-fact.component.html",
   styleUrl: "./input.component.css",
 })
-export class InputFactComponent implements FormValueControl<GedcomFact> {
+export class InputFactComponent implements FormValueControl<
+  Immutable<GedcomFact>
+> {
   readonly workingDatabase = input.required<Immutable<GedcomDatabase>>();
   readonly tags = input.required<Record<string, GedcomEventMetadata>>();
-  readonly value = model<GedcomFact>(newGedcomFact());
+  readonly value = model<Immutable<GedcomFact>>(newGedcomFact());
   readonly form = form(this.value);
 
   focus(options?: FocusOptions) {
