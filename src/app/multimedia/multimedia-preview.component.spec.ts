@@ -90,9 +90,14 @@ describe("MultimediaPreviewComponent with a crop", () => {
         {
           provide: AncestryService,
           useValue: {
-            gedcomResource: { value: () => undefined },
-            getMultimediaFileHandle: () =>
-              Promise.resolve({ getFile: () => Promise.resolve(file) }),
+            gedcomResource: {
+              value: () => ({
+                directoryHandle: {
+                  getFileHandle: () =>
+                    Promise.resolve({ getFile: () => Promise.resolve(file) }),
+                },
+              }),
+            },
           },
         },
       ],
@@ -135,9 +140,14 @@ describe("MultimediaPreviewComponent with a crop", () => {
         {
           provide: AncestryService,
           useValue: {
-            gedcomResource: { value: () => undefined },
-            getMultimediaFileHandle: () =>
-              Promise.resolve({ getFile: () => Promise.resolve(file) }),
+            gedcomResource: {
+              value: () => ({
+                directoryHandle: {
+                  getFileHandle: () =>
+                    Promise.resolve({ getFile: () => Promise.resolve(file) }),
+                },
+              }),
+            },
           },
         },
       ],
@@ -157,7 +167,7 @@ describe("MultimediaPreviewComponent with a crop", () => {
 
   it("shows a pending file without reading the data folder", async () => {
     const file = await pngFile(10, 10);
-    const getMultimediaFileHandle = vi.fn();
+    const getFileHandle = vi.fn();
     const { fixture } = await render(MultimediaPreviewComponent, {
       bindings: [
         inputBinding(
@@ -175,8 +185,9 @@ describe("MultimediaPreviewComponent with a crop", () => {
         {
           provide: AncestryService,
           useValue: {
-            gedcomResource: { value: () => undefined },
-            getMultimediaFileHandle,
+            gedcomResource: {
+              value: () => ({ directoryHandle: { getFileHandle } }),
+            },
           },
         },
       ],
@@ -191,6 +202,6 @@ describe("MultimediaPreviewComponent with a crop", () => {
       return img;
     });
     expect(img.naturalWidth).toBe(10);
-    expect(getMultimediaFileHandle).not.toHaveBeenCalled();
+    expect(getFileHandle).not.toHaveBeenCalled();
   });
 });
