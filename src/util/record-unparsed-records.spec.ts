@@ -1,14 +1,14 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { parseGedcomRecords } from "../gedcom/gedcomRecord";
 import {
+  clearUnparsedRecords,
+  collectUnparsedRecords,
   reportUnparsedRecord,
-  warnUnparsedRecords,
 } from "./record-unparsed-records";
 
-describe("warnUnparsedRecords", () => {
-  it("warns once per full path of each reported record", () => {
-    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+describe("collectUnparsedRecords", () => {
+  it("warns about each reported record, with its path, xref and line", () => {
     const records = parseGedcomRecords(
       [
         "0 @I1@ INDI",
@@ -30,13 +30,30 @@ describe("warnUnparsedRecords", () => {
       }
     }
 
-    warnUnparsedRecords(records);
+    const problems = collectUnparsedRecords(records);
 
-    expect(warn.mock.calls).toEqual([
-      ["Unparsed tag ", "INDI.BIRT._FOO"],
-      ["Unparsed tag ", "FAM.MARR._FOO"],
-      ["Unparsed tag ", "_BAR"],
+    expect(
+      problems.map(({ severity, path, xref, line }) => ({
+        severity,
+        path,
+        xref,
+        line,
+      })),
+    ).toEqual([
+      { severity: "warning", path: "INDI.BIRT._FOO", xref: "@I1@", line: 3 },
+      { severity: "warning", path: "INDI.BIRT._FOO", xref: "@I2@", line: 6 },
+      { severity: "warning", path: "FAM.MARR._FOO", xref: "@F1@", line: 9 },
+      { severity: "warning", path: "_BAR", xref: "", line: 10 },
     ]);
-    warn.mockRestore();
+    expect(collectUnparsedRecords(records)).toEqual([]);
+  });
+
+  it("forgets records reported before a clear", () => {
+    const records = parseGedcomRecords("0 _BAR");
+    records.forEach(reportUnparsedRecord);
+
+    clearUnparsedRecords();
+
+    expect(collectUnparsedRecords(records)).toEqual([]);
   });
 });
