@@ -1,67 +1,65 @@
-<details #container open (toggle)="(true)">
+<details open>
   <summary>Repositories ({{ form.length }})</summary>
-  @defer (when container.open) {
-    @for (formGroup of form; track formGroup) {
-      @let repositoryXref = formGroup.repositoryXref().value();
-      <details [open]="true">
-        <summary>
-          <button
-            class="btn btn-sm btn-outline-danger bi-trash"
-            type="button"
-            aria-label="Remove repository link"
-            (click)="removeCitation($index)"
-          ></button>
-          {{
-            workingDatabase().repositories[repositoryXref]?.name ??
-              "Unknown repository"
-          }}
-        </summary>
-        <div class="d-flex gap-2 align-items-center mb-2">
-          <div class="flex-grow-1">
-            <app-input-repository-xref
-              [formField]="formGroup.repositoryXref"
-              [workingDatabase]="workingDatabase()"
-            ></app-input-repository-xref>
-          </div>
-          @if (gedcomEditor) {
-            <!-- <button
-              type="button"
-              class="btn btn-sm btn-outline-primary text-nowrap"
-              (click)="createNewRepository($index)"
-              title="Create a new repository and open in tab"
-            >
-              <i class="bi bi-plus"></i> New
-            </button>
-            @if (repositoryXref) {
-              <button
-                type="button"
-                class="btn btn-sm btn-outline-secondary text-nowrap"
-                /* (click)="openRepositoryInSession(repositoryXref)" */
-                title="Edit repository in a session tab"
-              >
-                <i class="bi bi-pencil"></i> Edit
-              </button>
-            } -->
-          }
+  @for (formGroup of form; track formGroup) {
+    @let repositoryXref = formGroup.repositoryXref().value();
+    <details open>
+      <summary>
+        <button
+          class="btn btn-sm btn-outline-danger bi-trash"
+          type="button"
+          aria-label="Remove repository link"
+          (click)="removeCitation($index)"
+        ></button>
+        {{
+          workingDatabase().repositories[repositoryXref]?.name ??
+            "Unknown repository"
+        }}
+      </summary>
+      <div class="d-flex gap-2 align-items-center mb-2">
+        <div class="flex-grow-1">
+          <app-input-repository-xref
+            [formField]="formGroup.repositoryXref"
+            [workingDatabase]="workingDatabase()"
+          ></app-input-repository-xref>
         </div>
-        <app-input-repository-call-numbers
-          [formField]="formGroup.callNumbers"
-          [workingDatabase]="workingDatabase()"
-        ></app-input-repository-call-numbers>
-      </details>
-    }
-    <div
-      class="details-lookalike"
-      tabindex="0"
-      (click)="appendCitation()"
-      (keydown.enter)="appendCitation()"
-    >
-      <button
-        class="btn btn-sm btn-outline-primary bi-plus"
-        aria-label="Add repository link"
-        (click)="$event.preventDefault()"
-      ></button>
-      Associate with another repository
-    </div>
+        @if (gedcomEditor) {
+          <!-- <button
+            type="button"
+            class="btn btn-sm btn-outline-primary text-nowrap"
+            (click)="createNewRepository($index)"
+            title="Create a new repository and open in tab"
+          >
+            <i class="bi bi-plus"></i> New
+          </button>
+          @if (repositoryXref) {
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-secondary text-nowrap"
+              /* (click)="openRepositoryInSession(repositoryXref)" */
+              title="Edit repository in a session tab"
+            >
+              <i class="bi bi-pencil"></i> Edit
+            </button>
+          } -->
+        }
+      </div>
+      <app-input-repository-call-numbers
+        [formField]="formGroup.callNumbers"
+        [workingDatabase]="workingDatabase()"
+      ></app-input-repository-call-numbers>
+    </details>
   }
+  <div
+    class="details-lookalike"
+    tabindex="0"
+    (click)="appendCitation()"
+    (keydown.enter)="appendCitation()"
+  >
+    <button
+      class="btn btn-sm btn-outline-primary bi-plus"
+      aria-label="Add repository link"
+      (click)="$event.preventDefault()"
+    ></button>
+    Associate with another repository
+  </div>
 </details>

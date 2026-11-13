@@ -1,17 +1,15 @@
-<details #container (toggle)="(true)" [open]="open()">
+<details open>
   <summary>Sex ({{ form.sex().value() }})</summary>
-  @defer (when container.open) {
-    <div class="form-floating">
-      <select class="form-select" [formField]="form.sex">
-        <option value=""></option>
-        <option value="M">Male</option>
-        <option value="F">Female</option>
-      </select>
-      <label for="sex">Sex</label>
-    </div>
-    <app-input-source-citations
-      [formField]="form.citations"
-      [workingDatabase]="workingDatabase()"
-    ></app-input-source-citations>
-  }
+  <div class="form-floating">
+    <select class="form-select" [formField]="form.sex">
+      <option value=""></option>
+      <option value="M">Male</option>
+      <option value="F">Female</option>
+    </select>
+    <label for="sex">Sex</label>
+  </div>
+  <app-input-source-citations
+    [formField]="form.citations"
+    [workingDatabase]="workingDatabase()"
+  ></app-input-source-citations>
 </details>

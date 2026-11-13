@@ -1,73 +1,71 @@
-<details #container open (toggle)="(true)">
+<details open>
   <summary>Citations ({{ form.length }})</summary>
-  @defer (when container.open) {
-    @for (formGroup of form; track formGroup) {
-      <details open>
-        <summary>
-          <button
-            type="button"
-            class="btn btn-sm btn-outline-danger bi-trash"
-            aria-label="Remove citation"
-            (click)="removeCitation($index)"
-          ></button>
-          @let sourceXref = formGroup.sourceXref().value();
-          @let source = workingDatabase().sources[sourceXref];
-          {{ source?.abbr || sourceXref }}
-        </summary>
-        <div class="form-floating">
-          <app-input-source-xref
-            #focusTarget
-            [formField]="formGroup.sourceXref"
-            [workingDatabase]="workingDatabase()"
-          ></app-input-source-xref>
-        </div>
-        <div class="form-floating">
-          <input
-            class="form-control"
-            id="page_{{ $index }}"
-            [formField]="formGroup.page"
-          />
-          <label for="page_{{ $index }}">Page</label>
-        </div>
-        <div class="form-floating">
-          <input
-            class="form-control"
-            id="quality_{{ $index }}"
-            [formField]="formGroup.quality"
-          />
-          <label for="quality_{{ $index }}">Quality</label>
-        </div>
-        <div class="form-floating">
-          <textarea
-            class="form-control"
-            id="text_{{ $index }}"
-            [formField]="formGroup.text"
-          ></textarea>
-          <label for="text_{{ $index }}">Text</label>
-        </div>
-        <app-input-multimedia-links
-          [formField]="formGroup.multimediaLinks"
+  @for (formGroup of form; track formGroup) {
+    <details open>
+      <summary>
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-danger bi-trash"
+          aria-label="Remove citation"
+          (click)="removeCitation($index)"
+        ></button>
+        @let sourceXref = formGroup.sourceXref().value();
+        @let source = workingDatabase().sources[sourceXref];
+        {{ source?.abbr || sourceXref }}
+      </summary>
+      <div class="form-floating">
+        <app-input-source-xref
+          #focusTarget
+          [formField]="formGroup.sourceXref"
           [workingDatabase]="workingDatabase()"
-        ></app-input-multimedia-links>
-        <app-input-notes
-          [formField]="formGroup.notes"
-          [workingDatabase]="workingDatabase()"
-        ></app-input-notes>
-      </details>
-    }
-    <div
-      class="details-lookalike"
-      tabindex="0"
-      (click)="appendCitation()"
-      (keydown.enter)="appendCitation()"
-    >
-      <button
-        type="button"
-        class="btn btn-sm btn-outline-primary bi-plus"
-        aria-label="Add citation"
-        (click)="$event.preventDefault()"
-      ></button>
-      Append another citation
-    </div>
+        ></app-input-source-xref>
+      </div>
+      <div class="form-floating">
+        <input
+          class="form-control"
+          id="page_{{ $index }}"
+          [formField]="formGroup.page"
+        />
+        <label for="page_{{ $index }}">Page</label>
+      </div>
+      <div class="form-floating">
+        <input
+          class="form-control"
+          id="quality_{{ $index }}"
+          [formField]="formGroup.quality"
+        />
+        <label for="quality_{{ $index }}">Quality</label>
+      </div>
+      <div class="form-floating">
+        <textarea
+          class="form-control"
+          id="text_{{ $index }}"
+          [formField]="formGroup.text"
+        ></textarea>
+        <label for="text_{{ $index }}">Text</label>
+      </div>
+      <app-input-multimedia-links
+        [formField]="formGroup.multimediaLinks"
+        [workingDatabase]="workingDatabase()"
+      ></app-input-multimedia-links>
+      <app-input-notes
+        [formField]="formGroup.notes"
+        [workingDatabase]="workingDatabase()"
+      ></app-input-notes>
+    </details>
   }
+  <div
+    class="details-lookalike"
+    tabindex="0"
+    (click)="appendCitation()"
+    (keydown.enter)="appendCitation()"
+  >
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-primary bi-plus"
+      aria-label="Add citation"
+      (click)="$event.preventDefault()"
+    ></button>
+    Append another citation
+  </div>
 </details>

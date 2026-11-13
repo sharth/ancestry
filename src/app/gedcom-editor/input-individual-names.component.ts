@@ -29,7 +29,6 @@ export class InputIndividualNamesComponent implements FormValueControl<
   readonly workingDatabase = input.required<GedcomDatabase>();
 
   // Set true to expand the details by default.
-  readonly open = input<boolean>(true);
 
   readonly value = model<GedcomName[]>([]);
   readonly form = form(this.value);

@@ -24,7 +24,6 @@ import { InputSourceCitationsComponent } from "./input-source-citations.componen
 export class InputFactComponent implements FormValueControl<GedcomFact> {
   readonly workingDatabase = input.required<GedcomDatabase>();
   readonly tags = input.required<Record<string, GedcomEventMetadata>>();
-  readonly open = input<boolean>(true);
   readonly value = model<GedcomFact>(newGedcomFact());
   readonly form = form(this.value);
 

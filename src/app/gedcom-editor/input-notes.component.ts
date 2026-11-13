@@ -14,7 +14,6 @@ export class InputNotesComponent implements FormValueControl<GedcomNote[]> {
   readonly workingDatabase = input.required<GedcomDatabase>();
   readonly value = model<GedcomNote[]>([]);
   readonly form = form(this.value);
-  readonly open = input<boolean>(true);
 
   appendNote() {
     this.value.update((notes) => [...notes, newGedcomNote()]);
