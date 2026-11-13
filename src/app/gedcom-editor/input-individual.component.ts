@@ -1,5 +1,6 @@
 import { Component, inject, input, model } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
+import type { Immutable } from "immer";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import {
@@ -27,11 +28,15 @@ import { InputUnknownRecordsComponent } from "./input-unknown-records.component"
   templateUrl: "./input-individual.component.html",
   styleUrl: "./input.component.css",
 })
-export class InputIndividualComponent implements FormValueControl<GedcomIndividual> {
+export class InputIndividualComponent implements FormValueControl<
+  Immutable<GedcomIndividual>
+> {
   readonly gedcomEditor = inject(GEDCOM_EDITOR, { optional: true });
 
-  readonly workingDatabase = input.required<GedcomDatabase>();
-  readonly value = model<GedcomIndividual>(newGedcomIndividual({ xref: "" }));
+  readonly workingDatabase = input.required<Immutable<GedcomDatabase>>();
+  readonly value = model<Immutable<GedcomIndividual>>(
+    newGedcomIndividual({ xref: "" }),
+  );
   readonly form = form(this.value);
 
   childOfFamilyLabel(familyXref: string): string {

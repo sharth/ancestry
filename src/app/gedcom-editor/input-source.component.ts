@@ -1,5 +1,6 @@
 import { Component, input, model } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
+import type { Immutable } from "immer";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomSource, type GedcomSource } from "../../gedcom/gedcomSource";
@@ -18,8 +19,12 @@ import { InputUnknownRecordsComponent } from "./input-unknown-records.component"
   templateUrl: "./input-source.component.html",
   styleUrl: "./input.component.css",
 })
-export class InputSourceComponent implements FormValueControl<GedcomSource> {
-  readonly workingDatabase = input.required<GedcomDatabase>();
-  readonly value = model<GedcomSource>(newGedcomSource({ xref: "" }));
+export class InputSourceComponent implements FormValueControl<
+  Immutable<GedcomSource>
+> {
+  readonly workingDatabase = input.required<Immutable<GedcomDatabase>>();
+  readonly value = model<Immutable<GedcomSource>>(
+    newGedcomSource({ xref: "" }),
+  );
   readonly form = form(this.value);
 }

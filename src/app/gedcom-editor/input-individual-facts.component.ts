@@ -7,6 +7,7 @@ import {
   model,
 } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
+import type { Immutable } from "immer";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomFact, type GedcomFact } from "../../gedcom/gedcomFact";
@@ -20,12 +21,12 @@ import { InputFactComponent } from "./input-fact.component";
   styleUrl: "./input.component.css",
 })
 export class InputIndividualFactsComponent implements FormValueControl<
-  GedcomFact[]
+  readonly Immutable<GedcomFact>[]
 > {
   private readonly _injector = inject(Injector);
 
-  readonly workingDatabase = input.required<GedcomDatabase>();
-  readonly value = model<GedcomFact[]>([]);
+  readonly workingDatabase = input.required<Immutable<GedcomDatabase>>();
+  readonly value = model<readonly Immutable<GedcomFact>[]>([]);
   readonly form = form(this.value);
   readonly tags = gedcomIndividualFacts;
 

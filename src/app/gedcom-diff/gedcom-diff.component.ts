@@ -1,4 +1,5 @@
 import { Component, computed, input } from "@angular/core";
+import type { Immutable } from "immer";
 
 import {
   serializeGedcomRecordToText,
@@ -13,8 +14,12 @@ import { diff, type Difference } from "./diff";
   imports: [],
 })
 export class GedcomDiffComponent {
-  readonly newGedcomRecord = input.required<GedcomRecord | undefined>();
-  readonly oldGedcomRecord = input.required<GedcomRecord | undefined>();
+  readonly newGedcomRecord = input.required<
+    Immutable<GedcomRecord> | undefined
+  >();
+  readonly oldGedcomRecord = input.required<
+    Immutable<GedcomRecord> | undefined
+  >();
 
   readonly newGedcomText = computed<string[]>(() => {
     const gedcomRecord = this.newGedcomRecord();

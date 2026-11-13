@@ -1,3 +1,5 @@
+import type { Immutable } from "immer";
+
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import {
   filterTrivialGedcomRecord,
@@ -48,8 +50,8 @@ export function parseGedcomCreationDate(
 }
 
 export function serializeGedcomCreationDate(
-  gedcomCreationDate: GedcomCreationDate,
-): GedcomRecord | null {
+  gedcomCreationDate: Immutable<GedcomCreationDate>,
+): Immutable<GedcomRecord> | null {
   return filterTrivialGedcomRecord(
     newGedcomRecord({
       tag: "CREA",

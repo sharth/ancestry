@@ -10,6 +10,7 @@ import {
   type QueryList,
 } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
+import type { Immutable } from "immer";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomName, type GedcomName } from "../../gedcom/gedcomName";
@@ -22,15 +23,15 @@ import { InputSourceCitationsComponent } from "./input-source-citations.componen
   styleUrl: "./input.component.css",
 })
 export class InputIndividualNamesComponent implements FormValueControl<
-  GedcomName[]
+  readonly Immutable<GedcomName>[]
 > {
   private readonly _injector = inject(Injector);
 
-  readonly workingDatabase = input.required<GedcomDatabase>();
+  readonly workingDatabase = input.required<Immutable<GedcomDatabase>>();
 
   // Set true to expand the details by default.
 
-  readonly value = model<GedcomName[]>([]);
+  readonly value = model<readonly Immutable<GedcomName>[]>([]);
   readonly form = form(this.value);
 
   @ViewChildren("focusTarget") private focusTargets!: QueryList<

@@ -1,3 +1,5 @@
+import type { Immutable } from "immer";
+
 import {
   reportUnparsedRecord,
   warnUnparsedRecords,
@@ -193,21 +195,24 @@ function stampDates<
  * CHAN stamped with `now`, and new ones their CREA too, as HEAD gets its
  * DATE. */
 export function compareGedcomDatabase(
-  originalGedcomRecords: GedcomRecord[],
-  originalGedcomDatabase: GedcomDatabase,
-  updatedGedcomDatabase: GedcomDatabase,
+  originalGedcomRecords: Immutable<GedcomRecord>[],
+  originalGedcomDatabase: Immutable<GedcomDatabase>,
+  updatedGedcomDatabase: Immutable<GedcomDatabase>,
   now = new Date(),
 ): {
-  originalGedcomRecord?: GedcomRecord;
-  updatedGedcomRecord?: GedcomRecord;
+  originalGedcomRecord?: Immutable<GedcomRecord>;
+  updatedGedcomRecord?: Immutable<GedcomRecord>;
 }[] {
   const date = gedcomDateExact(now);
-  function hash(gedcomRecord: GedcomRecord) {
+  function hash(gedcomRecord: Immutable<GedcomRecord>) {
     return `${gedcomRecord.tag} ${gedcomRecord.xref} ${gedcomRecord.value}`;
   }
   const recordMap = new Map<
     string,
-    { originalGedcomRecord?: GedcomRecord; updatedGedcomRecord?: GedcomRecord }
+    {
+      originalGedcomRecord?: Immutable<GedcomRecord>;
+      updatedGedcomRecord?: Immutable<GedcomRecord>;
+    }
   >();
   originalGedcomRecords.forEach((gedcomRecord) => {
     recordMap.set(hash(gedcomRecord), { originalGedcomRecord: gedcomRecord });
@@ -246,7 +251,7 @@ export function compareGedcomDatabase(
       ),
     ),
     newGedcomRecord({ tag: "TRLR" }),
-  ].forEach((gedcomRecord: GedcomRecord) => {
+  ].forEach((gedcomRecord: Immutable<GedcomRecord>) => {
     const h = hash(gedcomRecord);
     const r = recordMap.get(h);
     if (r === undefined) {
@@ -260,9 +265,9 @@ export function compareGedcomDatabase(
 }
 
 export function serializeGedcomDatabase(
-  originalGedcomRecords: GedcomRecord[],
-  originalGedcomDatabase: GedcomDatabase,
-  gedcomDatabase: GedcomDatabase,
+  originalGedcomRecords: Immutable<GedcomRecord>[],
+  originalGedcomDatabase: Immutable<GedcomDatabase>,
+  gedcomDatabase: Immutable<GedcomDatabase>,
   now = new Date(),
 ): string[] {
   return compareGedcomDatabase(

@@ -1,3 +1,5 @@
+import type { Immutable } from "immer";
+
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import type { GedcomMultimedia } from "./gedcomMultimedia";
 import {
@@ -114,8 +116,8 @@ export function parseGedcomMultimediaLink(
 }
 
 export function serializeGedcomMultimediaLink(
-  gedcomMultimediaLink: GedcomMultimediaLink,
-): GedcomRecord {
+  gedcomMultimediaLink: Immutable<GedcomMultimediaLink>,
+): Immutable<GedcomRecord> {
   return newGedcomRecord({
     tag: "OBJE",
     value: gedcomMultimediaLink.xref,

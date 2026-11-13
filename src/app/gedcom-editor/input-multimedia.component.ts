@@ -8,6 +8,7 @@ import {
   signal,
 } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
+import type { Immutable } from "immer";
 
 import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
@@ -33,11 +34,15 @@ import { GEDCOM_EDITOR } from "./gedcom-editor-interface";
     "(window:focus)": "filePathProblem.reload()",
   },
 })
-export class InputMultimediaComponent implements FormValueControl<GedcomMultimedia> {
+export class InputMultimediaComponent implements FormValueControl<
+  Immutable<GedcomMultimedia>
+> {
   readonly ancestryService = inject(AncestryService);
   readonly gedcomEditor = inject(GEDCOM_EDITOR, { optional: true });
-  readonly workingDatabase = input.required<GedcomDatabase>();
-  readonly value = model<GedcomMultimedia>(newGedcomMultimedia({ xref: "" }));
+  readonly workingDatabase = input.required<Immutable<GedcomDatabase>>();
+  readonly value = model<Immutable<GedcomMultimedia>>(
+    newGedcomMultimedia({ xref: "" }),
+  );
   readonly form = form(this.value);
 
   // A file picked from outside the data folder. The editor copies it to

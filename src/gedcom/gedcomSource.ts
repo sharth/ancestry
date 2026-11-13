@@ -1,3 +1,5 @@
+import type { Immutable } from "immer";
+
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import {
   newGedcomChangeDate,
@@ -124,9 +126,14 @@ export function parseGedcomSource(record: GedcomRecord): GedcomSource {
 // through immer, which makes a new object for an edited one and keeps an
 // unedited one as the same object, so a cached serialization never goes
 // stale. See serializeGedcomIndividual.
-const serializedSources = new WeakMap<GedcomSource, GedcomRecord>();
+const serializedSources = new WeakMap<
+  Immutable<GedcomSource>,
+  Immutable<GedcomRecord>
+>();
 
-export function serializeGedcomSource(source: GedcomSource): GedcomRecord {
+export function serializeGedcomSource(
+  source: Immutable<GedcomSource>,
+): Immutable<GedcomRecord> {
   return serializedSources.getOrInsertComputed(source, () =>
     newGedcomRecord({
       xref: source.xref,

@@ -1,5 +1,6 @@
 import { Component, computed, inject, input, viewChild } from "@angular/core";
 import { RouterModule } from "@angular/router";
+import type { Immutable } from "immer";
 
 import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
@@ -26,7 +27,7 @@ import { MultimediaSourcesComponent } from "./multimedia-sources.component";
 })
 export class MultimediaComponent implements ComponentWithUnsavedChanges {
   readonly ancestryService = inject(AncestryService);
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly ancestryDatabase = input.required<Immutable<GedcomDatabase>>();
   readonly xref = input.required<string>();
 
   readonly editDialog = viewChild<GedcomEditorDialogComponent>("editDialog");

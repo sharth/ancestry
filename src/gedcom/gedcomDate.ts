@@ -1,3 +1,5 @@
+import type { Immutable } from "immer";
+
 import {
   filterTrivialGedcomRecord,
   newGedcomRecord,
@@ -49,8 +51,8 @@ export function parseGedcomDate(gedcomRecord: GedcomRecord): GedcomDate {
 }
 
 export function serializeGedcomDate(
-  gedcomDate: GedcomDate,
-): GedcomRecord | null {
+  gedcomDate: Immutable<GedcomDate>,
+): Immutable<GedcomRecord> | null {
   return filterTrivialGedcomRecord(
     newGedcomRecord({
       tag: "DATE",
@@ -60,8 +62,8 @@ export function serializeGedcomDate(
 }
 
 export function serializeGedcomSortDate(
-  gedcomDate: GedcomDate,
-): GedcomRecord | null {
+  gedcomDate: Immutable<GedcomDate>,
+): Immutable<GedcomRecord> | null {
   return filterTrivialGedcomRecord(
     newGedcomRecord({
       tag: "SDATE",

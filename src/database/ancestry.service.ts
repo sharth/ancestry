@@ -2,6 +2,7 @@ import { DestroyRef, Service, computed, inject } from "@angular/core";
 import { rxResource, toObservable } from "@angular/core/rxjs-interop";
 import { RedirectCommand, Router, type ResolveFn } from "@angular/router";
 import Dexie, { liveQuery } from "dexie";
+import type { Immutable } from "immer";
 import { filter, firstValueFrom, from, switchMap } from "rxjs";
 
 import {
@@ -181,21 +182,23 @@ export class AncestryService {
       ),
   });
 
-  readonly ancestryDatabase = computed<GedcomDatabase | undefined>(() => {
-    const gedcomResourceValue = this.gedcomResource.value();
-    if (
-      gedcomResourceValue === undefined ||
-      gedcomResourceValue.gedcomRecords.length === 0
-    ) {
-      return undefined;
-    }
+  readonly ancestryDatabase = computed<Immutable<GedcomDatabase> | undefined>(
+    () => {
+      const gedcomResourceValue = this.gedcomResource.value();
+      if (
+        gedcomResourceValue === undefined ||
+        gedcomResourceValue.gedcomRecords.length === 0
+      ) {
+        return undefined;
+      }
 
-    return parseGedcomDatabase(gedcomResourceValue.gedcomRecords);
-  });
+      return parseGedcomDatabase(gedcomResourceValue.gedcomRecords);
+    },
+  );
 
-  compareGedcomDatabase(gedcomDatabase: GedcomDatabase): {
-    originalGedcomRecord?: GedcomRecord;
-    updatedGedcomRecord?: GedcomRecord;
+  compareGedcomDatabase(gedcomDatabase: Immutable<GedcomDatabase>): {
+    originalGedcomRecord?: Immutable<GedcomRecord>;
+    updatedGedcomRecord?: Immutable<GedcomRecord>;
   }[] {
     return compareGedcomDatabase(
       this.gedcomResource.value()?.gedcomRecords ?? [],
@@ -210,11 +213,11 @@ export class AncestryService {
    * are in the file. A record whose xref is in `alwaysIncludeXrefs` is
    * listed even when unchanged. */
   gedcomDatabaseDifferences(
-    gedcomDatabase: GedcomDatabase,
+    gedcomDatabase: Immutable<GedcomDatabase>,
     alwaysIncludeXrefs: ReadonlySet<string> = new Set(),
   ): {
-    originalGedcomRecord?: GedcomRecord;
-    updatedGedcomRecord?: GedcomRecord;
+    originalGedcomRecord?: Immutable<GedcomRecord>;
+    updatedGedcomRecord?: Immutable<GedcomRecord>;
   }[] {
     return this.compareGedcomDatabase(gedcomDatabase).filter(
       ({ originalGedcomRecord, updatedGedcomRecord }) => {
@@ -229,7 +232,7 @@ export class AncestryService {
     );
   }
 
-  async updateGedcomDatabase(gedcomDatabase: GedcomDatabase) {
+  async updateGedcomDatabase(gedcomDatabase: Immutable<GedcomDatabase>) {
     const gedcomResource = this.gedcomResource.value();
     const originalGedcomRecords = gedcomResource?.gedcomRecords ?? [];
     const originalGedcomDatabase =
@@ -350,7 +353,7 @@ export class AncestryService {
 }
 
 export const ancestryDatabaseResolver: ResolveFn<
-  GedcomDatabase | RedirectCommand
+  Immutable<GedcomDatabase> | RedirectCommand
 > = async () => {
   const ancestryService = inject(AncestryService);
   const router = inject(Router);

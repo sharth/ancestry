@@ -1,5 +1,6 @@
 import { Component, computed, inject, input, output } from "@angular/core";
 import { RouterModule } from "@angular/router";
+import type { Immutable } from "immer";
 
 import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
@@ -23,10 +24,10 @@ import {
 export class BibliographyWithoutTitleComponent {
   private readonly ancestryService = inject(AncestryService);
 
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly ancestryDatabase = input.required<Immutable<GedcomDatabase>>();
 
-  readonly reviewSuggestion = output<GedcomSource>();
-  readonly submitSuggestion = output<GedcomSource>();
+  readonly reviewSuggestion = output<Immutable<GedcomSource>>();
+  readonly submitSuggestion = output<Immutable<GedcomSource>>();
 
   readonly rows = computed(() =>
     Object.values(this.ancestryDatabase().sources).flatMap((source) => {
@@ -38,7 +39,7 @@ export class BibliographyWithoutTitleComponent {
 
   // The records that would actually change on disk if the suggestion is
   // applied and saved, built from the same diff the save path uses.
-  private differences(source: GedcomSource) {
+  private differences(source: Immutable<GedcomSource>) {
     const { database } = applyBibliographyTitleSuggestion(
       this.ancestryDatabase(),
       source,

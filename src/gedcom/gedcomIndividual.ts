@@ -1,3 +1,5 @@
+import type { Immutable } from "immer";
+
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import {
   newGedcomChangeDate,
@@ -72,7 +74,7 @@ export function newGedcomIndividual(
   };
 }
 
-export function nameToString(gedcomName: GedcomName): string {
+export function nameToString(gedcomName: Immutable<GedcomName>): string {
   return [
     gedcomName.prefix,
     gedcomName.givenName,
@@ -85,13 +87,15 @@ export function nameToString(gedcomName: GedcomName): string {
     .join(" ");
 }
 
-export function fullname(gedcomIndividual: GedcomIndividual): string {
+export function fullname(
+  gedcomIndividual: Immutable<GedcomIndividual>,
+): string {
   const gedcomName = gedcomIndividual.names.at(0);
   if (gedcomName == null) return "";
   return nameToString(gedcomName);
 }
 
-export function surname(gedcomIndividual: GedcomIndividual): string {
+export function surname(gedcomIndividual: Immutable<GedcomIndividual>): string {
   const gedcomName = gedcomIndividual.names.at(0);
   return gedcomName?.surname ?? "";
 }
@@ -162,11 +166,14 @@ export function parseGedcomIndividual(record: GedcomRecord): GedcomIndividual {
 // and keeps an unedited one as the same object, so a cached serialization
 // never goes stale. A WeakMap lets an entry go once its individual is no
 // longer referenced.
-const serializedIndividuals = new WeakMap<GedcomIndividual, GedcomRecord>();
+const serializedIndividuals = new WeakMap<
+  Immutable<GedcomIndividual>,
+  Immutable<GedcomRecord>
+>();
 
 export function serializeGedcomIndividual(
-  gedcomIndividual: GedcomIndividual,
-): GedcomRecord {
+  gedcomIndividual: Immutable<GedcomIndividual>,
+): Immutable<GedcomRecord> {
   return serializedIndividuals.getOrInsertComputed(gedcomIndividual, () =>
     newGedcomRecord({
       xref: gedcomIndividual.xref,
@@ -213,10 +220,13 @@ export function serializeGedcomIndividual(
 }
 
 export function getIndividualMultimediaCitations(
-  individual: GedcomIndividual,
+  individual: Immutable<GedcomIndividual>,
   multimediaXref: string,
-): { event: string; citation: GedcomSourceCitation }[] {
-  const references: { event: string; citation: GedcomSourceCitation }[] = [];
+): { event: string; citation: Immutable<GedcomSourceCitation> }[] {
+  const references: {
+    event: string;
+    citation: Immutable<GedcomSourceCitation>;
+  }[] = [];
 
   for (const event of individual.facts) {
     for (const citation of event.citations) {
@@ -247,14 +257,16 @@ export function getIndividualMultimediaCitations(
   return references;
 }
 
-export function getIndividualSourceCitations(individual: GedcomIndividual): {
+export function getIndividualSourceCitations(
+  individual: Immutable<GedcomIndividual>,
+): {
   event: string;
-  citation: GedcomSourceCitation;
+  citation: Immutable<GedcomSourceCitation>;
   nameText?: string;
 }[] {
   const references: {
     event: string;
-    citation: GedcomSourceCitation;
+    citation: Immutable<GedcomSourceCitation>;
     nameText?: string;
   }[] = [];
 

@@ -1,4 +1,4 @@
-import { produce } from "immer";
+import { produce, type Immutable } from "immer";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomRepository } from "../../gedcom/gedcomRepository";
@@ -12,7 +12,7 @@ import {
 import type { UrlRepositorySuggestion } from "./source-validators";
 
 export interface ApplyUrlSuggestionResult {
-  database: GedcomDatabase;
+  database: Immutable<GedcomDatabase>;
   /** The repository the source was linked to: `suggestion.matchedRepository`'s
    * xref, or the newly created repository's xref. */
   repositoryXref: string;
@@ -25,8 +25,8 @@ export interface ApplyUrlSuggestionResult {
  * so it's safe to use both for a preview and as the database handed to the
  * GEDCOM editor for further review before saving. */
 export function applyUrlSuggestion(
-  database: GedcomDatabase,
-  source: GedcomSource,
+  database: Immutable<GedcomDatabase>,
+  source: Immutable<GedcomSource>,
   suggestion: UrlRepositorySuggestion,
 ): ApplyUrlSuggestionResult {
   const repositoryXref =
@@ -79,7 +79,7 @@ export function applyUrlSuggestion(
 }
 
 export interface ApplyUrlSuggestionsResult {
-  database: GedcomDatabase;
+  database: Immutable<GedcomDatabase>;
   /** The xrefs of the repositories created along the way, in order. */
   createdRepositoryXrefs: string[];
 }
@@ -90,8 +90,8 @@ export interface ApplyUrlSuggestionsResult {
  * suggestions, so two URLs for the same site create one repository and
  * share its citation rather than creating two. */
 export function applyUrlSuggestions(
-  database: GedcomDatabase,
-  source: GedcomSource,
+  database: Immutable<GedcomDatabase>,
+  source: Immutable<GedcomSource>,
   suggestions: UrlRepositorySuggestion[],
 ): ApplyUrlSuggestionsResult {
   const createdRepositoryXrefs: string[] = [];

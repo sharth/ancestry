@@ -6,6 +6,7 @@ import {
   viewChild,
   type ElementRef,
 } from "@angular/core";
+import type { Immutable } from "immer";
 
 import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
@@ -26,7 +27,7 @@ export class GedcomEditorDialogComponent {
   private readonly ancestryService = inject(AncestryService);
 
   readonly tabs = input.required<TabInformation[]>();
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly ancestryDatabase = input.required<Immutable<GedcomDatabase>>();
 
   readonly editDialog =
     viewChild.required<ElementRef<HTMLDialogElement>>("editDialog");

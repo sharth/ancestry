@@ -1,5 +1,6 @@
 import { Component, computed, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
+import type { Immutable } from "immer";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 
@@ -10,7 +11,7 @@ import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
   imports: [RouterModule],
 })
 export class MultimediaSourcesComponent {
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly ancestryDatabase = input.required<Immutable<GedcomDatabase>>();
   readonly xref = input.required<string>();
 
   /** Sources whose own record links to this multimedia object (SOUR.OBJE). */

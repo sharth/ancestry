@@ -1,5 +1,6 @@
 import { Component, input, model } from "@angular/core";
 import type { FormValueControl } from "@angular/forms/signals";
+import type { Immutable } from "immer";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import {
@@ -14,10 +15,10 @@ import {
   imports: [],
 })
 export class InputUnknownRecordsComponent implements FormValueControl<
-  GedcomRecord[]
+  readonly Immutable<GedcomRecord>[]
 > {
-  readonly workingDatabase = input.required<GedcomDatabase>();
-  readonly value = model<GedcomRecord[]>([]);
+  readonly workingDatabase = input.required<Immutable<GedcomDatabase>>();
+  readonly value = model<readonly Immutable<GedcomRecord>[]>([]);
 
   removeUnknownRecord(index: number) {
     this.value.update((unknownRecords) => unknownRecords.toSpliced(index, 1));

@@ -1,4 +1,5 @@
 import { Component, computed, input } from "@angular/core";
+import type { Immutable } from "immer";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import {
@@ -14,7 +15,7 @@ import { FamilyRelativesComponent } from "./family-relatives.component";
   styleUrl: "./family.component.css",
 })
 export class FamilyFactsComponent {
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly ancestryDatabase = input.required<Immutable<GedcomDatabase>>();
   readonly xref = input.required<string>();
 
   readonly vm = computed(() => {

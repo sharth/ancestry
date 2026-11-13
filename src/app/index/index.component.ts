@@ -1,4 +1,5 @@
 import { Component, computed, input } from "@angular/core";
+import type { Immutable } from "immer";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 
@@ -9,7 +10,7 @@ import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
   styleUrl: "./index.component.css",
 })
 export class IndexComponent {
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly ancestryDatabase = input.required<Immutable<GedcomDatabase>>();
 
   readonly vm = computed(() => {
     const ancestryDatabase = this.ancestryDatabase();

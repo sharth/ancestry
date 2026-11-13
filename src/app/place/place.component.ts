@@ -1,5 +1,6 @@
 import { Component, computed, input } from "@angular/core";
 import { RouterLink } from "@angular/router";
+import type { Immutable } from "immer";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import type { PlaceTreeNode } from "../places/places.util";
@@ -15,7 +16,7 @@ import {
   templateUrl: "./place.component.html",
 })
 export class PlaceComponent {
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly ancestryDatabase = input.required<Immutable<GedcomDatabase>>();
   readonly path = input.required<string[]>();
 
   readonly node = computed<PlaceTreeNode | undefined>(() => {

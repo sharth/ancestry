@@ -1,3 +1,5 @@
+import type { Immutable } from "immer";
+
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import type { GedcomRecord } from "./gedcomRecord";
 
@@ -17,7 +19,7 @@ export function newGedcomRepositoryLink(
 }
 
 export function parseGedcomRepositoryLink(
-  gedcomRecord: GedcomRecord,
+  gedcomRecord: Immutable<GedcomRecord>,
 ): GedcomRepositoryLink {
   if (gedcomRecord.tag !== "REPO") throw new Error();
   if (gedcomRecord.xref != "") throw new Error();
@@ -45,8 +47,8 @@ export function parseGedcomRepositoryLink(
 }
 
 export function serializeGedcomRepositoryLink(
-  repositoryLink: GedcomRepositoryLink,
-): GedcomRecord {
+  repositoryLink: Immutable<GedcomRepositoryLink>,
+): Immutable<GedcomRecord> {
   return {
     tag: "REPO",
     xref: "",

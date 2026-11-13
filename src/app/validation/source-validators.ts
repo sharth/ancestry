@@ -1,3 +1,5 @@
+import type { Immutable } from "immer";
+
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import type { GedcomRepository } from "../../gedcom/gedcomRepository";
 import type { GedcomSource } from "../../gedcom/gedcomSource";
@@ -27,7 +29,7 @@ export interface UrlRepositorySuggestion {
   url: string;
   standalone: boolean;
   suggestedName: string;
-  matchedRepository?: GedcomRepository;
+  matchedRepository?: Immutable<GedcomRepository>;
 }
 
 /** A suggested fix for a source with more than one repository citation
@@ -57,8 +59,8 @@ const FIELD_LABELS: Record<UrlSuggestionFieldName, string> = {
 };
 
 export function sourceValidators(
-  source: GedcomSource,
-  database: GedcomDatabase,
+  source: Immutable<GedcomSource>,
+  database: Immutable<GedcomDatabase>,
 ): SourceValidationResult {
   const warnings: ValidationFinding[] = [];
 

@@ -1,3 +1,5 @@
+import type { Immutable } from "immer";
+
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import {
   gedcomFamilyFacts,
@@ -25,7 +27,9 @@ export interface PlaceGroup {
 
 /** Every individual/family event that has a place or address, grouped by
  * place name and then by address, sorted alphabetically at both levels. */
-export function computePlaceGroups(database: GedcomDatabase): PlaceGroup[] {
+export function computePlaceGroups(
+  database: Immutable<GedcomDatabase>,
+): PlaceGroup[] {
   const placeMap = new Map<string, Map<string, EventItem[]>>();
 
   const addEvent = (place: string, address: string, event: EventItem) => {
@@ -127,7 +131,9 @@ export interface PlaceTreeNode {
 /** Builds the region hierarchy tree for every place in the database, so a
  * region (e.g. "Maryland, United States") can be browsed down to the
  * specific places (counties, cities) within it. */
-export function buildPlaceTree(database: GedcomDatabase): PlaceTreeNode {
+export function buildPlaceTree(
+  database: Immutable<GedcomDatabase>,
+): PlaceTreeNode {
   const root: PlaceTreeNode = { name: "", path: [], children: new Map() };
 
   for (const placeGroup of computePlaceGroups(database)) {

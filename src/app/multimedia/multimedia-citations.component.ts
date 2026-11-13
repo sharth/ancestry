@@ -1,5 +1,6 @@
 import { Component, computed, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
+import type { Immutable } from "immer";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { getFamilyMultimediaCitations } from "../../gedcom/gedcomFamily";
@@ -13,7 +14,7 @@ import { IndividualLinkComponent } from "../individual-link/individual-link.comp
   imports: [RouterModule, IndividualLinkComponent],
 })
 export class MultimediaCitationsComponent {
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly ancestryDatabase = input.required<Immutable<GedcomDatabase>>();
   readonly xref = input.required<string>();
 
   readonly vm = computed(() => {

@@ -1,4 +1,5 @@
 import { Component, computed, input } from "@angular/core";
+import type { Immutable } from "immer";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomFact } from "../../gedcom/gedcomFact";
@@ -16,7 +17,7 @@ import { IndividualRelativesComponent } from "./individual-relatives.component";
   styleUrl: "./individual.component.css",
 })
 export class IndividualFactsComponent {
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly ancestryDatabase = input.required<Immutable<GedcomDatabase>>();
   readonly xref = input.required<string>();
 
   readonly vm = computed(() => {
@@ -36,13 +37,15 @@ export class IndividualFactsComponent {
         owner: "individual",
       })),
       ...individual.names.map((name): TimelineEvent => ({
-        fact: newGedcomFact({
-          tag: "NAME",
-          type: name.nameType,
-          value: nameToString(name),
+        fact: {
+          ...newGedcomFact({
+            tag: "NAME",
+            type: name.nameType,
+            value: nameToString(name),
+          }),
           citations: name.citations,
           notes: name.notes,
-        }),
+        },
         owner: "individual",
       })),
       ...individual.parentOfFamilyXrefs.flatMap((familyXref) => {

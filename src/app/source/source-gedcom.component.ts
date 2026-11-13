@@ -1,4 +1,5 @@
 import { Component, computed, input } from "@angular/core";
+import type { Immutable } from "immer";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { serializeGedcomSource } from "../../gedcom/gedcomSource";
@@ -12,7 +13,7 @@ import { SourceUnknownsComponent } from "./source-unknowns.component";
   imports: [GedcomDisplayComponent, SourceUnknownsComponent],
 })
 export class SourceGedcomComponent {
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly ancestryDatabase = input.required<Immutable<GedcomDatabase>>();
   readonly xref = input.required<string>();
 
   readonly vm = computed(() => {

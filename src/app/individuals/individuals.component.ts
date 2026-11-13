@@ -1,4 +1,5 @@
 import { Component, computed, input, viewChild } from "@angular/core";
+import type { Immutable } from "immer";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import {
@@ -17,7 +18,7 @@ import type { ComponentWithUnsavedChanges } from "../unsaved-changes.guard";
   styleUrl: "./individuals.component.css",
 })
 export class IndividualsComponent implements ComponentWithUnsavedChanges {
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly ancestryDatabase = input.required<Immutable<GedcomDatabase>>();
 
   readonly editDialog = viewChild<GedcomEditorDialogComponent>("editDialog");
 
@@ -36,8 +37,11 @@ export class IndividualsComponent implements ComponentWithUnsavedChanges {
   });
 
   private individualsBySurname(
-    individuals: Record<string, GedcomIndividual>,
-  ): { surname?: string; individuals: GedcomIndividual[] }[] {
+    individuals: Immutable<Record<string, Immutable<GedcomIndividual>>>,
+  ): {
+    surname?: string;
+    individuals: readonly Immutable<GedcomIndividual>[];
+  }[] {
     const individualsList = Object.values(individuals).sort(
       (lhs, rhs) =>
         surname(lhs).localeCompare(surname(rhs)) ||

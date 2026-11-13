@@ -1,4 +1,5 @@
 import { Component, computed, input } from "@angular/core";
+import type { Immutable } from "immer";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { serializeGedcomFamily } from "../../gedcom/gedcomFamily";
@@ -11,7 +12,7 @@ import { GedcomDisplayComponent } from "../gedcom-display/gedcom-display.compone
   styleUrl: "./family.component.css",
 })
 export class FamilyGedcomComponent {
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly ancestryDatabase = input.required<Immutable<GedcomDatabase>>();
   readonly xref = input.required<string>();
 
   readonly vm = computed(() => {

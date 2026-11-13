@@ -6,6 +6,7 @@ import {
   type QueryList,
 } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
+import type { Immutable } from "immer";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import type { GedcomFactSharedWith } from "../../gedcom/gedcomFact";
@@ -18,10 +19,10 @@ import { InputIndividualXrefComponent } from "./input-individual-xref.component"
   styleUrl: "./input.component.css",
 })
 export class InputSharedWithComponent implements FormValueControl<
-  GedcomFactSharedWith[]
+  readonly Immutable<GedcomFactSharedWith>[]
 > {
-  readonly workingDatabase = input.required<GedcomDatabase>();
-  readonly value = model<GedcomFactSharedWith[]>([]);
+  readonly workingDatabase = input.required<Immutable<GedcomDatabase>>();
+  readonly value = model<readonly Immutable<GedcomFactSharedWith>[]>([]);
   readonly form = form(this.value);
 
   @ViewChildren("focusTarget")

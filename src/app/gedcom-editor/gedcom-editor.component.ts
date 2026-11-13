@@ -8,7 +8,7 @@ import {
 } from "@angular/core";
 import { FormField, form } from "@angular/forms/signals";
 import { ActivatedRoute, Router } from "@angular/router";
-import { produce } from "immer";
+import { produce, type Immutable } from "immer";
 
 import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
@@ -70,7 +70,7 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   // default; an empty xref on any of them means "create a new record of
   // this type" (its xref is calculated once resolved).
   readonly tabs = input.required<TabInformation[]>();
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly ancestryDatabase = input.required<Immutable<GedcomDatabase>>();
   readonly finished = output();
 
   // `tabs()` with each xref resolved: an empty xref means "create a new
@@ -99,8 +99,12 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   // The GedcomDatabase that the form will be manipulating and editing.
   // When the editor completes successfully, we will persist this instance of the database.
   // If the user provides an xref that is not present in the database (or an empty string), we should instantiate a new object.
-  readonly workingDatabase = linkedSignal<GedcomDatabase>(() => {
+  readonly workingDatabase = linkedSignal<Immutable<GedcomDatabase>>(() => {
     const tabs = this.effectiveTabs();
+    // Signal Forms edits a mutable model, so this is where the read-only
+    // database becomes the editor's writable copy. Edits still never touch
+    // the original objects: produce() copies whatever it changes, and Signal
+    // Forms writes new objects rather than mutating in place.
     return produce(this.ancestryDatabase(), (draft) => {
       for (const tab of tabs) {
         const xref = tab.xref;
@@ -140,7 +144,7 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   // Any changes will be persisted in workingDatabase().
   // This will be used in the Angular Signal Forms. The indirection is required,
   // because if we used `form = form(this.workingDatabase)`, that call would take a few seconds.
-  readonly workingDatabaseView = linkedSignal<GedcomDatabase>(
+  readonly workingDatabaseView = linkedSignal<Immutable<GedcomDatabase>>(
     () => ({
       submitters: filteredProperties(
         this.workingDatabase().submitters,
@@ -180,7 +184,7 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
       ),
     }),
     {
-      set: (updates: GedcomDatabase) => {
+      set: (updates: Immutable<GedcomDatabase>) => {
         this.workingDatabase.update((database) =>
           produce(database, (draft) => {
             Object.assign(draft.submitters, updates.submitters);

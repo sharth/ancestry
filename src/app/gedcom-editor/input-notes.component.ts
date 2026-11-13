@@ -1,5 +1,6 @@
 import { Component, input, model } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
+import type { Immutable } from "immer";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomNote, type GedcomNote } from "../../gedcom/gedcomNote";
@@ -10,9 +11,11 @@ import { newGedcomNote, type GedcomNote } from "../../gedcom/gedcomNote";
   templateUrl: "./input-notes.component.html",
   styleUrl: "./input.component.css",
 })
-export class InputNotesComponent implements FormValueControl<GedcomNote[]> {
-  readonly workingDatabase = input.required<GedcomDatabase>();
-  readonly value = model<GedcomNote[]>([]);
+export class InputNotesComponent implements FormValueControl<
+  readonly Immutable<GedcomNote>[]
+> {
+  readonly workingDatabase = input.required<Immutable<GedcomDatabase>>();
+  readonly value = model<readonly Immutable<GedcomNote>[]>([]);
   readonly form = form(this.value);
 
   appendNote() {

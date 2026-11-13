@@ -8,12 +8,13 @@ import {
 } from "@angular/core";
 import { RouterLink } from "@angular/router";
 import * as d3 from "d3";
+import type { Immutable } from "immer";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { fullname, type GedcomIndividual } from "../../gedcom/gedcomIndividual";
 
 interface SunburstNode {
-  individual: GedcomIndividual;
+  individual: Immutable<GedcomIndividual>;
   generation: number;
   x: number;
   y: number;
@@ -31,8 +32,8 @@ interface SunburstNode {
   styleUrl: "./individual.component.css",
 })
 export class IndividualSunburstComponent {
-  readonly individual = input.required<GedcomIndividual>();
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly individual = input.required<Immutable<GedcomIndividual>>();
+  readonly ancestryDatabase = input.required<Immutable<GedcomDatabase>>();
 
   private readonly svgElement =
     viewChild.required<ElementRef<SVGSVGElement>>("svgElement");
@@ -43,7 +44,7 @@ export class IndividualSunburstComponent {
   protected readonly ringWidth = 120;
   protected readonly s = this.centerRadius * Math.sqrt(2) - 10;
 
-  color(individual: GedcomIndividual) {
+  color(individual: Immutable<GedcomIndividual>) {
     if (individual.sex.sex === "M") return "#add8e6"; // Light blue
     if (individual.sex.sex === "F") return "#ffb6c1"; // Light pink
     return "#eeeeee";

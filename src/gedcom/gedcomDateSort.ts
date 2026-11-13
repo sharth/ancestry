@@ -1,3 +1,5 @@
+import type { Immutable } from "immer";
+
 // Interpretation of GEDCOM date values for sorting and display.
 //
 // GEDCOM 5.5.1 and 7.0 date values share the same general shape:
@@ -179,21 +181,26 @@ export function gedcomDateYear(date: GedcomDate): number | undefined {
 // Returns the sort key for a fact. When the fact has a sort date (SDATE), that
 // is used, even if it can't be interpreted, as recommended by GEDCOM 7.
 // Otherwise, the date (DATE) is used.
-export function gedcomFactSortKey(fact: GedcomFact): number | undefined {
+export function gedcomFactSortKey(
+  fact: Immutable<GedcomFact>,
+): number | undefined {
   return gedcomDateSortKey(fact.sortDate.value ? fact.sortDate : fact.date);
 }
 
 // Returns a copy of `items` sorted chronologically. Items without an
 // interpretable date are kept in their original relative order at the end.
 // `factOf` can be omitted when `items` are already `GedcomFact`s.
-export function sortChronologically(items: readonly GedcomFact[]): GedcomFact[];
-export function sortChronologically<T>(
+export function sortChronologically<T extends Immutable<GedcomFact>>(
   items: readonly T[],
-  factOf: (item: T) => GedcomFact,
 ): T[];
 export function sortChronologically<T>(
   items: readonly T[],
-  factOf: (item: T) => GedcomFact = (item) => item as unknown as GedcomFact,
+  factOf: (item: T) => Immutable<GedcomFact>,
+): T[];
+export function sortChronologically<T>(
+  items: readonly T[],
+  factOf: (item: T) => Immutable<GedcomFact> = (item) =>
+    item as unknown as Immutable<GedcomFact>,
 ): T[] {
   return items
     .map((item, index) => ({

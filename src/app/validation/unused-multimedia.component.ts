@@ -1,5 +1,6 @@
 import { Component, computed, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
+import type { Immutable } from "immer";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import type { GedcomRecord } from "../../gedcom/gedcomRecord";
@@ -13,14 +14,16 @@ import type { GedcomSourceCitation } from "../../gedcom/gedcomSourceCitation";
   templateUrl: "./unused-multimedia.component.html",
 })
 export class UnusedMultimediaComponent {
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly ancestryDatabase = input.required<Immutable<GedcomDatabase>>();
 
   readonly unusedMultimedia = computed(() =>
     findUnusedMultimedia(this.ancestryDatabase()),
   );
 }
 
-export function findUnusedMultimedia(gedcomDatabase: GedcomDatabase) {
+export function findUnusedMultimedia(
+  gedcomDatabase: Immutable<GedcomDatabase>,
+) {
   const linked = new Set(linkedMultimediaXrefs(gedcomDatabase));
   return Object.values(gedcomDatabase.multimedias).filter(
     (multimedia) => !linked.has(multimedia.xref),
@@ -28,7 +31,7 @@ export function findUnusedMultimedia(gedcomDatabase: GedcomDatabase) {
 }
 
 function* linkedMultimediaXrefs(
-  gedcomDatabase: GedcomDatabase,
+  gedcomDatabase: Immutable<GedcomDatabase>,
 ): Generator<string> {
   for (const individual of Object.values(gedcomDatabase.individuals)) {
     yield* fromCitations(individual.sex.citations);
@@ -54,13 +57,17 @@ function* linkedMultimediaXrefs(
   }
 }
 
-function* fromCitations(citations: GedcomSourceCitation[]): Generator<string> {
+function* fromCitations(
+  citations: readonly Immutable<GedcomSourceCitation>[],
+): Generator<string> {
   for (const citation of citations) {
     yield* citation.multimediaLinks.map((link) => link.xref);
   }
 }
 
-function* fromUnknownRecords(records: GedcomRecord[]): Generator<string> {
+function* fromUnknownRecords(
+  records: readonly Immutable<GedcomRecord>[],
+): Generator<string> {
   for (const record of records) {
     if (record.tag === "OBJE") yield record.value;
     yield* fromUnknownRecords(record.children);

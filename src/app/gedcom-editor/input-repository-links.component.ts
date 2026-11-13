@@ -8,6 +8,7 @@ import {
 } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 import { RouterModule } from "@angular/router";
+import type { Immutable } from "immer";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import {
@@ -30,13 +31,13 @@ import { InputRepositoryXrefComponent } from "./input-repository-xref.component"
   ],
 })
 export class InputRepositoryLinksComponent implements FormValueControl<
-  GedcomRepositoryLink[]
+  readonly Immutable<GedcomRepositoryLink>[]
 > {
   private readonly _injector = inject(Injector);
   readonly gedcomEditor = inject(GEDCOM_EDITOR, { optional: true });
 
-  readonly workingDatabase = input.required<GedcomDatabase>();
-  readonly value = model<GedcomRepositoryLink[]>([]);
+  readonly workingDatabase = input.required<Immutable<GedcomDatabase>>();
+  readonly value = model<readonly Immutable<GedcomRepositoryLink>[]>([]);
   readonly form = form(this.value);
 
   appendCitation() {

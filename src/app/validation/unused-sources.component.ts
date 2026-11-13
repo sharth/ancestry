@@ -1,5 +1,6 @@
 import { Component, computed, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
+import type { Immutable } from "immer";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { getFamilySourceCitations } from "../../gedcom/gedcomFamily";
@@ -13,21 +14,23 @@ import type { GedcomRecord } from "../../gedcom/gedcomRecord";
   templateUrl: "./unused-sources.component.html",
 })
 export class UnusedSourcesComponent {
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly ancestryDatabase = input.required<Immutable<GedcomDatabase>>();
 
   readonly unusedSources = computed(() =>
     findUnusedSources(this.ancestryDatabase()),
   );
 }
 
-export function findUnusedSources(gedcomDatabase: GedcomDatabase) {
+export function findUnusedSources(gedcomDatabase: Immutable<GedcomDatabase>) {
   const cited = new Set(citedSourceXrefs(gedcomDatabase));
   return Object.values(gedcomDatabase.sources).filter(
     (source) => !cited.has(source.xref),
   );
 }
 
-function* citedSourceXrefs(gedcomDatabase: GedcomDatabase): Generator<string> {
+function* citedSourceXrefs(
+  gedcomDatabase: Immutable<GedcomDatabase>,
+): Generator<string> {
   for (const individual of Object.values(gedcomDatabase.individuals)) {
     for (const { citation } of getIndividualSourceCitations(individual)) {
       yield citation.sourceXref;
@@ -46,7 +49,9 @@ function* citedSourceXrefs(gedcomDatabase: GedcomDatabase): Generator<string> {
   }
 }
 
-function* fromUnknownRecords(records: GedcomRecord[]): Generator<string> {
+function* fromUnknownRecords(
+  records: readonly Immutable<GedcomRecord>[],
+): Generator<string> {
   for (const record of records) {
     if (record.tag === "SOUR") yield record.value;
     yield* fromUnknownRecords(record.children);

@@ -1,3 +1,5 @@
+import type { Immutable } from "immer";
+
 import { reportUnparsedRecord } from "../util/record-unparsed-records";
 import { newGedcomRecord, type GedcomRecord } from "./gedcomRecord";
 
@@ -34,6 +36,8 @@ export function parseGedcomNote(gedcomRecord: GedcomRecord): GedcomNote {
   return gedcomNote;
 }
 
-export function serializeGedcomNote(gedcomNote: GedcomNote): GedcomRecord {
+export function serializeGedcomNote(
+  gedcomNote: Immutable<GedcomNote>,
+): Immutable<GedcomRecord> {
   return newGedcomRecord({ tag: "NOTE", value: gedcomNote.text });
 }
