@@ -71,4 +71,16 @@ describe("InputRepositoryLinksComponent", () => {
     // assert.isOk(newLinkDetails);
     // assert.isTrue(newLinkDetails.open);
   });
+
+  it("should start a newly appended repository link with one empty call number", async () => {
+    const user = userEvent.setup();
+    const addButton = nativeElement.querySelector(
+      'button[aria-label="Add repository link"]',
+    );
+    assert.isOk(addButton);
+    await user.click(addButton);
+    await fixture.whenStable();
+
+    expect(component.value().at(-1)?.callNumbers).toEqual([""]);
+  });
 });

@@ -42,7 +42,9 @@ export class InputRepositoryLinksComponent implements FormValueControl<
   appendCitation() {
     this.value.update((repositoryLinks) => [
       ...repositoryLinks,
-      newGedcomRepositoryLink(),
+      // Start with one empty call number, since most links have one. The
+      // user can still remove it, and an empty one isn't serialized.
+      newGedcomRepositoryLink({ callNumbers: [""] }),
     ]);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const newControl = this.form[this.form.length - 1]!;
