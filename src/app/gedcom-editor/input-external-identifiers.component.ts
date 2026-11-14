@@ -1,4 +1,4 @@
-import { Component, computed, input, model } from "@angular/core";
+import { Component, computed, input, model, signal } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
@@ -7,6 +7,7 @@ import {
   type GedcomExternalIdentifier,
 } from "../../gedcom/gedcomExternalIdentifier";
 import {
+  externalIdentifierFromUrl,
   externalIdentifierLink,
   familySearchPersonIdType,
 } from "../../util/external-identifier-link";
@@ -43,6 +44,23 @@ export class InputExternalIdentifiersComponent implements FormValueControl<
       externalIdentifierLink(externalIdentifier),
     ),
   );
+
+  /** What's typed or pasted in the "add from a link" field; cleared once
+   * it's read as a FamilySearch or Ancestry person page. */
+  readonly pastedUrl = signal("");
+
+  /** Adds the EXID for a pasted FamilySearch or Ancestry person page URL,
+   * so the TYPE never has to be typed by hand. */
+  addFromUrl(text: string) {
+    this.pastedUrl.set(text);
+    const externalIdentifier = externalIdentifierFromUrl(text);
+    if (externalIdentifier === undefined) return;
+    this.value.update((externalIdentifiers) => [
+      ...externalIdentifiers,
+      externalIdentifier,
+    ]);
+    this.pastedUrl.set("");
+  }
 
   appendExternalIdentifier(type = "") {
     this.value.update((externalIdentifiers) => [

@@ -45,6 +45,25 @@
       </div>
     </div>
   }
+  <div class="form-floating mb-2">
+    <input
+      class="form-control"
+      type="url"
+      id="externalIdentifierUrl"
+      placeholder="Paste a FamilySearch or Ancestry person link"
+      #urlInput
+      [value]="pastedUrl()"
+      (input)="addFromUrl(urlInput.value)"
+    />
+    <label for="externalIdentifierUrl"
+      >Paste a FamilySearch or Ancestry person link to add it</label
+    >
+    @if (pastedUrl() !== "") {
+      <div class="form-text text-danger">
+        That isn't a FamilySearch or Ancestry person page link.
+      </div>
+    }
+  </div>
   <div class="d-flex gap-2">
     <button
       type="button"

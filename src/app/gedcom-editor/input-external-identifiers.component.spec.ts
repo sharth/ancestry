@@ -74,4 +74,21 @@ describe("InputExternalIdentifiersComponent", () => {
     );
     expect(link?.getAttribute("rel")).toBe("noopener noreferrer nofollow");
   });
+
+  it("adds an identifier from a pasted Ancestry link", () => {
+    component.addFromUrl("not a link");
+    expect(component.value()).toEqual([]);
+    expect(component.pastedUrl()).toBe("not a link");
+
+    component.addFromUrl(
+      "https://www.ancestry.com/family-tree/person/tree/183714515/person/132395462563/facts",
+    );
+    expect(component.value()).toEqual([
+      newGedcomExternalIdentifier({
+        id: "132395462563",
+        type: ancestryPersonIdType("183714515"),
+      }),
+    ]);
+    expect(component.pastedUrl()).toBe("");
+  });
 });

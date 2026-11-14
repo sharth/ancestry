@@ -43,3 +43,44 @@ export function externalIdentifierLink(
 
   return undefined;
 }
+
+const familySearchPersonIdPattern = /^[A-Z0-9]{4}-[A-Z0-9]{2,4}$/;
+
+/** The EXID for a pasted FamilySearch or Ancestry person page URL, or
+ * undefined when the URL isn't one. Accepts e.g.
+ * https://www.familysearch.org/en/tree/person/details/GQ8J-538,
+ * https://www.familysearch.org/ark:/61903/4:1:GQ8J-538, and
+ * https://www.ancestry.com/family-tree/person/tree/183714515/person/132395462563/facts
+ * (any Ancestry country site). */
+export function externalIdentifierFromUrl(
+  text: string,
+): GedcomExternalIdentifier | undefined {
+  const url = URL.parse(text.trim());
+  if (url === null) return undefined;
+  if (url.protocol !== "https:" && url.protocol !== "http:") return undefined;
+  const segments = url.pathname.split("/").filter((segment) => segment !== "");
+
+  if (/^(www\.)?familysearch\.org$/.test(url.hostname)) {
+    const ark = /^4:1:([A-Z0-9-]+)$/.exec(segments.at(-1) ?? "");
+    const id = ark?.[1] ?? (segments.includes("person") ? segments.at(-1) : "");
+    if (id === undefined || !familySearchPersonIdPattern.test(id)) {
+      return undefined;
+    }
+    return { id, type: familySearchPersonIdType };
+  }
+
+  if (
+    /^(www\.)?ancestry\.(com|ca|de|fr|it|se|mx|co\.uk|com\.au)$/.test(
+      url.hostname,
+    )
+  ) {
+    const match =
+      /\/family-tree\/person\/tree\/(\d+)\/person\/(\d+)(\/|$)/.exec(
+        url.pathname,
+      );
+    if (match?.[1] === undefined || match[2] === undefined) return undefined;
+    return { id: match[2], type: ancestryPersonIdType(match[1]) };
+  }
+
+  return undefined;
+}
