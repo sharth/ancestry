@@ -3,6 +3,7 @@ import type { ActivatedRouteSnapshot, Routes } from "@angular/router";
 import {
   ancestryDatabaseGuard,
   ancestryDatabaseResources,
+  gedcomResources,
 } from "../database/ancestry.service";
 import { FamiliesComponent } from "./families/families.component";
 import { FamilyFactsComponent } from "./family/family-facts.component";
@@ -54,14 +55,14 @@ export const routes: Routes = [
     path: "individuals",
     component: IndividualsComponent,
     canActivate: [ancestryDatabaseGuard],
-    resources: ancestryDatabaseResources,
+    resources: gedcomResources,
     canDeactivate: [confirmUnsavedChangesGuard],
   },
   {
     path: "individual/:xref",
     component: IndividualComponent,
     canActivate: [ancestryDatabaseGuard],
-    resources: ancestryDatabaseResources,
+    resources: gedcomResources,
     canDeactivate: [confirmUnsavedChangesGuard],
     children: [
       { path: "", redirectTo: "facts", pathMatch: "full" },

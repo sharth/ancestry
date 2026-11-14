@@ -1,4 +1,4 @@
-import { inputBinding, signal } from "@angular/core";
+import { computed, inputBinding, signal } from "@angular/core";
 import { TestBed, type ComponentFixture } from "@angular/core/testing";
 import {
   Router,
@@ -136,7 +136,18 @@ describe("IndividualComponent", () => {
         ),
       ],
       bindings: [
-        inputBinding("ancestryDatabase", ancestryDatabase),
+        inputBinding(
+          "gedcom",
+          computed(() => ({
+            dataSource: undefined,
+            gedcomFileHandle: undefined,
+            gedcomFile: undefined,
+            gedcomText: undefined,
+            gedcomRecords: [],
+            gedcomDatabase: ancestryDatabase(),
+            directoryHandle: undefined,
+          })),
+        ),
         inputBinding("xref", signal("@I1@")),
       ],
       waitForStableOnRender: true,

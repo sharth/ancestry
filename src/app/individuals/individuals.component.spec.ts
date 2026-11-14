@@ -14,7 +14,20 @@ describe("IndividualsComponent", () => {
   beforeEach(async () => {
     const renderResult = await render(IndividualsComponent, {
       providers: [provideRouter([])],
-      bindings: [inputBinding("ancestryDatabase", signal(newGedcomDatabase()))],
+      bindings: [
+        inputBinding(
+          "gedcom",
+          signal({
+            dataSource: undefined,
+            gedcomFileHandle: undefined,
+            gedcomFile: undefined,
+            gedcomText: undefined,
+            gedcomRecords: [],
+            gedcomDatabase: newGedcomDatabase(),
+            directoryHandle: undefined,
+          }),
+        ),
+      ],
       waitForStableOnRender: true,
     });
 

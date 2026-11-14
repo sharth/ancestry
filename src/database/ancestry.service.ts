@@ -87,7 +87,7 @@ class DexieDatabase extends Dexie {
   }
 }
 
-interface GedcomResourceValue {
+export interface GedcomResourceValue {
   dataSource: DataSource | undefined;
   gedcomFileHandle: FileSystemFileHandle | undefined;
   gedcomFile: File | undefined;
@@ -396,6 +396,14 @@ export const ancestryDatabaseGuard: CanActivateFn = async () => {
   }
   return true;
 };
+
+/** A data route's `resources`, binding gedcomResource itself to a
+ * `gedcom` input: the page gets the whole loaded file (handles, records
+ * and parsed database) and reads `gedcomDatabase` from it. Only the
+ * individuals and individual pages use this so far. */
+export function gedcomResources(): ResourceResult {
+  return { gedcom: inject(AncestryService).gedcomResource };
+}
 
 /** A data route's `resources`: binds its component's `ancestryDatabase`
  * input to the loaded database, which then follows every reload of the

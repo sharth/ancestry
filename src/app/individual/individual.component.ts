@@ -1,7 +1,7 @@
 import { Component, computed, input, viewChild } from "@angular/core";
 import { RouterModule } from "@angular/router";
 
-import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
+import type { GedcomResourceValue } from "../../database/ancestry.service";
 import { fullname } from "../../gedcom/gedcomIndividual";
 import { externalIdentifierLink } from "../../util/external-identifier-link";
 import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
@@ -15,7 +15,13 @@ import type { ComponentWithUnsavedChanges } from "../unsaved-changes.guard";
 })
 export class IndividualComponent implements ComponentWithUnsavedChanges {
   readonly xref = input.required<string>();
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly gedcom = input.required<GedcomResourceValue>();
+  // ancestryDatabaseGuard keeps this route away until a file is loaded.
+  readonly ancestryDatabase = computed(() => {
+    const ancestryDatabase = this.gedcom().gedcomDatabase;
+    if (ancestryDatabase === undefined) throw new Error("No GEDCOM loaded");
+    return ancestryDatabase;
+  });
 
   readonly editDialog = viewChild<GedcomEditorDialogComponent>("editDialog");
 
