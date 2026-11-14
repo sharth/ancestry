@@ -182,14 +182,14 @@
       (submitSuggestion)="submitBibliographySuggestion($event)"
     />
   }
-  @case ("familysearch-ids") {
-    <app-familysearch-ids
+  @case ("tree-ids") {
+    <app-tree-ids
       [ancestryDatabase]="ancestryDatabase()"
       (reviewSuggestion)="
-        reviewFamilySearchIdSuggestion($event); editDialog.showModal()
+        reviewTreeIdSuggestion($event); editDialog.showModal()
       "
-      (submitSuggestion)="submitFamilySearchIdSuggestions([$event])"
-      (submitAllSuggestions)="submitFamilySearchIdSuggestions($event)"
+      (submitSuggestion)="submitTreeIdSuggestions([$event])"
+      (submitAllSuggestions)="submitTreeIdSuggestions($event)"
     />
   }
 }

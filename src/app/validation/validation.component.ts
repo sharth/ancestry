@@ -21,18 +21,14 @@ import {
   applyBibliographyTitleSuggestion,
   bibliographyForMissingTitle,
 } from "./apply-bibliography-title-suggestion.util";
-import { applyFamilySearchIdSuggestion } from "./apply-familysearch-id-suggestion.util";
 import { applyMergeRepositoryLinksSuggestion } from "./apply-merge-repository-links-suggestion.util";
+import { applyTreeIdSuggestion } from "./apply-tree-id-suggestion.util";
 import { applyUrlSuggestions } from "./apply-url-suggestion.util";
 import { BibliographyWithoutTitleComponent } from "./bibliography-without-title.component";
 import {
   DuplicateCallNumbersComponent,
   findDuplicateCallNumbers,
 } from "./duplicate-call-numbers.component";
-import {
-  FamilySearchIdsComponent,
-  findFamilySearchIdsToConvert,
-} from "./familysearch-ids.component";
 import {
   sourceValidators,
   type MergeRepositoryLinksSuggestion,
@@ -42,6 +38,7 @@ import {
   findSourcesWithoutRepositories,
   SourcesWithoutRepositoriesComponent,
 } from "./sources-without-repositories.component";
+import { findTreeIdsToConvert, TreeIdsComponent } from "./tree-ids.component";
 import {
   findUnusedMultimedia,
   UnusedMultimediaComponent,
@@ -71,7 +68,7 @@ type ReviewState =
       source: GedcomSource;
     }
   | {
-      kind: "familysearch-id";
+      kind: "tree-id";
       individual: GedcomIndividual;
     };
 
@@ -82,7 +79,7 @@ const tabs = [
   { id: "unused-sources", label: "Unused sources" },
   { id: "unused-multimedia", label: "Unused multimedia" },
   { id: "bibliography-without-title", label: "Bibliography without title" },
-  { id: "familysearch-ids", label: "FamilySearch ids" },
+  { id: "tree-ids", label: "Tree ids" },
 ] as const;
 
 type TabId = (typeof tabs)[number]["id"];
@@ -108,7 +105,7 @@ interface TableRow {
     UnusedSourcesComponent,
     SourcesWithoutRepositoriesComponent,
     BibliographyWithoutTitleComponent,
-    FamilySearchIdsComponent,
+    TreeIdsComponent,
   ],
   templateUrl: "./validation.component.html",
   styleUrl: "./validation.component.css",
@@ -145,7 +142,7 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
       "bibliography-without-title": Object.values(database.sources).filter(
         (source) => bibliographyForMissingTitle(source) !== undefined,
       ).length,
-      "familysearch-ids": findFamilySearchIdsToConvert(database).length,
+      "tree-ids": findTreeIdsToConvert(database).length,
     };
   });
 
@@ -229,8 +226,8 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
   readonly reviewDatabase = computed<GedcomDatabase>(() => {
     const state = this.reviewState();
     if (state === undefined) return this.ancestryDatabase();
-    if (state.kind === "familysearch-id") {
-      return applyFamilySearchIdSuggestion(this.ancestryDatabase(), [
+    if (state.kind === "tree-id") {
+      return applyTreeIdSuggestion(this.ancestryDatabase(), [
         state.individual.xref,
       ]);
     }
@@ -262,7 +259,7 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
   readonly reviewTabs = computed<TabInformation[]>(() => {
     const state = this.reviewState();
     if (state === undefined) return [];
-    if (state.kind === "familysearch-id") {
+    if (state.kind === "tree-id") {
       return [{ type: "INDI", xref: state.individual.xref }];
     }
     const tabs: TabInformation[] = [{ type: "SOUR", xref: state.source.xref }];
@@ -352,15 +349,15 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
     await this.reload();
   }
 
-  reviewFamilySearchIdSuggestion(individual: GedcomIndividual) {
-    this.reviewState.set({ kind: "familysearch-id", individual });
+  reviewTreeIdSuggestion(individual: GedcomIndividual) {
+    this.reviewState.set({ kind: "tree-id", individual });
   }
 
-  async submitFamilySearchIdSuggestions(individuals: GedcomIndividual[]) {
+  async submitTreeIdSuggestions(individuals: GedcomIndividual[]) {
     const granted = await this.ancestryService.requestWritePermission();
     if (!granted) return;
 
-    const database = applyFamilySearchIdSuggestion(
+    const database = applyTreeIdSuggestion(
       this.ancestryDatabase(),
       individuals.map((individual) => individual.xref),
     );

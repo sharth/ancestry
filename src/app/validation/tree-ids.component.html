@@ -1,10 +1,10 @@
 @if (rows().length === 0) {
-  <p>No individual has a FamilySearch id in a _FSFTID record.</p>
+  <p>No individual has a FamilySearch or Ancestry id in _FSFTID or _AMTID.</p>
 } @else {
   <p>
-    These individuals keep their FamilySearch person id in _FSFTID, a tag that
-    isn't in the GEDCOM spec. The suggested fix moves it to a standard EXID with
-    the FamilySearch person type.
+    These individuals keep their FamilySearch person id in _FSFTID or their
+    Ancestry person and tree ids in _AMTID, tags that aren't in the GEDCOM spec.
+    The suggested fix moves them to standard EXIDs.
   </p>
   <button
     type="button"
@@ -17,7 +17,7 @@
     <thead>
       <tr>
         <th>Individual</th>
-        <th>FamilySearch id</th>
+        <th>Tree ids</th>
         <th>Fix</th>
       </tr>
     </thead>
@@ -29,7 +29,11 @@
               {{ row.name || row.individual.xref }}
             </a>
           </td>
-          <td>{{ row.ids.join(", ") }}</td>
+          <td>
+            @for (id of row.ids; track $index) {
+              <div>{{ id }}</div>
+            }
+          </td>
           <td>
             <div class="btn-group-vertical">
               <button

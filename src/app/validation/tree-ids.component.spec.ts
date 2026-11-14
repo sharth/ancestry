@@ -13,20 +13,20 @@ import {
 } from "../../gedcom/gedcomIndividual";
 import { newGedcomName } from "../../gedcom/gedcomName";
 import { newGedcomRecord } from "../../gedcom/gedcomRecord";
-import { FamilySearchIdsComponent } from "./familysearch-ids.component";
+import { TreeIdsComponent } from "./tree-ids.component";
 
 function fsftid(value: string) {
   return newGedcomRecord({ tag: "_FSFTID", value });
 }
 
-describe("FamilySearchIdsComponent", () => {
+describe("TreeIdsComponent", () => {
   async function renderWith(
     database: GedcomDatabase,
     reviewed: GedcomIndividual[] = [],
     submitted: GedcomIndividual[] = [],
     submittedAll: GedcomIndividual[][] = [],
   ) {
-    await render(FamilySearchIdsComponent, {
+    await render(TreeIdsComponent, {
       providers: [provideRouter([])],
       bindings: [
         inputBinding("ancestryDatabase", signal(database)),
@@ -44,7 +44,7 @@ describe("FamilySearchIdsComponent", () => {
     });
   }
 
-  it("says so when no individual has a _FSFTID", async () => {
+  it("says so when no individual has a _FSFTID or _AMTID", async () => {
     await renderWith(
       newGedcomDatabase({
         individuals: { "@I1@": newGedcomIndividual({ xref: "@I1@" }) },
@@ -52,19 +52,25 @@ describe("FamilySearchIdsComponent", () => {
     );
     expect(
       screen.getByText(
-        "No individual has a FamilySearch id in a _FSFTID record.",
+        "No individual has a FamilySearch or Ancestry id in _FSFTID or _AMTID.",
       ),
     ).toBeTruthy();
   });
 
-  it("lists each individual with a _FSFTID, with its proposed diff", async () => {
+  it("lists each individual with a _FSFTID or _AMTID, with its proposed diff", async () => {
     await renderWith(
       newGedcomDatabase({
         individuals: {
           "@I1@": newGedcomIndividual({
             xref: "@I1@",
             names: [newGedcomName({ givenName: "John", surname: "Doe" })],
-            unknownRecords: [fsftid("KWCB-QS1")],
+            unknownRecords: [
+              fsftid("KWCB-QS1"),
+              newGedcomRecord({
+                tag: "_AMTID",
+                value: "132395462563:1030:183714515",
+              }),
+            ],
           }),
           "@I2@": newGedcomIndividual({ xref: "@I2@" }),
         },
@@ -77,6 +83,11 @@ describe("FamilySearchIdsComponent", () => {
     expect(document.body.textContent).toContain(
       "2 TYPE https://gedcom.io/exid-type/FamilySearch-PersonId",
     );
+    expect(document.body.textContent).toContain("1 EXID 132395462563");
+    expect(document.body.textContent).toContain(
+      "2 TYPE https://www.ancestry.com/family-tree/person/tree/183714515/person/",
+    );
+    expect(screen.getByText("Ancestry 132395462563")).toBeTruthy();
   });
 
   it("hands review, submit and submit all back to the page", async () => {
