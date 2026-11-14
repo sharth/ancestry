@@ -182,6 +182,16 @@
       (submitSuggestion)="submitBibliographySuggestion($event)"
     />
   }
+  @case ("tree-ids") {
+    <app-tree-ids
+      [ancestryDatabase]="ancestryDatabase()"
+      (reviewSuggestion)="
+        reviewTreeIdSuggestion($event); editDialog.showModal()
+      "
+      (submitSuggestion)="submitTreeIdSuggestions([$event])"
+      (submitAllSuggestions)="submitTreeIdSuggestions($event)"
+    />
+  }
 }
 
 <app-gedcom-editor-dialog

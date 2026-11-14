@@ -10,6 +10,7 @@ import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 
 import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
+import type { GedcomIndividual } from "../../gedcom/gedcomIndividual";
 import type { GedcomRecord } from "../../gedcom/gedcomRecord";
 import type { GedcomSource } from "../../gedcom/gedcomSource";
 import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
@@ -21,6 +22,7 @@ import {
   bibliographyForMissingTitle,
 } from "./apply-bibliography-title-suggestion.util";
 import { applyMergeRepositoryLinksSuggestion } from "./apply-merge-repository-links-suggestion.util";
+import { applyTreeIdSuggestion } from "./apply-tree-id-suggestion.util";
 import { applyUrlSuggestions } from "./apply-url-suggestion.util";
 import { BibliographyWithoutTitleComponent } from "./bibliography-without-title.component";
 import {
@@ -36,6 +38,7 @@ import {
   findSourcesWithoutRepositories,
   SourcesWithoutRepositoriesComponent,
 } from "./sources-without-repositories.component";
+import { findTreeIdsToConvert, TreeIdsComponent } from "./tree-ids.component";
 import {
   findUnusedMultimedia,
   UnusedMultimediaComponent,
@@ -63,6 +66,10 @@ type ReviewState =
   | {
       kind: "bibliography";
       source: GedcomSource;
+    }
+  | {
+      kind: "tree-id";
+      individual: GedcomIndividual;
     };
 
 const tabs = [
@@ -72,6 +79,7 @@ const tabs = [
   { id: "unused-sources", label: "Unused sources" },
   { id: "unused-multimedia", label: "Unused multimedia" },
   { id: "bibliography-without-title", label: "Bibliography without title" },
+  { id: "tree-ids", label: "Tree ids" },
 ] as const;
 
 type TabId = (typeof tabs)[number]["id"];
@@ -97,6 +105,7 @@ interface TableRow {
     UnusedSourcesComponent,
     SourcesWithoutRepositoriesComponent,
     BibliographyWithoutTitleComponent,
+    TreeIdsComponent,
   ],
   templateUrl: "./validation.component.html",
   styleUrl: "./validation.component.css",
@@ -133,6 +142,7 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
       "bibliography-without-title": Object.values(database.sources).filter(
         (source) => bibliographyForMissingTitle(source) !== undefined,
       ).length,
+      "tree-ids": findTreeIdsToConvert(database).length,
     };
   });
 
@@ -216,6 +226,11 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
   readonly reviewDatabase = computed<GedcomDatabase>(() => {
     const state = this.reviewState();
     if (state === undefined) return this.ancestryDatabase();
+    if (state.kind === "tree-id") {
+      return applyTreeIdSuggestion(this.ancestryDatabase(), [
+        state.individual.xref,
+      ]);
+    }
     if (state.kind === "bibliography") {
       return applyBibliographyTitleSuggestion(
         this.ancestryDatabase(),
@@ -244,6 +259,9 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
   readonly reviewTabs = computed<TabInformation[]>(() => {
     const state = this.reviewState();
     if (state === undefined) return [];
+    if (state.kind === "tree-id") {
+      return [{ type: "INDI", xref: state.individual.xref }];
+    }
     const tabs: TabInformation[] = [{ type: "SOUR", xref: state.source.xref }];
     if (state.kind === "url") {
       const { createdRepositoryXrefs } = applyUrlSuggestions(
@@ -326,6 +344,22 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
     const { database } = applyBibliographyTitleSuggestion(
       this.ancestryDatabase(),
       source,
+    );
+    await this.ancestryService.updateGedcomDatabase(database);
+    await this.reload();
+  }
+
+  reviewTreeIdSuggestion(individual: GedcomIndividual) {
+    this.reviewState.set({ kind: "tree-id", individual });
+  }
+
+  async submitTreeIdSuggestions(individuals: GedcomIndividual[]) {
+    const granted = await this.ancestryService.requestWritePermission();
+    if (!granted) return;
+
+    const database = applyTreeIdSuggestion(
+      this.ancestryDatabase(),
+      individuals.map((individual) => individual.xref),
     );
     await this.ancestryService.updateGedcomDatabase(database);
     await this.reload();
