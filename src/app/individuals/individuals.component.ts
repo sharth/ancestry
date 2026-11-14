@@ -18,12 +18,7 @@ import type { ComponentWithUnsavedChanges } from "../unsaved-changes.guard";
 })
 export class IndividualsComponent implements ComponentWithUnsavedChanges {
   readonly gedcom = input.required<GedcomResourceValue>();
-  // ancestryDatabaseGuard keeps this route away until a file is loaded.
-  readonly ancestryDatabase = computed(() => {
-    const ancestryDatabase = this.gedcom().gedcomDatabase;
-    if (ancestryDatabase === undefined) throw new Error("No GEDCOM loaded");
-    return ancestryDatabase;
-  });
+  readonly ancestryDatabase = computed(() => this.gedcom().gedcomDatabase);
 
   readonly editDialog = viewChild<GedcomEditorDialogComponent>("editDialog");
 

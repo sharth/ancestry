@@ -139,10 +139,10 @@ describe("IndividualComponent", () => {
         inputBinding(
           "gedcom",
           computed(() => ({
-            dataSource: undefined,
+            dataSource: { mode: "builtin" },
             gedcomFileHandle: undefined,
             gedcomFile: undefined,
-            gedcomText: undefined,
+            gedcomText: "",
             gedcomRecords: [],
             gedcomDatabase: ancestryDatabase(),
             directoryHandle: undefined,

@@ -67,7 +67,7 @@ describe("SettingsComponent", () => {
 
     await vi.waitFor(async () => {
       await fixture.whenStable();
-      expect(ancestryService.gedcomResource.value()?.dataSource?.mode).toBe(
+      expect(ancestryService.gedcomResource.value()?.dataSource.mode).toBe(
         "builtin",
       );
     });

@@ -18,10 +18,10 @@ describe("IndividualsComponent", () => {
         inputBinding(
           "gedcom",
           signal({
-            dataSource: undefined,
+            dataSource: { mode: "builtin" },
             gedcomFileHandle: undefined,
             gedcomFile: undefined,
-            gedcomText: undefined,
+            gedcomText: "",
             gedcomRecords: [],
             gedcomDatabase: newGedcomDatabase(),
             directoryHandle: undefined,

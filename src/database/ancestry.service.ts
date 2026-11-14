@@ -87,30 +87,23 @@ class DexieDatabase extends Dexie {
   }
 }
 
+/** The loaded GEDCOM file. gedcomResource's value is undefined instead
+ * when no data source is stored. */
 export interface GedcomResourceValue {
-  dataSource: DataSource | undefined;
+  dataSource: DataSource;
   gedcomFileHandle: FileSystemFileHandle | undefined;
   gedcomFile: File | undefined;
-  gedcomText: string | undefined;
+  gedcomText: string;
   gedcomRecords: GedcomRecord[];
-  /** The parse of `gedcomRecords`, or undefined when there's no file. */
-  gedcomDatabase: GedcomDatabase | undefined;
+  gedcomDatabase: GedcomDatabase;
   directoryHandle: FileSystemDirectoryHandle | undefined;
 }
 
 async function loadGedcom(
   dataSource: DataSource | undefined,
-): Promise<GedcomResourceValue> {
+): Promise<GedcomResourceValue | undefined> {
   if (dataSource === undefined) {
-    return {
-      dataSource: undefined,
-      gedcomFileHandle: undefined,
-      gedcomFile: undefined,
-      gedcomText: undefined,
-      gedcomRecords: [],
-      gedcomDatabase: undefined,
-      directoryHandle: undefined,
-    };
+    return undefined;
   }
 
   if (dataSource.mode === "builtin") {
@@ -123,7 +116,7 @@ async function loadGedcom(
       gedcomFile: undefined,
       gedcomText,
       gedcomRecords,
-      gedcomDatabase: parseGedcomRecordsIntoDatabase(gedcomRecords),
+      gedcomDatabase: parseGedcomDatabase(gedcomRecords),
       directoryHandle: undefined,
     };
   }
@@ -147,17 +140,9 @@ async function loadGedcom(
     gedcomFile,
     gedcomText,
     gedcomRecords,
-    gedcomDatabase: parseGedcomRecordsIntoDatabase(gedcomRecords),
+    gedcomDatabase: parseGedcomDatabase(gedcomRecords),
     directoryHandle,
   };
-}
-
-function parseGedcomRecordsIntoDatabase(
-  gedcomRecords: GedcomRecord[],
-): GedcomDatabase | undefined {
-  return gedcomRecords.length === 0
-    ? undefined
-    : parseGedcomDatabase(gedcomRecords);
 }
 
 export async function findGedcomFilenames(
