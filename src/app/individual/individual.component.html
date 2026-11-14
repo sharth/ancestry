@@ -17,15 +17,19 @@
               target="_blank"
               rel="noopener noreferrer nofollow"
               referrerpolicy="no-referrer"
-              ><i class="bi bi-box-arrow-up-right me-1"></i>{{ link.label }}:
-              {{ externalIdentifier.id }}</a
+              class="d-inline-flex gap-1 text-decoration-none"
             >
+              <i class="bi bi-box-arrow-up-right"></i>
+              <span class="text-decoration-underline">
+                {{ link.label }}: {{ externalIdentifier.id }}
+              </span>
+            </a>
           } @else {
             {{ externalIdentifier.id }}
             @if (externalIdentifier.type) {
-              <span class="text-body-secondary"
-                >({{ externalIdentifier.type }})</span
-              >
+              <span class="text-body-secondary">
+                ({{ externalIdentifier.type }})
+              </span>
             }
           }
         </li>
