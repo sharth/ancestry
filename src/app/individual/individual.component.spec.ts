@@ -9,6 +9,7 @@ import { render } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
+import { newGedcomExternalIdentifier } from "../../gedcom/gedcomExternalIdentifier";
 import { newGedcomFact } from "../../gedcom/gedcomFact";
 import { newGedcomFamily } from "../../gedcom/gedcomFamily";
 import { newGedcomIndividual } from "../../gedcom/gedcomIndividual";
@@ -33,6 +34,12 @@ describe("IndividualComponent", () => {
           xref: "@I1@",
           names: [newGedcomName({ givenName: "John", surname: "Doe" })],
           sex: newGedcomSex({ sex: "M" }),
+          externalIdentifiers: [
+            newGedcomExternalIdentifier({
+              id: "KWCB-QS1",
+              type: "https://gedcom.io/exid-type/FamilySearch-PersonId",
+            }),
+          ],
           facts: [
             newGedcomFact({
               tag: "BIRT",
@@ -148,5 +155,16 @@ describe("IndividualComponent", () => {
 
   it("hasUnsavedChanges delegates to the edit dialog", () => {
     expect(component.hasUnsavedChanges()).toBe(false);
+  });
+
+  it("links the FamilySearch person", () => {
+    const element = fixture.nativeElement as HTMLElement;
+    const link = element.querySelector<HTMLAnchorElement>(
+      'a[href^="https://www.familysearch.org/"]',
+    );
+    expect(link?.href).toBe(
+      "https://www.familysearch.org/tree/person/details/KWCB-QS1",
+    );
+    expect(link?.textContent).toContain("FamilySearch: KWCB-QS1");
   });
 });

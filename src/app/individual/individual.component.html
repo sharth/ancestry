@@ -6,6 +6,33 @@
   <!-- TODO: Include the citations. -->
   <p>{{ vm.sex }}</p>
 
+  @if (vm.externalIdentifiers.length > 0) {
+    <h2>External Trees</h2>
+    <ul class="list-unstyled">
+      @for (externalIdentifier of vm.externalIdentifiers; track $index) {
+        <li>
+          @if (externalIdentifier.link; as link) {
+            <a
+              [href]="link.url"
+              target="_blank"
+              rel="noopener noreferrer nofollow"
+              referrerpolicy="no-referrer"
+              ><i class="bi bi-box-arrow-up-right me-1"></i>{{ link.label }}:
+              {{ externalIdentifier.id }}</a
+            >
+          } @else {
+            {{ externalIdentifier.id }}
+            @if (externalIdentifier.type) {
+              <span class="text-body-secondary"
+                >({{ externalIdentifier.type }})</span
+              >
+            }
+          }
+        </li>
+      }
+    </ul>
+  }
+
   <ul class="nav nav-tabs mb-3" role="tablist">
     <li class="nav-item" role="presentation">
       <a class="nav-link" routerLink="facts" routerLinkActive="active">
