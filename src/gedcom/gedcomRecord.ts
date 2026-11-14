@@ -51,6 +51,17 @@ export function filterTrivialGedcomRecords(
     .filter((record) => filterTrivialGedcomRecord(record) !== null);
 }
 
+// The 1-based line of the file each parsed record started on, for pointing
+// the user at a problem. Kept beside the records rather than in them, since a
+// line number isn't part of the record and is meaningless once it's edited.
+const lineNumbers = new WeakMap<GedcomRecord, number>();
+
+export function gedcomRecordLineNumber(
+  gedcomRecord: GedcomRecord,
+): number | undefined {
+  return lineNumbers.get(gedcomRecord);
+}
+
 export function parseGedcomRecords(text: string): GedcomRecord[] {
   const lines = text.split(/\r?\n/);
   const records: GedcomRecord[] = [];
@@ -74,6 +85,7 @@ export function parseGedcomRecords(text: string): GedcomRecord[] {
     ];
     const level = parseInt(levelString, 10);
     const record = newGedcomRecord({ xref, tag, value });
+    lineNumbers.set(record, lineNumber + 1);
 
     if (level == 0) {
       ladder = [record];
