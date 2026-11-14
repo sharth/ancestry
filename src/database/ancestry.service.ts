@@ -1,6 +1,17 @@
-import { DestroyRef, Service, computed, inject } from "@angular/core";
+import {
+  DestroyRef,
+  Service,
+  computed,
+  inject,
+  resourceFromSnapshots,
+} from "@angular/core";
 import { rxResource, toObservable } from "@angular/core/rxjs-interop";
-import { RedirectCommand, Router, type ResolveFn } from "@angular/router";
+import {
+  RedirectCommand,
+  Router,
+  type CanActivateFn,
+  type ResourceResult,
+} from "@angular/router";
 import Dexie, { liveQuery } from "dexie";
 import { filter, firstValueFrom, from, switchMap } from "rxjs";
 
@@ -193,6 +204,20 @@ export class AncestryService {
     return parseGedcomDatabase(gedcomResourceValue.gedcomRecords);
   });
 
+  /** ancestryDatabase() as a Resource, for routes to bind to their
+   * component's `ancestryDatabase` input (see ancestryDatabaseResources).
+   * The router keeps such an input in step with the resource itself, so a
+   * page sees a reloaded file in the same render as everything else that
+   * reads the service. */
+  readonly ancestryDatabaseResource = Object.assign(
+    resourceFromSnapshots(() => {
+      const snapshot = this.gedcomResource.snapshot();
+      if (snapshot.status === "error") return snapshot;
+      return { status: snapshot.status, value: this.ancestryDatabase() };
+    }),
+    { reload: () => this.gedcomResource.reload() },
+  );
+
   compareGedcomDatabase(gedcomDatabase: GedcomDatabase): {
     originalGedcomRecord?: GedcomRecord;
     updatedGedcomRecord?: GedcomRecord;
@@ -349,9 +374,9 @@ export class AncestryService {
   }
 }
 
-export const ancestryDatabaseResolver: ResolveFn<
-  GedcomDatabase | RedirectCommand
-> = async () => {
+/** Keeps the data routes away until a GEDCOM file is loaded, sending the
+ * user to /settings to pick one if there's none. */
+export const ancestryDatabaseGuard: CanActivateFn = async () => {
   const ancestryService = inject(AncestryService);
   const router = inject(Router);
 
@@ -360,9 +385,17 @@ export const ancestryDatabaseResolver: ResolveFn<
       filter((isLoading) => !isLoading),
     ),
   );
-  const database = ancestryService.ancestryDatabase();
-  if (database === undefined) {
+  if (ancestryService.ancestryDatabase() === undefined) {
     return new RedirectCommand(router.parseUrl("/settings"));
   }
-  return database;
+  return true;
 };
+
+/** A data route's `resources`: binds its component's `ancestryDatabase`
+ * input to the loaded database, which then follows every reload of the
+ * file, so saving an edit needs no navigation to refresh the page. */
+export function ancestryDatabaseResources(): ResourceResult {
+  return {
+    ancestryDatabase: inject(AncestryService).ancestryDatabaseResource,
+  };
+}

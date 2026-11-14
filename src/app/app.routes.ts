@@ -1,6 +1,9 @@
 import type { ActivatedRouteSnapshot, Routes } from "@angular/router";
 
-import { ancestryDatabaseResolver } from "../database/ancestry.service";
+import {
+  ancestryDatabaseGuard,
+  ancestryDatabaseResources,
+} from "../database/ancestry.service";
 import { FamiliesComponent } from "./families/families.component";
 import { FamilyFactsComponent } from "./family/family-facts.component";
 import { FamilyGedcomComponent } from "./family/family-gedcom.component";
@@ -34,8 +37,8 @@ export const routes: Routes = [
   {
     path: "",
     component: IndexComponent,
-    resolve: { ancestryDatabase: ancestryDatabaseResolver },
-    runGuardsAndResolvers: "always",
+    canActivate: [ancestryDatabaseGuard],
+    resources: ancestryDatabaseResources,
   },
   {
     path: "settings",
@@ -44,89 +47,129 @@ export const routes: Routes = [
   {
     path: "search",
     component: SearchComponent,
-    resolve: { ancestryDatabase: ancestryDatabaseResolver },
-    runGuardsAndResolvers: "always",
+    canActivate: [ancestryDatabaseGuard],
+    resources: ancestryDatabaseResources,
   },
   {
     path: "individuals",
     component: IndividualsComponent,
-    resolve: { ancestryDatabase: ancestryDatabaseResolver },
-    runGuardsAndResolvers: "always",
+    canActivate: [ancestryDatabaseGuard],
+    resources: ancestryDatabaseResources,
     canDeactivate: [confirmUnsavedChangesGuard],
   },
   {
     path: "individual/:xref",
     component: IndividualComponent,
-    resolve: { ancestryDatabase: ancestryDatabaseResolver },
-    runGuardsAndResolvers: "always",
+    canActivate: [ancestryDatabaseGuard],
+    resources: ancestryDatabaseResources,
     canDeactivate: [confirmUnsavedChangesGuard],
     children: [
       { path: "", redirectTo: "facts", pathMatch: "full" },
-      { path: "facts", component: IndividualFactsComponent },
-      { path: "ancestors", component: IndividualAncestorsComponent },
-      { path: "sources", component: IndividualSourcesComponent },
-      { path: "gedcom", component: IndividualGedcomComponent },
+      {
+        path: "facts",
+        component: IndividualFactsComponent,
+        resources: ancestryDatabaseResources,
+      },
+      {
+        path: "ancestors",
+        component: IndividualAncestorsComponent,
+        resources: ancestryDatabaseResources,
+      },
+      {
+        path: "sources",
+        component: IndividualSourcesComponent,
+        resources: ancestryDatabaseResources,
+      },
+      {
+        path: "gedcom",
+        component: IndividualGedcomComponent,
+        resources: ancestryDatabaseResources,
+      },
     ],
   },
   {
     path: "families",
     component: FamiliesComponent,
-    resolve: { ancestryDatabase: ancestryDatabaseResolver },
-    runGuardsAndResolvers: "always",
+    canActivate: [ancestryDatabaseGuard],
+    resources: ancestryDatabaseResources,
     canDeactivate: [confirmUnsavedChangesGuard],
   },
   {
     path: "family/:xref",
     component: FamilyComponent,
-    resolve: { ancestryDatabase: ancestryDatabaseResolver },
-    runGuardsAndResolvers: "always",
+    canActivate: [ancestryDatabaseGuard],
+    resources: ancestryDatabaseResources,
     canDeactivate: [confirmUnsavedChangesGuard],
     children: [
       { path: "", redirectTo: "facts", pathMatch: "full" },
-      { path: "facts", component: FamilyFactsComponent },
-      { path: "sources", component: FamilySourcesComponent },
-      { path: "gedcom", component: FamilyGedcomComponent },
+      {
+        path: "facts",
+        component: FamilyFactsComponent,
+        resources: ancestryDatabaseResources,
+      },
+      {
+        path: "sources",
+        component: FamilySourcesComponent,
+        resources: ancestryDatabaseResources,
+      },
+      {
+        path: "gedcom",
+        component: FamilyGedcomComponent,
+        resources: ancestryDatabaseResources,
+      },
     ],
   },
   {
     path: "repositories",
     component: RepositoriesComponent,
-    resolve: { ancestryDatabase: ancestryDatabaseResolver },
-    runGuardsAndResolvers: "always",
+    canActivate: [ancestryDatabaseGuard],
+    resources: ancestryDatabaseResources,
     canDeactivate: [confirmUnsavedChangesGuard],
   },
   {
     path: "repository/:xref",
     component: RepositoryComponent,
-    resolve: { ancestryDatabase: ancestryDatabaseResolver },
-    runGuardsAndResolvers: "always",
+    canActivate: [ancestryDatabaseGuard],
+    resources: ancestryDatabaseResources,
     canDeactivate: [confirmUnsavedChangesGuard],
   },
   {
     path: "sources",
     component: SourcesComponent,
-    resolve: { ancestryDatabase: ancestryDatabaseResolver },
-    runGuardsAndResolvers: "always",
+    canActivate: [ancestryDatabaseGuard],
+    resources: ancestryDatabaseResources,
     canDeactivate: [confirmUnsavedChangesGuard],
   },
   {
     path: "source/:xref",
     component: SourceComponent,
-    resolve: { ancestryDatabase: ancestryDatabaseResolver },
-    runGuardsAndResolvers: "always",
+    canActivate: [ancestryDatabaseGuard],
+    resources: ancestryDatabaseResources,
     canDeactivate: [confirmUnsavedChangesGuard],
     children: [
       { path: "", redirectTo: "overview", pathMatch: "full" },
-      { path: "overview", component: SourceOverviewComponent },
-      { path: "citations", component: SourceCitationsComponent },
-      { path: "gedcom", component: SourceGedcomComponent },
+      {
+        path: "overview",
+        component: SourceOverviewComponent,
+        resources: ancestryDatabaseResources,
+      },
+      {
+        path: "citations",
+        component: SourceCitationsComponent,
+        resources: ancestryDatabaseResources,
+      },
+      {
+        path: "gedcom",
+        component: SourceGedcomComponent,
+        resources: ancestryDatabaseResources,
+      },
     ],
   },
   {
     path: "places",
     component: PlacesComponent,
-    resolve: { ancestryDatabase: ancestryDatabaseResolver },
-    runGuardsAndResolvers: "always",
+    canActivate: [ancestryDatabaseGuard],
+    resources: ancestryDatabaseResources,
   },
   {
     // Matches any number of remaining segments under `place/`, so a region
@@ -137,36 +180,36 @@ export const routes: Routes = [
       {
         matcher: (segments) => ({ consumed: segments }),
         component: PlaceComponent,
+        canActivate: [ancestryDatabaseGuard],
+        resources: ancestryDatabaseResources,
         resolve: {
-          ancestryDatabase: ancestryDatabaseResolver,
           // The matched `place/...` segments as plain, lowercased strings,
           // e.g. ["united-states", "maryland"].
           path: (route: ActivatedRouteSnapshot) =>
             route.url.map((segment) => segment.path.toLowerCase()),
         },
-        runGuardsAndResolvers: "always",
       },
     ],
   },
   {
     path: "multimedias",
     component: MultimediasComponent,
-    resolve: { ancestryDatabase: ancestryDatabaseResolver },
-    runGuardsAndResolvers: "always",
+    canActivate: [ancestryDatabaseGuard],
+    resources: ancestryDatabaseResources,
     canDeactivate: [confirmUnsavedChangesGuard],
   },
   {
     path: "multimedia/:xref",
     component: MultimediaComponent,
-    resolve: { ancestryDatabase: ancestryDatabaseResolver },
-    runGuardsAndResolvers: "always",
+    canActivate: [ancestryDatabaseGuard],
+    resources: ancestryDatabaseResources,
     canDeactivate: [confirmUnsavedChangesGuard],
   },
   {
     path: "validation",
     component: ValidationComponent,
-    resolve: { ancestryDatabase: ancestryDatabaseResolver },
-    runGuardsAndResolvers: "always",
+    canActivate: [ancestryDatabaseGuard],
+    resources: ancestryDatabaseResources,
     canDeactivate: [confirmUnsavedChangesGuard],
   },
   { path: "**", component: PageNotFoundComponent },

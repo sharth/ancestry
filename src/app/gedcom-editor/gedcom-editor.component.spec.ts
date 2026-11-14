@@ -353,20 +353,20 @@ describe("GedcomEditorComponent Integration", () => {
   });
 
   describe("submitForm tests", () => {
-    it("emits finished before navigating, so the dialog is already closed by the time the reload re-checks the unsaved-changes guard", async () => {
+    // The page picks up the saved file through its route's resources, so
+    // saving needs no navigation to refresh it.
+    it("emits finished after saving, without navigating", async () => {
       vi.spyOn(ancestryService, "updateGedcomDatabase").mockResolvedValue(
         undefined,
       );
-      const order: string[] = [];
-      component.finished.subscribe(() => order.push("finished"));
-      vi.spyOn(TestBed.inject(Router), "navigate").mockImplementation(() => {
-        order.push("navigate");
-        return Promise.resolve(true);
-      });
+      const finished = vi.fn();
+      component.finished.subscribe(finished);
+      const navigate = vi.spyOn(TestBed.inject(Router), "navigate");
 
       await component.submitForm(new Event("submit"));
 
-      expect(order).toEqual(["finished", "navigate"]);
+      expect(finished).toHaveBeenCalled();
+      expect(navigate).not.toHaveBeenCalled();
     });
 
     // Regression test for the bug this guards against: the <form> has no
@@ -380,7 +380,6 @@ describe("GedcomEditorComponent Integration", () => {
       vi.spyOn(ancestryService, "updateGedcomDatabase").mockResolvedValue(
         undefined,
       );
-      vi.spyOn(TestBed.inject(Router), "navigate").mockResolvedValue(true);
       const event = new Event("submit", { cancelable: true });
 
       await component.submitForm(event);
@@ -394,7 +393,6 @@ describe("GedcomEditorComponent Integration", () => {
       let filePath: string;
 
       beforeEach(() => {
-        vi.spyOn(TestBed.inject(Router), "navigate").mockResolvedValue(true);
         xref = component.openNewMultimedia();
         filePath = `${xref.replaceAll("@", "")} Census.png`;
         component.workingDatabase.update((database) =>

@@ -5,6 +5,7 @@ import {
   RouterOutlet,
   provideRouter,
   withComponentInputBinding,
+  withRouterResources,
 } from "@angular/router";
 import { render, screen } from "@testing-library/angular/zoneless";
 import {
@@ -122,7 +123,13 @@ describe("saving the GEDCOM editor from every entry point", () => {
     );
 
     await render(StubComponent, {
-      providers: [provideRouter(routes, withComponentInputBinding())],
+      providers: [
+        provideRouter(
+          routes,
+          withComponentInputBinding(),
+          withRouterResources(),
+        ),
+      ],
       waitForStableOnRender: true,
     });
 

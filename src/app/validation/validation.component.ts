@@ -6,7 +6,7 @@ import {
   signal,
   viewChild,
 } from "@angular/core";
-import { ActivatedRoute, Router, RouterModule } from "@angular/router";
+import { RouterModule } from "@angular/router";
 
 import { AncestryService } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
@@ -112,8 +112,6 @@ interface TableRow {
 })
 export class ValidationComponent implements ComponentWithUnsavedChanges {
   private readonly ancestryService = inject(AncestryService);
-  private readonly router = inject(Router);
-  private readonly route = inject(ActivatedRoute);
 
   readonly ancestryDatabase = input.required<GedcomDatabase>();
 
@@ -318,7 +316,6 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
       suggestions,
     );
     await this.ancestryService.updateGedcomDatabase(database);
-    await this.reload();
   }
 
   async submitMergeSuggestion(
@@ -334,7 +331,6 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
       suggestion,
     );
     await this.ancestryService.updateGedcomDatabase(database);
-    await this.reload();
   }
 
   async submitBibliographySuggestion(source: GedcomSource) {
@@ -346,7 +342,6 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
       source,
     );
     await this.ancestryService.updateGedcomDatabase(database);
-    await this.reload();
   }
 
   reviewTreeIdSuggestion(individual: GedcomIndividual) {
@@ -362,15 +357,6 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
       individuals.map((individual) => individual.xref),
     );
     await this.ancestryService.updateGedcomDatabase(database);
-    await this.reload();
-  }
-
-  private async reload() {
-    await this.router.navigate([], {
-      relativeTo: this.route,
-      onSameUrlNavigation: "reload",
-      skipLocationChange: true,
-    });
   }
 
   // The records that would actually change on disk if `suggestions` are
