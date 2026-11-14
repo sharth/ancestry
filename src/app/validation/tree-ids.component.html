@@ -1,0 +1,69 @@
+@if (rows().length === 0) {
+  <p>No individual has a FamilySearch or Ancestry id in _FSFTID or _AMTID.</p>
+} @else {
+  <p>
+    These individuals keep their FamilySearch person id in _FSFTID or their
+    Ancestry person and tree ids in _AMTID, tags that aren't in the GEDCOM spec.
+    The suggested fix moves them to standard EXIDs.
+  </p>
+  <button
+    type="button"
+    class="btn btn-outline-success mb-3"
+    (click)="submitAllSuggestions.emit(individuals())"
+  >
+    Submit all {{ rows().length }} as proposed
+  </button>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Individual</th>
+        <th>Tree ids</th>
+        <th>Fix</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of rows(); track row.individual.xref) {
+        <tr>
+          <td>
+            <a [routerLink]="['/individual', row.individual.xref]">
+              {{ row.name || row.individual.xref }}
+            </a>
+          </td>
+          <td>
+            @for (id of row.ids; track $index) {
+              <div>{{ id }}</div>
+            }
+          </td>
+          <td>
+            <div class="btn-group-vertical">
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-primary"
+                (click)="reviewSuggestion.emit(row.individual)"
+              >
+                Open editor with proposed changes
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-success"
+                (click)="submitSuggestion.emit(row.individual)"
+              >
+                Submit changes as proposed
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="3">
+            @for (d of row.differences; track $index) {
+              <app-gedcom-diff
+                [oldGedcomRecord]="d.originalGedcomRecord"
+                [newGedcomRecord]="d.updatedGedcomRecord"
+              />
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}
