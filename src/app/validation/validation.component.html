@@ -182,6 +182,16 @@
       (submitSuggestion)="submitBibliographySuggestion($event)"
     />
   }
+  @case ("familysearch-ids") {
+    <app-familysearch-ids
+      [ancestryDatabase]="ancestryDatabase()"
+      (reviewSuggestion)="
+        reviewFamilySearchIdSuggestion($event); editDialog.showModal()
+      "
+      (submitSuggestion)="submitFamilySearchIdSuggestions([$event])"
+      (submitAllSuggestions)="submitFamilySearchIdSuggestions($event)"
+    />
+  }
 }
 
 <app-gedcom-editor-dialog

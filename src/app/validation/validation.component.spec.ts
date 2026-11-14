@@ -106,6 +106,7 @@ describe("ValidationComponent", () => {
       "Unused sources": "1",
       "Unused multimedia": "0",
       "Bibliography without title": "0",
+      "FamilySearch ids": "0",
     });
   });
 
