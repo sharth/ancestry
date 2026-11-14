@@ -13,6 +13,11 @@ import {
 } from "./gedcomCreationDate";
 import { sortChronologically } from "./gedcomDateSort";
 import {
+  parseGedcomExternalIdentifier,
+  serializeGedcomExternalIdentifier,
+  type GedcomExternalIdentifier,
+} from "./gedcomExternalIdentifier";
+import {
   parseGedcomFact,
   serializeGedcomIndividualFact,
   type GedcomFact,
@@ -52,6 +57,7 @@ export interface GedcomIndividual {
   childOfFamilyXrefs: string[];
   parentOfFamilyXrefs: string[];
   notes: GedcomNote[];
+  externalIdentifiers: GedcomExternalIdentifier[];
   unknownRecords: GedcomRecord[];
 }
 
@@ -66,6 +72,7 @@ export function newGedcomIndividual(
     childOfFamilyXrefs: [],
     unknownRecords: [],
     notes: [],
+    externalIdentifiers: [],
     changeDate: newGedcomChangeDate(),
     creationDate: newGedcomCreationDate(),
     ...fieldsToUpdate,
@@ -139,6 +146,11 @@ export function parseGedcomIndividual(record: GedcomRecord): GedcomIndividual {
       case "NOTE":
         gedcomIndividual.notes.push(parseGedcomNote(childRecord));
         break;
+      case "EXID":
+        gedcomIndividual.externalIdentifiers.push(
+          parseGedcomExternalIdentifier(childRecord),
+        );
+        break;
       default:
         gedcomIndividual.unknownRecords.push(childRecord);
         break;
@@ -176,6 +188,9 @@ export function serializeGedcomIndividual(
         serializeGedcomSex(gedcomIndividual.sex),
         ...gedcomIndividual.unknownRecords.filter(
           (record) => record.tag == "_UID",
+        ),
+        ...gedcomIndividual.externalIdentifiers.map((externalIdentifier) =>
+          serializeGedcomExternalIdentifier(externalIdentifier),
         ),
         ...gedcomIndividual.unknownRecords.filter(
           (record) => record.tag == "_FSFTID",
