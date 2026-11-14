@@ -1,0 +1,83 @@
+<details open>
+  <summary>External Trees ({{ form.length }})</summary>
+  <datalist id="externalIdentifierTypes">
+    @for (type of knownTypes(); track type) {
+      <option [value]="type"></option>
+    }
+  </datalist>
+  @for (externalIdentifier of form; track externalIdentifier) {
+    <div class="d-flex gap-2 align-items-center mb-2">
+      <button
+        class="btn btn-sm btn-outline-danger bi-trash"
+        type="button"
+        aria-label="Remove external identifier"
+        (click)="removeExternalIdentifier($index)"
+      ></button>
+      <div class="form-floating" style="flex: 1">
+        <input
+          class="form-control"
+          type="text"
+          id="externalIdentifierId_{{ $index }}"
+          [formField]="externalIdentifier.id"
+        />
+        <label for="externalIdentifierId_{{ $index }}">ID</label>
+      </div>
+      <div class="form-floating" style="flex: 2">
+        <input
+          class="form-control"
+          type="url"
+          list="externalIdentifierTypes"
+          id="externalIdentifierType_{{ $index }}"
+          [formField]="externalIdentifier.type"
+        />
+        <label for="externalIdentifierType_{{ $index }}">Type (URI)</label>
+      </div>
+      <div style="width: 8rem">
+        @if (links()[$index]; as link) {
+          <a
+            [href]="link.url"
+            target="_blank"
+            rel="noopener noreferrer nofollow"
+            referrerpolicy="no-referrer"
+            ><i class="bi bi-box-arrow-up-right me-1"></i>{{ link.label }}</a
+          >
+        }
+      </div>
+    </div>
+  }
+  <div class="form-floating mb-2">
+    <input
+      class="form-control"
+      type="url"
+      id="externalIdentifierUrl"
+      placeholder="Paste a FamilySearch or Ancestry person link"
+      #urlInput
+      [value]="pastedUrl()"
+      (input)="addFromUrl(urlInput.value)"
+    />
+    <label for="externalIdentifierUrl">
+      Paste a FamilySearch or Ancestry person link to add it
+    </label>
+    @if (pastedUrl() !== "") {
+      <div class="form-text text-danger">
+        That isn't a FamilySearch or Ancestry person page link.
+      </div>
+    }
+  </div>
+  <div class="d-flex gap-2">
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-primary"
+      (click)="appendFamilySearchPersonId()"
+    >
+      <i class="bi bi-plus"></i> Add FamilySearch ID
+    </button>
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-primary"
+      (click)="appendExternalIdentifier()"
+    >
+      <i class="bi bi-plus"></i> Add other ID
+    </button>
+  </div>
+</details>

@@ -3,6 +3,7 @@ import { RouterModule } from "@angular/router";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { fullname } from "../../gedcom/gedcomIndividual";
+import { externalIdentifierLink } from "../../util/external-identifier-link";
 import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
 import type { ComponentWithUnsavedChanges } from "../unsaved-changes.guard";
 
@@ -32,6 +33,12 @@ export class IndividualComponent implements ComponentWithUnsavedChanges {
       individual,
       name: fullname(individual),
       sex: individual.sex.sex || "Unknown",
+      externalIdentifiers: individual.externalIdentifiers.map(
+        (externalIdentifier) => ({
+          ...externalIdentifier,
+          link: externalIdentifierLink(externalIdentifier),
+        }),
+      ),
     };
   });
 }
