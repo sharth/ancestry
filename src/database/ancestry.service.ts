@@ -93,6 +93,8 @@ interface GedcomResourceValue {
   gedcomFile: File | undefined;
   gedcomText: string | undefined;
   gedcomRecords: GedcomRecord[];
+  /** The parse of `gedcomRecords`, or undefined when there's no file. */
+  gedcomDatabase: GedcomDatabase | undefined;
   directoryHandle: FileSystemDirectoryHandle | undefined;
 }
 
@@ -106,6 +108,7 @@ async function loadGedcom(
       gedcomFile: undefined,
       gedcomText: undefined,
       gedcomRecords: [],
+      gedcomDatabase: undefined,
       directoryHandle: undefined,
     };
   }
@@ -120,6 +123,7 @@ async function loadGedcom(
       gedcomFile: undefined,
       gedcomText,
       gedcomRecords,
+      gedcomDatabase: parseGedcomRecordsIntoDatabase(gedcomRecords),
       directoryHandle: undefined,
     };
   }
@@ -143,8 +147,17 @@ async function loadGedcom(
     gedcomFile,
     gedcomText,
     gedcomRecords,
+    gedcomDatabase: parseGedcomRecordsIntoDatabase(gedcomRecords),
     directoryHandle,
   };
+}
+
+function parseGedcomRecordsIntoDatabase(
+  gedcomRecords: GedcomRecord[],
+): GedcomDatabase | undefined {
+  return gedcomRecords.length === 0
+    ? undefined
+    : parseGedcomDatabase(gedcomRecords);
 }
 
 export async function findGedcomFilenames(
@@ -192,28 +205,21 @@ export class AncestryService {
       ),
   });
 
-  readonly ancestryDatabase = computed<GedcomDatabase | undefined>(() => {
-    const gedcomResourceValue = this.gedcomResource.value();
-    if (
-      gedcomResourceValue === undefined ||
-      gedcomResourceValue.gedcomRecords.length === 0
-    ) {
-      return undefined;
-    }
+  readonly ancestryDatabase = computed<GedcomDatabase | undefined>(
+    () => this.gedcomResource.value()?.gedcomDatabase,
+  );
 
-    return parseGedcomDatabase(gedcomResourceValue.gedcomRecords);
-  });
-
-  /** ancestryDatabase() as a Resource, for routes to bind to their
-   * component's `ancestryDatabase` input (see ancestryDatabaseResources).
-   * The router keeps such an input in step with the resource itself, so a
-   * page sees a reloaded file in the same render as everything else that
-   * reads the service. */
+  /** The parsed database, as a Resource of its own: the router binds a
+   * resource's value to the input with the same name (see
+   * ancestryDatabaseResources), so the route needs a resource whose value
+   * is the database itself rather than gedcomResource's whole value.
+   * resourceFromSnapshots derives it from gedcomResource's state; the
+   * router's ResourceResult type also asks for reload(). */
   readonly ancestryDatabaseResource = Object.assign(
     resourceFromSnapshots(() => {
       const snapshot = this.gedcomResource.snapshot();
       if (snapshot.status === "error") return snapshot;
-      return { status: snapshot.status, value: this.ancestryDatabase() };
+      return { status: snapshot.status, value: snapshot.value?.gedcomDatabase };
     }),
     { reload: () => this.gedcomResource.reload() },
   );
