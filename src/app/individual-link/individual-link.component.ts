@@ -17,7 +17,8 @@ export class IndividualLinkComponent {
 
   readonly vm = computed(() => {
     const xref = this.xref();
-    const ancestry = this.ancestryService.ancestryDatabase();
+    const ancestry =
+      this.ancestryService.gedcomResource.value()?.gedcomDatabase;
     const individual = ancestry?.individuals[xref];
 
     const name = individual ? fullname(individual) : undefined;

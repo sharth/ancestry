@@ -1,7 +1,6 @@
 import {
   DestroyRef,
   Service,
-  computed,
   inject,
   resourceFromSnapshots,
 } from "@angular/core";
@@ -205,10 +204,6 @@ export class AncestryService {
       ),
   });
 
-  readonly ancestryDatabase = computed<GedcomDatabase | undefined>(
-    () => this.gedcomResource.value()?.gedcomDatabase,
-  );
-
   /** The parsed database, as a Resource of its own: the router binds a
    * resource's value to the input with the same name (see
    * ancestryDatabaseResources), so the route needs a resource whose value
@@ -230,7 +225,7 @@ export class AncestryService {
   }[] {
     return compareGedcomDatabase(
       this.gedcomResource.value()?.gedcomRecords ?? [],
-      this.ancestryDatabase() ?? newGedcomDatabase(),
+      this.gedcomResource.value()?.gedcomDatabase ?? newGedcomDatabase(),
       gedcomDatabase,
     );
   }
@@ -264,7 +259,7 @@ export class AncestryService {
     const gedcomResource = this.gedcomResource.value();
     const originalGedcomRecords = gedcomResource?.gedcomRecords ?? [];
     const originalGedcomDatabase =
-      this.ancestryDatabase() ?? newGedcomDatabase();
+      this.gedcomResource.value()?.gedcomDatabase ?? newGedcomDatabase();
     const text = serializeGedcomDatabase(
       originalGedcomRecords,
       originalGedcomDatabase,
@@ -391,7 +386,7 @@ export const ancestryDatabaseGuard: CanActivateFn = async () => {
       filter((isLoading) => !isLoading),
     ),
   );
-  if (ancestryService.ancestryDatabase() === undefined) {
+  if (ancestryService.gedcomResource.value()?.gedcomDatabase === undefined) {
     return new RedirectCommand(router.parseUrl("/settings"));
   }
   return true;

@@ -17,7 +17,8 @@ export class SourceCitationsComponent {
 
   readonly vm = computed(() => {
     const xref = this.xref();
-    const ancestry = this.ancestryService.ancestryDatabase();
+    const ancestry =
+      this.ancestryService.gedcomResource.value()?.gedcomDatabase;
     if (ancestry == undefined) {
       return undefined;
     }

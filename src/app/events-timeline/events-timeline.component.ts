@@ -51,7 +51,8 @@ export class EventsTimelineComponent {
   readonly rows = computed(() => {
     const birthDate = this.birthDate();
     const birthYear = birthDate ? gedcomDateYear(birthDate) : undefined;
-    const sources = this.ancestryService.ancestryDatabase()?.sources ?? {};
+    const sources =
+      this.ancestryService.gedcomResource.value()?.gedcomDatabase.sources ?? {};
 
     return sortChronologically(this.events(), (event) => event.fact).map(
       (event) => {

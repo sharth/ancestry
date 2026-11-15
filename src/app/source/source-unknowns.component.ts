@@ -16,7 +16,8 @@ export class SourceUnknownsComponent {
   private readonly ancestryService = inject(AncestryService);
 
   readonly vm = computed(() => {
-    const ancestry = this.ancestryService.ancestryDatabase();
+    const ancestry =
+      this.ancestryService.gedcomResource.value()?.gedcomDatabase;
     if (ancestry === undefined) {
       return undefined;
     }

@@ -15,7 +15,8 @@ export class PlacesComponent {
   readonly placeNodeSlugs = placeNodeSlugs;
 
   readonly topLevelPlaces = computed(() => {
-    const database = this.ancestryService.ancestryDatabase();
+    const database =
+      this.ancestryService.gedcomResource.value()?.gedcomDatabase;
     if (!database) return [];
     const root = buildPlaceTree(database);
     return Array.from(root.children.values()).sort((a, b) =>
