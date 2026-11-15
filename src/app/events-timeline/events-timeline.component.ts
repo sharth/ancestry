@@ -1,7 +1,7 @@
-import { Component, computed, inject, input } from "@angular/core";
+import { Component, computed, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
 
-import { AncestryService } from "../../database/ancestry.service";
+import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import type { GedcomDate } from "../../gedcom/gedcomDate";
 import {
   formatGedcomDateValue,
@@ -42,7 +42,7 @@ const familyMetadata = { ...gedcomFamilyAttributes, ...gedcomFamilyEvents };
   styleUrl: "./events-timeline.component.css",
 })
 export class EventsTimelineComponent {
-  private readonly ancestryService = inject(AncestryService);
+  readonly ancestryDatabase = input.required<GedcomDatabase>();
 
   readonly events = input.required<TimelineEvent[]>();
   // When set, each event is labelled with the individual's age at the time.
@@ -51,8 +51,7 @@ export class EventsTimelineComponent {
   readonly rows = computed(() => {
     const birthDate = this.birthDate();
     const birthYear = birthDate ? gedcomDateYear(birthDate) : undefined;
-    const sources =
-      this.ancestryService.gedcomResource.value()?.gedcomDatabase.sources ?? {};
+    const sources = this.ancestryDatabase().sources;
 
     return sortChronologically(this.events(), (event) => event.fact).map(
       (event) => {

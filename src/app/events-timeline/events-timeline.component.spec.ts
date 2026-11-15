@@ -4,31 +4,29 @@ import { provideRouter } from "@angular/router";
 import { render } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { AncestryService } from "../../database/ancestry.service";
+import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomDate } from "../../gedcom/gedcomDate";
 import { newGedcomFact } from "../../gedcom/gedcomFact";
+import { newGedcomSource } from "../../gedcom/gedcomSource";
 import { newGedcomSourceCitation } from "../../gedcom/gedcomSourceCitation";
 import {
   EventsTimelineComponent,
   type TimelineEvent,
 } from "./events-timeline.component";
 
-const fakeAncestryService = {
-  gedcomResource: {
-    value: () => ({
-      gedcomDatabase: {
-        individuals: {},
-        sources: {
-          "@S1@": {
-            abbr: "1910 Census",
-            title: "1910 United States Federal Census",
-          },
-          "@S2@": { abbr: "", title: "Massachusetts, Death Index, 1901-1980" },
-        },
-      },
+const ancestryDatabase = newGedcomDatabase({
+  sources: {
+    "@S1@": newGedcomSource({
+      xref: "@S1@",
+      abbr: "1910 Census",
+      title: "1910 United States Federal Census",
+    }),
+    "@S2@": newGedcomSource({
+      xref: "@S2@",
+      title: "Massachusetts, Death Index, 1901-1980",
     }),
   },
-};
+});
 
 describe("EventsTimelineComponent", () => {
   let events: WritableSignal<TimelineEvent[]>;
@@ -71,11 +69,11 @@ describe("EventsTimelineComponent", () => {
     ]);
 
     const renderResult = await render(EventsTimelineComponent, {
-      providers: [
-        { provide: AncestryService, useValue: fakeAncestryService },
-        provideRouter([]),
+      providers: [provideRouter([])],
+      bindings: [
+        inputBinding("events", events),
+        inputBinding("ancestryDatabase", signal(ancestryDatabase)),
       ],
-      bindings: [inputBinding("events", events)],
     });
 
     fixture = renderResult.fixture;
