@@ -12,10 +12,11 @@ import { buildPlaceTree, placeNodeSlugs } from "./places.util";
 })
 export class PlacesComponent {
   readonly gedcom = input.required<GedcomResourceValue>();
+  readonly ancestryDatabase = computed(() => this.gedcom().gedcomDatabase);
   readonly placeNodeSlugs = placeNodeSlugs;
 
   readonly topLevelPlaces = computed(() => {
-    const root = buildPlaceTree(this.gedcom().gedcomDatabase);
+    const root = buildPlaceTree(this.ancestryDatabase());
     return Array.from(root.children.values()).sort((a, b) =>
       a.name.localeCompare(b.name),
     );
