@@ -54,6 +54,10 @@ export class InputMultimediaCropComponent {
   // The rendered size as a fraction of the natural size, or undefined to fit
   // the whole image in the viewport.
   readonly zoom = signal<number | undefined>(undefined);
+  // The fitted scale, as last measured while the image was fitted. Once
+  // zoomed, the image's rendered width reflects the zoom instead, so it can't
+  // be measured then.
+  private lastFitScale: number | undefined;
   private dragStart: DragStart | undefined;
 
   readonly fileResource = multimediaFileResource(this.multimedia);
@@ -119,9 +123,10 @@ export class InputMultimediaCropComponent {
       return;
     }
     const zoom = scale / zoomStep;
-    // Once zooming out would make the image smaller than the fitted view,
-    // just fit it.
-    this.setZoom(zoom <= (this.fitScale() ?? 0) ? undefined : zoom);
+    // Once zooming out would make the image no larger than the fitted view,
+    // just fit it. The slack absorbs rounding when stepping back down to
+    // exactly the fitted scale.
+    this.setZoom(zoom <= (this.fitScale() ?? 0) * 1.001 ? undefined : zoom);
   }
 
   zoomToFit() {
@@ -168,12 +173,16 @@ export class InputMultimediaCropComponent {
   }
 
   private fitScale(): number | undefined {
+    if (this.zoom() !== undefined) {
+      return this.lastFitScale;
+    }
     const naturalSize = this.naturalSize();
     const img = this.image()?.nativeElement;
     if (!naturalSize || !img || naturalSize.width === 0) {
       return undefined;
     }
-    return img.clientWidth / naturalSize.width;
+    this.lastFitScale = img.clientWidth / naturalSize.width;
+    return this.lastFitScale;
   }
 
   // Changes the zoom while keeping the crop (or, without one, whatever was in

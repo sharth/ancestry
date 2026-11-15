@@ -106,3 +106,58 @@ describe("InputMultimediaCropComponent with a pending file", () => {
     expect(getFileHandle).not.toHaveBeenCalled();
   });
 });
+
+describe("InputMultimediaCropComponent with a large image", () => {
+  it("zooms out one step at a time instead of straight back to fit", async () => {
+    // Larger than the test viewport, so the fitted view shrinks it.
+    const canvas = document.createElement("canvas");
+    canvas.width = 2000;
+    canvas.height = 3000;
+    const blob = await new Promise<Blob | null>((resolve) => {
+      canvas.toBlob(resolve, "image/png");
+    });
+    if (!blob) throw new Error("canvas.toBlob failed");
+    const file = new File([blob], "scan.png", { type: "image/png" });
+    const { fixture } = await render(InputMultimediaCropComponent, {
+      bindings: [
+        inputBinding(
+          "multimedia",
+          signal(
+            newGedcomMultimedia({
+              xref: "@M1@",
+              filePath: "scan.png",
+              pendingFile: file,
+            }),
+          ),
+        ),
+      ],
+      waitForStableOnRender: true,
+    });
+    const component = fixture.componentInstance;
+    const img = await vi.waitFor(() => {
+      const img = (fixture.nativeElement as HTMLElement).querySelector("img");
+      if (
+        !img?.complete ||
+        img.naturalWidth === 0 ||
+        !component.naturalSize()
+      ) {
+        throw new Error("image not loaded yet");
+      }
+      return img;
+    });
+    const fitScale = img.clientWidth / 2000;
+    expect(fitScale).toBeLessThan(1 / 1.5 ** 2);
+
+    component.zoomIn();
+    component.zoomIn();
+    await fixture.whenStable();
+    expect(component.zoom()).toBeCloseTo(fitScale * 1.5 ** 2);
+
+    component.zoomOut();
+    await fixture.whenStable();
+    expect(component.zoom()).toBeCloseTo(fitScale * 1.5);
+
+    component.zoomOut();
+    expect(component.zoom()).toBeUndefined();
+  });
+});
