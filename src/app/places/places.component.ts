@@ -1,7 +1,7 @@
-import { Component, computed, inject } from "@angular/core";
+import { Component, computed, input } from "@angular/core";
 import { RouterLink } from "@angular/router";
 
-import { AncestryService } from "../../database/ancestry.service";
+import type { GedcomResourceValue } from "../../database/ancestry.service";
 import { buildPlaceTree, placeNodeSlugs } from "./places.util";
 
 @Component({
@@ -11,14 +11,11 @@ import { buildPlaceTree, placeNodeSlugs } from "./places.util";
   templateUrl: "./places.component.html",
 })
 export class PlacesComponent {
-  readonly ancestryService = inject(AncestryService);
+  readonly gedcom = input.required<GedcomResourceValue>();
   readonly placeNodeSlugs = placeNodeSlugs;
 
   readonly topLevelPlaces = computed(() => {
-    const database =
-      this.ancestryService.gedcomResource.value()?.gedcomDatabase;
-    if (!database) return [];
-    const root = buildPlaceTree(database);
+    const root = buildPlaceTree(this.gedcom().gedcomDatabase);
     return Array.from(root.children.values()).sort((a, b) =>
       a.name.localeCompare(b.name),
     );
