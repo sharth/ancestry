@@ -1,6 +1,6 @@
 import { Component, computed, input } from "@angular/core";
 
-import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
+import type { GedcomResourceValue } from "../../database/ancestry.service";
 import { serializeGedcomSource } from "../../gedcom/gedcomSource";
 import { GedcomDisplayComponent } from "../gedcom-display/gedcom-display.component";
 import { SourceUnknownsComponent } from "./source-unknowns.component";
@@ -12,7 +12,8 @@ import { SourceUnknownsComponent } from "./source-unknowns.component";
   imports: [GedcomDisplayComponent, SourceUnknownsComponent],
 })
 export class SourceGedcomComponent {
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly gedcom = input.required<GedcomResourceValue>();
+  readonly ancestryDatabase = computed(() => this.gedcom().gedcomDatabase);
   readonly xref = input.required<string>();
 
   readonly vm = computed(() => {

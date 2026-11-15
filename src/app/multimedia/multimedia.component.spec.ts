@@ -4,6 +4,7 @@ import { provideRouter } from "@angular/router";
 import { render } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it } from "vitest";
 
+import { newGedcomResourceValue } from "../../database/ancestry.service";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomMultimedia } from "../../gedcom/gedcomMultimedia";
 import { MultimediaComponent } from "./multimedia.component";
@@ -17,10 +18,12 @@ describe("MultimediaComponent", () => {
       providers: [provideRouter([])],
       bindings: [
         inputBinding(
-          "ancestryDatabase",
+          "gedcom",
           signal(
-            newGedcomDatabase({
-              multimedias: { "@M1@": newGedcomMultimedia({ xref: "@M1@" }) },
+            newGedcomResourceValue({
+              gedcomDatabase: newGedcomDatabase({
+                multimedias: { "@M1@": newGedcomMultimedia({ xref: "@M1@" }) },
+              }),
             }),
           ),
         ),

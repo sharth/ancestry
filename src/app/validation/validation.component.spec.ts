@@ -1,10 +1,13 @@
-import { inputBinding, signal } from "@angular/core";
+import { inputBinding, signal, computed } from "@angular/core";
 import { TestBed, type ComponentFixture } from "@angular/core/testing";
 import { provideRouter } from "@angular/router";
 import { render, screen } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { AncestryService } from "../../database/ancestry.service";
+import {
+  AncestryService,
+  newGedcomResourceValue,
+} from "../../database/ancestry.service";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomRepository } from "../../gedcom/gedcomRepository";
 import { newGedcomRepositoryLink } from "../../gedcom/gedcomRepositoryLink";
@@ -41,7 +44,14 @@ describe("ValidationComponent", () => {
 
     const renderResult = await render(ValidationComponent, {
       providers: [provideRouter([])],
-      bindings: [inputBinding("ancestryDatabase", ancestryDatabase)],
+      bindings: [
+        inputBinding(
+          "gedcom",
+          computed(() =>
+            newGedcomResourceValue({ gedcomDatabase: ancestryDatabase() }),
+          ),
+        ),
+      ],
       waitForStableOnRender: true,
     });
     fixture = renderResult.fixture;
@@ -209,7 +219,14 @@ describe("ValidationComponent merge repository links suggestion", () => {
 
     const renderResult = await render(ValidationComponent, {
       providers: [provideRouter([])],
-      bindings: [inputBinding("ancestryDatabase", ancestryDatabase)],
+      bindings: [
+        inputBinding(
+          "gedcom",
+          computed(() =>
+            newGedcomResourceValue({ gedcomDatabase: ancestryDatabase() }),
+          ),
+        ),
+      ],
       waitForStableOnRender: true,
     });
     fixture = renderResult.fixture;
@@ -300,7 +317,14 @@ describe("ValidationComponent sticky header", () => {
 
     await render(ValidationComponent, {
       providers: [provideRouter([])],
-      bindings: [inputBinding("ancestryDatabase", ancestryDatabase)],
+      bindings: [
+        inputBinding(
+          "gedcom",
+          computed(() =>
+            newGedcomResourceValue({ gedcomDatabase: ancestryDatabase() }),
+          ),
+        ),
+      ],
       waitForStableOnRender: true,
     });
 

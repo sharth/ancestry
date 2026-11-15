@@ -5,6 +5,7 @@ import { provideRouter } from "@angular/router";
 import { render } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it } from "vitest";
 
+import { newGedcomResourceValue } from "../../database/ancestry.service";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomMultimedia } from "../../gedcom/gedcomMultimedia";
 import { newGedcomMultimediaLink } from "../../gedcom/gedcomMultimediaLink";
@@ -23,49 +24,51 @@ describe("SourceOverviewComponent", () => {
       providers: [provideRouter([])],
       bindings: [
         inputBinding(
-          "ancestryDatabase",
+          "gedcom",
           signal(
-            newGedcomDatabase({
-              sources: {
-                "@S1@": newGedcomSource({
-                  xref: "@S1@",
-                  title: "Springfield Vital Records",
-                  text: "Birth and death records for Springfield.",
-                  multimediaLinks: [
-                    newGedcomMultimediaLink({
-                      xref: "@M1@",
-                      title: "Scan of record",
-                      crop: { top: 10, left: 20, height: 30, width: 40 },
-                    }),
-                    newGedcomMultimediaLink({ xref: "@M2@" }),
-                  ],
-                  repositoryLinks: [
-                    newGedcomRepositoryLink({
-                      repositoryXref: "@R1@",
-                      callNumbers: ["12345"],
-                    }),
-                  ],
-                }),
-              },
-              multimedias: {
-                "@M1@": newGedcomMultimedia({
-                  xref: "@M1@",
-                  filePath: "scan.jpg",
-                  mediaType: "image/jpeg",
-                  title: "Original record title",
-                }),
-                "@M2@": newGedcomMultimedia({
-                  xref: "@M2@",
-                  filePath: "certificate.jpg",
-                  title: "Death certificate",
-                }),
-              },
-              repositories: {
-                "@R1@": newGedcomRepository({
-                  xref: "@R1@",
-                  name: "Springfield Hall of Records",
-                }),
-              },
+            newGedcomResourceValue({
+              gedcomDatabase: newGedcomDatabase({
+                sources: {
+                  "@S1@": newGedcomSource({
+                    xref: "@S1@",
+                    title: "Springfield Vital Records",
+                    text: "Birth and death records for Springfield.",
+                    multimediaLinks: [
+                      newGedcomMultimediaLink({
+                        xref: "@M1@",
+                        title: "Scan of record",
+                        crop: { top: 10, left: 20, height: 30, width: 40 },
+                      }),
+                      newGedcomMultimediaLink({ xref: "@M2@" }),
+                    ],
+                    repositoryLinks: [
+                      newGedcomRepositoryLink({
+                        repositoryXref: "@R1@",
+                        callNumbers: ["12345"],
+                      }),
+                    ],
+                  }),
+                },
+                multimedias: {
+                  "@M1@": newGedcomMultimedia({
+                    xref: "@M1@",
+                    filePath: "scan.jpg",
+                    mediaType: "image/jpeg",
+                    title: "Original record title",
+                  }),
+                  "@M2@": newGedcomMultimedia({
+                    xref: "@M2@",
+                    filePath: "certificate.jpg",
+                    title: "Death certificate",
+                  }),
+                },
+                repositories: {
+                  "@R1@": newGedcomRepository({
+                    xref: "@R1@",
+                    name: "Springfield Hall of Records",
+                  }),
+                },
+              }),
             }),
           ),
         ),

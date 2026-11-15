@@ -8,7 +8,10 @@ import {
 } from "@angular/core";
 import { RouterModule } from "@angular/router";
 
-import { AncestryService } from "../../database/ancestry.service";
+import {
+  AncestryService,
+  type GedcomResourceValue,
+} from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import type { GedcomIndividual } from "../../gedcom/gedcomIndividual";
 import type { GedcomRecord } from "../../gedcom/gedcomRecord";
@@ -113,7 +116,8 @@ interface TableRow {
 export class ValidationComponent implements ComponentWithUnsavedChanges {
   private readonly ancestryService = inject(AncestryService);
 
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly gedcom = input.required<GedcomResourceValue>();
+  readonly ancestryDatabase = computed(() => this.gedcom().gedcomDatabase);
 
   readonly editDialog = viewChild<GedcomEditorDialogComponent>("editDialog");
 

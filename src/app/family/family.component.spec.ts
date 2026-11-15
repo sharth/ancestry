@@ -1,4 +1,4 @@
-import { inputBinding, signal } from "@angular/core";
+import { inputBinding, signal, computed } from "@angular/core";
 import { TestBed, type ComponentFixture } from "@angular/core/testing";
 import {
   Router,
@@ -8,6 +8,7 @@ import {
 import { render } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it } from "vitest";
 
+import { newGedcomResourceValue } from "../../database/ancestry.service";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomFact } from "../../gedcom/gedcomFact";
 import { newGedcomFamily } from "../../gedcom/gedcomFamily";
@@ -96,7 +97,10 @@ describe("FamilyComponent", () => {
               path: "facts",
               component: FamilyFactsComponent,
               resolve: {
-                ancestryDatabase: () => ancestryDatabase(),
+                gedcom: () =>
+                  newGedcomResourceValue({
+                    gedcomDatabase: ancestryDatabase(),
+                  }),
                 xref: () => "@F1@",
               },
             },
@@ -104,7 +108,10 @@ describe("FamilyComponent", () => {
               path: "sources",
               component: FamilySourcesComponent,
               resolve: {
-                ancestryDatabase: () => ancestryDatabase(),
+                gedcom: () =>
+                  newGedcomResourceValue({
+                    gedcomDatabase: ancestryDatabase(),
+                  }),
                 xref: () => "@F1@",
               },
             },
@@ -112,7 +119,10 @@ describe("FamilyComponent", () => {
               path: "gedcom",
               component: FamilyGedcomComponent,
               resolve: {
-                ancestryDatabase: () => ancestryDatabase(),
+                gedcom: () =>
+                  newGedcomResourceValue({
+                    gedcomDatabase: ancestryDatabase(),
+                  }),
                 xref: () => "@F1@",
               },
             },
@@ -121,7 +131,12 @@ describe("FamilyComponent", () => {
         ),
       ],
       bindings: [
-        inputBinding("ancestryDatabase", ancestryDatabase),
+        inputBinding(
+          "gedcom",
+          computed(() =>
+            newGedcomResourceValue({ gedcomDatabase: ancestryDatabase() }),
+          ),
+        ),
         inputBinding("xref", signal("@F1@")),
       ],
       waitForStableOnRender: true,

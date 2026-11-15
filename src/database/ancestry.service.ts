@@ -1,9 +1,4 @@
-import {
-  DestroyRef,
-  Service,
-  inject,
-  resourceFromSnapshots,
-} from "@angular/core";
+import { DestroyRef, Service, inject } from "@angular/core";
 import { rxResource, toObservable } from "@angular/core/rxjs-interop";
 import {
   RedirectCommand,
@@ -204,21 +199,6 @@ export class AncestryService {
       ),
   });
 
-  /** The parsed database, as a Resource of its own: the router binds a
-   * resource's value to the input with the same name (see
-   * ancestryDatabaseResources), so the route needs a resource whose value
-   * is the database itself rather than gedcomResource's whole value.
-   * resourceFromSnapshots derives it from gedcomResource's state; the
-   * router's ResourceResult type also asks for reload(). */
-  readonly ancestryDatabaseResource = Object.assign(
-    resourceFromSnapshots(() => {
-      const snapshot = this.gedcomResource.snapshot();
-      if (snapshot.status === "error") return snapshot;
-      return { status: snapshot.status, value: snapshot.value?.gedcomDatabase };
-    }),
-    { reload: () => this.gedcomResource.reload() },
-  );
-
   compareGedcomDatabase(gedcomDatabase: GedcomDatabase): {
     originalGedcomRecord?: GedcomRecord;
     updatedGedcomRecord?: GedcomRecord;
@@ -386,25 +366,17 @@ export const ancestryDatabaseGuard: CanActivateFn = async () => {
       filter((isLoading) => !isLoading),
     ),
   );
-  if (ancestryService.gedcomResource.value()?.gedcomDatabase === undefined) {
+  if (ancestryService.gedcomResource.value() === undefined) {
     return new RedirectCommand(router.parseUrl("/settings"));
   }
   return true;
 };
 
-/** A data route's `resources`, binding gedcomResource itself to a
+/** A data route's `resources`, binding gedcomResource to the page's
  * `gedcom` input: the page gets the whole loaded file (handles, records
- * and parsed database) and reads `gedcomDatabase` from it. Only the
- * individuals and individual pages use this so far. */
+ * and parsed database) and reads `gedcomDatabase` from it. The router keeps
+ * the input in step with the resource, so a save's reload reaches the page
+ * in the same render as everything else, with no navigation. */
 export function gedcomResources(): ResourceResult {
   return { gedcom: inject(AncestryService).gedcomResource };
-}
-
-/** A data route's `resources`: binds its component's `ancestryDatabase`
- * input to the loaded database, which then follows every reload of the
- * file, so saving an edit needs no navigation to refresh the page. */
-export function ancestryDatabaseResources(): ResourceResult {
-  return {
-    ancestryDatabase: inject(AncestryService).ancestryDatabaseResource,
-  };
 }

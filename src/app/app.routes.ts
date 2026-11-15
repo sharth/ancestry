@@ -2,7 +2,6 @@ import type { ActivatedRouteSnapshot, Routes } from "@angular/router";
 
 import {
   ancestryDatabaseGuard,
-  ancestryDatabaseResources,
   gedcomResources,
 } from "../database/ancestry.service";
 import { FamiliesComponent } from "./families/families.component";
@@ -39,7 +38,7 @@ export const routes: Routes = [
     path: "",
     component: IndexComponent,
     canActivate: [ancestryDatabaseGuard],
-    resources: ancestryDatabaseResources,
+    resources: gedcomResources,
   },
   {
     path: "settings",
@@ -49,7 +48,7 @@ export const routes: Routes = [
     path: "search",
     component: SearchComponent,
     canActivate: [ancestryDatabaseGuard],
-    resources: ancestryDatabaseResources,
+    resources: gedcomResources,
   },
   {
     path: "individuals",
@@ -92,31 +91,31 @@ export const routes: Routes = [
     path: "families",
     component: FamiliesComponent,
     canActivate: [ancestryDatabaseGuard],
-    resources: ancestryDatabaseResources,
+    resources: gedcomResources,
     canDeactivate: [confirmUnsavedChangesGuard],
   },
   {
     path: "family/:xref",
     component: FamilyComponent,
     canActivate: [ancestryDatabaseGuard],
-    resources: ancestryDatabaseResources,
+    resources: gedcomResources,
     canDeactivate: [confirmUnsavedChangesGuard],
     children: [
       { path: "", redirectTo: "facts", pathMatch: "full" },
       {
         path: "facts",
         component: FamilyFactsComponent,
-        resources: ancestryDatabaseResources,
+        resources: gedcomResources,
       },
       {
         path: "sources",
         component: FamilySourcesComponent,
-        resources: ancestryDatabaseResources,
+        resources: gedcomResources,
       },
       {
         path: "gedcom",
         component: FamilyGedcomComponent,
-        resources: ancestryDatabaseResources,
+        resources: gedcomResources,
       },
     ],
   },
@@ -124,45 +123,45 @@ export const routes: Routes = [
     path: "repositories",
     component: RepositoriesComponent,
     canActivate: [ancestryDatabaseGuard],
-    resources: ancestryDatabaseResources,
+    resources: gedcomResources,
     canDeactivate: [confirmUnsavedChangesGuard],
   },
   {
     path: "repository/:xref",
     component: RepositoryComponent,
     canActivate: [ancestryDatabaseGuard],
-    resources: ancestryDatabaseResources,
+    resources: gedcomResources,
     canDeactivate: [confirmUnsavedChangesGuard],
   },
   {
     path: "sources",
     component: SourcesComponent,
     canActivate: [ancestryDatabaseGuard],
-    resources: ancestryDatabaseResources,
+    resources: gedcomResources,
     canDeactivate: [confirmUnsavedChangesGuard],
   },
   {
     path: "source/:xref",
     component: SourceComponent,
     canActivate: [ancestryDatabaseGuard],
-    resources: ancestryDatabaseResources,
+    resources: gedcomResources,
     canDeactivate: [confirmUnsavedChangesGuard],
     children: [
       { path: "", redirectTo: "overview", pathMatch: "full" },
       {
         path: "overview",
         component: SourceOverviewComponent,
-        resources: ancestryDatabaseResources,
+        resources: gedcomResources,
       },
       {
         path: "citations",
         component: SourceCitationsComponent,
-        resources: ancestryDatabaseResources,
+        resources: gedcomResources,
       },
       {
         path: "gedcom",
         component: SourceGedcomComponent,
-        resources: ancestryDatabaseResources,
+        resources: gedcomResources,
       },
     ],
   },
@@ -170,7 +169,7 @@ export const routes: Routes = [
     path: "places",
     component: PlacesComponent,
     canActivate: [ancestryDatabaseGuard],
-    resources: ancestryDatabaseResources,
+    resources: gedcomResources,
   },
   {
     // Matches any number of remaining segments under `place/`, so a region
@@ -182,7 +181,7 @@ export const routes: Routes = [
         matcher: (segments) => ({ consumed: segments }),
         component: PlaceComponent,
         canActivate: [ancestryDatabaseGuard],
-        resources: ancestryDatabaseResources,
+        resources: gedcomResources,
         resolve: {
           // The matched `place/...` segments as plain, lowercased strings,
           // e.g. ["united-states", "maryland"].
@@ -196,21 +195,21 @@ export const routes: Routes = [
     path: "multimedias",
     component: MultimediasComponent,
     canActivate: [ancestryDatabaseGuard],
-    resources: ancestryDatabaseResources,
+    resources: gedcomResources,
     canDeactivate: [confirmUnsavedChangesGuard],
   },
   {
     path: "multimedia/:xref",
     component: MultimediaComponent,
     canActivate: [ancestryDatabaseGuard],
-    resources: ancestryDatabaseResources,
+    resources: gedcomResources,
     canDeactivate: [confirmUnsavedChangesGuard],
   },
   {
     path: "validation",
     component: ValidationComponent,
     canActivate: [ancestryDatabaseGuard],
-    resources: ancestryDatabaseResources,
+    resources: gedcomResources,
     canDeactivate: [confirmUnsavedChangesGuard],
   },
   { path: "**", component: PageNotFoundComponent },
