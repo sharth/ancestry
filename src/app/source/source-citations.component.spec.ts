@@ -4,6 +4,7 @@ import { provideRouter } from "@angular/router";
 import { render } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it } from "vitest";
 
+import { newGedcomResourceValue } from "../../database/ancestry.service";
 import { SourceCitationsComponent } from "./source-citations.component";
 
 describe("SourceCitationsComponent", () => {
@@ -13,7 +14,10 @@ describe("SourceCitationsComponent", () => {
   beforeEach(async () => {
     const renderResult = await render(SourceCitationsComponent, {
       providers: [provideRouter([])],
-      bindings: [inputBinding("xref", signal("@S1@"))],
+      bindings: [
+        inputBinding("xref", signal("@S1@")),
+        inputBinding("gedcom", signal(newGedcomResourceValue())),
+      ],
       waitForStableOnRender: true,
     });
     fixture = renderResult.fixture;

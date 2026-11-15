@@ -4,6 +4,7 @@ import { provideRouter } from "@angular/router";
 import { render } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it } from "vitest";
 
+import { newGedcomResourceValue } from "../../database/ancestry.service";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomFact } from "../../gedcom/gedcomFact";
 import { newGedcomFamily } from "../../gedcom/gedcomFamily";
@@ -61,7 +62,10 @@ describe("FamilySourcesComponent", () => {
     const renderResult = await render(FamilySourcesComponent, {
       providers: [provideRouter([])],
       bindings: [
-        inputBinding("ancestryDatabase", signal(ancestryDatabase)),
+        inputBinding(
+          "gedcom",
+          signal(newGedcomResourceValue({ gedcomDatabase: ancestryDatabase })),
+        ),
         inputBinding("xref", signal("@F1@")),
       ],
       waitForStableOnRender: true,

@@ -1,7 +1,7 @@
-import { Component, computed, inject, input } from "@angular/core";
+import { Component, computed, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
 
-import { AncestryService } from "../../database/ancestry.service";
+import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { RepositoryCallNumberComponent } from "../repository-call-number/repository-call-number.component";
 
 @Component({
@@ -12,13 +12,10 @@ import { RepositoryCallNumberComponent } from "../repository-call-number/reposit
 })
 export class RepositorySourcesComponent {
   readonly xref = input.required<string>();
-  private readonly ancestryService = inject(AncestryService);
+  readonly ancestryDatabase = input.required<GedcomDatabase>();
 
   readonly vm = computed(() => {
-    const ancestry = this.ancestryService.ancestryDatabase();
-    if (ancestry == undefined) {
-      return undefined;
-    }
+    const ancestry = this.ancestryDatabase();
 
     return {
       sources: Object.values(ancestry.sources)

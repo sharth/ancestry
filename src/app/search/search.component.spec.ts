@@ -4,6 +4,7 @@ import { provideRouter } from "@angular/router";
 import { render, screen } from "@testing-library/angular/zoneless";
 import { describe, expect, it } from "vitest";
 
+import { newGedcomResourceValue } from "../../database/ancestry.service";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomFact } from "../../gedcom/gedcomFact";
 import { newGedcomFamily } from "../../gedcom/gedcomFamily";
@@ -44,7 +45,10 @@ describe("SearchComponent", () => {
     const renderResult = await render(SearchComponent, {
       providers: [provideRouter([])],
       bindings: [
-        inputBinding("ancestryDatabase", signal(database)),
+        inputBinding(
+          "gedcom",
+          signal(newGedcomResourceValue({ gedcomDatabase: database })),
+        ),
         inputBinding("q", signal(query)),
       ],
       waitForStableOnRender: true,

@@ -1,6 +1,6 @@
 import { Component, computed, input } from "@angular/core";
 
-import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
+import type { GedcomResourceValue } from "../../database/ancestry.service";
 
 @Component({
   selector: "app-index",
@@ -9,7 +9,8 @@ import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
   styleUrl: "./index.component.css",
 })
 export class IndexComponent {
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly gedcom = input.required<GedcomResourceValue>();
+  readonly ancestryDatabase = computed(() => this.gedcom().gedcomDatabase);
 
   readonly vm = computed(() => {
     const ancestryDatabase = this.ancestryDatabase();

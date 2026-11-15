@@ -4,6 +4,7 @@ import { provideRouter } from "@angular/router";
 import { render } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it } from "vitest";
 
+import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { IndividualLinkComponent } from "./individual-link.component";
 
 describe("IndividualLinkComponent", () => {
@@ -13,7 +14,10 @@ describe("IndividualLinkComponent", () => {
   beforeEach(async () => {
     const renderResult = await render(IndividualLinkComponent, {
       providers: [provideRouter([])],
-      bindings: [inputBinding("xref", signal("@I1@"))],
+      bindings: [
+        inputBinding("xref", signal("@I1@")),
+        inputBinding("ancestryDatabase", signal(newGedcomDatabase())),
+      ],
       waitForStableOnRender: true,
     });
     fixture = renderResult.fixture;

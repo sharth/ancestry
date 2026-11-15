@@ -1,8 +1,10 @@
 import { Component, computed, inject, input, viewChild } from "@angular/core";
 import { RouterModule } from "@angular/router";
 
-import { AncestryService } from "../../database/ancestry.service";
-import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
+import {
+  AncestryService,
+  type GedcomResourceValue,
+} from "../../database/ancestry.service";
 import { serializeGedcomMultimedia } from "../../gedcom/gedcomMultimedia";
 import { GedcomDisplayComponent } from "../gedcom-display/gedcom-display.component";
 import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
@@ -26,7 +28,8 @@ import { MultimediaSourcesComponent } from "./multimedia-sources.component";
 })
 export class MultimediaComponent implements ComponentWithUnsavedChanges {
   readonly ancestryService = inject(AncestryService);
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly gedcom = input.required<GedcomResourceValue>();
+  readonly ancestryDatabase = computed(() => this.gedcom().gedcomDatabase);
   readonly xref = input.required<string>();
 
   readonly editDialog = viewChild<GedcomEditorDialogComponent>("editDialog");

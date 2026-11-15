@@ -79,21 +79,25 @@ mandatory) used by facts/events across individuals and families.
 There's no upload step — `AncestryService` stores a `FileSystemFileHandle`/`FileSystemDirectoryHandle`
 (File System Access API) for the GEDCOM file and multimedia directory in IndexedDB via Dexie, and re-reads
 the live file from disk through an Angular `rxResource()` driven by a Dexie `liveQuery` on that metadata
-row, so it reloads whenever the stored data source changes. `ancestryDatabaseResolver` is a route resolver
-used on every data-bearing route; it waits for the resource to settle and redirects to `/settings` if no
+row, so it reloads whenever the stored data source changes. `ancestryDatabaseGuard` is a `canActivate`
+guard on every data-bearing route; it waits for the resource to settle and redirects to `/settings` if no
 GEDCOM file is loaded yet.
 
 ### 3. Routing and components (`src/app/`)
 
-Routes are configured with `withComponentInputBinding()` (`app.config.ts`), so route params and resolved
-data (`ancestryDatabase`, `xref`) bind directly to matching `input.required<...>()` properties — including
-on nested child routes, without each child re-declaring its own resolver, as long as its own route segment
-resolves/declares the same data key (see `individual/:xref` and `family/:xref` in `app.routes.ts`).
+Routes are configured with `withComponentInputBinding()` and `withRouterResources()` (`app.config.ts`), so
+route params (`xref`) and route resources bind directly to matching `input.required<...>()` properties.
+Every data-bearing route, child routes included, declares `resources: gedcomResources`, which binds
+`AncestryService.gedcomResource` to the page's `gedcom` input (the loaded file: handles, records and the
+parsed `gedcomDatabase`); pages derive `ancestryDatabase = computed(() => this.gedcom().gedcomDatabase)`.
+The router keeps that input in step with the resource, so after a save the page sees the reloaded file in
+the same render as the service does, with no reload navigation. Specs build the input with
+`newGedcomResourceValue({ gedcomDatabase })`.
 
 Detail pages for individuals and families both follow the same shape: a parent component renders the
 identity info that's always visible (name, members, etc.) plus a Bootstrap `nav-tabs` bar and a
 `<router-outlet>`, and each tab (Facts, Ancestors, Sources, Gedcom) is a separate routed child component
-reading the same `ancestryDatabase`/`xref` inputs, which are consumed reactively (via `computed()`), so
+reading the same `gedcom`/`xref` inputs, which are consumed reactively (via `computed()`), so
 Angular's default route reuse strategy keeps working correctly across navigations, including between these
 tabs.
 

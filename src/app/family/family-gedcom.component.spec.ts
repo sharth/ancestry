@@ -4,6 +4,7 @@ import { provideRouter } from "@angular/router";
 import { render } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it } from "vitest";
 
+import { newGedcomResourceValue } from "../../database/ancestry.service";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomFact } from "../../gedcom/gedcomFact";
 import { newGedcomFamily } from "../../gedcom/gedcomFamily";
@@ -18,24 +19,26 @@ describe("FamilyGedcomComponent", () => {
       providers: [provideRouter([])],
       bindings: [
         inputBinding(
-          "ancestryDatabase",
+          "gedcom",
           signal(
-            newGedcomDatabase({
-              families: {
-                "@F1@": newGedcomFamily({
-                  xref: "@F1@",
-                  husbandXref: "@I1@",
-                  wifeXref: "@I2@",
-                  childXrefs: ["@I3@"],
-                  facts: [
-                    newGedcomFact({
-                      tag: "MARR",
-                      date: { value: "20 JUN 1924" },
-                      place: "Springfield",
-                    }),
-                  ],
-                }),
-              },
+            newGedcomResourceValue({
+              gedcomDatabase: newGedcomDatabase({
+                families: {
+                  "@F1@": newGedcomFamily({
+                    xref: "@F1@",
+                    husbandXref: "@I1@",
+                    wifeXref: "@I2@",
+                    childXrefs: ["@I3@"],
+                    facts: [
+                      newGedcomFact({
+                        tag: "MARR",
+                        date: { value: "20 JUN 1924" },
+                        place: "Springfield",
+                      }),
+                    ],
+                  }),
+                },
+              }),
             }),
           ),
         ),

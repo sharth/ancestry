@@ -1,7 +1,7 @@
 import { Component, computed, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
 
-import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
+import type { GedcomResourceValue } from "../../database/ancestry.service";
 import { gedcomFamilyFacts } from "../../gedcom/gedcomFactMetadata";
 import { getFamilySourceCitations } from "../../gedcom/gedcomFamily";
 import type { GedcomSourceCitation } from "../../gedcom/gedcomSourceCitation";
@@ -13,7 +13,8 @@ import type { GedcomSourceCitation } from "../../gedcom/gedcomSourceCitation";
   styleUrl: "./family.component.css",
 })
 export class FamilySourcesComponent {
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly gedcom = input.required<GedcomResourceValue>();
+  readonly ancestryDatabase = computed(() => this.gedcom().gedcomDatabase);
   readonly xref = input.required<string>();
 
   readonly vm = computed(() => {

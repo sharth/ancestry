@@ -1,6 +1,7 @@
 import { Component, computed, input } from "@angular/core";
 import { RouterLink } from "@angular/router";
 
+import type { GedcomResourceValue } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { fullname } from "../../gedcom/gedcomIndividual";
 import { IndividualLinkComponent } from "../individual-link/individual-link.component";
@@ -41,7 +42,8 @@ interface PlaceResult extends SearchResult {
   styleUrl: "./search.component.css",
 })
 export class SearchComponent {
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly gedcom = input.required<GedcomResourceValue>();
+  readonly ancestryDatabase = computed(() => this.gedcom().gedcomDatabase);
   readonly q = input<string>("");
 
   readonly vm = computed(() => {

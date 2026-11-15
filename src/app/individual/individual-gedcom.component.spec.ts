@@ -1,8 +1,9 @@
-import { inputBinding, signal } from "@angular/core";
+import { computed, inputBinding, signal } from "@angular/core";
 import type { ComponentFixture } from "@angular/core/testing";
 import { render } from "@testing-library/angular/zoneless";
 import { assert, beforeEach, describe, it } from "vitest";
 
+import { newGedcomResourceValue } from "../../database/ancestry.service";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomFact } from "../../gedcom/gedcomFact";
 import { newGedcomIndividual } from "../../gedcom/gedcomIndividual";
@@ -38,7 +39,12 @@ describe("IndividualGedcomComponent", () => {
 
     const renderResult = await render(IndividualGedcomComponent, {
       bindings: [
-        inputBinding("ancestryDatabase", ancestryDatabase),
+        inputBinding(
+          "gedcom",
+          computed(() =>
+            newGedcomResourceValue({ gedcomDatabase: ancestryDatabase() }),
+          ),
+        ),
         inputBinding("xref", xref),
       ],
       waitForStableOnRender: true,

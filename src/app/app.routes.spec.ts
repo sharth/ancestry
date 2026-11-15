@@ -2,10 +2,12 @@ import { Component } from "@angular/core";
 import { TestBed } from "@angular/core/testing";
 import {
   Router,
+  RouterOutlet,
   provideRouter,
   withComponentInputBinding,
+  withRouterResources,
 } from "@angular/router";
-import { render } from "@testing-library/angular/zoneless";
+import { render, screen } from "@testing-library/angular/zoneless";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AncestryService } from "../database/ancestry.service";
@@ -36,7 +38,13 @@ describe("place route", () => {
     );
 
     await render(StubComponent, {
-      providers: [provideRouter(routes, withComponentInputBinding())],
+      providers: [
+        provideRouter(
+          routes,
+          withComponentInputBinding(),
+          withRouterResources(),
+        ),
+      ],
       waitForStableOnRender: true,
     });
 
@@ -65,5 +73,51 @@ describe("place route", () => {
 
     const route = router.routerState.snapshot.root.firstChild?.firstChild;
     expect(route?.data["path"]).toEqual([]);
+  });
+});
+
+@Component({
+  selector: "app-outlet-stub",
+  imports: [RouterOutlet],
+  template: "<router-outlet />",
+})
+class OutletStubComponent {}
+
+describe("data routes", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  // Pages get the database through the route's resources, which the router
+  // keeps bound to the loaded file: a save's reload reaches the page in the
+  // same render as everything else, with no navigation to refresh it.
+  it("show a reloaded file without navigating", async () => {
+    let gedcomText = MINIMAL_GEDCOM_TEXT;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() => Promise.resolve(new Response(gedcomText))),
+    );
+    await render(OutletStubComponent, {
+      providers: [
+        provideRouter(
+          routes,
+          withComponentInputBinding(),
+          withRouterResources(),
+        ),
+      ],
+      waitForStableOnRender: true,
+    });
+    const ancestryService = TestBed.inject(AncestryService);
+    const router = TestBed.inject(Router);
+    await ancestryService.openBuiltin();
+    await router.navigateByUrl("/individuals");
+    expect(await screen.findByText("1 Individuals")).toBeTruthy();
+
+    const navigate = vi.spyOn(router, "navigateByUrl");
+    gedcomText = MINIMAL_GEDCOM_TEXT.replace("0 TRLR", "0 @I2@ INDI\n0 TRLR");
+    ancestryService.gedcomResource.reload();
+
+    expect(await screen.findByText("2 Individuals")).toBeTruthy();
+    expect(navigate).not.toHaveBeenCalled();
   });
 });

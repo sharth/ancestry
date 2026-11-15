@@ -31,7 +31,11 @@
           }
           @if (row.event.spouseXref) {
             <div class="timeline-details">
-              with <app-individual-link [xref]="row.event.spouseXref" />
+              with
+              <app-individual-link
+                [xref]="row.event.spouseXref"
+                [ancestryDatabase]="ancestryDatabase()"
+              />
             </div>
           }
           @for (note of fact.notes; track note) {

@@ -4,7 +4,10 @@
       <dt>Parents</dt>
       @for (parent of group.parents; track parent.xref) {
         <dd>
-          <app-individual-link [xref]="parent.xref"></app-individual-link>
+          <app-individual-link
+            [xref]="parent.xref"
+            [ancestryDatabase]="ancestryDatabase()"
+          ></app-individual-link>
         </dd>
       } @empty {
         <dd>None</dd>
@@ -12,7 +15,10 @@
       <dt class="ms-3">Siblings</dt>
       @for (sibling of group.siblings; track sibling.xref) {
         <dd class="ms-3">
-          <app-individual-link [xref]="sibling.xref"></app-individual-link>
+          <app-individual-link
+            [xref]="sibling.xref"
+            [ancestryDatabase]="ancestryDatabase()"
+          ></app-individual-link>
         </dd>
       } @empty {
         <dd class="ms-3">None</dd>
@@ -20,7 +26,10 @@
       <dt class="ms-3">Halfsiblings</dt>
       @for (halfsibling of group.halfsiblings; track halfsibling.xref) {
         <dd class="ms-3">
-          <app-individual-link [xref]="halfsibling.xref"></app-individual-link>
+          <app-individual-link
+            [xref]="halfsibling.xref"
+            [ancestryDatabase]="ancestryDatabase()"
+          ></app-individual-link>
         </dd>
       } @empty {
         <dd class="ms-3">None</dd>
@@ -30,7 +39,10 @@
       <dt>Spouse</dt>
       @if (group.spouse) {
         <dd>
-          <app-individual-link [xref]="group.spouse.xref"></app-individual-link>
+          <app-individual-link
+            [xref]="group.spouse.xref"
+            [ancestryDatabase]="ancestryDatabase()"
+          ></app-individual-link>
         </dd>
       } @else {
         <dd>None</dd>
@@ -38,7 +50,10 @@
       <dt class="ms-3">Children</dt>
       @for (child of group.children; track child.xref) {
         <dd class="ms-3">
-          <app-individual-link [xref]="child.xref"></app-individual-link>
+          <app-individual-link
+            [xref]="child.xref"
+            [ancestryDatabase]="ancestryDatabase()"
+          ></app-individual-link>
         </dd>
       } @empty {
         <dd class="ms-3">None</dd>

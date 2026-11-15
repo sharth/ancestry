@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { newGedcomDatabase } from "../gedcom/gedcomDatabase";
 import { newGedcomRecord } from "../gedcom/gedcomRecord";
-import { AncestryService, ancestryDatabaseResolver } from "./ancestry.service";
+import { AncestryService, ancestryDatabaseGuard } from "./ancestry.service";
 
 @Component({ selector: "app-stub", template: "" })
 class StubComponent {}
@@ -25,7 +25,7 @@ const MINIMAL_GEDCOM_TEXT = [
   "",
 ].join("\n");
 
-describe("ancestryDatabaseResolver", () => {
+describe("ancestryDatabaseGuard", () => {
   let ancestryService: AncestryService;
   let router: Router;
 
@@ -41,7 +41,7 @@ describe("ancestryDatabaseResolver", () => {
           {
             path: "",
             component: StubComponent,
-            resolve: { ancestryDatabase: ancestryDatabaseResolver },
+            canActivate: [ancestryDatabaseGuard],
             runGuardsAndResolvers: "always",
           },
           { path: "settings", component: StubComponent },
@@ -66,8 +66,8 @@ describe("ancestryDatabaseResolver", () => {
 
   it("does not redirect when a data source was already stored before navigation", async () => {
     // This is the regression case: the data source is committed to Dexie
-    // (and readable back out of it) well before the resolver ever runs, so
-    // a redirect here would mean the resolver acted on a stale "nothing
+    // (and readable back out of it) well before the guard ever runs, so
+    // a redirect here would mean the guard acted on a stale "nothing
     // loaded yet" signal rather than what's actually in IndexedDB.
     await ancestryService.openBuiltin();
 

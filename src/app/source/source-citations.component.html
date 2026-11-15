@@ -11,7 +11,10 @@
       @for (citation of vm.citations; track citation) {
         <tr>
           <td>
-            <app-individual-link [xref]="citation.individual.xref" />
+            <app-individual-link
+              [xref]="citation.individual.xref"
+              [ancestryDatabase]="ancestryDatabase()"
+            />
           </td>
           <td>{{ citation.eventDescription }}</td>
           <td>{{ citation.citation.text }}</td>

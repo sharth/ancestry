@@ -2,7 +2,10 @@
   <h1>{{ vm.name || xref() }}</h1>
 
   <h2>Sources</h2>
-  <app-repository-sources [xref]="xref()" />
+  <app-repository-sources
+    [xref]="xref()"
+    [ancestryDatabase]="ancestryDatabase()"
+  />
 
   <h2>Gedcom</h2>
   <app-gedcom-display [gedcomRecord]="vm.gedcomRecord" />

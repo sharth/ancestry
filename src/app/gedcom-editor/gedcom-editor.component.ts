@@ -7,7 +7,6 @@ import {
   output,
 } from "@angular/core";
 import { FormField, form } from "@angular/forms/signals";
-import { ActivatedRoute, Router } from "@angular/router";
 import { produce } from "immer";
 
 import { AncestryService } from "../../database/ancestry.service";
@@ -63,8 +62,6 @@ import { OpenExistingRecordComponent } from "./open-existing-record.component";
 })
 export class GedcomEditorComponent implements GedcomEditorInterface {
   private readonly ancestryService = inject(AncestryService);
-  private readonly router = inject(Router);
-  private readonly route = inject(ActivatedRoute);
 
   // The tabs to open the editor with. The first is the one shown by
   // default; an empty xref on any of them means "create a new record of
@@ -452,17 +449,7 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
       alert(`Couldn't save: ${(error as Error).message}`);
       return;
     }
-    // Close the dialog before the reload navigation below: the unsaved-changes
-    // guard checks whether the dialog is still open, and the just-saved
-    // database hasn't reached this component's `ancestryDatabase` input yet
-    // (that's what the reload is for), so differences() would still look
-    // unsaved if the guard ran while the dialog is still open.
     this.finished.emit();
-    await this.router.navigate([], {
-      relativeTo: this.route,
-      onSameUrlNavigation: "reload",
-      skipLocationChange: true,
-    });
   }
 
   cancelForm() {

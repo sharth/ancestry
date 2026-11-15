@@ -20,7 +20,10 @@
         <ul class="list-group mb-4">
           @for (result of vm.individuals; track result.xref) {
             <li class="list-group-item">
-              <app-individual-link [xref]="result.xref" />
+              <app-individual-link
+                [xref]="result.xref"
+                [ancestryDatabase]="ancestryDatabase()"
+              />
             </li>
           }
         </ul>

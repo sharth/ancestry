@@ -4,6 +4,7 @@ import { provideRouter } from "@angular/router";
 import { render } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it } from "vitest";
 
+import { newGedcomResourceValue } from "../../database/ancestry.service";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomFact } from "../../gedcom/gedcomFact";
 import { newGedcomFamily } from "../../gedcom/gedcomFamily";
@@ -21,39 +22,43 @@ describe("FamilyFactsComponent", () => {
       providers: [provideRouter([])],
       bindings: [
         inputBinding(
-          "ancestryDatabase",
+          "gedcom",
           signal(
-            newGedcomDatabase({
-              individuals: {
-                "@I1@": newGedcomIndividual({
-                  xref: "@I1@",
-                  names: [newGedcomName({ givenName: "John", surname: "Doe" })],
-                }),
-                "@I2@": newGedcomIndividual({
-                  xref: "@I2@",
-                  names: [
-                    newGedcomName({ givenName: "Jane", surname: "Smith" }),
-                  ],
-                }),
-              },
-              families: {
-                "@F1@": newGedcomFamily({
-                  xref: "@F1@",
-                  husbandXref: "@I1@",
-                  wifeXref: "@I2@",
-                  facts: [
-                    newGedcomFact({
-                      tag: "MARR",
-                      date: { value: "20 JUN 1924" },
-                      place: "Springfield",
-                    }),
-                    newGedcomFact({
-                      tag: "DIV",
-                      date: { value: "3 MAR 1940" },
-                    }),
-                  ],
-                }),
-              },
+            newGedcomResourceValue({
+              gedcomDatabase: newGedcomDatabase({
+                individuals: {
+                  "@I1@": newGedcomIndividual({
+                    xref: "@I1@",
+                    names: [
+                      newGedcomName({ givenName: "John", surname: "Doe" }),
+                    ],
+                  }),
+                  "@I2@": newGedcomIndividual({
+                    xref: "@I2@",
+                    names: [
+                      newGedcomName({ givenName: "Jane", surname: "Smith" }),
+                    ],
+                  }),
+                },
+                families: {
+                  "@F1@": newGedcomFamily({
+                    xref: "@F1@",
+                    husbandXref: "@I1@",
+                    wifeXref: "@I2@",
+                    facts: [
+                      newGedcomFact({
+                        tag: "MARR",
+                        date: { value: "20 JUN 1924" },
+                        place: "Springfield",
+                      }),
+                      newGedcomFact({
+                        tag: "DIV",
+                        date: { value: "3 MAR 1940" },
+                      }),
+                    ],
+                  }),
+                },
+              }),
             }),
           ),
         ),

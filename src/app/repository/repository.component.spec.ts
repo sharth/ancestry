@@ -1,8 +1,9 @@
-import { inputBinding, signal } from "@angular/core";
+import { inputBinding, signal, computed } from "@angular/core";
 import type { ComponentFixture } from "@angular/core/testing";
 import { render } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it } from "vitest";
 
+import { newGedcomResourceValue } from "../../database/ancestry.service";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomRepository } from "../../gedcom/gedcomRepository";
 import { RepositoryComponent } from "./repository.component";
@@ -26,7 +27,12 @@ describe("RepositoryComponent", () => {
 
     const renderResult = await render(RepositoryComponent, {
       bindings: [
-        inputBinding("ancestryDatabase", ancestryDatabase),
+        inputBinding(
+          "gedcom",
+          computed(() =>
+            newGedcomResourceValue({ gedcomDatabase: ancestryDatabase() }),
+          ),
+        ),
         inputBinding("xref", xref),
       ],
       waitForStableOnRender: true,

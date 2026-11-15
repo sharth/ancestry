@@ -1,6 +1,6 @@
 import { Component, computed, input, viewChild } from "@angular/core";
 
-import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
+import type { GedcomResourceValue } from "../../database/ancestry.service";
 import {
   fullname,
   surname,
@@ -17,7 +17,8 @@ import type { ComponentWithUnsavedChanges } from "../unsaved-changes.guard";
   styleUrl: "./individuals.component.css",
 })
 export class IndividualsComponent implements ComponentWithUnsavedChanges {
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly gedcom = input.required<GedcomResourceValue>();
+  readonly ancestryDatabase = computed(() => this.gedcom().gedcomDatabase);
 
   readonly editDialog = viewChild<GedcomEditorDialogComponent>("editDialog");
 

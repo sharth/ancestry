@@ -1,7 +1,7 @@
 import { Component, computed, input } from "@angular/core";
 import { RouterLink } from "@angular/router";
 
-import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
+import type { GedcomResourceValue } from "../../database/ancestry.service";
 import type { PlaceTreeNode } from "../places/places.util";
 import {
   buildPlaceTree,
@@ -15,7 +15,8 @@ import {
   templateUrl: "./place.component.html",
 })
 export class PlaceComponent {
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly gedcom = input.required<GedcomResourceValue>();
+  readonly ancestryDatabase = computed(() => this.gedcom().gedcomDatabase);
   readonly path = input.required<string[]>();
 
   readonly node = computed<PlaceTreeNode | undefined>(() => {

@@ -4,6 +4,7 @@ import {
   withComponentInputBinding,
   withHashLocation,
   withInMemoryScrolling,
+  withRouterResources,
 } from "@angular/router";
 
 import { routes } from "./app.routes";
@@ -15,6 +16,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(
       routes,
       withComponentInputBinding(),
+      withRouterResources(),
       ...(USE_HASH_LOCATION ? [withHashLocation()] : []),
       withInMemoryScrolling({
         scrollPositionRestoration: "enabled",

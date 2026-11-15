@@ -1,6 +1,11 @@
-import { DestroyRef, Service, computed, inject } from "@angular/core";
+import { DestroyRef, Service, inject } from "@angular/core";
 import { rxResource, toObservable } from "@angular/core/rxjs-interop";
-import { RedirectCommand, Router, type ResolveFn } from "@angular/router";
+import {
+  RedirectCommand,
+  Router,
+  type CanActivateFn,
+  type ResourceResult,
+} from "@angular/router";
 import Dexie, { liveQuery } from "dexie";
 import { filter, firstValueFrom, from, switchMap } from "rxjs";
 
@@ -76,27 +81,38 @@ class DexieDatabase extends Dexie {
   }
 }
 
-interface GedcomResourceValue {
-  dataSource: DataSource | undefined;
+/** The loaded GEDCOM file. gedcomResource's value is undefined instead
+ * when no data source is stored. */
+export interface GedcomResourceValue {
+  dataSource: DataSource;
   gedcomFileHandle: FileSystemFileHandle | undefined;
   gedcomFile: File | undefined;
-  gedcomText: string | undefined;
+  gedcomText: string;
   gedcomRecords: GedcomRecord[];
+  gedcomDatabase: GedcomDatabase;
   directoryHandle: FileSystemDirectoryHandle | undefined;
+}
+
+export function newGedcomResourceValue(
+  fieldsToUpdate: Partial<GedcomResourceValue> = {},
+): GedcomResourceValue {
+  return {
+    dataSource: { mode: "builtin" },
+    gedcomFileHandle: undefined,
+    gedcomFile: undefined,
+    gedcomText: "",
+    gedcomRecords: [],
+    gedcomDatabase: newGedcomDatabase(),
+    directoryHandle: undefined,
+    ...fieldsToUpdate,
+  };
 }
 
 async function loadGedcom(
   dataSource: DataSource | undefined,
-): Promise<GedcomResourceValue> {
+): Promise<GedcomResourceValue | undefined> {
   if (dataSource === undefined) {
-    return {
-      dataSource: undefined,
-      gedcomFileHandle: undefined,
-      gedcomFile: undefined,
-      gedcomText: undefined,
-      gedcomRecords: [],
-      directoryHandle: undefined,
-    };
+    return undefined;
   }
 
   if (dataSource.mode === "builtin") {
@@ -109,6 +125,7 @@ async function loadGedcom(
       gedcomFile: undefined,
       gedcomText,
       gedcomRecords,
+      gedcomDatabase: parseGedcomDatabase(gedcomRecords),
       directoryHandle: undefined,
     };
   }
@@ -132,6 +149,7 @@ async function loadGedcom(
     gedcomFile,
     gedcomText,
     gedcomRecords,
+    gedcomDatabase: parseGedcomDatabase(gedcomRecords),
     directoryHandle,
   };
 }
@@ -181,25 +199,13 @@ export class AncestryService {
       ),
   });
 
-  readonly ancestryDatabase = computed<GedcomDatabase | undefined>(() => {
-    const gedcomResourceValue = this.gedcomResource.value();
-    if (
-      gedcomResourceValue === undefined ||
-      gedcomResourceValue.gedcomRecords.length === 0
-    ) {
-      return undefined;
-    }
-
-    return parseGedcomDatabase(gedcomResourceValue.gedcomRecords);
-  });
-
   compareGedcomDatabase(gedcomDatabase: GedcomDatabase): {
     originalGedcomRecord?: GedcomRecord;
     updatedGedcomRecord?: GedcomRecord;
   }[] {
     return compareGedcomDatabase(
       this.gedcomResource.value()?.gedcomRecords ?? [],
-      this.ancestryDatabase() ?? newGedcomDatabase(),
+      this.gedcomResource.value()?.gedcomDatabase ?? newGedcomDatabase(),
       gedcomDatabase,
     );
   }
@@ -233,7 +239,7 @@ export class AncestryService {
     const gedcomResource = this.gedcomResource.value();
     const originalGedcomRecords = gedcomResource?.gedcomRecords ?? [];
     const originalGedcomDatabase =
-      this.ancestryDatabase() ?? newGedcomDatabase();
+      this.gedcomResource.value()?.gedcomDatabase ?? newGedcomDatabase();
     const text = serializeGedcomDatabase(
       originalGedcomRecords,
       originalGedcomDatabase,
@@ -349,9 +355,9 @@ export class AncestryService {
   }
 }
 
-export const ancestryDatabaseResolver: ResolveFn<
-  GedcomDatabase | RedirectCommand
-> = async () => {
+/** Keeps the data routes away until a GEDCOM file is loaded, sending the
+ * user to /settings to pick one if there's none. */
+export const ancestryDatabaseGuard: CanActivateFn = async () => {
   const ancestryService = inject(AncestryService);
   const router = inject(Router);
 
@@ -360,9 +366,17 @@ export const ancestryDatabaseResolver: ResolveFn<
       filter((isLoading) => !isLoading),
     ),
   );
-  const database = ancestryService.ancestryDatabase();
-  if (database === undefined) {
+  if (ancestryService.gedcomResource.value() === undefined) {
     return new RedirectCommand(router.parseUrl("/settings"));
   }
-  return database;
+  return true;
 };
+
+/** A data route's `resources`, binding gedcomResource to the page's
+ * `gedcom` input: the page gets the whole loaded file (handles, records
+ * and parsed database) and reads `gedcomDatabase` from it. The router keeps
+ * the input in step with the resource, so a save's reload reaches the page
+ * in the same render as everything else, with no navigation. */
+export function gedcomResources(): ResourceResult {
+  return { gedcom: inject(AncestryService).gedcomResource };
+}
