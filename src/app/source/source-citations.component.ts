@@ -14,10 +14,11 @@ import { IndividualLinkComponent } from "../individual-link/individual-link.comp
 export class SourceCitationsComponent {
   readonly xref = input.required<string>();
   readonly gedcom = input.required<GedcomResourceValue>();
+  readonly ancestryDatabase = computed(() => this.gedcom().gedcomDatabase);
 
   readonly vm = computed(() => {
     const xref = this.xref();
-    const ancestry = this.gedcom().gedcomDatabase;
+    const ancestry = this.ancestryDatabase();
 
     return {
       citations: [

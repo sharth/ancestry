@@ -6,7 +6,10 @@
       <ul>
         @for (individual of group.individuals; track individual.xref) {
           <li>
-            <app-individual-link [xref]="individual.xref" />
+            <app-individual-link
+              [xref]="individual.xref"
+              [ancestryDatabase]="ancestryDatabase()"
+            />
           </li>
         }
       </ul>

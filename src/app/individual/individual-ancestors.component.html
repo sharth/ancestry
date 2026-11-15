@@ -10,7 +10,10 @@
     @for (ancestor of vm.ancestors; let ahnentafel = $index; track $index) {
       @if (ancestor !== undefined) {
         <li value="{{ ahnentafel }}">
-          <app-individual-link [xref]="ancestor.xref" />
+          <app-individual-link
+            [xref]="ancestor.xref"
+            [ancestryDatabase]="ancestryDatabase()"
+          />
         </li>
       }
     }

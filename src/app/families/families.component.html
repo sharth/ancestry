@@ -17,12 +17,18 @@
           </td>
           <td>
             @if (family.husbandXref) {
-              <app-individual-link [xref]="family.husbandXref" />
+              <app-individual-link
+                [xref]="family.husbandXref"
+                [ancestryDatabase]="ancestryDatabase()"
+              />
             }
           </td>
           <td>
             @if (family.wifeXref) {
-              <app-individual-link [xref]="family.wifeXref" />
+              <app-individual-link
+                [xref]="family.wifeXref"
+                [ancestryDatabase]="ancestryDatabase()"
+              />
             }
           </td>
           <td>{{ family.childXrefs.length }}</td>

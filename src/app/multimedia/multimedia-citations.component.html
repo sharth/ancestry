@@ -13,7 +13,10 @@
           <td>
             @if (citation.type === "Individual") {
               Individual:
-              <app-individual-link [xref]="citation.individual.xref" />
+              <app-individual-link
+                [xref]="citation.individual.xref"
+                [ancestryDatabase]="ancestryDatabase()"
+              />
             } @else if (citation.type === "Family") {
               Family:
               <a [routerLink]="['/family', citation.family.xref]">{{

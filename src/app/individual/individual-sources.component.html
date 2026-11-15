@@ -16,7 +16,11 @@
             <div>
               {{ row.eventDescription }}
               @if (row.spouseXref) {
-                (with <app-individual-link [xref]="row.spouseXref" />)
+                (with
+                <app-individual-link
+                  [xref]="row.spouseXref"
+                  [ancestryDatabase]="ancestryDatabase()"
+                />)
               }
               @if (row.nameText) {
                 ({{ row.nameText }})
