@@ -8,6 +8,7 @@ import {
 import { render } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it } from "vitest";
 
+import { newGedcomResourceValue } from "../../database/ancestry.service";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomExternalIdentifier } from "../../gedcom/gedcomExternalIdentifier";
 import { newGedcomFact } from "../../gedcom/gedcomFact";
@@ -103,7 +104,10 @@ describe("IndividualComponent", () => {
               path: "facts",
               component: IndividualFactsComponent,
               resolve: {
-                ancestryDatabase: () => ancestryDatabase(),
+                gedcom: () =>
+                  newGedcomResourceValue({
+                    gedcomDatabase: ancestryDatabase(),
+                  }),
                 xref: () => "@I1@",
               },
             },
@@ -111,7 +115,10 @@ describe("IndividualComponent", () => {
               path: "ancestors",
               component: IndividualAncestorsComponent,
               resolve: {
-                ancestryDatabase: () => ancestryDatabase(),
+                gedcom: () =>
+                  newGedcomResourceValue({
+                    gedcomDatabase: ancestryDatabase(),
+                  }),
                 xref: () => "@I1@",
               },
             },
@@ -119,7 +126,10 @@ describe("IndividualComponent", () => {
               path: "sources",
               component: IndividualSourcesComponent,
               resolve: {
-                ancestryDatabase: () => ancestryDatabase(),
+                gedcom: () =>
+                  newGedcomResourceValue({
+                    gedcomDatabase: ancestryDatabase(),
+                  }),
                 xref: () => "@I1@",
               },
             },
@@ -127,7 +137,10 @@ describe("IndividualComponent", () => {
               path: "gedcom",
               component: IndividualGedcomComponent,
               resolve: {
-                ancestryDatabase: () => ancestryDatabase(),
+                gedcom: () =>
+                  newGedcomResourceValue({
+                    gedcomDatabase: ancestryDatabase(),
+                  }),
                 xref: () => "@I1@",
               },
             },
@@ -138,15 +151,9 @@ describe("IndividualComponent", () => {
       bindings: [
         inputBinding(
           "gedcom",
-          computed(() => ({
-            dataSource: { mode: "builtin" },
-            gedcomFileHandle: undefined,
-            gedcomFile: undefined,
-            gedcomText: "",
-            gedcomRecords: [],
-            gedcomDatabase: ancestryDatabase(),
-            directoryHandle: undefined,
-          })),
+          computed(() =>
+            newGedcomResourceValue({ gedcomDatabase: ancestryDatabase() }),
+          ),
         ),
         inputBinding("xref", signal("@I1@")),
       ],

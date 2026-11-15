@@ -1,6 +1,6 @@
 import { Component, computed, input } from "@angular/core";
 
-import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
+import type { GedcomResourceValue } from "../../database/ancestry.service";
 import type { GedcomIndividual } from "../../gedcom/gedcomIndividual";
 import { IndividualLinkComponent } from "../individual-link/individual-link.component";
 import { IndividualRelativesComponent } from "./individual-relatives.component";
@@ -17,7 +17,8 @@ import { IndividualSunburstComponent } from "./individual-sunburst.component";
   styleUrl: "./individual.component.css",
 })
 export class IndividualAncestorsComponent {
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly gedcom = input.required<GedcomResourceValue>();
+  readonly ancestryDatabase = computed(() => this.gedcom().gedcomDatabase);
   readonly xref = input.required<string>();
 
   readonly vm = computed(() => {

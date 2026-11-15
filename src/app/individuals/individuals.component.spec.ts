@@ -4,6 +4,7 @@ import { provideRouter } from "@angular/router";
 import { render } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it } from "vitest";
 
+import { newGedcomResourceValue } from "../../database/ancestry.service";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { IndividualsComponent } from "./individuals.component";
 
@@ -17,15 +18,9 @@ describe("IndividualsComponent", () => {
       bindings: [
         inputBinding(
           "gedcom",
-          signal({
-            dataSource: { mode: "builtin" },
-            gedcomFileHandle: undefined,
-            gedcomFile: undefined,
-            gedcomText: "",
-            gedcomRecords: [],
-            gedcomDatabase: newGedcomDatabase(),
-            directoryHandle: undefined,
-          }),
+          signal(
+            newGedcomResourceValue({ gedcomDatabase: newGedcomDatabase() }),
+          ),
         ),
       ],
       waitForStableOnRender: true,

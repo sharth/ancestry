@@ -99,6 +99,21 @@ export interface GedcomResourceValue {
   directoryHandle: FileSystemDirectoryHandle | undefined;
 }
 
+export function newGedcomResourceValue(
+  fieldsToUpdate: Partial<GedcomResourceValue> = {},
+): GedcomResourceValue {
+  return {
+    dataSource: { mode: "builtin" },
+    gedcomFileHandle: undefined,
+    gedcomFile: undefined,
+    gedcomText: "",
+    gedcomRecords: [],
+    gedcomDatabase: newGedcomDatabase(),
+    directoryHandle: undefined,
+    ...fieldsToUpdate,
+  };
+}
+
 async function loadGedcom(
   dataSource: DataSource | undefined,
 ): Promise<GedcomResourceValue | undefined> {

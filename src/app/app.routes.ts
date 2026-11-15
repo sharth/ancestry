@@ -69,22 +69,22 @@ export const routes: Routes = [
       {
         path: "facts",
         component: IndividualFactsComponent,
-        resources: ancestryDatabaseResources,
+        resources: gedcomResources,
       },
       {
         path: "ancestors",
         component: IndividualAncestorsComponent,
-        resources: ancestryDatabaseResources,
+        resources: gedcomResources,
       },
       {
         path: "sources",
         component: IndividualSourcesComponent,
-        resources: ancestryDatabaseResources,
+        resources: gedcomResources,
       },
       {
         path: "gedcom",
         component: IndividualGedcomComponent,
-        resources: ancestryDatabaseResources,
+        resources: gedcomResources,
       },
     ],
   },

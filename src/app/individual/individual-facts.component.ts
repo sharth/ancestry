@@ -1,6 +1,6 @@
 import { Component, computed, input } from "@angular/core";
 
-import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
+import type { GedcomResourceValue } from "../../database/ancestry.service";
 import { newGedcomFact } from "../../gedcom/gedcomFact";
 import { nameToString } from "../../gedcom/gedcomIndividual";
 import {
@@ -16,7 +16,8 @@ import { IndividualRelativesComponent } from "./individual-relatives.component";
   styleUrl: "./individual.component.css",
 })
 export class IndividualFactsComponent {
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly gedcom = input.required<GedcomResourceValue>();
+  readonly ancestryDatabase = computed(() => this.gedcom().gedcomDatabase);
   readonly xref = input.required<string>();
 
   readonly vm = computed(() => {
