@@ -3,5 +3,8 @@
   <app-gedcom-display [gedcomRecord]="vm.gedcomRecord" />
 
   <h2>Unknown Records</h2>
-  <app-source-unknowns [xref]="xref()" [gedcom]="gedcom()" />
+  <app-source-unknowns
+    [xref]="xref()"
+    [ancestryDatabase]="ancestryDatabase()"
+  />
 }
