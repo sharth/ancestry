@@ -86,4 +86,28 @@ describe("multimediaFileResource", () => {
     expect(getFileHandle).toHaveBeenCalledTimes(1);
     expect(fileResource.isLoading()).toBe(false);
   });
+
+  it("doesn't reload a pending file when its path changes", async () => {
+    const pendingFile = new File(["pdf"], "picked.pdf", {
+      type: "application/pdf",
+    });
+    const { fileResource, multimedia } = setUp({
+      filePath: "@M1@ Census.pdf",
+      pendingFile,
+    });
+    await vi.waitFor(() => {
+      expect(fileResource.value()).toBeDefined();
+    });
+    const fileUrl = fileResource.value()?.fileUrl;
+
+    multimedia.update((m) => ({
+      ...m,
+      title: "Census 1900",
+      filePath: "@M1@ Census 1900.pdf",
+    }));
+    await TestBed.inject(ApplicationRef).whenStable();
+
+    expect(fileResource.isLoading()).toBe(false);
+    expect(fileResource.value()?.fileUrl).toBe(fileUrl);
+  });
 });

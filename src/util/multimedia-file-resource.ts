@@ -29,11 +29,22 @@ export function multimediaFileResource(
   const pendingFile = computed(() => multimedia().pendingFile);
 
   return resource({
-    params: () => ({
-      filePath: filePath(),
-      pendingFile: pendingFile(),
-      directoryHandle: ancestryService.gedcomResource.value()?.directoryHandle,
-    }),
+    // A pending file doesn't depend on the path, so don't read it then: in
+    // the editor's default filename mode the path follows the title, and
+    // reloading on each keystroke makes the image flash.
+    params: () =>
+      pendingFile() !== undefined
+        ? {
+            filePath: "",
+            pendingFile: pendingFile(),
+            directoryHandle: undefined,
+          }
+        : {
+            filePath: filePath(),
+            pendingFile: undefined,
+            directoryHandle:
+              ancestryService.gedcomResource.value()?.directoryHandle,
+          },
     loader: async ({ params }) => {
       try {
         let file = params.pendingFile;
