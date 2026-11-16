@@ -9,7 +9,7 @@ import {
   gedcomFamilyFacts,
   gedcomIndividualFacts,
 } from "../../gedcom/gedcomFactMetadata";
-import { SAVED_FACT_IDS } from "./gedcom-editor-interface";
+import { GEDCOM_EDITOR } from "./gedcom-editor-interface";
 import { InputFactComponent } from "./input-fact.component";
 
 describe("InputFactComponent", () => {
@@ -94,8 +94,10 @@ describe("InputFactComponent fact type lock", () => {
       ],
       providers: [
         {
-          provide: SAVED_FACT_IDS,
-          useValue: signal(new Set(saved ? [fact.id] : [])),
+          provide: GEDCOM_EDITOR,
+          useValue: {
+            savedFactIds: signal(new Set(saved ? [fact.id] : [])),
+          },
         },
       ],
       waitForStableOnRender: true,

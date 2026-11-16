@@ -4,7 +4,7 @@ import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomFact, type GedcomFact } from "../../gedcom/gedcomFact";
 import type { GedcomEventMetadata } from "../../gedcom/gedcomFactMetadata";
-import { SAVED_FACT_IDS } from "./gedcom-editor-interface";
+import { GEDCOM_EDITOR } from "./gedcom-editor-interface";
 import { InputNotesComponent } from "./input-notes.component";
 import { InputSharedWithComponent } from "./input-shared-with.component";
 import { InputSourceCitationsComponent } from "./input-source-citations.component";
@@ -29,9 +29,9 @@ export class InputFactComponent implements FormValueControl<GedcomFact> {
   readonly value = model<GedcomFact>(newGedcomFact());
   readonly form = form(this.value);
 
-  private readonly savedFactIds = inject(SAVED_FACT_IDS, { optional: true });
+  private readonly gedcomEditor = inject(GEDCOM_EDITOR, { optional: true });
   readonly tagLocked = computed(
-    () => this.savedFactIds?.().has(this.value().id) ?? false,
+    () => this.gedcomEditor?.savedFactIds().has(this.value().id) ?? false,
   );
   readonly tagDescription = computed(() => {
     const tag = this.value().tag;

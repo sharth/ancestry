@@ -34,7 +34,6 @@ import {
 import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
 import {
   GEDCOM_EDITOR,
-  SAVED_FACT_IDS,
   type GedcomEditorInterface,
   type TabInformation,
 } from "./gedcom-editor-interface";
@@ -57,13 +56,7 @@ import { OpenExistingRecordComponent } from "./open-existing-record.component";
     InputSourceComponent,
     OpenExistingRecordComponent,
   ],
-  providers: [
-    { provide: GEDCOM_EDITOR, useExisting: GedcomEditorComponent },
-    {
-      provide: SAVED_FACT_IDS,
-      useFactory: () => inject(GedcomEditorComponent).savedFactIds,
-    },
-  ],
+  providers: [{ provide: GEDCOM_EDITOR, useExisting: GedcomEditorComponent }],
   templateUrl: "./gedcom-editor.component.html",
   styleUrl: "./gedcom-editor.component.css",
 })
