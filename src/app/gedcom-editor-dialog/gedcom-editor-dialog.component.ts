@@ -51,6 +51,9 @@ export class GedcomEditorDialogComponent {
     // Settings only ever requests read access; upgrade to write access now
     // that the user is actually about to edit, prompting them if needed.
     await this.ancestryService.requestWritePermission();
+    // Pick up any change made elsewhere before the user starts editing; the
+    // editor follows the reload as long as nothing has been edited yet.
+    void this.ancestryService.reloadIfFileChanged();
     this.editDialog().nativeElement.showModal();
     this.cdr.detectChanges();
   }

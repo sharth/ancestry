@@ -215,6 +215,7 @@ describe("AncestryService.updateGedcomDatabase", () => {
       newGedcomResourceValue({
         dataSource: { mode: "gedcom", gedcomHandle: gedcomFileHandle },
         gedcomFileHandle,
+        gedcomFile: await gedcomFileHandle.getFile(),
         gedcomText: MINIMAL_GEDCOM_TEXT,
         gedcomRecords,
         gedcomDatabase: parseGedcomDatabase(gedcomRecords),
@@ -228,6 +229,44 @@ describe("AncestryService.updateGedcomDatabase", () => {
     await ancestryService.updateGedcomDatabase(loadedDatabase(), edited);
 
     expect(await readFile()).toContain("2 GIVN Jane");
+  });
+
+  it("doesn't reload when the file is unchanged", async () => {
+    const reloadSpy = vi.spyOn(ancestryService.gedcomResource, "reload");
+
+    await ancestryService.reloadIfFileChanged();
+
+    expect(reloadSpy).not.toHaveBeenCalled();
+  });
+
+  it("reloads when another program changed the file", async () => {
+    const reloadSpy = vi.spyOn(ancestryService.gedcomResource, "reload");
+
+    await writeFile(MINIMAL_GEDCOM_TEXT.replace("John", "Johnny"));
+    await ancestryService.reloadIfFileChanged();
+
+    expect(reloadSpy).toHaveBeenCalled();
+  });
+
+  it("checks the file when the tab gets focus", () => {
+    const checkSpy = vi
+      .spyOn(ancestryService, "reloadIfFileChanged")
+      .mockResolvedValue();
+
+    window.dispatchEvent(new Event("focus"));
+
+    expect(checkSpy).toHaveBeenCalled();
+  });
+
+  it("notices the file changing without being asked", async () => {
+    const reloadSpy = vi.spyOn(ancestryService.gedcomResource, "reload");
+    TestBed.tick();
+
+    await writeFile(MINIMAL_GEDCOM_TEXT.replace("John", "Johnny"));
+
+    await vi.waitFor(() => {
+      expect(reloadSpy).toHaveBeenCalled();
+    });
   });
 
   it("tells other tabs it saved", async () => {

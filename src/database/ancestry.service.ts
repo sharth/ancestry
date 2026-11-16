@@ -1,4 +1,4 @@
-import { DestroyRef, Service, inject } from "@angular/core";
+import { DestroyRef, Service, effect, inject } from "@angular/core";
 import { rxResource, toObservable } from "@angular/core/rxjs-interop";
 import {
   RedirectCommand,
@@ -22,6 +22,14 @@ import {
   type GedcomRecord,
 } from "../gedcom/gedcomRecord";
 import { copyFileToPath, fileExistsAtPath } from "../util/file-system";
+
+// The File System Observer API isn't in TypeScript's DOM types yet. Only
+// what this file uses.
+declare class FileSystemObserver {
+  constructor(callback: () => void);
+  observe(handle: FileSystemHandle): Promise<void>;
+  disconnect(): void;
+}
 
 export const BUILTIN_GEDCOM_URL = "assets/samples/royal-family.ged";
 
@@ -174,7 +182,40 @@ export class AncestryService {
     this.savedChannel.onmessage = () => {
       this.gedcomResource.reload();
     };
+
+    // Another program can change the file too, and it can't tell us over
+    // savedChannel. Watch the file where the browser supports it, and
+    // re-check whenever the user comes back to this tab.
+    effect((onCleanup) => {
+      const handle = this.gedcomResource.value()?.gedcomFileHandle;
+      if (handle === undefined || typeof FileSystemObserver === "undefined") {
+        return;
+      }
+      const observer = new FileSystemObserver(() => {
+        void this.reloadIfFileChanged();
+      });
+      // Watching is a convenience: if it fails, the focus and save-time
+      // checks still catch the change.
+      Promise.resolve()
+        .then(() => observer.observe(handle))
+        .catch((error: unknown) => {
+          console.error(error);
+        });
+      onCleanup(() => {
+        observer.disconnect();
+      });
+    });
+    const onFocus = () => {
+      if (document.visibilityState === "visible") {
+        void this.reloadIfFileChanged();
+      }
+    };
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onFocus);
+
     inject(DestroyRef).onDestroy(() => {
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onFocus);
       this.savedChannel.close();
       // Dexie opens its IndexedDB connection lazily and never closes it on
       // its own. Without this, every AncestryService instance (e.g. one per
@@ -202,6 +243,32 @@ export class AncestryService {
         switchMap((metadata) => loadGedcom(metadata)),
       ),
   });
+
+  /** Reloads the GEDCOM file if it changed on disk since it was loaded,
+   * e.g. saved by another program. Cheap when it hasn't: it compares the
+   * file's size and modification time, without reading it. */
+  async reloadIfFileChanged(): Promise<void> {
+    // A reload already under way (e.g. after our own save) picks up the
+    // change anyway.
+    if (this.gedcomResource.isLoading()) return;
+    const loaded = this.gedcomResource.value();
+    if (loaded?.gedcomFileHandle === undefined) return;
+    const loadedFile = loaded.gedcomFile;
+    let current: File;
+    try {
+      current = await loaded.gedcomFileHandle.getFile();
+    } catch {
+      // Gone or no longer readable: reloading reports that properly.
+      this.gedcomResource.reload();
+      return;
+    }
+    const changed =
+      current.lastModified !== loadedFile?.lastModified ||
+      current.size !== loadedFile.size;
+    if (changed && this.gedcomResource.value() === loaded) {
+      this.gedcomResource.reload();
+    }
+  }
 
   compareGedcomDatabase(gedcomDatabase: GedcomDatabase): {
     originalGedcomRecord?: GedcomRecord;
@@ -259,6 +326,8 @@ export class AncestryService {
     }
     const currentFile = await gedcomResource.gedcomFileHandle.getFile();
     if ((await currentFile.text()) !== gedcomResource.gedcomText) {
+      // Show the newer file; an open editor keeps its unsaved edits.
+      this.gedcomResource.reload();
       throw new GedcomFileChangedError();
     }
 
