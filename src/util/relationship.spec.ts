@@ -151,6 +151,10 @@ describe("relationshipName", () => {
   it("names half relationships", () => {
     expect(relationshipName(1, 1, "F", { half: true })).toBe("half-sister");
     expect(relationshipName(2, 1, "M", { half: true })).toBe("half-uncle");
+    expect(relationshipName(3, 1, "F", { half: true })).toBe("half-great-aunt");
+    expect(relationshipName(4, 1, "F", { half: true })).toBe(
+      "half 2nd great-aunt",
+    );
     expect(relationshipName(2, 2, "", { half: true })).toBe(
       "half first cousin",
     );
