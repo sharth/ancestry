@@ -305,6 +305,17 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
     this.reviewState.set({ kind: "bibliography", source });
   }
 
+  // Shows a failed save (e.g. the file changed in another tab) instead of
+  // leaving it as an unhandled rejection the user never sees.
+  private async save(database: GedcomDatabase) {
+    try {
+      await this.ancestryService.updateGedcomDatabase(database);
+    } catch (error) {
+      console.error(error);
+      alert(`Couldn't save: ${(error as Error).message}`);
+    }
+  }
+
   // Applies a suggested fix directly and saves it, without opening the
   // editor dialog for further review.
   async submitUrlSuggestions(
@@ -319,7 +330,7 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
       source,
       suggestions,
     );
-    await this.ancestryService.updateGedcomDatabase(database);
+    await this.save(database);
   }
 
   async submitMergeSuggestion(
@@ -334,7 +345,7 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
       source,
       suggestion,
     );
-    await this.ancestryService.updateGedcomDatabase(database);
+    await this.save(database);
   }
 
   async submitBibliographySuggestion(source: GedcomSource) {
@@ -345,7 +356,7 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
       this.ancestryDatabase(),
       source,
     );
-    await this.ancestryService.updateGedcomDatabase(database);
+    await this.save(database);
   }
 
   reviewTreeIdSuggestion(individual: GedcomIndividual) {
@@ -360,7 +371,7 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
       this.ancestryDatabase(),
       individuals.map((individual) => individual.xref),
     );
-    await this.ancestryService.updateGedcomDatabase(database);
+    await this.save(database);
   }
 
   // The records that would actually change on disk if `suggestions` are

@@ -2,11 +2,20 @@ import { Component } from "@angular/core";
 import { TestBed } from "@angular/core/testing";
 import { Router, provideRouter } from "@angular/router";
 import { render } from "@testing-library/angular/zoneless";
+import { produce } from "immer";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { newGedcomDatabase } from "../gedcom/gedcomDatabase";
-import { newGedcomRecord } from "../gedcom/gedcomRecord";
-import { AncestryService, ancestryDatabaseGuard } from "./ancestry.service";
+import {
+  newGedcomDatabase,
+  parseGedcomDatabase,
+} from "../gedcom/gedcomDatabase";
+import { newGedcomRecord, parseGedcomRecords } from "../gedcom/gedcomRecord";
+import {
+  AncestryService,
+  GedcomFileChangedError,
+  ancestryDatabaseGuard,
+  newGedcomResourceValue,
+} from "./ancestry.service";
 
 @Component({ selector: "app-stub", template: "" })
 class StubComponent {}
@@ -145,5 +154,82 @@ describe("AncestryService.gedcomDatabaseDifferences", () => {
         new Set(["@S1@"]),
       ),
     ).toEqual([unchanged, edited, added, removed]);
+  });
+});
+
+describe("AncestryService.updateGedcomDatabase", () => {
+  let ancestryService: AncestryService;
+  let gedcomFileHandle: FileSystemFileHandle;
+
+  async function writeFile(text: string) {
+    const writable = await gedcomFileHandle.createWritable();
+    await writable.write(text);
+    await writable.close();
+  }
+
+  async function readFile(): Promise<string> {
+    return (await gedcomFileHandle.getFile()).text();
+  }
+
+  // The loaded database with @I1@'s given name edited, as an editor would.
+  function renameJohnToJane() {
+    const database = ancestryService.gedcomResource.value()?.gedcomDatabase;
+    if (database === undefined) throw new Error("nothing loaded");
+    return produce(database, (draft) => {
+      const name = draft.individuals["@I1@"]?.names[0];
+      if (name) name.givenName = "Jane";
+    });
+  }
+
+  beforeEach(async () => {
+    // A real file in the browser's origin-private file system, so the save
+    // goes through the same FileSystemFileHandle calls as a user's file.
+    const root = await navigator.storage.getDirectory();
+    gedcomFileHandle = await root.getFileHandle("update-test.ged", {
+      create: true,
+    });
+    await writeFile(MINIMAL_GEDCOM_TEXT);
+
+    ancestryService = TestBed.inject(AncestryService);
+    // Let the (empty) first load from IndexedDB land, so it can't replace
+    // the value set below.
+    await vi.waitFor(() => {
+      if (ancestryService.gedcomResource.isLoading()) {
+        throw new Error("still loading");
+      }
+    });
+    const gedcomRecords = parseGedcomRecords(MINIMAL_GEDCOM_TEXT);
+    ancestryService.gedcomResource.set(
+      newGedcomResourceValue({
+        dataSource: { mode: "gedcom", gedcomHandle: gedcomFileHandle },
+        gedcomFileHandle,
+        gedcomText: MINIMAL_GEDCOM_TEXT,
+        gedcomRecords,
+        gedcomDatabase: parseGedcomDatabase(gedcomRecords),
+      }),
+    );
+  });
+
+  it("writes the edit when the file is unchanged since it was loaded", async () => {
+    const edited = renameJohnToJane();
+
+    await ancestryService.updateGedcomDatabase(edited);
+
+    expect(await readFile()).toContain("2 GIVN Jane");
+  });
+
+  it("refuses to overwrite a file that changed after it was loaded", async () => {
+    const changedElsewhere = MINIMAL_GEDCOM_TEXT.replace(
+      "John /Doe/",
+      "Johnny /Doe/",
+    );
+    await writeFile(changedElsewhere);
+    const edited = renameJohnToJane();
+
+    await expect(
+      ancestryService.updateGedcomDatabase(edited),
+    ).rejects.toBeInstanceOf(GedcomFileChangedError);
+
+    expect(await readFile()).toBe(changedElsewhere);
   });
 });

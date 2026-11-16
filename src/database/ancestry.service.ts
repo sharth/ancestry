@@ -154,6 +154,20 @@ async function loadGedcom(
   };
 }
 
+/** Thrown by AncestryService.updateGedcomDatabase() when the file on disk
+ * no longer matches what was loaded, so saving would overwrite someone
+ * else's changes. Nothing is written. */
+export class GedcomFileChangedError extends Error {
+  constructor() {
+    super(
+      "The GEDCOM file was changed since this page loaded it, maybe by " +
+        "another tab. Nothing was saved, so those changes are safe. " +
+        "Reload the page to get the latest version, then make your edit again.",
+    );
+    this.name = "GedcomFileChangedError";
+  }
+}
+
 export async function findGedcomFilenames(
   directoryHandle: FileSystemDirectoryHandle,
 ): Promise<string[]> {
@@ -249,6 +263,14 @@ export class AncestryService {
     const gedcomFileHandle = this.gedcomResource.value()?.gedcomFileHandle;
     if (gedcomFileHandle == undefined) {
       throw new Error("No GEDCOM file handle available");
+    }
+
+    // The edit was made against the file as this tab last loaded it. If the
+    // file has changed since (a save from another tab, or another program),
+    // writing now would silently throw those changes away, so refuse.
+    const currentText = await (await gedcomFileHandle.getFile()).text();
+    if (currentText !== gedcomResource?.gedcomText) {
+      throw new GedcomFileChangedError();
     }
 
     const writableStream = await gedcomFileHandle.createWritable();
