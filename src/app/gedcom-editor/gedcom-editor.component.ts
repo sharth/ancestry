@@ -70,6 +70,14 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   readonly ancestryDatabase = input.required<GedcomDatabase>();
   readonly finished = output();
 
+  // Whether this tab has since reloaded a newer file (another tab saved)
+  // than the one these edits started from; saving would then be refused.
+  // See GedcomEditorDialogComponent.editorDatabase.
+  readonly fileChanged = computed(() => {
+    const loaded = this.ancestryService.gedcomResource.value()?.gedcomDatabase;
+    return loaded !== undefined && loaded !== this.ancestryDatabase();
+  });
+
   // The records open as tabs in the editor: `tabs()` with each xref
   // resolved, plus any opened later with openTab(). An empty xref means
   // "create a new record of this type," so we calculate the next available
@@ -362,7 +370,10 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     // the edits intact, so the user can fix it and submit again.
     try {
       await this.copyPendingMultimediaFiles();
-      await this.ancestryService.updateGedcomDatabase(this.workingDatabase());
+      await this.ancestryService.updateGedcomDatabase(
+        this.ancestryDatabase(),
+        this.workingDatabase(),
+      );
     } catch (error) {
       console.error(error);
       alert(`Couldn't save: ${(error as Error).message}`);

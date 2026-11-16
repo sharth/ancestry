@@ -124,8 +124,12 @@ export class ValidationTableComponent<
     if (!granted) return;
     // Show a failed save (e.g. the file changed in another tab) instead of
     // leaving it as an unhandled rejection the user never sees.
+    // Rows are rebuilt from every reload, so a fix is always an edit of the
+    // database loaded now.
+    const loaded = this.ancestryService.gedcomResource.value()?.gedcomDatabase;
     try {
-      await this.ancestryService.updateGedcomDatabase(database);
+      if (loaded === undefined) throw new Error("No GEDCOM file loaded");
+      await this.ancestryService.updateGedcomDatabase(loaded, database);
     } catch (error) {
       console.error(error);
       alert(`Couldn't save: ${(error as Error).message}`);

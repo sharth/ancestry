@@ -3,7 +3,10 @@ import { TestBed } from "@angular/core/testing";
 import { render, screen } from "@testing-library/angular/zoneless";
 import { describe, expect, it, vi } from "vitest";
 
-import { AncestryService } from "../../database/ancestry.service";
+import {
+  AncestryService,
+  newGedcomResourceValue,
+} from "../../database/ancestry.service";
 import {
   newGedcomDatabase,
   type GedcomDatabase,
@@ -59,6 +62,9 @@ function headers() {
   ).map((header) => header.textContent.trim());
 }
 
+// The file loaded when a fix is submitted.
+const loadedDatabase = newGedcomDatabase();
+
 describe("ValidationTableComponent", () => {
   async function setup() {
     const { fixture } = await render(HostComponent, {
@@ -75,6 +81,9 @@ describe("ValidationTableComponent", () => {
     const updateGedcomDatabaseSpy = vi
       .spyOn(ancestryService, "updateGedcomDatabase")
       .mockResolvedValue(undefined);
+    ancestryService.gedcomResource.set(
+      newGedcomResourceValue({ gedcomDatabase: loadedDatabase }),
+    );
     return {
       fixture,
       table,
@@ -124,7 +133,7 @@ describe("ValidationTableComponent", () => {
     const { updateGedcomDatabaseSpy } = await setup();
     screen.getByRole("button", { name: "Submit changes as proposed" }).click();
     await vi.waitFor(() => {
-      expect(updateGedcomDatabaseSpy).toHaveBeenCalledWith(fixedDatabase);
+      expect(updateGedcomDatabaseSpy).toHaveBeenCalledWith(loadedDatabase, fixedDatabase);
     });
   });
 
@@ -132,7 +141,10 @@ describe("ValidationTableComponent", () => {
     const { updateGedcomDatabaseSpy } = await setup();
     screen.getByRole("button", { name: "Submit all 1 as proposed" }).click();
     await vi.waitFor(() => {
-      expect(updateGedcomDatabaseSpy).toHaveBeenCalledWith(allFixedDatabase);
+      expect(updateGedcomDatabaseSpy).toHaveBeenCalledWith(
+        loadedDatabase,
+        allFixedDatabase,
+      );
     });
   });
 
