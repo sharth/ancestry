@@ -1,15 +1,17 @@
-import { Component, computed, input, model } from "@angular/core";
+import { Component, computed, inject, input, model } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomFact, type GedcomFact } from "../../gedcom/gedcomFact";
 import type { GedcomEventMetadata } from "../../gedcom/gedcomFactMetadata";
+import { SAVED_FACT_IDS } from "./gedcom-editor-interface";
 import { InputNotesComponent } from "./input-notes.component";
 import { InputSharedWithComponent } from "./input-shared-with.component";
 import { InputSourceCitationsComponent } from "./input-source-citations.component";
 
 // Edits one fact (event or attribute) of an individual or a family. `tags`
-// lists the fact types to offer, e.g. gedcomIndividualFacts.
+// lists the fact types to offer, e.g. gedcomIndividualFacts. Only a new fact
+// can change its type; a fact from the file shows its type read-only.
 @Component({
   selector: "app-input-fact",
   imports: [
@@ -26,6 +28,15 @@ export class InputFactComponent implements FormValueControl<GedcomFact> {
   readonly tags = input.required<Record<string, GedcomEventMetadata>>();
   readonly value = model<GedcomFact>(newGedcomFact());
   readonly form = form(this.value);
+
+  private readonly savedFactIds = inject(SAVED_FACT_IDS, { optional: true });
+  readonly tagLocked = computed(
+    () => this.savedFactIds?.().has(this.value().id) ?? false,
+  );
+  readonly tagDescription = computed(() => {
+    const tag = this.value().tag;
+    return this.tags()[tag]?.humanReadableDescription ?? tag;
+  });
 
   focus(options?: FocusOptions) {
     this.form.tag().focusBoundControl(options);
