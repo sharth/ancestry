@@ -1,10 +1,11 @@
-import { Component, inject, signal } from "@angular/core";
+import { Component, computed, inject, signal } from "@angular/core";
 import { Router } from "@angular/router";
 
 import {
   AncestryService,
   findGedcomFilenames,
 } from "../../database/ancestry.service";
+import { fullname, surname } from "../../gedcom/gedcomIndividual";
 
 @Component({
   selector: "app-settings",
@@ -17,6 +18,24 @@ export class SettingsComponent {
   private readonly router = inject(Router);
 
   readonly gedcomResource = this.ancestryService.gedcomResource;
+  readonly rootIndividualXref = this.ancestryService.rootIndividualXref;
+
+  // Everyone in the loaded file, as root person choices, sorted by surname
+  // then full name.
+  readonly rootIndividualChoices = computed(() =>
+    Object.values(this.gedcomResource.value()?.gedcomDatabase.individuals ?? {})
+      .map((individual) => ({
+        xref: individual.xref,
+        surname: surname(individual),
+        name: fullname(individual) || "Unnamed Person",
+      }))
+      .sort(
+        (a, b) =>
+          a.surname.localeCompare(b.surname) ||
+          a.name.localeCompare(b.name) ||
+          a.xref.localeCompare(b.xref),
+      ),
+  );
 
   // Set while a chosen directory contains more than one GEDCOM file at its
   // root, so the user needs to pick which one to use.
@@ -81,6 +100,14 @@ export class SettingsComponent {
     }
     await this.ancestryService.openDirectory(choices.directoryHandle, filename);
     this.directoryGedcomChoices.set(undefined);
+  }
+
+  async setRootIndividual(xref: string) {
+    try {
+      await this.ancestryService.setRootIndividualXref(xref || undefined);
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   async requestPermissions() {

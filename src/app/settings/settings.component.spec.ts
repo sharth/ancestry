@@ -92,4 +92,41 @@ describe("SettingsComponent", () => {
       expect(openGedcomSpy).toHaveBeenCalledWith(gedcomFileHandle);
     });
   });
+
+  it("saves the root person chosen from the loaded file", async () => {
+    await ancestryService.openBuiltin();
+    const componentElement = fixture.nativeElement as HTMLElement;
+    const select = await vi.waitFor(async () => {
+      await fixture.whenStable();
+      const select =
+        componentElement.querySelector<HTMLSelectElement>("#root-individual");
+      assert.isOk(select);
+      return select;
+    });
+    const option = Array.from(select.options).find((o) =>
+      o.textContent.includes("Elizabeth"),
+    );
+    assert.isOk(option);
+
+    select.value = option.value;
+    select.dispatchEvent(new Event("change"));
+
+    await vi.waitFor(() => {
+      expect(ancestryService.rootIndividualXref()).toBe(option.value);
+    });
+  });
+
+  it("forgets the root person when a different data source is chosen", async () => {
+    await ancestryService.openBuiltin();
+    await ancestryService.setRootIndividualXref("@I1@");
+    await vi.waitFor(() => {
+      expect(ancestryService.rootIndividualXref()).toBe("@I1@");
+    });
+
+    await ancestryService.openBuiltin();
+
+    await vi.waitFor(() => {
+      expect(ancestryService.rootIndividualXref()).toBeUndefined();
+    });
+  });
 });

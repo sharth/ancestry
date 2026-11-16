@@ -1,5 +1,5 @@
 import { DestroyRef, Service, inject } from "@angular/core";
-import { rxResource, toObservable } from "@angular/core/rxjs-interop";
+import { rxResource, toObservable, toSignal } from "@angular/core/rxjs-interop";
 import {
   RedirectCommand,
   Router,
@@ -7,7 +7,7 @@ import {
   type ResourceResult,
 } from "@angular/router";
 import Dexie, { liveQuery } from "dexie";
-import { filter, firstValueFrom, from, switchMap } from "rxjs";
+import { filter, firstValueFrom, from, map, switchMap } from "rxjs";
 
 import {
   compareGedcomDatabase,
@@ -39,6 +39,15 @@ interface DatabaseState {
   dataSource?: DataSource;
 }
 
+// The user's own choices about how to show the loaded file, kept apart from
+// the metadata row so that changing one doesn't make gedcomResource re-read
+// the file. Never written to the GEDCOM file itself.
+interface Preferences {
+  id?: number;
+  // The person relationships are described from.
+  rootIndividualXref?: string;
+}
+
 // Older versions of this table stored `gedcomHandle`/`multimediaHandle`
 // directly rather than as a `dataSource` union; migrate anyone who has that
 // shape already in IndexedDB into the "gedcom" mode (multimedia handles
@@ -52,6 +61,7 @@ interface LegacyDatabaseState {
 
 class DexieDatabase extends Dexie {
   metadata!: Dexie.Table<DatabaseState, number>;
+  preferences!: Dexie.Table<Preferences, number>;
 
   constructor() {
     super("AncestryDatabase");
@@ -78,6 +88,10 @@ class DexieDatabase extends Dexie {
             delete legacy.multimediaHandle;
           });
       });
+    this.version(7).stores({
+      metadata: "++id",
+      preferences: "++id",
+    });
   }
 }
 
@@ -199,6 +213,18 @@ export class AncestryService {
       ),
   });
 
+  // The root person's xref, or undefined if none is chosen. It may name
+  // someone who isn't in the loaded file.
+  readonly rootIndividualXref = toSignal(
+    from(liveQuery(() => this.dexieDatabase.preferences.get(1))).pipe(
+      map((preferences) => preferences?.rootIndividualXref),
+    ),
+  );
+
+  async setRootIndividualXref(rootIndividualXref: string | undefined) {
+    await this.dexieDatabase.preferences.put({ id: 1, rootIndividualXref });
+  }
+
   compareGedcomDatabase(gedcomDatabase: GedcomDatabase): {
     originalGedcomRecord?: GedcomRecord;
     updatedGedcomRecord?: GedcomRecord;
@@ -261,8 +287,10 @@ export class AncestryService {
   private async setDataSource(dataSource: DataSource) {
     await this.dexieDatabase.transaction(
       "rw",
-      this.dexieDatabase.metadata,
+      [this.dexieDatabase.metadata, this.dexieDatabase.preferences],
       async () => {
+        // A root person picked in another file means nothing in this one.
+        await this.dexieDatabase.preferences.clear();
         // Upsert logic for singleton
         const metadata = (await this.dexieDatabase.metadata.get(1)) ?? {
           id: 1,
@@ -295,9 +323,10 @@ export class AncestryService {
   async clearDatabase() {
     await this.dexieDatabase.transaction(
       "rw",
-      this.dexieDatabase.metadata,
+      [this.dexieDatabase.metadata, this.dexieDatabase.preferences],
       async () => {
         await this.dexieDatabase.metadata.clear();
+        await this.dexieDatabase.preferences.clear();
       },
     );
   }
