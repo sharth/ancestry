@@ -167,7 +167,7 @@ describe("ValidationComponent", () => {
     await component.submitUrlSuggestions(source, [urlSuggestion]);
 
     expect(updateGedcomDatabaseSpy).toHaveBeenCalledTimes(1);
-    const savedDatabase = updateGedcomDatabaseSpy.mock.calls[0]?.[0];
+    const savedDatabase = updateGedcomDatabaseSpy.mock.calls[0]?.[1];
     expect(savedDatabase?.repositories["@R0@"]).toBeDefined();
   });
 
@@ -261,7 +261,7 @@ describe("ValidationComponent merge repository links suggestion", () => {
     await component.submitMergeSuggestion(source, mergeSuggestion);
 
     expect(updateGedcomDatabaseSpy).toHaveBeenCalledTimes(1);
-    const savedDatabase = updateGedcomDatabaseSpy.mock.calls[0]?.[0];
+    const savedDatabase = updateGedcomDatabaseSpy.mock.calls[0]?.[1];
     expect(savedDatabase?.sources[source.xref]?.repositoryLinks).toEqual([
       { repositoryXref: "@R1@", callNumbers: ["one", "two"] },
     ]);

@@ -13,13 +13,15 @@ describe("GedcomEditorDialogComponent", () => {
   let component: GedcomEditorDialogComponent;
   let fixture: ComponentFixture<GedcomEditorDialogComponent>;
   let ancestryService: AncestryService;
+  const ancestryDatabase = signal(newGedcomDatabase());
 
   beforeEach(async () => {
+    ancestryDatabase.set(newGedcomDatabase());
     const renderResult = await render(GedcomEditorDialogComponent, {
       providers: [provideRouter([])],
       bindings: [
         inputBinding("tabs", signal([{ type: "INDI" as const, xref: "" }])),
-        inputBinding("ancestryDatabase", signal(newGedcomDatabase())),
+        inputBinding("ancestryDatabase", ancestryDatabase),
       ],
       waitForStableOnRender: true,
     });
@@ -42,6 +44,17 @@ describe("GedcomEditorDialogComponent", () => {
 
     expect(requestWritePermissionSpy).toHaveBeenCalled();
     expect(component.editDialog().nativeElement.open).toBe(true);
+  });
+
+  it("checks for changes to the file when opening", async () => {
+    vi.spyOn(ancestryService, "requestWritePermission").mockResolvedValue(true);
+    const checkSpy = vi
+      .spyOn(ancestryService, "reloadIfFileChanged")
+      .mockResolvedValue();
+
+    await component.showModal();
+
+    expect(checkSpy).toHaveBeenCalled();
   });
 
   // These tests stub out the nested <app-gedcom-editor> rather than
@@ -122,6 +135,44 @@ describe("GedcomEditorDialogComponent", () => {
       component.onDialogCancel(event);
       expect(confirmSpy).not.toHaveBeenCalled();
       expect(preventDefault).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("when the file is reloaded while the editor is open", () => {
+    // What another tab's save leaves in this tab after it reloads.
+    function reload() {
+      const reloaded = newGedcomDatabase();
+      ancestryDatabase.set(reloaded);
+      fixture.detectChanges();
+      return reloaded;
+    }
+
+    it("gives the editor the reloaded file when nothing was edited", () => {
+      stubGedcomEditor(false);
+      setDialogOpen(true);
+
+      const reloaded = reload();
+
+      expect(component.editorDatabase()).toBe(reloaded);
+    });
+
+    it("keeps the editor on the file its unsaved edits started from", () => {
+      const original = component.editorDatabase();
+      stubGedcomEditor(true);
+      setDialogOpen(true);
+
+      reload();
+
+      expect(component.editorDatabase()).toBe(original);
+    });
+
+    it("follows the file again once the dialog is closed", () => {
+      stubGedcomEditor(true);
+      setDialogOpen(false);
+
+      const reloaded = reload();
+
+      expect(component.editorDatabase()).toBe(reloaded);
     });
   });
 });

@@ -1,4 +1,11 @@
 <form (submit)="submitForm($event)" class="vstack gap-3">
+  @if (fileChanged()) {
+    <div class="alert alert-warning mb-0" role="alert">
+      The GEDCOM file was changed in another tab after you started editing, so
+      these edits can't be saved without losing those changes. Cancel and make
+      your edit again.
+    </div>
+  }
   <div
     class="working-set-tabs d-flex flex-wrap align-items-center justify-content-between gap-2 border-bottom pb-2"
   >
@@ -187,7 +194,7 @@
   }
 
   <div>
-    <input type="submit" />
+    <input type="submit" [disabled]="fileChanged()" />
     <input type="button" value="Cancel" (click)="cancelForm()" />
   </div>
 </form>

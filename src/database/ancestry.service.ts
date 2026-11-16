@@ -1,4 +1,4 @@
-import { DestroyRef, Service, inject } from "@angular/core";
+import { DestroyRef, Service, effect, inject } from "@angular/core";
 import { rxResource, toObservable } from "@angular/core/rxjs-interop";
 import {
   RedirectCommand,
@@ -22,6 +22,14 @@ import {
   type GedcomRecord,
 } from "../gedcom/gedcomRecord";
 import { copyFileToPath, fileExistsAtPath } from "../util/file-system";
+
+// The File System Observer API isn't in TypeScript's DOM types yet. Only
+// what this file uses.
+declare class FileSystemObserver {
+  constructor(callback: () => void);
+  observe(handle: FileSystemHandle): Promise<void>;
+  disconnect(): void;
+}
 
 export const BUILTIN_GEDCOM_URL = "assets/samples/royal-family.ged";
 
@@ -154,6 +162,21 @@ async function loadGedcom(
   };
 }
 
+/** Thrown by AncestryService.updateGedcomDatabase() when the file on disk
+ * no longer matches what was loaded, so saving would overwrite someone
+ * else's changes. Nothing is written. */
+export class GedcomFileChangedError extends Error {
+  constructor() {
+    super(
+      "The GEDCOM file was changed after this edit started, maybe by " +
+        "another tab. Nothing was saved, so those changes are safe. " +
+        "Close the editor (or reload the page) to get the latest version, " +
+        "then make your edit again.",
+    );
+    this.name = "GedcomFileChangedError";
+  }
+}
+
 export async function findGedcomFilenames(
   directoryHandle: FileSystemDirectoryHandle,
 ): Promise<string[]> {
@@ -170,8 +193,50 @@ export async function findGedcomFilenames(
 export class AncestryService {
   readonly dexieDatabase = new DexieDatabase();
 
+  // Tells this app's other tabs (same origin) that the GEDCOM file was just
+  // saved, so they reload it instead of showing, and later saving over, a
+  // stale copy. A tab doesn't receive its own messages.
+  private readonly savedChannel = new BroadcastChannel("ancestry-gedcom-saved");
+
   constructor() {
+    this.savedChannel.onmessage = () => {
+      this.gedcomResource.reload();
+    };
+
+    // Another program can change the file too, and it can't tell us over
+    // savedChannel. Watch the file where the browser supports it, and
+    // re-check whenever the user comes back to this tab.
+    effect((onCleanup) => {
+      const handle = this.gedcomResource.value()?.gedcomFileHandle;
+      if (handle === undefined || typeof FileSystemObserver === "undefined") {
+        return;
+      }
+      const observer = new FileSystemObserver(() => {
+        void this.reloadIfFileChanged();
+      });
+      // Watching is a convenience: if it fails, the focus and save-time
+      // checks still catch the change.
+      Promise.resolve()
+        .then(() => observer.observe(handle))
+        .catch((error: unknown) => {
+          console.error(error);
+        });
+      onCleanup(() => {
+        observer.disconnect();
+      });
+    });
+    const onFocus = () => {
+      if (document.visibilityState === "visible") {
+        void this.reloadIfFileChanged();
+      }
+    };
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onFocus);
+
     inject(DestroyRef).onDestroy(() => {
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onFocus);
+      this.savedChannel.close();
       // Dexie opens its IndexedDB connection lazily and never closes it on
       // its own. Without this, every AncestryService instance (e.g. one per
       // unit test) leaves its IndexedDB connection open indefinitely, and
@@ -198,6 +263,32 @@ export class AncestryService {
         switchMap((metadata) => loadGedcom(metadata?.dataSource)),
       ),
   });
+
+  /** Reloads the GEDCOM file if it changed on disk since it was loaded,
+   * e.g. saved by another program. Cheap when it hasn't: it compares the
+   * file's size and modification time, without reading it. */
+  async reloadIfFileChanged(): Promise<void> {
+    // A reload already under way (e.g. after our own save) picks up the
+    // change anyway.
+    if (this.gedcomResource.isLoading()) return;
+    const loaded = this.gedcomResource.value();
+    if (loaded?.gedcomFileHandle === undefined) return;
+    const loadedFile = loaded.gedcomFile;
+    let current: File;
+    try {
+      current = await loaded.gedcomFileHandle.getFile();
+    } catch {
+      // Gone or no longer readable: reloading reports that properly.
+      this.gedcomResource.reload();
+      return;
+    }
+    const changed =
+      current.lastModified !== loadedFile?.lastModified ||
+      current.size !== loadedFile.size;
+    if (changed && this.gedcomResource.value() === loaded) {
+      this.gedcomResource.reload();
+    }
+  }
 
   compareGedcomDatabase(gedcomDatabase: GedcomDatabase): {
     originalGedcomRecord?: GedcomRecord;
@@ -235,26 +326,42 @@ export class AncestryService {
     );
   }
 
-  async updateGedcomDatabase(gedcomDatabase: GedcomDatabase) {
+  /** Saves `gedcomDatabase`, an edit of `originalGedcomDatabase`, which
+   * must be the database this tab currently has loaded. Throws
+   * GedcomFileChangedError, writing nothing, if the file has changed since
+   * the edit started: either this tab has already reloaded a newer file
+   * (another tab saved), or the file on disk differs from what was loaded
+   * (another program, or a tab whose message hasn't arrived yet). Writing
+   * anyway would silently throw those changes away. */
+  async updateGedcomDatabase(
+    originalGedcomDatabase: GedcomDatabase,
+    gedcomDatabase: GedcomDatabase,
+  ) {
     const gedcomResource = this.gedcomResource.value();
-    const originalGedcomRecords = gedcomResource?.gedcomRecords ?? [];
-    const originalGedcomDatabase =
-      this.gedcomResource.value()?.gedcomDatabase ?? newGedcomDatabase();
-    const text = serializeGedcomDatabase(
-      originalGedcomRecords,
-      originalGedcomDatabase,
-      gedcomDatabase,
-    );
-
-    const gedcomFileHandle = this.gedcomResource.value()?.gedcomFileHandle;
-    if (gedcomFileHandle == undefined) {
+    if (gedcomResource?.gedcomFileHandle == undefined) {
       throw new Error("No GEDCOM file handle available");
     }
+    if (originalGedcomDatabase !== gedcomResource.gedcomDatabase) {
+      throw new GedcomFileChangedError();
+    }
+    const currentFile = await gedcomResource.gedcomFileHandle.getFile();
+    if ((await currentFile.text()) !== gedcomResource.gedcomText) {
+      // Show the newer file; an open editor keeps its unsaved edits.
+      this.gedcomResource.reload();
+      throw new GedcomFileChangedError();
+    }
 
-    const writableStream = await gedcomFileHandle.createWritable();
+    const text = serializeGedcomDatabase(
+      gedcomResource.gedcomRecords,
+      gedcomResource.gedcomDatabase,
+      gedcomDatabase,
+    );
+    const writableStream =
+      await gedcomResource.gedcomFileHandle.createWritable();
     await writableStream.write(text.join("\n"));
     await writableStream.write("\n");
     await writableStream.close();
+    this.savedChannel.postMessage("saved");
     this.gedcomResource.reload();
   }
 

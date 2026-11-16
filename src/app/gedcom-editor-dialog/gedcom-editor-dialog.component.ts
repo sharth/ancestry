@@ -3,6 +3,8 @@ import {
   Component,
   inject,
   input,
+  linkedSignal,
+  untracked,
   viewChild,
   type ElementRef,
 } from "@angular/core";
@@ -28,6 +30,19 @@ export class GedcomEditorDialogComponent {
   readonly tabs = input.required<TabInformation[]>();
   readonly ancestryDatabase = input.required<GedcomDatabase>();
 
+  // What the editor edits. It follows `ancestryDatabase()` (e.g. when
+  // another tab saves and this tab reloads the file) except while the user
+  // has unsaved edits open: then it stays put, so the reload doesn't wipe
+  // them, and saving them is refused (the file changed underneath them)
+  // rather than writing over the other tab's changes.
+  readonly editorDatabase = linkedSignal<GedcomDatabase, GedcomDatabase>({
+    source: this.ancestryDatabase,
+    computation: (latest, previous) =>
+      previous !== undefined && untracked(() => this.hasUnsavedChanges())
+        ? previous.value
+        : latest,
+  });
+
   readonly editDialog =
     viewChild.required<ElementRef<HTMLDialogElement>>("editDialog");
   readonly gedcomEditor = viewChild(GedcomEditorComponent);
@@ -36,6 +51,9 @@ export class GedcomEditorDialogComponent {
     // Settings only ever requests read access; upgrade to write access now
     // that the user is actually about to edit, prompting them if needed.
     await this.ancestryService.requestWritePermission();
+    // Pick up any change made elsewhere before the user starts editing; the
+    // editor follows the reload as long as nothing has been edited yet.
+    void this.ancestryService.reloadIfFileChanged();
     this.editDialog().nativeElement.showModal();
     this.cdr.detectChanges();
   }
