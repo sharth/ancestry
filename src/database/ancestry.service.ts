@@ -42,45 +42,17 @@ interface DatabaseState {
   rootIndividualXref?: string;
 }
 
-// Older versions of this table stored `gedcomHandle`/`multimediaHandle`
-// directly rather than as a `dataSource` union; migrate anyone who has that
-// shape already in IndexedDB into the "gedcom" mode (multimedia handles
-// stored independently of a directory aren't representable anymore, so they
-// are dropped, matching the new gedcom-only vs. directory split).
-interface LegacyDatabaseState {
-  id?: number;
-  gedcomHandle?: FileSystemFileHandle;
-  multimediaHandle?: FileSystemDirectoryHandle;
-}
-
 class DexieDatabase extends Dexie {
   metadata!: Dexie.Table<DatabaseState, number>;
 
   constructor() {
     super("AncestryDatabase");
-    this.version(5).stores({
+    // Version 6 introduced the dataSource union. Older databases aren't
+    // migrated: anything they hold is simply not read, and the user picks a
+    // data source again.
+    this.version(6).stores({
       metadata: "++id",
     });
-    this.version(6)
-      .stores({
-        metadata: "++id",
-      })
-      .upgrade(async (transaction) => {
-        await transaction
-          .table<LegacyDatabaseState, number>("metadata")
-          .toCollection()
-          .modify((state) => {
-            const legacy = state as DatabaseState & LegacyDatabaseState;
-            if (legacy.gedcomHandle !== undefined) {
-              legacy.dataSource = {
-                mode: "gedcom",
-                gedcomHandle: legacy.gedcomHandle,
-              };
-            }
-            delete legacy.gedcomHandle;
-            delete legacy.multimediaHandle;
-          });
-      });
   }
 }
 
