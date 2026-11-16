@@ -122,7 +122,14 @@ export class ValidationTableComponent<
   async submit(database: GedcomDatabase) {
     const granted = await this.ancestryService.requestWritePermission();
     if (!granted) return;
-    await this.ancestryService.updateGedcomDatabase(database);
+    // Show a failed save (e.g. the file changed in another tab) instead of
+    // leaving it as an unhandled rejection the user never sees.
+    try {
+      await this.ancestryService.updateGedcomDatabase(database);
+    } catch (error) {
+      console.error(error);
+      alert(`Couldn't save: ${(error as Error).message}`);
+    }
   }
 
   protected readonly emptyDatabase = emptyDatabase;
