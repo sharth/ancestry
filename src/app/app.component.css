@@ -1,15 +1,20 @@
+/* The window is the page's scroll container (the header and sidebar stay
+   put with position: sticky), so the router's scrollPositionRestoration and
+   the browser's own restoration on reload both see the real scroll offset. */
 :host {
   display: grid;
   grid-template-rows: auto 1fr;
   grid-template-columns: 240px 1fr;
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden;
+  min-height: 100vh;
 }
 
 header {
   grid-row: 1;
   grid-column: 1 / span 2;
+  position: sticky;
+  top: 0;
+  z-index: 1030; /* Bootstrap's fixed/sticky-top z-index */
+  height: var(--app-header-height);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -30,6 +35,9 @@ header .navbar-brand {
 nav {
   grid-row: 2;
   grid-column: 1;
+  position: sticky;
+  top: var(--app-header-height);
+  height: calc(100vh - var(--app-header-height));
   background-color: #f8f9fa;
   overflow-y: auto;
 }
@@ -60,8 +68,8 @@ nav a:hover {
 main {
   grid-row: 2;
   grid-column: 2;
+  min-width: 0;
   padding: 2rem;
-  overflow-y: auto;
   background-color: #ffffff;
   border-left: 1px solid #dee2e6;
   border-top: 1px solid #dee2e6;
@@ -91,6 +99,7 @@ main {
     top: 0;
     bottom: 0;
     left: 0;
+    height: auto;
     z-index: 1050;
     width: min(80vw, 300px);
     transform: translateX(-100%);
