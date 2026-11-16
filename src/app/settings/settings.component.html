@@ -91,6 +91,35 @@
         </div>
 
         @if (gedcomResource.value()?.gedcomRecords?.length) {
+          <div class="p-3 border rounded">
+            <h5>Root Person</h5>
+            <p class="text-muted">
+              Individual pages describe everyone's relationship to this person,
+              such as grandfather or first cousin once removed. It's saved in
+              this browser only, not in the GEDCOM file.
+            </p>
+            @let rootXref = gedcomResource.value()?.rootIndividualXref ?? "";
+            <div class="form-floating">
+              <select
+                id="root-individual"
+                #rootSelect
+                class="form-select"
+                (change)="setRootIndividual(rootSelect.value)"
+              >
+                <option value="" [selected]="rootXref === ''">No one</option>
+                @for (choice of rootIndividualChoices(); track choice.xref) {
+                  <option
+                    [value]="choice.xref"
+                    [selected]="choice.xref === rootXref"
+                  >
+                    {{ choice.name }} ({{ choice.xref }})
+                  </option>
+                }
+              </select>
+              <label for="root-individual">Root person</label>
+            </div>
+          </div>
+
           <hr />
           <button class="btn btn-success btn-lg" (click)="enterApp()">
             Enter Application

@@ -37,17 +37,9 @@ export type DataSource =
 interface DatabaseState {
   id?: number;
   dataSource?: DataSource;
-}
-
-// Older versions of this table stored `gedcomHandle`/`multimediaHandle`
-// directly rather than as a `dataSource` union; migrate anyone who has that
-// shape already in IndexedDB into the "gedcom" mode (multimedia handles
-// stored independently of a directory aren't representable anymore, so they
-// are dropped, matching the new gedcom-only vs. directory split).
-interface LegacyDatabaseState {
-  id?: number;
-  gedcomHandle?: FileSystemFileHandle;
-  multimediaHandle?: FileSystemDirectoryHandle;
+  // The person relationships are described from, chosen in settings. Kept
+  // here in the browser only, never written to the GEDCOM file.
+  rootIndividualXref?: string;
 }
 
 class DexieDatabase extends Dexie {
@@ -55,29 +47,9 @@ class DexieDatabase extends Dexie {
 
   constructor() {
     super("AncestryDatabase");
-    this.version(5).stores({
+    this.version(6).stores({
       metadata: "++id",
     });
-    this.version(6)
-      .stores({
-        metadata: "++id",
-      })
-      .upgrade(async (transaction) => {
-        await transaction
-          .table<LegacyDatabaseState, number>("metadata")
-          .toCollection()
-          .modify((state) => {
-            const legacy = state as DatabaseState & LegacyDatabaseState;
-            if (legacy.gedcomHandle !== undefined) {
-              legacy.dataSource = {
-                mode: "gedcom",
-                gedcomHandle: legacy.gedcomHandle,
-              };
-            }
-            delete legacy.gedcomHandle;
-            delete legacy.multimediaHandle;
-          });
-      });
   }
 }
 
@@ -91,6 +63,9 @@ export interface GedcomResourceValue {
   gedcomRecords: GedcomRecord[];
   gedcomDatabase: GedcomDatabase;
   directoryHandle: FileSystemDirectoryHandle | undefined;
+  // The person relationships are described from, chosen in settings. It
+  // may name someone who isn't in the file.
+  rootIndividualXref: string | undefined;
 }
 
 export function newGedcomResourceValue(
@@ -104,13 +79,16 @@ export function newGedcomResourceValue(
     gedcomRecords: [],
     gedcomDatabase: newGedcomDatabase(),
     directoryHandle: undefined,
+    rootIndividualXref: undefined,
     ...fieldsToUpdate,
   };
 }
 
 async function loadGedcom(
-  dataSource: DataSource | undefined,
+  metadata: DatabaseState | undefined,
 ): Promise<GedcomResourceValue | undefined> {
+  const dataSource = metadata?.dataSource;
+  const rootIndividualXref = metadata?.rootIndividualXref;
   if (dataSource === undefined) {
     return undefined;
   }
@@ -127,6 +105,7 @@ async function loadGedcom(
       gedcomRecords,
       gedcomDatabase: parseGedcomDatabase(gedcomRecords),
       directoryHandle: undefined,
+      rootIndividualXref,
     };
   }
 
@@ -151,6 +130,7 @@ async function loadGedcom(
     gedcomRecords,
     gedcomDatabase: parseGedcomDatabase(gedcomRecords),
     directoryHandle,
+    rootIndividualXref,
   };
 }
 
@@ -195,7 +175,7 @@ export class AncestryService {
   readonly gedcomResource = rxResource({
     stream: () =>
       from(liveQuery(() => this.dexieDatabase.metadata.get(1))).pipe(
-        switchMap((metadata) => loadGedcom(metadata?.dataSource)),
+        switchMap((metadata) => loadGedcom(metadata)),
       ),
   });
 
@@ -268,9 +248,15 @@ export class AncestryService {
           id: 1,
         };
         metadata.dataSource = dataSource;
+        // A root person picked in another file means nothing in this one.
+        delete metadata.rootIndividualXref;
         await this.dexieDatabase.metadata.put(metadata);
       },
     );
+  }
+
+  async setRootIndividualXref(rootIndividualXref: string | undefined) {
+    await this.dexieDatabase.metadata.update(1, { rootIndividualXref });
   }
 
   async openBuiltin() {
