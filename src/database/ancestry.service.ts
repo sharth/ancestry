@@ -47,9 +47,6 @@ class DexieDatabase extends Dexie {
 
   constructor() {
     super("AncestryDatabase");
-    // Version 6 introduced the dataSource union. Older databases aren't
-    // migrated: anything they hold is simply not read, and the user picks a
-    // data source again.
     this.version(6).stores({
       metadata: "++id",
     });
