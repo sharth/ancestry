@@ -1,5 +1,11 @@
 /* You can add global styles to this file, and also import other style files */
 
+:root {
+  /* The app header's fixed height. Things that stick to the top of the
+     page (position: sticky) sit just below it. */
+  --app-header-height: 3.875rem;
+}
+
 html {
   height: 100%;
 }
