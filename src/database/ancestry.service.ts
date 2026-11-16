@@ -1,4 +1,4 @@
-import { DestroyRef, Service, inject } from "@angular/core";
+import { DestroyRef, Service, inject, type Signal } from "@angular/core";
 import { rxResource, toObservable, toSignal } from "@angular/core/rxjs-interop";
 import {
   RedirectCommand,
@@ -43,7 +43,8 @@ interface DatabaseState {
 // the metadata row so that changing one doesn't make gedcomResource re-read
 // the file. Never written to the GEDCOM file itself.
 interface Preferences {
-  id?: number;
+  // Always 1: the table holds a single row.
+  id: number;
   // The person relationships are described from.
   rootIndividualXref?: string;
 }
@@ -90,7 +91,9 @@ class DexieDatabase extends Dexie {
       });
     this.version(7).stores({
       metadata: "++id",
-      preferences: "++id",
+      // Every IndexedDB table needs a primary key. There's only ever the one
+      // row, written with id 1, so it isn't auto-incremented.
+      preferences: "id",
     });
   }
 }
@@ -215,7 +218,7 @@ export class AncestryService {
 
   // The root person's xref, or undefined if none is chosen. It may name
   // someone who isn't in the loaded file.
-  readonly rootIndividualXref = toSignal(
+  readonly rootIndividualXref: Signal<string | undefined> = toSignal(
     from(liveQuery(() => this.dexieDatabase.preferences.get(1))).pipe(
       map((preferences) => preferences?.rootIndividualXref),
     ),
