@@ -3,7 +3,15 @@ import { TestBed } from "@angular/core/testing";
 import { Router, provideRouter } from "@angular/router";
 import { render } from "@testing-library/angular/zoneless";
 import { produce } from "immer";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  afterEach,
+  assert,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
 
 import {
   newGedcomDatabase,
@@ -171,11 +179,15 @@ describe("AncestryService.updateGedcomDatabase", () => {
     return (await gedcomFileHandle.getFile()).text();
   }
 
-  // The loaded database with @I1@'s given name edited, as an editor would.
-  function renameJohnToJane() {
+  function loadedDatabase() {
     const database = ancestryService.gedcomResource.value()?.gedcomDatabase;
     if (database === undefined) throw new Error("nothing loaded");
-    return produce(database, (draft) => {
+    return database;
+  }
+
+  // The loaded database with @I1@'s given name edited, as an editor would.
+  function renameJohnToJane() {
+    return produce(loadedDatabase(), (draft) => {
       const name = draft.individuals["@I1@"]?.names[0];
       if (name) name.givenName = "Jane";
     });
@@ -213,9 +225,44 @@ describe("AncestryService.updateGedcomDatabase", () => {
   it("writes the edit when the file is unchanged since it was loaded", async () => {
     const edited = renameJohnToJane();
 
-    await ancestryService.updateGedcomDatabase(edited);
+    await ancestryService.updateGedcomDatabase(loadedDatabase(), edited);
 
     expect(await readFile()).toContain("2 GIVN Jane");
+  });
+
+  it("tells other tabs it saved", async () => {
+    const otherTab = new BroadcastChannel("ancestry-gedcom-saved");
+    const received = new Promise<unknown>((resolve) => {
+      otherTab.onmessage = (event) => {
+        resolve(event.data);
+      };
+    });
+
+    await ancestryService.updateGedcomDatabase(
+      loadedDatabase(),
+      renameJohnToJane(),
+    );
+
+    await expect(received).resolves.toBe("saved");
+    otherTab.close();
+  });
+
+  it("refuses to save an edit of a database that has since been reloaded", async () => {
+    const edited = renameJohnToJane();
+    const stale = loadedDatabase();
+    const current = ancestryService.gedcomResource.value();
+    assert.isOk(current);
+    // Another tab's save reloaded the file into a new database object.
+    ancestryService.gedcomResource.set({
+      ...current,
+      gedcomDatabase: parseGedcomDatabase(current.gedcomRecords),
+    });
+
+    await expect(
+      ancestryService.updateGedcomDatabase(stale, edited),
+    ).rejects.toBeInstanceOf(GedcomFileChangedError);
+
+    expect(await readFile()).toBe(MINIMAL_GEDCOM_TEXT);
   });
 
   it("refuses to overwrite a file that changed after it was loaded", async () => {
@@ -227,9 +274,33 @@ describe("AncestryService.updateGedcomDatabase", () => {
     const edited = renameJohnToJane();
 
     await expect(
-      ancestryService.updateGedcomDatabase(edited),
+      ancestryService.updateGedcomDatabase(loadedDatabase(), edited),
     ).rejects.toBeInstanceOf(GedcomFileChangedError);
 
     expect(await readFile()).toBe(changedElsewhere);
+  });
+});
+
+describe("AncestryService across tabs", () => {
+  // Stands in for another tab: a channel of the same name in this page.
+  let otherTab: BroadcastChannel;
+
+  beforeEach(() => {
+    otherTab = new BroadcastChannel("ancestry-gedcom-saved");
+  });
+
+  afterEach(() => {
+    otherTab.close();
+  });
+
+  it("reloads the file when another tab saves it", async () => {
+    const ancestryService = TestBed.inject(AncestryService);
+    const reloadSpy = vi.spyOn(ancestryService.gedcomResource, "reload");
+
+    otherTab.postMessage("saved");
+
+    await vi.waitFor(() => {
+      expect(reloadSpy).toHaveBeenCalled();
+    });
   });
 });

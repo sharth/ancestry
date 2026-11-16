@@ -309,7 +309,10 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
   // leaving it as an unhandled rejection the user never sees.
   private async save(database: GedcomDatabase) {
     try {
-      await this.ancestryService.updateGedcomDatabase(database);
+      await this.ancestryService.updateGedcomDatabase(
+        this.ancestryDatabase(),
+        database,
+      );
     } catch (error) {
       console.error(error);
       alert(`Couldn't save: ${(error as Error).message}`);

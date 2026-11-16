@@ -160,9 +160,10 @@ async function loadGedcom(
 export class GedcomFileChangedError extends Error {
   constructor() {
     super(
-      "The GEDCOM file was changed since this page loaded it, maybe by " +
+      "The GEDCOM file was changed after this edit started, maybe by " +
         "another tab. Nothing was saved, so those changes are safe. " +
-        "Reload the page to get the latest version, then make your edit again.",
+        "Close the editor (or reload the page) to get the latest version, " +
+        "then make your edit again.",
     );
     this.name = "GedcomFileChangedError";
   }
@@ -184,8 +185,17 @@ export async function findGedcomFilenames(
 export class AncestryService {
   readonly dexieDatabase = new DexieDatabase();
 
+  // Tells this app's other tabs (same origin) that the GEDCOM file was just
+  // saved, so they reload it instead of showing, and later saving over, a
+  // stale copy. A tab doesn't receive its own messages.
+  private readonly savedChannel = new BroadcastChannel("ancestry-gedcom-saved");
+
   constructor() {
+    this.savedChannel.onmessage = () => {
+      this.gedcomResource.reload();
+    };
     inject(DestroyRef).onDestroy(() => {
+      this.savedChannel.close();
       // Dexie opens its IndexedDB connection lazily and never closes it on
       // its own. Without this, every AncestryService instance (e.g. one per
       // unit test) leaves its IndexedDB connection open indefinitely, and
@@ -249,34 +259,40 @@ export class AncestryService {
     );
   }
 
-  async updateGedcomDatabase(gedcomDatabase: GedcomDatabase) {
+  /** Saves `gedcomDatabase`, an edit of `originalGedcomDatabase`, which
+   * must be the database this tab currently has loaded. Throws
+   * GedcomFileChangedError, writing nothing, if the file has changed since
+   * the edit started: either this tab has already reloaded a newer file
+   * (another tab saved), or the file on disk differs from what was loaded
+   * (another program, or a tab whose message hasn't arrived yet). Writing
+   * anyway would silently throw those changes away. */
+  async updateGedcomDatabase(
+    originalGedcomDatabase: GedcomDatabase,
+    gedcomDatabase: GedcomDatabase,
+  ) {
     const gedcomResource = this.gedcomResource.value();
-    const originalGedcomRecords = gedcomResource?.gedcomRecords ?? [];
-    const originalGedcomDatabase =
-      this.gedcomResource.value()?.gedcomDatabase ?? newGedcomDatabase();
-    const text = serializeGedcomDatabase(
-      originalGedcomRecords,
-      originalGedcomDatabase,
-      gedcomDatabase,
-    );
-
-    const gedcomFileHandle = this.gedcomResource.value()?.gedcomFileHandle;
-    if (gedcomFileHandle == undefined) {
+    if (gedcomResource?.gedcomFileHandle == undefined) {
       throw new Error("No GEDCOM file handle available");
     }
-
-    // The edit was made against the file as this tab last loaded it. If the
-    // file has changed since (a save from another tab, or another program),
-    // writing now would silently throw those changes away, so refuse.
-    const currentText = await (await gedcomFileHandle.getFile()).text();
-    if (currentText !== gedcomResource?.gedcomText) {
+    if (originalGedcomDatabase !== gedcomResource.gedcomDatabase) {
+      throw new GedcomFileChangedError();
+    }
+    const currentFile = await gedcomResource.gedcomFileHandle.getFile();
+    if ((await currentFile.text()) !== gedcomResource.gedcomText) {
       throw new GedcomFileChangedError();
     }
 
-    const writableStream = await gedcomFileHandle.createWritable();
+    const text = serializeGedcomDatabase(
+      gedcomResource.gedcomRecords,
+      gedcomResource.gedcomDatabase,
+      gedcomDatabase,
+    );
+    const writableStream =
+      await gedcomResource.gedcomFileHandle.createWritable();
     await writableStream.write(text.join("\n"));
     await writableStream.write("\n");
     await writableStream.close();
+    this.savedChannel.postMessage("saved");
     this.gedcomResource.reload();
   }
 

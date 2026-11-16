@@ -5,7 +5,10 @@ import { userEvent } from "@testing-library/user-event";
 import { produce } from "immer";
 import { assert, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { AncestryService } from "../../database/ancestry.service";
+import {
+  AncestryService,
+  newGedcomResourceValue,
+} from "../../database/ancestry.service";
 import {
   compareGedcomDatabase,
   newGedcomDatabase,
@@ -694,6 +697,51 @@ describe("GedcomEditorComponent hasUnsavedChanges with real form interaction", (
     expect(renderResult.fixture.componentInstance.hasUnsavedChanges()).toBe(
       true,
     );
+  });
+});
+
+describe("GedcomEditorComponent saving", () => {
+  it("saves as an edit of the database it was given", async () => {
+    const database = newGedcomDatabase();
+    const { fixture } = await render(GedcomEditorComponent, {
+      providers: [provideRouter([])],
+      skipDetectChanges: true,
+    });
+    fixture.componentRef.setInput("tabs", [{ type: "INDI", xref: "" }]);
+    fixture.componentRef.setInput("ancestryDatabase", database);
+    const updateGedcomDatabaseSpy = vi
+      .spyOn(TestBed.inject(AncestryService), "updateGedcomDatabase")
+      .mockResolvedValue();
+
+    await fixture.componentInstance.submitForm(new Event("submit"));
+
+    expect(updateGedcomDatabaseSpy.mock.calls[0]?.[0]).toBe(database);
+  });
+
+  it("warns and won't submit once another tab's save was reloaded", async () => {
+    const database = newGedcomDatabase();
+    const { fixture } = await render(GedcomEditorComponent, {
+      providers: [provideRouter([])],
+      skipDetectChanges: true,
+    });
+    fixture.componentRef.setInput("tabs", [{ type: "INDI", xref: "" }]);
+    fixture.componentRef.setInput("ancestryDatabase", database);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(screen.queryByRole("alert")).toBeNull();
+
+    TestBed.inject(AncestryService).gedcomResource.set(
+      newGedcomResourceValue({ gedcomDatabase: newGedcomDatabase() }),
+    );
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(screen.getByRole("alert").textContent).toContain(
+      "changed in another tab",
+    );
+    expect(
+      screen.getByRole<HTMLInputElement>("button", { name: "Submit" }).disabled,
+    ).toBe(true);
   });
 });
 

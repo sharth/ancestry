@@ -2,7 +2,7 @@
   @defer (when editDialog.open) {
     <app-gedcom-editor
       [tabs]="tabs()"
-      [ancestryDatabase]="ancestryDatabase()"
+      [ancestryDatabase]="editorDatabase()"
       (finished)="editDialog.close()"
     />
   }
