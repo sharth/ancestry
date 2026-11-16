@@ -1,10 +1,7 @@
-import { Component, computed, inject, input, viewChild } from "@angular/core";
+import { Component, computed, input, viewChild } from "@angular/core";
 import { RouterModule } from "@angular/router";
 
-import {
-  AncestryService,
-  type GedcomResourceValue,
-} from "../../database/ancestry.service";
+import type { GedcomResourceValue } from "../../database/ancestry.service";
 import { fullname } from "../../gedcom/gedcomIndividual";
 import { externalIdentifierLink } from "../../util/external-identifier-link";
 import { describeRelationship } from "../../util/relationship";
@@ -22,9 +19,6 @@ export class IndividualComponent implements ComponentWithUnsavedChanges {
   readonly gedcom = input.required<GedcomResourceValue>();
   readonly ancestryDatabase = computed(() => this.gedcom().gedcomDatabase);
 
-  private readonly rootIndividualXref =
-    inject(AncestryService).rootIndividualXref;
-
   readonly editDialog = viewChild<GedcomEditorDialogComponent>("editDialog");
 
   hasUnsavedChanges(): boolean {
@@ -37,7 +31,7 @@ export class IndividualComponent implements ComponentWithUnsavedChanges {
     if (individual === undefined) {
       return undefined;
     }
-    const rootXref = this.rootIndividualXref();
+    const rootXref = this.gedcom().rootIndividualXref;
     const root =
       rootXref === undefined
         ? undefined

@@ -6,12 +6,9 @@ import {
   withComponentInputBinding,
 } from "@angular/router";
 import { render } from "@testing-library/angular/zoneless";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
-import {
-  AncestryService,
-  newGedcomResourceValue,
-} from "../../database/ancestry.service";
+import { newGedcomResourceValue } from "../../database/ancestry.service";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomExternalIdentifier } from "../../gedcom/gedcomExternalIdentifier";
 import { newGedcomFact } from "../../gedcom/gedcomFact";
@@ -31,6 +28,7 @@ describe("IndividualComponent", () => {
   let component: IndividualComponent;
   let fixture: ComponentFixture<IndividualComponent>;
 
+  const rootIndividualXref = signal<string | undefined>(undefined);
   const ancestryDatabase = signal(
     newGedcomDatabase({
       individuals: {
@@ -155,7 +153,10 @@ describe("IndividualComponent", () => {
         inputBinding(
           "gedcom",
           computed(() =>
-            newGedcomResourceValue({ gedcomDatabase: ancestryDatabase() }),
+            newGedcomResourceValue({
+              gedcomDatabase: ancestryDatabase(),
+              rootIndividualXref: rootIndividualXref(),
+            }),
           ),
         ),
         inputBinding("xref", signal("@I1@")),
@@ -200,12 +201,8 @@ describe("IndividualComponent", () => {
     };
 
     const setRoot = async (xref: string | undefined) => {
-      const ancestryService = TestBed.inject(AncestryService);
-      await ancestryService.setRootIndividualXref(xref);
-      await vi.waitFor(async () => {
-        expect(ancestryService.rootIndividualXref()).toBe(xref);
-        await fixture.whenStable();
-      });
+      rootIndividualXref.set(xref);
+      await fixture.whenStable();
     };
 
     it("asks for a root person when none is chosen", async () => {
