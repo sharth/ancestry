@@ -18,7 +18,6 @@ export class SettingsComponent {
   private readonly router = inject(Router);
 
   readonly gedcomResource = this.ancestryService.gedcomResource;
-  readonly rootIndividualXref = this.ancestryService.rootIndividualXref;
 
   // Everyone in the loaded file, as root person choices, sorted by surname
   // then full name.

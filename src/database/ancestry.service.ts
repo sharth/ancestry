@@ -1,5 +1,5 @@
-import { DestroyRef, Service, inject, type Signal } from "@angular/core";
-import { rxResource, toObservable, toSignal } from "@angular/core/rxjs-interop";
+import { DestroyRef, Service, inject } from "@angular/core";
+import { rxResource, toObservable } from "@angular/core/rxjs-interop";
 import {
   RedirectCommand,
   Router,
@@ -7,7 +7,14 @@ import {
   type ResourceResult,
 } from "@angular/router";
 import Dexie, { liveQuery } from "dexie";
-import { filter, firstValueFrom, from, map, switchMap } from "rxjs";
+import {
+  combineLatest,
+  filter,
+  firstValueFrom,
+  from,
+  map,
+  switchMap,
+} from "rxjs";
 
 import {
   compareGedcomDatabase,
@@ -39,15 +46,10 @@ interface DatabaseState {
   dataSource?: DataSource;
 }
 
-// The user's own choices about how to show the loaded file, kept apart from
-// the metadata row so that changing one doesn't make gedcomResource re-read
-// the file. Never written to the GEDCOM file itself.
-interface Preferences {
-  // Always 1: the table holds a single row.
-  id: number;
-  // The person relationships are described from.
-  rootIndividualXref?: string;
-}
+// The user's own choices about how to show the loaded file, each stored
+// under its own name (Dexie keeps the key outside the value). Never written
+// to the GEDCOM file itself.
+const ROOT_INDIVIDUAL_XREF = "rootIndividualXref";
 
 // Older versions of this table stored `gedcomHandle`/`multimediaHandle`
 // directly rather than as a `dataSource` union; migrate anyone who has that
@@ -62,7 +64,7 @@ interface LegacyDatabaseState {
 
 class DexieDatabase extends Dexie {
   metadata!: Dexie.Table<DatabaseState, number>;
-  preferences!: Dexie.Table<Preferences, number>;
+  preferences!: Dexie.Table<string, string>;
 
   constructor() {
     super("AncestryDatabase");
@@ -91,9 +93,7 @@ class DexieDatabase extends Dexie {
       });
     this.version(7).stores({
       metadata: "++id",
-      // Every IndexedDB table needs a primary key. There's only ever the one
-      // row, written with id 1, so it isn't auto-incremented.
-      preferences: "id",
+      preferences: "",
     });
   }
 }
@@ -108,6 +108,9 @@ export interface GedcomResourceValue {
   gedcomRecords: GedcomRecord[];
   gedcomDatabase: GedcomDatabase;
   directoryHandle: FileSystemDirectoryHandle | undefined;
+  // The person relationships are described from, chosen in settings. It
+  // may name someone who isn't in the file.
+  rootIndividualXref: string | undefined;
 }
 
 export function newGedcomResourceValue(
@@ -121,13 +124,14 @@ export function newGedcomResourceValue(
     gedcomRecords: [],
     gedcomDatabase: newGedcomDatabase(),
     directoryHandle: undefined,
+    rootIndividualXref: undefined,
     ...fieldsToUpdate,
   };
 }
 
 async function loadGedcom(
   dataSource: DataSource | undefined,
-): Promise<GedcomResourceValue | undefined> {
+): Promise<Omit<GedcomResourceValue, "rootIndividualXref"> | undefined> {
   if (dataSource === undefined) {
     return undefined;
   }
@@ -209,23 +213,36 @@ export class AncestryService {
   // "read IndexedDB, and there's genuinely no data source configured".
   // Driving the resource straight off the observable means it just stays
   // loading, correctly, until that first real read comes back.
+  //
+  // The preferences are watched separately and combined in, so changing one
+  // (e.g. the root person) updates the value without re-reading the file.
   readonly gedcomResource = rxResource({
     stream: () =>
-      from(liveQuery(() => this.dexieDatabase.metadata.get(1))).pipe(
-        switchMap((metadata) => loadGedcom(metadata?.dataSource)),
+      combineLatest([
+        from(liveQuery(() => this.dexieDatabase.metadata.get(1))).pipe(
+          switchMap((metadata) => loadGedcom(metadata?.dataSource)),
+        ),
+        from(
+          liveQuery(() =>
+            this.dexieDatabase.preferences.get(ROOT_INDIVIDUAL_XREF),
+          ),
+        ),
+      ]).pipe(
+        map(([gedcom, rootIndividualXref]) =>
+          gedcom === undefined ? undefined : { ...gedcom, rootIndividualXref },
+        ),
       ),
   });
 
-  // The root person's xref, or undefined if none is chosen. It may name
-  // someone who isn't in the loaded file.
-  readonly rootIndividualXref: Signal<string | undefined> = toSignal(
-    from(liveQuery(() => this.dexieDatabase.preferences.get(1))).pipe(
-      map((preferences) => preferences?.rootIndividualXref),
-    ),
-  );
-
   async setRootIndividualXref(rootIndividualXref: string | undefined) {
-    await this.dexieDatabase.preferences.put({ id: 1, rootIndividualXref });
+    if (rootIndividualXref === undefined) {
+      await this.dexieDatabase.preferences.delete(ROOT_INDIVIDUAL_XREF);
+    } else {
+      await this.dexieDatabase.preferences.put(
+        rootIndividualXref,
+        ROOT_INDIVIDUAL_XREF,
+      );
+    }
   }
 
   compareGedcomDatabase(gedcomDatabase: GedcomDatabase): {

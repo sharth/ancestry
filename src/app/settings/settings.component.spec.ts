@@ -112,7 +112,9 @@ describe("SettingsComponent", () => {
     select.dispatchEvent(new Event("change"));
 
     await vi.waitFor(() => {
-      expect(ancestryService.rootIndividualXref()).toBe(option.value);
+      expect(ancestryService.gedcomResource.value()?.rootIndividualXref).toBe(
+        option.value,
+      );
     });
   });
 
@@ -120,13 +122,17 @@ describe("SettingsComponent", () => {
     await ancestryService.openBuiltin();
     await ancestryService.setRootIndividualXref("@I1@");
     await vi.waitFor(() => {
-      expect(ancestryService.rootIndividualXref()).toBe("@I1@");
+      expect(ancestryService.gedcomResource.value()?.rootIndividualXref).toBe(
+        "@I1@",
+      );
     });
 
     await ancestryService.openBuiltin();
 
     await vi.waitFor(() => {
-      expect(ancestryService.rootIndividualXref()).toBeUndefined();
+      expect(
+        ancestryService.gedcomResource.value()?.rootIndividualXref,
+      ).toBeUndefined();
     });
   });
 });

@@ -98,7 +98,7 @@
               such as grandfather or first cousin once removed. It's saved in
               this browser only, not in the GEDCOM file.
             </p>
-            @let rootXref = rootIndividualXref() ?? "";
+            @let rootXref = gedcomResource.value()?.rootIndividualXref ?? "";
             <div class="form-floating">
               <select
                 id="root-individual"
