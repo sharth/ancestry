@@ -44,7 +44,9 @@ export function relationshipName(
   sex: string,
   { half = false }: { half?: boolean } = {},
 ): string {
-  const halfPrefix = half ? "half-" : "";
+  // "half-aunt", but "half 2nd great-aunt".
+  const halfPrefix = (term: string) =>
+    !half ? term : /^\d/.test(term) ? `half ${term}` : `half-${term}`;
 
   if (rootGenerations === 0 && targetGenerations === 0) {
     return "self";
@@ -70,22 +72,20 @@ export function relationshipName(
     );
   }
   if (rootGenerations === 1 && targetGenerations === 1) {
-    return halfPrefix + gendered(sex, "brother", "sister", "sibling");
+    return halfPrefix(gendered(sex, "brother", "sister", "sibling"));
   }
   if (rootGenerations === 1) {
     // The target descends from the root's sibling.
-    return (
-      halfPrefix +
+    return halfPrefix(
       greats(targetGenerations - 2) +
-      gendered(sex, "nephew", "niece", "niece or nephew")
+        gendered(sex, "nephew", "niece", "niece or nephew"),
     );
   }
   if (targetGenerations === 1) {
     // The target is a sibling of the root's ancestor.
-    return (
-      halfPrefix +
+    return halfPrefix(
       greats(rootGenerations - 2) +
-      gendered(sex, "uncle", "aunt", "aunt or uncle")
+        gendered(sex, "uncle", "aunt", "aunt or uncle"),
     );
   }
 
