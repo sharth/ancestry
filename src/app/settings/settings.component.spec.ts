@@ -1,6 +1,7 @@
 import { TestBed, type ComponentFixture } from "@angular/core/testing";
 import { render } from "@testing-library/angular/zoneless";
 import {
+  afterEach,
   aroundEach,
   assert,
   beforeEach,
@@ -19,6 +20,41 @@ describe("SettingsComponent", () => {
   let ancestryService: AncestryService;
 
   let gedcomFileHandle: FileSystemFileHandle;
+
+  // A small stand-in for the built-in example file. Every change to the
+  // data source or root person re-reads and re-parses the file, and the real
+  // royal-family.ged takes about half a second to parse here, more on CI,
+  // which ran past vi.waitFor's one-second default.
+  beforeEach(() => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() =>
+        Promise.resolve(
+          new Response(
+            [
+              "0 HEAD",
+              "1 GEDC",
+              "2 VERS 7.0.18",
+              "0 @I1@ INDI",
+              "1 NAME Elizabeth /Windsor/",
+              "2 GIVN Elizabeth",
+              "2 SURN Windsor",
+              "0 @I2@ INDI",
+              "1 NAME Philip /Mountbatten/",
+              "2 GIVN Philip",
+              "2 SURN Mountbatten",
+              "0 TRLR",
+              "",
+            ].join("\n"),
+          ),
+        ),
+      ),
+    );
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
 
   beforeEach(async () => {
     const renderResult = await render(SettingsComponent, {
