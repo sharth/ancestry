@@ -56,6 +56,11 @@ describe("SourceWarningsComponent", () => {
     );
 
     expect(
+      Array.from(
+        document.querySelectorAll('.header-row > [role="columnheader"]'),
+      ).map((header) => header.textContent.trim()),
+    ).toEqual(["Source", "Message", "Fix"]);
+    expect(
       screen.getByRole("button", {
         name: "Open editor with proposed changes: Create repository",
       }),
