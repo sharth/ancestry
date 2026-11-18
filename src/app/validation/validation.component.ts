@@ -24,6 +24,7 @@ import {
   applyBibliographyTitleSuggestion,
   bibliographyForMissingTitle,
 } from "./apply-bibliography-title-suggestion.util";
+import { applyIrishGenealogyUrlSuggestion } from "./apply-irish-genealogy-url-suggestion.util";
 import { applyMergeRepositoryLinksSuggestion } from "./apply-merge-repository-links-suggestion.util";
 import { applyTreeIdSuggestion } from "./apply-tree-id-suggestion.util";
 import { applyUrlSuggestions } from "./apply-url-suggestion.util";
@@ -32,6 +33,10 @@ import {
   DuplicateCallNumbersComponent,
   findDuplicateCallNumbers,
 } from "./duplicate-call-numbers.component";
+import {
+  findIrishGenealogyUrlsToUpdate,
+  IrishGenealogyUrlsComponent,
+} from "./irish-genealogy-urls.component";
 import {
   sourceValidators,
   type MergeRepositoryLinksSuggestion,
@@ -71,6 +76,10 @@ type ReviewState =
       source: GedcomSource;
     }
   | {
+      kind: "irish-genealogy";
+      source: GedcomSource;
+    }
+  | {
       kind: "tree-id";
       individual: GedcomIndividual;
     };
@@ -83,6 +92,7 @@ const tabs = [
   { id: "unused-multimedia", label: "Unused multimedia" },
   { id: "bibliography-without-title", label: "Bibliography without title" },
   { id: "tree-ids", label: "Tree ids" },
+  { id: "irish-genealogy-urls", label: "IrishGenealogy.ie URLs" },
 ] as const;
 
 type TabId = (typeof tabs)[number]["id"];
@@ -109,6 +119,7 @@ interface TableRow {
     SourcesWithoutRepositoriesComponent,
     BibliographyWithoutTitleComponent,
     TreeIdsComponent,
+    IrishGenealogyUrlsComponent,
   ],
   templateUrl: "./validation.component.html",
   styleUrl: "./validation.component.css",
@@ -145,6 +156,7 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
         (source) => bibliographyForMissingTitle(source) !== undefined,
       ).length,
       "tree-ids": findTreeIdsToConvert(database).length,
+      "irish-genealogy-urls": findIrishGenealogyUrlsToUpdate(database).length,
     };
   });
 
@@ -231,6 +243,11 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
     if (state.kind === "tree-id") {
       return applyTreeIdSuggestion(this.ancestryDatabase(), [
         state.individual.xref,
+      ]);
+    }
+    if (state.kind === "irish-genealogy") {
+      return applyIrishGenealogyUrlSuggestion(this.ancestryDatabase(), [
+        state.source.xref,
       ]);
     }
     if (state.kind === "bibliography") {
@@ -350,6 +367,21 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
 
   reviewTreeIdSuggestion(individual: GedcomIndividual) {
     this.reviewState.set({ kind: "tree-id", individual });
+  }
+
+  reviewIrishGenealogyUrlSuggestion(source: GedcomSource) {
+    this.reviewState.set({ kind: "irish-genealogy", source });
+  }
+
+  async submitIrishGenealogyUrlSuggestions(sources: GedcomSource[]) {
+    const granted = await this.ancestryService.requestWritePermission();
+    if (!granted) return;
+
+    const database = applyIrishGenealogyUrlSuggestion(
+      this.ancestryDatabase(),
+      sources.map((source) => source.xref),
+    );
+    await this.ancestryService.updateGedcomDatabase(database);
   }
 
   async submitTreeIdSuggestions(individuals: GedcomIndividual[]) {

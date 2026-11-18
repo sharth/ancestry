@@ -192,6 +192,16 @@
       (submitAllSuggestions)="submitTreeIdSuggestions($event)"
     />
   }
+  @case ("irish-genealogy-urls") {
+    <app-irish-genealogy-urls
+      [ancestryDatabase]="ancestryDatabase()"
+      (reviewSuggestion)="
+        reviewIrishGenealogyUrlSuggestion($event); editDialog.showModal()
+      "
+      (submitSuggestion)="submitIrishGenealogyUrlSuggestions([$event])"
+      (submitAllSuggestions)="submitIrishGenealogyUrlSuggestions($event)"
+    />
+  }
 }
 
 <app-gedcom-editor-dialog
