@@ -32,7 +32,7 @@ export function duplicateCallNumberSources(
 ): DuplicateSources | undefined {
   const [kept, ...duplicates] = duplicate.sources.map((use) => use.source);
   if (kept === undefined || duplicates.length === 0) return undefined;
-  return { title: kept.title, kept, duplicates };
+  return { kept, duplicates };
 }
 
 /** Merges the sources sharing a call number into the first of them (see

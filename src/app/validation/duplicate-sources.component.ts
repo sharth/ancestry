@@ -11,30 +11,28 @@ import {
 } from "./apply-merge-duplicate-sources.util";
 import { ValidationTableComponent } from "./validation-table.component";
 
-/** The sources that share a title (ignoring surrounding whitespace) with
- * another source, grouped by title. The first source of each group, in file
- * order, is the one the rest would be merged into. */
+/** The sources that share an abbreviation (ABBR, ignoring surrounding
+ * whitespace) with another source, grouped by abbreviation. The first source
+ * of each group, in file order, is the one the rest would be merged into. */
 export function findDuplicateSources(
   database: GedcomDatabase,
 ): DuplicateSources[] {
-  const byTitle = Map.groupBy(
+  const byAbbr = Map.groupBy(
     Object.values(database.sources).filter(
-      (source) => source.title.trim() !== "",
+      (source) => source.abbr.trim() !== "",
     ),
-    (source) => source.title.trim(),
+    (source) => source.abbr.trim(),
   );
-  return byTitle
+  return byAbbr
     .entries()
-    .flatMap(([title, [kept, ...duplicates]]) =>
-      kept !== undefined && duplicates.length > 0
-        ? [{ title, kept, duplicates }]
-        : [],
+    .flatMap(([, [kept, ...duplicates]]) =>
+      kept !== undefined && duplicates.length > 0 ? [{ kept, duplicates }] : [],
     )
     .toArray();
 }
 
-/** Lists sources with the same title and suggests merging each group into
- * one source, repointing every citation at the source that's kept. */
+/** Lists sources with the same abbreviation and suggests merging each group
+ * into one source, repointing every citation at the source that's kept. */
 @Component({
   selector: "app-duplicate-sources",
   imports: [RouterModule, ValidationTableComponent],
@@ -49,6 +47,7 @@ export class DuplicateSourcesComponent implements ComponentWithUnsavedChanges {
   readonly rows = computed(() =>
     findDuplicateSources(this.ancestryDatabase()).map((group) => ({
       key: group.kept.xref,
+      abbr: group.kept.abbr.trim(),
       group,
       conflicts: mergeConflicts(group),
       fixedDatabase: applyMergeDuplicateSources(this.ancestryDatabase(), [

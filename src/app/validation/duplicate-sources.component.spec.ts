@@ -18,11 +18,11 @@ import {
 } from "./duplicate-sources.component";
 
 const sources = {
-  "@S1@": newGedcomSource({ xref: "@S1@", title: "1900 Census" }),
-  "@S2@": newGedcomSource({ xref: "@S2@", title: "Parish register" }),
-  "@S3@": newGedcomSource({ xref: "@S3@", title: " 1900 Census " }),
-  "@S4@": newGedcomSource({ xref: "@S4@", title: "" }),
-  "@S5@": newGedcomSource({ xref: "@S5@", title: "" }),
+  "@S1@": newGedcomSource({ xref: "@S1@", abbr: "1900 Census" }),
+  "@S2@": newGedcomSource({ xref: "@S2@", abbr: "Parish register" }),
+  "@S3@": newGedcomSource({ xref: "@S3@", abbr: " 1900 Census " }),
+  "@S4@": newGedcomSource({ xref: "@S4@", abbr: "" }),
+  "@S5@": newGedcomSource({ xref: "@S5@", abbr: "" }),
 };
 
 const individuals = {
@@ -38,10 +38,10 @@ const individuals = {
 };
 
 describe("findDuplicateSources", () => {
-  it("groups sources by trimmed title, ignoring untitled sources", () => {
+  it("groups sources by trimmed abbreviation, ignoring sources without one", () => {
     expect(
       findDuplicateSources(newGedcomDatabase({ sources })).map((group) => [
-        group.title,
+        group.kept.abbr.trim(),
         group.kept.xref,
         group.duplicates.map((source) => source.xref),
       ]),
@@ -64,11 +64,13 @@ describe("DuplicateSourcesComponent", () => {
     return fixture.componentInstance;
   }
 
-  it("says so when no two sources share a title", async () => {
+  it("says so when no two sources share an abbreviation", async () => {
     await renderWith(
       newGedcomDatabase({ sources: { "@S2@": sources["@S2@"] } }),
     );
-    expect(screen.getByText("No two sources share a title.")).toBeTruthy();
+    expect(
+      screen.getByText("No two sources share an abbreviation."),
+    ).toBeTruthy();
   });
 
   it("lists each group with its proposed diff", async () => {
@@ -83,10 +85,10 @@ describe("DuplicateSourcesComponent", () => {
     await renderWith(
       newGedcomDatabase({
         sources: {
-          "@S1@": newGedcomSource({ xref: "@S1@", title: "A", text: "one" }),
-          "@S2@": newGedcomSource({ xref: "@S2@", title: "A", text: "two" }),
-          "@S3@": newGedcomSource({ xref: "@S3@", title: "B" }),
-          "@S4@": newGedcomSource({ xref: "@S4@", title: "B" }),
+          "@S1@": newGedcomSource({ xref: "@S1@", abbr: "A", text: "one" }),
+          "@S2@": newGedcomSource({ xref: "@S2@", abbr: "A", text: "two" }),
+          "@S3@": newGedcomSource({ xref: "@S3@", abbr: "B" }),
+          "@S4@": newGedcomSource({ xref: "@S4@", abbr: "B" }),
         },
       }),
     );

@@ -27,8 +27,8 @@ function sourcesOf(...sources: GedcomSource[]) {
 }
 
 describe("applyMergeDuplicateSources", () => {
-  const kept = newGedcomSource({ xref: "@S1@", title: "Census" });
-  const duplicate = newGedcomSource({ xref: "@S2@", title: "Census" });
+  const kept = newGedcomSource({ xref: "@S1@", abbr: "Census" });
+  const duplicate = newGedcomSource({ xref: "@S2@", abbr: "Census" });
 
   it("repoints every citation of the duplicate and deletes it", () => {
     const database = newGedcomDatabase({
@@ -53,7 +53,7 @@ describe("applyMergeDuplicateSources", () => {
     });
 
     const result = applyMergeDuplicateSources(database, [
-      { title: "Census", kept, duplicates: [duplicate] },
+      { kept, duplicates: [duplicate] },
     ]);
 
     expect(Object.keys(result.sources)).toEqual(["@S1@"]);
@@ -76,7 +76,7 @@ describe("applyMergeDuplicateSources", () => {
   it("combines repository links, multimedia links and unparsed records without repeats", () => {
     const keptWithLinks = newGedcomSource({
       xref: "@S1@",
-      title: "Census",
+      abbr: "Census",
       repositoryLinks: [
         newGedcomRepositoryLink({ repositoryXref: "@R1@", callNumbers: ["a"] }),
       ],
@@ -85,7 +85,7 @@ describe("applyMergeDuplicateSources", () => {
     });
     const duplicateWithLinks = newGedcomSource({
       xref: "@S2@",
-      title: "Census",
+      abbr: "Census",
       text: "Some text",
       repositoryLinks: [
         newGedcomRepositoryLink({
@@ -103,11 +103,7 @@ describe("applyMergeDuplicateSources", () => {
         newGedcomRecord({ tag: "PUBL", value: "Publisher" }),
       ],
     });
-    const group = {
-      title: "Census",
-      kept: keptWithLinks,
-      duplicates: [duplicateWithLinks],
-    };
+    const group = { kept: keptWithLinks, duplicates: [duplicateWithLinks] };
 
     const result = applyMergeDuplicateSources(
       newGedcomDatabase({
@@ -136,21 +132,19 @@ describe("applyMergeDuplicateSources", () => {
   it("keeps the kept source's value where the two differ, and reports it", () => {
     const keptWithText = newGedcomSource({
       xref: "@S1@",
-      title: "Census",
+      abbr: "Census",
+      title: "1911 Census, Dublin",
       text: "First",
       unknownRecords: [newGedcomRecord({ tag: "AUTH", value: "One" })],
     });
     const duplicateWithText = newGedcomSource({
       xref: "@S2@",
-      title: "Census",
+      abbr: "Census",
+      title: "1911 Census of Ireland, Dublin",
       text: "Second",
       unknownRecords: [newGedcomRecord({ tag: "AUTH", value: "Two" })],
     });
-    const group = {
-      title: "Census",
-      kept: keptWithText,
-      duplicates: [duplicateWithText],
-    };
+    const group = { kept: keptWithText, duplicates: [duplicateWithText] };
 
     const result = applyMergeDuplicateSources(
       newGedcomDatabase({
@@ -159,10 +153,15 @@ describe("applyMergeDuplicateSources", () => {
       [group],
     );
 
+    expect(result.sources["@S1@"]?.title).toBe("1911 Census, Dublin");
     expect(result.sources["@S1@"]?.text).toBe("First");
     expect(result.sources["@S1@"]?.unknownRecords).toEqual(
       keptWithText.unknownRecords,
     );
-    expect(mergeConflicts(group)).toEqual(["TEXT of @S2@", "AUTH of @S2@"]);
+    expect(mergeConflicts(group)).toEqual([
+      "TITL of @S2@",
+      "TEXT of @S2@",
+      "AUTH of @S2@",
+    ]);
   });
 });
