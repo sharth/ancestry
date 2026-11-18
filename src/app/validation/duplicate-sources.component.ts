@@ -1,27 +1,15 @@
-import {
-  Component,
-  computed,
-  inject,
-  input,
-  signal,
-  viewChild,
-} from "@angular/core";
+import { Component, computed, input, viewChild } from "@angular/core";
 import { RouterModule } from "@angular/router";
 
-import {
-  AncestryService,
-  type GedcomResourceValue,
-} from "../../database/ancestry.service";
+import type { GedcomResourceValue } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
-import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
-import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
-import type { TabInformation } from "../gedcom-editor/gedcom-editor-interface";
 import type { ComponentWithUnsavedChanges } from "../unsaved-changes.guard";
 import {
   applyMergeDuplicateSources,
   mergeConflicts,
   type DuplicateSources,
 } from "./apply-merge-duplicate-sources.util";
+import { ValidationTableComponent } from "./validation-table.component";
 
 /** The sources that share a title (ignoring surrounding whitespace) with
  * another source, grouped by title. The first source of each group, in file
@@ -49,63 +37,28 @@ export function findDuplicateSources(
  * one source, repointing every citation at the source that's kept. */
 @Component({
   selector: "app-duplicate-sources",
-  imports: [RouterModule, GedcomDiffComponent, GedcomEditorDialogComponent],
+  imports: [RouterModule, ValidationTableComponent],
   templateUrl: "./duplicate-sources.component.html",
 })
 export class DuplicateSourcesComponent implements ComponentWithUnsavedChanges {
-  private readonly ancestryService = inject(AncestryService);
-
   readonly gedcom = input.required<GedcomResourceValue>();
   readonly ancestryDatabase = computed(() => this.gedcom().gedcomDatabase);
 
-  readonly editDialog =
-    viewChild.required<GedcomEditorDialogComponent>("editDialog");
-
-  // The group whose merge is open in the editor dialog, if any.
-  readonly reviewing = signal<DuplicateSources | undefined>(undefined);
-
-  // The editor dialog opens with the merge already applied, so it can be
-  // reviewed and edited further before saving.
-  readonly reviewDatabase = computed(() => {
-    const group = this.reviewing();
-    if (group === undefined) return this.ancestryDatabase();
-    return applyMergeDuplicateSources(this.ancestryDatabase(), [group]);
-  });
-
-  readonly reviewTabs = computed<TabInformation[]>(() => {
-    const group = this.reviewing();
-    return group === undefined ? [] : [{ type: "SOUR", xref: group.kept.xref }];
-  });
+  readonly table = viewChild(ValidationTableComponent);
 
   readonly rows = computed(() =>
     findDuplicateSources(this.ancestryDatabase()).map((group) => ({
+      key: group.kept.xref,
       group,
       conflicts: mergeConflicts(group),
-      // The records that would actually change on disk, built from the
-      // same diff the save path uses.
-      differences: this.ancestryService.gedcomDatabaseDifferences(
-        applyMergeDuplicateSources(this.ancestryDatabase(), [group]),
-      ),
+      fixedDatabase: applyMergeDuplicateSources(this.ancestryDatabase(), [
+        group,
+      ]),
+      editorTabs: [{ type: "SOUR" as const, xref: group.kept.xref }],
     })),
   );
 
   hasUnsavedChanges(): boolean {
-    return this.editDialog().hasUnsavedChanges();
-  }
-
-  async review(group: DuplicateSources) {
-    this.reviewing.set(group);
-    await this.editDialog().showModal();
-  }
-
-  // Applies the merge directly and saves it, without opening the editor
-  // dialog.
-  async submit(group: DuplicateSources) {
-    const granted = await this.ancestryService.requestWritePermission();
-    if (!granted) return;
-
-    await this.ancestryService.updateGedcomDatabase(
-      applyMergeDuplicateSources(this.ancestryDatabase(), [group]),
-    );
+    return this.table()?.hasUnsavedChanges() ?? false;
   }
 }

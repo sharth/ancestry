@@ -1,37 +1,26 @@
-<h2 class="mt-4">Duplicate call numbers</h2>
-@if (duplicateCallNumbers().length === 0) {
+@if (rows().length === 0) {
   <p>Every repository call number is used only once.</p>
 } @else {
   <p>These call numbers appear more than once.</p>
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>Call number</th>
-        <th>Sources</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (duplicate of duplicateCallNumbers(); track duplicate.callNumber) {
-        <tr>
-          <td>
-            <app-repository-call-number [callNumber]="duplicate.callNumber" />
-          </td>
-          <td>
-            <ul class="list-unstyled mb-0">
-              @for (use of duplicate.sources; track use.source.xref) {
-                <li>
-                  <a [routerLink]="['/source', use.source.xref]">{{
-                    use.source.abbr || use.source.xref
-                  }}</a>
-                  @if (use.count > 1) {
-                    ({{ use.count }} times)
-                  }
-                </li>
+  <app-validation-table [columns]="['Call number', 'Sources']" [rows]="rows()">
+    <ng-template let-row>
+      <div role="cell">
+        <app-repository-call-number [callNumber]="row.callNumber" />
+      </div>
+      <div role="cell">
+        <ul class="list-unstyled mb-0">
+          @for (use of row.sources; track use.source.xref) {
+            <li>
+              <a [routerLink]="['/source', use.source.xref]">{{
+                use.source.abbr || use.source.xref
+              }}</a>
+              @if (use.count > 1) {
+                ({{ use.count }} times)
               }
-            </ul>
-          </td>
-        </tr>
-      }
-    </tbody>
-  </table>
+            </li>
+          }
+        </ul>
+      </div>
+    </ng-template>
+  </app-validation-table>
 }
