@@ -6,13 +6,15 @@
     The suggested fix replaces each with the page's new address. Open both links
     to check they show the same record.
   </p>
-  <button
-    type="button"
-    class="btn btn-outline-success mb-3"
-    (click)="submitAllSuggestions.emit(sources())"
-  >
-    Submit all {{ rows().length }} as proposed
-  </button>
+  @if (sourcesWithSuggestions().length > 0) {
+    <button
+      type="button"
+      class="btn btn-outline-success mb-3"
+      (click)="submitAllSuggestions.emit(sourcesWithSuggestions())"
+    >
+      Submit all {{ sourcesWithSuggestions().length }} as proposed
+    </button>
+  }
   <table class="table">
     <thead>
       <tr>
@@ -41,28 +43,37 @@
               <dl class="row mb-2">
                 <dt class="col-auto">New</dt>
                 <dd class="col mb-0">
-                  <app-repository-call-number [callNumber]="url.newUrl" />
+                  @if (url.newUrl; as newUrl) {
+                    <app-repository-call-number [callNumber]="newUrl" />
+                  } @else {
+                    <span class="text-body-secondary">
+                      No suggestion: the facts citing this source don't say
+                      which kind of record it is.
+                    </span>
+                  }
                 </dd>
               </dl>
             }
           </td>
           <td>
-            <div class="btn-group-vertical">
-              <button
-                type="button"
-                class="btn btn-sm btn-outline-primary"
-                (click)="reviewSuggestion.emit(row.source)"
-              >
-                Open editor with proposed changes
-              </button>
-              <button
-                type="button"
-                class="btn btn-sm btn-outline-success"
-                (click)="submitSuggestion.emit(row.source)"
-              >
-                Submit changes as proposed
-              </button>
-            </div>
+            @if (row.hasSuggestion) {
+              <div class="btn-group-vertical">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-primary"
+                  (click)="reviewSuggestion.emit(row.source)"
+                >
+                  Open editor with proposed changes
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-success"
+                  (click)="submitSuggestion.emit(row.source)"
+                >
+                  Submit changes as proposed
+                </button>
+              </div>
+            }
           </td>
         </tr>
         <tr>
