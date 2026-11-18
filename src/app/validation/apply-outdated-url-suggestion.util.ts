@@ -20,9 +20,9 @@ interface UrlRewrite {
 // IrishGenealogy.ie's new record ids start with the kind of civil record,
 // which is told from the words in the source's title and abbreviation.
 const irishGenealogyRecordTypes = [
-  { recordType: "cibi", words: /\bbirths?\b/i },
-  { recordType: "cima", words: /\bmarriages?\b/i },
-  { recordType: "cide", words: /\bdeaths?\b/i },
+  { recordType: "cibi", words: /\bbirth\b/i },
+  { recordType: "cima", words: /\bmarriage\b/i },
+  { recordType: "cide", words: /\bdeath\b/i },
 ];
 
 export const urlRewrites: readonly UrlRewrite[] = [

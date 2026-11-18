@@ -27,7 +27,7 @@ describe("outdatedUrl", () => {
     expect(
       outdatedUrl(
         "https://civilrecords.irishgenealogy.ie/churchrecords/details-civil/f1a46a10358934",
-        newGedcomSource({ xref: "@S2@", abbr: "Births, Dublin 1850" }),
+        newGedcomSource({ xref: "@S2@", abbr: "Birth, Dublin 1850" }),
       )?.newUrl,
     ).toBe("https://www.irishgenealogy.ie/view/?record_id=cibi-10358934");
     expect(
