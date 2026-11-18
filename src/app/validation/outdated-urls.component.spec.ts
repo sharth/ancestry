@@ -15,18 +15,20 @@ const oldUrl =
   "https://civilrecords.irishgenealogy.ie/churchrecords/details-civil/9cbd434898349";
 const newUrl = "https://www.irishgenealogy.ie/view/?record_id=cide-4898349";
 
+const deathSource = newGedcomSource({
+  xref: "@S1@",
+  abbr: "Death of John Doe",
+  repositoryLinks: [
+    newGedcomRepositoryLink({
+      repositoryXref: "@R1@",
+      callNumbers: [oldUrl],
+    }),
+  ],
+});
+
 const database = newGedcomDatabase({
   sources: {
-    "@S1@": newGedcomSource({
-      xref: "@S1@",
-      abbr: "Death of John Doe",
-      repositoryLinks: [
-        newGedcomRepositoryLink({
-          repositoryXref: "@R1@",
-          callNumbers: [oldUrl],
-        }),
-      ],
-    }),
+    "@S1@": deathSource,
     "@S2@": newGedcomSource({ xref: "@S2@" }),
   },
 });
@@ -79,6 +81,22 @@ describe("OutdatedUrlsComponent", () => {
       expect(link.getAttribute("rel")).toBe("noopener noreferrer nofollow");
     }
     expect(document.body.textContent).toContain(`2 CALN ${newUrl}`);
+  });
+
+  it("lists a call number with no new URL, with nothing to submit", async () => {
+    await renderWith(
+      newGedcomDatabase({
+        sources: {
+          "@S1@": newGedcomSource({ ...deathSource, abbr: "Civil record" }),
+        },
+      }),
+    );
+    expect(
+      screen.getByText(
+        "No suggestion: the source's title doesn't say which kind of record it is.",
+      ),
+    ).toBeTruthy();
+    expect(screen.queryAllByRole("button")).toEqual([]);
   });
 
   it("hands review, submit and submit all back to the page", async () => {
