@@ -4,6 +4,7 @@ import { RouterModule } from "@angular/router";
 import type { GedcomResourceValue } from "../../database/ancestry.service";
 import { bibliographyForMissingTitle } from "./apply-bibliography-title-suggestion.util";
 import { findDuplicateCallNumbers } from "./duplicate-call-numbers.component";
+import { findDuplicateRepositories } from "./duplicate-repositories.component";
 import { findOutdatedUrls } from "./outdated-urls.component";
 import { findSourceWarnings } from "./source-warnings.component";
 import { findSourcesWithoutRepositories } from "./sources-without-repositories.component";
@@ -16,6 +17,7 @@ const tabs = [
   { id: "source-warnings", label: "Source warnings" },
   { id: "sources-without-repositories", label: "Sources without repositories" },
   { id: "duplicate-call-numbers", label: "Duplicate call numbers" },
+  { id: "duplicate-repositories", label: "Duplicate repositories" },
   { id: "unused-sources", label: "Unused sources" },
   { id: "unused-multimedia", label: "Unused multimedia" },
   { id: "bibliography-without-title", label: "Bibliography without title" },
@@ -48,6 +50,7 @@ export class ValidationComponent {
       "sources-without-repositories":
         findSourcesWithoutRepositories(database).length,
       "duplicate-call-numbers": findDuplicateCallNumbers(database).length,
+      "duplicate-repositories": findDuplicateRepositories(database).length,
       "unused-sources": findUnusedSources(database).length,
       "unused-multimedia": findUnusedMultimedia(database).length,
       "bibliography-without-title": Object.values(database.sources).filter(
