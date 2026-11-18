@@ -24,8 +24,7 @@ import {
 
 /** Lists the sources that have a `_BIBL` (bibliography, e.g. from an
  * Ancestry.com export) but no TITL, and suggests moving the bibliography
- * into the title -- together with any repository links for URLs in the
- * source, as one edit. */
+ * into the title. */
 @Component({
   selector: "app-bibliography-without-title",
   imports: [RouterModule, GedcomDiffComponent, GedcomEditorDialogComponent],
@@ -45,27 +44,15 @@ export class BibliographyWithoutTitleComponent implements ComponentWithUnsavedCh
 
   // The editor dialog opens with the suggested fix already applied, so it
   // can be reviewed and edited further before saving.
-  readonly reviewSuggestion = computed(() => {
+  readonly reviewDatabase = computed(() => {
     const source = this.reviewing();
-    if (source === undefined) return undefined;
+    if (source === undefined) return this.ancestryDatabase();
     return applyBibliographyTitleSuggestion(this.ancestryDatabase(), source);
   });
 
-  readonly reviewDatabase = computed(
-    () => this.reviewSuggestion()?.database ?? this.ancestryDatabase(),
-  );
-
-  // The source first, then each repository the suggestion creates, so both
-  // can be reviewed without going to find the new repository.
   readonly reviewTabs = computed<TabInformation[]>(() => {
     const source = this.reviewing();
-    if (source === undefined) return [];
-    return [
-      { type: "SOUR", xref: source.xref },
-      ...(this.reviewSuggestion()?.createdRepositoryXrefs ?? []).map(
-        (xref): TabInformation => ({ type: "REPO", xref }),
-      ),
-    ];
+    return source === undefined ? [] : [{ type: "SOUR", xref: source.xref }];
   });
 
   readonly rows = computed(() =>
@@ -79,11 +66,9 @@ export class BibliographyWithoutTitleComponent implements ComponentWithUnsavedCh
   // The records that would actually change on disk if the suggestion is
   // applied and saved, built from the same diff the save path uses.
   private differences(source: GedcomSource) {
-    const { database } = applyBibliographyTitleSuggestion(
-      this.ancestryDatabase(),
-      source,
+    return this.ancestryService.gedcomDatabaseDifferences(
+      applyBibliographyTitleSuggestion(this.ancestryDatabase(), source),
     );
-    return this.ancestryService.gedcomDatabaseDifferences(database);
   }
 
   hasUnsavedChanges(): boolean {
@@ -101,10 +86,8 @@ export class BibliographyWithoutTitleComponent implements ComponentWithUnsavedCh
     const granted = await this.ancestryService.requestWritePermission();
     if (!granted) return;
 
-    const { database } = applyBibliographyTitleSuggestion(
-      this.ancestryDatabase(),
-      source,
+    await this.ancestryService.updateGedcomDatabase(
+      applyBibliographyTitleSuggestion(this.ancestryDatabase(), source),
     );
-    await this.ancestryService.updateGedcomDatabase(database);
   }
 }

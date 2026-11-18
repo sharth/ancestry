@@ -2,8 +2,6 @@ import { produce } from "immer";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import type { GedcomSource } from "../../gedcom/gedcomSource";
-import { applyUrlSuggestions } from "./apply-url-suggestion.util";
-import { sourceValidators } from "./source-validators";
 
 /** The `_BIBL` (bibliography) value to move into an untitled source's TITL,
  * or undefined when there's nothing to move: the source already has a
@@ -26,26 +24,18 @@ export function bibliographyForMissingTitle(
   return bibliography.value;
 }
 
-export interface ApplyBibliographyTitleSuggestionResult {
-  database: GedcomDatabase;
-  /** The xrefs of the repositories created by the URL suggestions. */
-  createdRepositoryXrefs: string[];
-}
-
-/** Moves an untitled source's `_BIBL` into its TITL and then, in the same
- * edit, applies every repository suggestion for URLs in the source as it
- * stands after the move -- so a URL that came over with the bibliography
- * becomes a repository call number too. Pure, like applyUrlSuggestions. */
+/** Moves an untitled source's `_BIBL` into its TITL. URLs in it are left
+ * for the other checks (Source warnings, Sources without repositories) to
+ * suggest repositories for, so each fix only does one thing. Pure: doesn't
+ * mutate `database`. */
 export function applyBibliographyTitleSuggestion(
   database: GedcomDatabase,
   source: GedcomSource,
-): ApplyBibliographyTitleSuggestionResult {
+): GedcomDatabase {
   const bibliography = bibliographyForMissingTitle(source);
-  if (bibliography === undefined) {
-    return { database, createdRepositoryXrefs: [] };
-  }
+  if (bibliography === undefined) return database;
 
-  const moved = produce(database, (draft) => {
+  return produce(database, (draft) => {
     const draftSource = draft.sources[source.xref];
     if (draftSource === undefined) return;
     draftSource.title = bibliography;
@@ -53,13 +43,4 @@ export function applyBibliographyTitleSuggestion(
       (record) => record.tag !== "_BIBL",
     );
   });
-
-  const movedSource = moved.sources[source.xref];
-  if (movedSource === undefined) {
-    return { database: moved, createdRepositoryXrefs: [] };
-  }
-  const urlSuggestions = sourceValidators(movedSource, moved).warnings.flatMap(
-    (warning) => warning.urlSuggestion ?? [],
-  );
-  return applyUrlSuggestions(moved, movedSource, urlSuggestions);
 }
