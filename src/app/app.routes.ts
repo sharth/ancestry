@@ -238,6 +238,7 @@ export const routes: Routes = [
         path: "duplicate-call-numbers",
         component: DuplicateCallNumbersComponent,
         resources: gedcomResources,
+        canDeactivate: [confirmUnsavedChangesGuard],
       },
       {
         path: "unused-sources",

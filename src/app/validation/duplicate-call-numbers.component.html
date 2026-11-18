@@ -1,15 +1,23 @@
 @if (rows().length === 0) {
   <p>Every repository call number is used only once.</p>
 } @else {
-  <p>These call numbers appear more than once.</p>
-  <app-validation-table [columns]="['Call number', 'Sources']" [rows]="rows()">
+  <p>
+    These call numbers appear more than once. The suggested fix merges the
+    sources that share one into the first of them (as Duplicate sources does)
+    and drops the repeated call number. Where they conflict, the merge keeps the
+    first source's value; open the editor to keep the other.
+  </p>
+  <app-validation-table
+    [columns]="['Call number', 'Sources', 'Conflicts']"
+    [rows]="rows()"
+  >
     <ng-template let-row>
       <div role="cell">
         <app-repository-call-number [callNumber]="row.callNumber" />
       </div>
       <div role="cell">
         <ul class="list-unstyled mb-0">
-          @for (use of row.sources; track use.source.xref) {
+          @for (use of row.sources; track use.source.xref; let first = $first) {
             <li>
               <a [routerLink]="['/source', use.source.xref]">{{
                 use.source.abbr || use.source.xref
@@ -17,9 +25,19 @@
               @if (use.count > 1) {
                 ({{ use.count }} times)
               }
+              @if (first && row.sources.length > 1) {
+                (kept)
+              }
             </li>
           }
         </ul>
+      </div>
+      <div role="cell">
+        @for (conflict of row.conflicts; track $index) {
+          <div class="text-danger">{{ conflict }} differs</div>
+        } @empty {
+          None
+        }
       </div>
     </ng-template>
   </app-validation-table>
