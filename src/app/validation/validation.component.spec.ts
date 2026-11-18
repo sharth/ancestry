@@ -64,6 +64,7 @@ describe("ValidationComponent", () => {
       "Sources without repositories": "1",
       "Duplicate call numbers": "0",
       "Duplicate repositories": "0",
+      "Duplicate sources": "0",
       "Unused sources": "1",
       "Unused multimedia": "0",
       "Bibliography without title": "0",

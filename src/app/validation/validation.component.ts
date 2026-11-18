@@ -5,6 +5,7 @@ import type { GedcomResourceValue } from "../../database/ancestry.service";
 import { bibliographyForMissingTitle } from "./apply-bibliography-title-suggestion.util";
 import { findDuplicateCallNumbers } from "./duplicate-call-numbers.component";
 import { findDuplicateRepositories } from "./duplicate-repositories.component";
+import { findDuplicateSources } from "./duplicate-sources.component";
 import { findOutdatedUrls } from "./outdated-urls.component";
 import { findSourceWarnings } from "./source-warnings.component";
 import { findSourcesWithoutRepositories } from "./sources-without-repositories.component";
@@ -18,6 +19,7 @@ const tabs = [
   { id: "sources-without-repositories", label: "Sources without repositories" },
   { id: "duplicate-call-numbers", label: "Duplicate call numbers" },
   { id: "duplicate-repositories", label: "Duplicate repositories" },
+  { id: "duplicate-sources", label: "Duplicate sources" },
   { id: "unused-sources", label: "Unused sources" },
   { id: "unused-multimedia", label: "Unused multimedia" },
   { id: "bibliography-without-title", label: "Bibliography without title" },
@@ -58,6 +60,7 @@ export class ValidationComponent {
       ).length,
       "tree-ids": findTreeIdsToConvert(database).length,
       "outdated-urls": findOutdatedUrls(database).length,
+      "duplicate-sources": findDuplicateSources(database).length,
     };
   });
 }
