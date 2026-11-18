@@ -3,6 +3,7 @@ import { provideRouter } from "@angular/router";
 import { render, screen } from "@testing-library/angular/zoneless";
 import { describe, expect, it } from "vitest";
 
+import { newGedcomResourceValue } from "../../database/ancestry.service";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomRepositoryLink } from "../../gedcom/gedcomRepositoryLink";
 import { newGedcomSource } from "../../gedcom/gedcomSource";
@@ -24,10 +25,12 @@ describe("DuplicateCallNumbersComponent", () => {
       providers: [provideRouter([])],
       bindings: [
         inputBinding(
-          "ancestryDatabase",
+          "gedcom",
           signal(
-            newGedcomDatabase({
-              sources: Object.fromEntries(sources.map((s) => [s.xref, s])),
+            newGedcomResourceValue({
+              gedcomDatabase: newGedcomDatabase({
+                sources: Object.fromEntries(sources.map((s) => [s.xref, s])),
+              }),
             }),
           ),
         ),

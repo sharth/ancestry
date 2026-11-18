@@ -1,6 +1,7 @@
 import { Component, computed, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
 
+import type { GedcomResourceValue } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { getFamilySourceCitations } from "../../gedcom/gedcomFamily";
 import { getIndividualSourceCitations } from "../../gedcom/gedcomIndividual";
@@ -13,7 +14,8 @@ import type { GedcomRecord } from "../../gedcom/gedcomRecord";
   templateUrl: "./unused-sources.component.html",
 })
 export class UnusedSourcesComponent {
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly gedcom = input.required<GedcomResourceValue>();
+  readonly ancestryDatabase = computed(() => this.gedcom().gedcomDatabase);
 
   readonly unusedSources = computed(() =>
     findUnusedSources(this.ancestryDatabase()),

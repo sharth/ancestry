@@ -31,6 +31,14 @@ import { SourceOverviewComponent } from "./source/source-overview.component";
 import { SourceComponent } from "./source/source.component";
 import { SourcesComponent } from "./sources/sources.component";
 import { confirmUnsavedChangesGuard } from "./unsaved-changes.guard";
+import { BibliographyWithoutTitleComponent } from "./validation/bibliography-without-title.component";
+import { DuplicateCallNumbersComponent } from "./validation/duplicate-call-numbers.component";
+import { OutdatedUrlsComponent } from "./validation/outdated-urls.component";
+import { SourceWarningsComponent } from "./validation/source-warnings.component";
+import { SourcesWithoutRepositoriesComponent } from "./validation/sources-without-repositories.component";
+import { TreeIdsComponent } from "./validation/tree-ids.component";
+import { UnusedMultimediaComponent } from "./validation/unused-multimedia.component";
+import { UnusedSourcesComponent } from "./validation/unused-sources.component";
 import { ValidationComponent } from "./validation/validation.component";
 
 export const routes: Routes = [
@@ -210,7 +218,54 @@ export const routes: Routes = [
     component: ValidationComponent,
     canActivate: [ancestryDatabaseGuard],
     resources: gedcomResources,
-    canDeactivate: [confirmUnsavedChangesGuard],
+    children: [
+      { path: "", redirectTo: "source-warnings", pathMatch: "full" },
+      {
+        path: "source-warnings",
+        component: SourceWarningsComponent,
+        resources: gedcomResources,
+        canDeactivate: [confirmUnsavedChangesGuard],
+      },
+      {
+        path: "sources-without-repositories",
+        component: SourcesWithoutRepositoriesComponent,
+        resources: gedcomResources,
+        canDeactivate: [confirmUnsavedChangesGuard],
+      },
+      {
+        path: "duplicate-call-numbers",
+        component: DuplicateCallNumbersComponent,
+        resources: gedcomResources,
+      },
+      {
+        path: "unused-sources",
+        component: UnusedSourcesComponent,
+        resources: gedcomResources,
+      },
+      {
+        path: "unused-multimedia",
+        component: UnusedMultimediaComponent,
+        resources: gedcomResources,
+      },
+      {
+        path: "bibliography-without-title",
+        component: BibliographyWithoutTitleComponent,
+        resources: gedcomResources,
+        canDeactivate: [confirmUnsavedChangesGuard],
+      },
+      {
+        path: "tree-ids",
+        component: TreeIdsComponent,
+        resources: gedcomResources,
+        canDeactivate: [confirmUnsavedChangesGuard],
+      },
+      {
+        path: "outdated-urls",
+        component: OutdatedUrlsComponent,
+        resources: gedcomResources,
+        canDeactivate: [confirmUnsavedChangesGuard],
+      },
+    ],
   },
   { path: "**", component: PageNotFoundComponent },
 ];

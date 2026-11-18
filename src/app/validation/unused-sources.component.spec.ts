@@ -3,6 +3,7 @@ import { provideRouter } from "@angular/router";
 import { render, screen } from "@testing-library/angular/zoneless";
 import { describe, expect, it } from "vitest";
 
+import { newGedcomResourceValue } from "../../database/ancestry.service";
 import {
   newGedcomDatabase,
   type GedcomDatabase,
@@ -32,7 +33,12 @@ describe("UnusedSourcesComponent", () => {
   async function renderLinkNames(database: GedcomDatabase) {
     await render(UnusedSourcesComponent, {
       providers: [provideRouter([])],
-      bindings: [inputBinding("ancestryDatabase", signal(database))],
+      bindings: [
+        inputBinding(
+          "gedcom",
+          signal(newGedcomResourceValue({ gedcomDatabase: database })),
+        ),
+      ],
       waitForStableOnRender: true,
     });
     return screen.queryAllByRole("link").map((link) => link.textContent.trim());

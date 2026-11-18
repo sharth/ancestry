@@ -1,6 +1,7 @@
 import { Component, computed, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
 
+import type { GedcomResourceValue } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import type { GedcomRecord } from "../../gedcom/gedcomRecord";
 import type { GedcomSourceCitation } from "../../gedcom/gedcomSourceCitation";
@@ -13,7 +14,8 @@ import type { GedcomSourceCitation } from "../../gedcom/gedcomSourceCitation";
   templateUrl: "./unused-multimedia.component.html",
 })
 export class UnusedMultimediaComponent {
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly gedcom = input.required<GedcomResourceValue>();
+  readonly ancestryDatabase = computed(() => this.gedcom().gedcomDatabase);
 
   readonly unusedMultimedia = computed(() =>
     findUnusedMultimedia(this.ancestryDatabase()),
