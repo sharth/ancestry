@@ -25,6 +25,7 @@ import {
   bibliographyForMissingTitle,
 } from "./apply-bibliography-title-suggestion.util";
 import { applyMergeRepositoryLinksSuggestion } from "./apply-merge-repository-links-suggestion.util";
+import { applyOutdatedUrlSuggestion } from "./apply-outdated-url-suggestion.util";
 import { applyTreeIdSuggestion } from "./apply-tree-id-suggestion.util";
 import { applyUrlSuggestions } from "./apply-url-suggestion.util";
 import { BibliographyWithoutTitleComponent } from "./bibliography-without-title.component";
@@ -32,6 +33,10 @@ import {
   DuplicateCallNumbersComponent,
   findDuplicateCallNumbers,
 } from "./duplicate-call-numbers.component";
+import {
+  findOutdatedUrls,
+  OutdatedUrlsComponent,
+} from "./outdated-urls.component";
 import {
   sourceValidators,
   type MergeRepositoryLinksSuggestion,
@@ -71,6 +76,10 @@ type ReviewState =
       source: GedcomSource;
     }
   | {
+      kind: "outdated-url";
+      source: GedcomSource;
+    }
+  | {
       kind: "tree-id";
       individual: GedcomIndividual;
     };
@@ -83,6 +92,7 @@ const tabs = [
   { id: "unused-multimedia", label: "Unused multimedia" },
   { id: "bibliography-without-title", label: "Bibliography without title" },
   { id: "tree-ids", label: "Tree ids" },
+  { id: "outdated-urls", label: "Outdated URLs" },
 ] as const;
 
 type TabId = (typeof tabs)[number]["id"];
@@ -109,6 +119,7 @@ interface TableRow {
     SourcesWithoutRepositoriesComponent,
     BibliographyWithoutTitleComponent,
     TreeIdsComponent,
+    OutdatedUrlsComponent,
   ],
   templateUrl: "./validation.component.html",
   styleUrl: "./validation.component.css",
@@ -145,6 +156,7 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
         (source) => bibliographyForMissingTitle(source) !== undefined,
       ).length,
       "tree-ids": findTreeIdsToConvert(database).length,
+      "outdated-urls": findOutdatedUrls(database).length,
     };
   });
 
@@ -231,6 +243,11 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
     if (state.kind === "tree-id") {
       return applyTreeIdSuggestion(this.ancestryDatabase(), [
         state.individual.xref,
+      ]);
+    }
+    if (state.kind === "outdated-url") {
+      return applyOutdatedUrlSuggestion(this.ancestryDatabase(), [
+        state.source.xref,
       ]);
     }
     if (state.kind === "bibliography") {
@@ -350,6 +367,21 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
 
   reviewTreeIdSuggestion(individual: GedcomIndividual) {
     this.reviewState.set({ kind: "tree-id", individual });
+  }
+
+  reviewOutdatedUrlSuggestion(source: GedcomSource) {
+    this.reviewState.set({ kind: "outdated-url", source });
+  }
+
+  async submitOutdatedUrlSuggestions(sources: GedcomSource[]) {
+    const granted = await this.ancestryService.requestWritePermission();
+    if (!granted) return;
+
+    const database = applyOutdatedUrlSuggestion(
+      this.ancestryDatabase(),
+      sources.map((source) => source.xref),
+    );
+    await this.ancestryService.updateGedcomDatabase(database);
   }
 
   async submitTreeIdSuggestions(individuals: GedcomIndividual[]) {

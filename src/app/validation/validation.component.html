@@ -192,6 +192,16 @@
       (submitAllSuggestions)="submitTreeIdSuggestions($event)"
     />
   }
+  @case ("outdated-urls") {
+    <app-outdated-urls
+      [ancestryDatabase]="ancestryDatabase()"
+      (reviewSuggestion)="
+        reviewOutdatedUrlSuggestion($event); editDialog.showModal()
+      "
+      (submitSuggestion)="submitOutdatedUrlSuggestions([$event])"
+      (submitAllSuggestions)="submitOutdatedUrlSuggestions($event)"
+    />
+  }
 }
 
 <app-gedcom-editor-dialog

@@ -1,0 +1,81 @@
+@if (rows().length === 0) {
+  <p>No call number is an outdated URL.</p>
+} @else {
+  <p>
+    These call numbers link to pages at addresses their site has since moved.
+    The suggested fix replaces each with the page's new address. Open both links
+    to check they show the same record.
+  </p>
+  <button
+    type="button"
+    class="btn btn-outline-success mb-3"
+    (click)="submitAllSuggestions.emit(sources())"
+  >
+    Submit all {{ rows().length }} as proposed
+  </button>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Source</th>
+        <th>Call numbers</th>
+        <th>Fix</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of rows(); track row.source.xref) {
+        <tr>
+          <td>
+            <a [routerLink]="['/source', row.source.xref]">
+              {{ row.source.abbr || row.source.xref }}
+            </a>
+          </td>
+          <td>
+            @for (url of row.urls; track $index) {
+              <div class="fw-semibold">{{ url.site }}</div>
+              <dl class="row mb-0">
+                <dt class="col-auto">Old</dt>
+                <dd class="col mb-0">
+                  <app-repository-call-number [callNumber]="url.oldUrl" />
+                </dd>
+              </dl>
+              <dl class="row mb-2">
+                <dt class="col-auto">New</dt>
+                <dd class="col mb-0">
+                  <app-repository-call-number [callNumber]="url.newUrl" />
+                </dd>
+              </dl>
+            }
+          </td>
+          <td>
+            <div class="btn-group-vertical">
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-primary"
+                (click)="reviewSuggestion.emit(row.source)"
+              >
+                Open editor with proposed changes
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-success"
+                (click)="submitSuggestion.emit(row.source)"
+              >
+                Submit changes as proposed
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="3">
+            @for (d of row.differences; track $index) {
+              <app-gedcom-diff
+                [oldGedcomRecord]="d.originalGedcomRecord"
+                [newGedcomRecord]="d.updatedGedcomRecord"
+              />
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}
