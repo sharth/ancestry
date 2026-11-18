@@ -83,7 +83,7 @@ describe("DuplicateSourcesComponent", () => {
     expect(document.body.textContent).toContain("2 SOUR @S1@");
   });
 
-  it("lists conflicts and leaves conflicting groups out of submit all", async () => {
+  it("lists each group's conflicts", async () => {
     await renderWith(
       newGedcomDatabase({
         sources: {
@@ -95,11 +95,7 @@ describe("DuplicateSourcesComponent", () => {
       }),
     );
     expect(screen.getByText("TEXT of @S2@ differs")).toBeTruthy();
-    expect(
-      screen.getByRole("button", {
-        name: "Submit all 1 without conflicts as proposed",
-      }),
-    ).toBeTruthy();
+    expect(screen.getByText("None")).toBeTruthy();
   });
 
   it("reviews in the editor dialog, or submits directly", async () => {
@@ -123,13 +119,8 @@ describe("DuplicateSourcesComponent", () => {
     expect(component.reviewDatabase().sources["@S3@"]).toBeUndefined();
 
     screen.getByRole("button", { name: "Submit changes as proposed" }).click();
-    screen
-      .getByRole("button", {
-        name: "Submit all 1 without conflicts as proposed",
-      })
-      .click();
     await vi.waitFor(() => {
-      expect(updateGedcomDatabaseSpy).toHaveBeenCalledTimes(2);
+      expect(updateGedcomDatabaseSpy).toHaveBeenCalledTimes(1);
     });
     for (const [saved] of updateGedcomDatabaseSpy.mock.calls) {
       expect(saved.sources["@S3@"]).toBeUndefined();

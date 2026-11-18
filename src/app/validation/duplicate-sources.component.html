@@ -6,16 +6,6 @@
     every citation of the others at it, carries over their repository and
     multimedia links, and deletes them.
   </p>
-  @if (groupsWithoutConflicts().length > 0) {
-    <button
-      type="button"
-      class="btn btn-outline-success mb-3"
-      (click)="submit(groupsWithoutConflicts())"
-    >
-      Submit all {{ groupsWithoutConflicts().length }} without conflicts as
-      proposed
-    </button>
-  }
   <table class="table">
     <thead>
       <tr>
@@ -63,7 +53,7 @@
               <button
                 type="button"
                 class="btn btn-sm btn-outline-success"
-                (click)="submit([row.group])"
+                (click)="submit(row.group)"
               >
                 Submit changes as proposed
               </button>

@@ -89,14 +89,6 @@ export class DuplicateSourcesComponent implements ComponentWithUnsavedChanges {
     })),
   );
 
-  // Groups whose merge would leave a duplicate's value behind are only
-  // merged one at a time, after looking at them.
-  readonly groupsWithoutConflicts = computed(() =>
-    this.rows()
-      .filter((row) => row.conflicts.length === 0)
-      .map((row) => row.group),
-  );
-
   hasUnsavedChanges(): boolean {
     return this.editDialog().hasUnsavedChanges();
   }
@@ -108,12 +100,12 @@ export class DuplicateSourcesComponent implements ComponentWithUnsavedChanges {
 
   // Applies the merge directly and saves it, without opening the editor
   // dialog.
-  async submit(groups: DuplicateSources[]) {
+  async submit(group: DuplicateSources) {
     const granted = await this.ancestryService.requestWritePermission();
     if (!granted) return;
 
     await this.ancestryService.updateGedcomDatabase(
-      applyMergeDuplicateSources(this.ancestryDatabase(), groups),
+      applyMergeDuplicateSources(this.ancestryDatabase(), [group]),
     );
   }
 }
