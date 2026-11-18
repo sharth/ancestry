@@ -21,8 +21,6 @@ import {
 export interface SourceWarning {
   source: GedcomSource;
   severity: "Error" | "Warning";
-  fieldName: string;
-  groupName: string;
   message: string;
   urlSuggestion?: UrlRepositorySuggestion;
   mergeSuggestion?: MergeRepositoryLinksSuggestion;
@@ -38,8 +36,6 @@ export function findSourceWarnings(database: GedcomDatabase): SourceWarning[] {
       result.push({
         source,
         severity: "Error",
-        fieldName: error.fieldName,
-        groupName: error.groupName,
         message: error.message,
       });
     }
@@ -55,8 +51,6 @@ export function findSourceWarnings(database: GedcomDatabase): SourceWarning[] {
       result.push({
         source,
         severity: "Warning",
-        fieldName: warning.fieldName,
-        groupName: warning.groupName,
         message: warning.message,
         urlSuggestion: warning.urlSuggestion,
         mergeSuggestion: warning.mergeRepositoryLinksSuggestion,

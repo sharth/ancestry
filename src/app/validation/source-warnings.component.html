@@ -2,14 +2,8 @@
   <p>No source has an error or a warning.</p>
 } @else {
   <app-validation-table
-    [columns]="['Source', 'Severity', 'Field', 'Group', 'Message']"
-    [columnSizes]="[
-      'minmax(0, 1fr)',
-      '6.5rem',
-      'minmax(0, 1fr)',
-      'minmax(0, 1fr)',
-      'minmax(0, 3fr)',
-    ]"
+    [columns]="['Source', 'Message']"
+    [columnSizes]="['minmax(0, 1fr)', 'minmax(0, 3fr)']"
     [rows]="rows()"
   >
     <ng-template let-row>
@@ -18,10 +12,12 @@
           {{ row.source.abbr || row.source.xref }}
         </a>
       </div>
-      <div role="cell">{{ row.severity }}</div>
-      <div role="cell">{{ row.fieldName }}</div>
-      <div role="cell">{{ row.groupName }}</div>
-      <div role="cell">{{ row.message }}</div>
+      <div role="cell">
+        @if (row.severity === "Error") {
+          <span class="badge text-bg-danger">Error</span>
+        }
+        {{ row.message }}
+      </div>
     </ng-template>
   </app-validation-table>
 }
