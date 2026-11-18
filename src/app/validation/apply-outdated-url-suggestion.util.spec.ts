@@ -1,15 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
-import { newGedcomFact } from "../../gedcom/gedcomFact";
-import { newGedcomFamily } from "../../gedcom/gedcomFamily";
-import { newGedcomIndividual } from "../../gedcom/gedcomIndividual";
 import { newGedcomRepositoryLink } from "../../gedcom/gedcomRepositoryLink";
 import { newGedcomSource } from "../../gedcom/gedcomSource";
-import { newGedcomSourceCitation } from "../../gedcom/gedcomSourceCitation";
 import {
   applyOutdatedUrlSuggestion,
-  citedFactTags,
   outdatedUrl,
   outdatedUrlsToUpdate,
 } from "./apply-outdated-url-suggestion.util";
@@ -18,37 +13,42 @@ const oldUrl =
   "https://civilrecords.irishgenealogy.ie/churchrecords/details-civil/9cbd434898349";
 const newUrl = "https://www.irishgenealogy.ie/view/?record_id=cide-4898349";
 
-function citingFact(tag: string, sourceXref: string) {
-  return newGedcomFact({
-    tag,
-    citations: [newGedcomSourceCitation({ sourceXref })],
-  });
-}
+const deathSource = newGedcomSource({
+  xref: "@S1@",
+  title: "Civil Death Record, Patrick Murphy",
+});
 
 describe("outdatedUrl", () => {
-  it("rewrites an old IrishGenealogy.ie civil record URL by the kind of record its source is cited for", () => {
-    expect(outdatedUrl(oldUrl, new Set(["DEAT"]))?.newUrl).toBe(newUrl);
+  it("rewrites an old IrishGenealogy.ie civil record URL by the kind of record its source's title names", () => {
+    expect(outdatedUrl(oldUrl, deathSource)?.newUrl).toBe(newUrl);
     expect(
-      outdatedUrl(oldUrl.replace("https:", "http:"), new Set(["DEAT"]))?.newUrl,
+      outdatedUrl(oldUrl.replace("https:", "http:"), deathSource)?.newUrl,
     ).toBe(newUrl);
     expect(
       outdatedUrl(
         "https://civilrecords.irishgenealogy.ie/churchrecords/details-civil/f1a46a10358934",
-        new Set(["BIRT", "SEX"]),
+        newGedcomSource({ xref: "@S2@", abbr: "Births, Dublin 1850" }),
       )?.newUrl,
     ).toBe("https://www.irishgenealogy.ie/view/?record_id=cibi-10358934");
-    expect(outdatedUrl(oldUrl, new Set(["MARR", "OCCU"]))?.newUrl).toBe(
-      "https://www.irishgenealogy.ie/view/?record_id=cima-4898349",
-    );
+    expect(
+      outdatedUrl(
+        oldUrl,
+        newGedcomSource({ xref: "@S3@", title: "Marriage of John Kelly" }),
+      )?.newUrl,
+    ).toBe("https://www.irishgenealogy.ie/view/?record_id=cima-4898349");
+    expect(
+      outdatedUrl(
+        "https://civilrecords.irishgenealogy.ie/churchrecords/details-civil/fd62df2667367",
+        newGedcomSource({ xref: "@S4@", abbr: "Marriage, Kelly-Byrne" }),
+      )?.newUrl,
+    ).toBe("https://www.irishgenealogy.ie/view/?record_id=cima-2667367");
   });
 
   it("lists an IrishGenealogy.ie URL with no new URL when the kind of record is unclear", () => {
-    for (const tags of [[], ["OCCU"], ["BIRT", "DEAT"]]) {
-      expect(outdatedUrl(oldUrl, new Set(tags))).toEqual({
-        site: "IrishGenealogy.ie",
-        oldUrl,
-        newUrl: undefined,
-      });
+    for (const title of ["", "Civil record", "Birth and death of John"]) {
+      expect(
+        outdatedUrl(oldUrl, newGedcomSource({ xref: "@S1@", title })),
+      ).toEqual({ site: "IrishGenealogy.ie", oldUrl, newUrl: undefined });
     }
   });
 
@@ -56,6 +56,7 @@ describe("outdatedUrl", () => {
     expect(
       outdatedUrl(
         "https://www.ancestry.com/discoveryui-content/view/150996143:60525",
+        deathSource,
       ),
     ).toEqual({
       site: "Ancestry",
@@ -67,42 +68,22 @@ describe("outdatedUrl", () => {
   });
 
   it("leaves anything else alone", () => {
-    expect(outdatedUrl(newUrl)).toBeUndefined();
-    expect(outdatedUrl("MS 123")).toBeUndefined();
+    expect(outdatedUrl(newUrl, deathSource)).toBeUndefined();
+    expect(outdatedUrl("MS 123", deathSource)).toBeUndefined();
     expect(
       outdatedUrl(
         "https://civilrecords.irishgenealogy.ie/churchrecords/details/9cbd434898349",
+        deathSource,
       ),
     ).toBeUndefined();
-    expect(outdatedUrl(`See ${oldUrl}`)).toBeUndefined();
-  });
-});
-
-describe("citedFactTags", () => {
-  it("collects the tags of individual and family facts citing a source", () => {
-    const database = newGedcomDatabase({
-      individuals: {
-        "@I1@": newGedcomIndividual({
-          xref: "@I1@",
-          facts: [citingFact("DEAT", "@S1@"), citingFact("BIRT", "@S2@")],
-        }),
-      },
-      families: {
-        "@F1@": newGedcomFamily({
-          xref: "@F1@",
-          facts: [citingFact("MARR", "@S1@")],
-        }),
-      },
-    });
-    expect(citedFactTags(database, "@S1@")).toEqual(new Set(["DEAT", "MARR"]));
-    expect(citedFactTags(database, "@S3@")).toEqual(new Set());
+    expect(outdatedUrl(`See ${oldUrl}`, deathSource)).toBeUndefined();
   });
 });
 
 describe("applyOutdatedUrlSuggestion", () => {
   it("replaces only the old URLs on the given sources", () => {
     const source = newGedcomSource({
-      xref: "@S1@",
+      ...deathSource,
       repositoryLinks: [
         newGedcomRepositoryLink({
           repositoryXref: "@R1@",
@@ -111,6 +92,7 @@ describe("applyOutdatedUrlSuggestion", () => {
       ],
     });
     const other = newGedcomSource({
+      ...deathSource,
       xref: "@S2@",
       repositoryLinks: [
         newGedcomRepositoryLink({
@@ -119,20 +101,14 @@ describe("applyOutdatedUrlSuggestion", () => {
         }),
       ],
     });
-    const original = newGedcomDatabase({
-      individuals: {
-        "@I1@": newGedcomIndividual({
-          xref: "@I1@",
-          facts: [citingFact("DEAT", "@S1@"), citingFact("DEAT", "@S2@")],
-        }),
-      },
-      sources: { "@S1@": source, "@S2@": other },
-    });
-    expect(outdatedUrlsToUpdate(original, source)).toEqual([
+    expect(outdatedUrlsToUpdate(source)).toEqual([
       { site: "IrishGenealogy.ie", oldUrl, newUrl },
     ]);
 
-    const database = applyOutdatedUrlSuggestion(original, ["@S1@"]);
+    const database = applyOutdatedUrlSuggestion(
+      newGedcomDatabase({ sources: { "@S1@": source, "@S2@": other } }),
+      ["@S1@"],
+    );
     expect(database.sources["@S1@"]?.repositoryLinks[0]?.callNumbers).toEqual([
       "MS 123",
       newUrl,

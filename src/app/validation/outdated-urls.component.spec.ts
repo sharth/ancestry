@@ -7,11 +7,8 @@ import {
   newGedcomDatabase,
   type GedcomDatabase,
 } from "../../gedcom/gedcomDatabase";
-import { newGedcomFact } from "../../gedcom/gedcomFact";
-import { newGedcomIndividual } from "../../gedcom/gedcomIndividual";
 import { newGedcomRepositoryLink } from "../../gedcom/gedcomRepositoryLink";
 import { newGedcomSource, type GedcomSource } from "../../gedcom/gedcomSource";
-import { newGedcomSourceCitation } from "../../gedcom/gedcomSourceCitation";
 import { OutdatedUrlsComponent } from "./outdated-urls.component";
 
 const oldUrl =
@@ -30,17 +27,6 @@ const deathSource = newGedcomSource({
 });
 
 const database = newGedcomDatabase({
-  individuals: {
-    "@I1@": newGedcomIndividual({
-      xref: "@I1@",
-      facts: [
-        newGedcomFact({
-          tag: "DEAT",
-          citations: [newGedcomSourceCitation({ sourceXref: "@S1@" })],
-        }),
-      ],
-    }),
-  },
   sources: {
     "@S1@": deathSource,
     "@S2@": newGedcomSource({ xref: "@S2@" }),
@@ -98,10 +84,16 @@ describe("OutdatedUrlsComponent", () => {
   });
 
   it("lists a call number with no new URL, with nothing to submit", async () => {
-    await renderWith(newGedcomDatabase({ sources: { "@S1@": deathSource } }));
+    await renderWith(
+      newGedcomDatabase({
+        sources: {
+          "@S1@": newGedcomSource({ ...deathSource, abbr: "Civil record" }),
+        },
+      }),
+    );
     expect(
       screen.getByText(
-        "No suggestion: the facts citing this source don't say which kind of record it is.",
+        "No suggestion: the source's title doesn't say which kind of record it is.",
       ),
     ).toBeTruthy();
     expect(screen.queryAllByRole("button")).toEqual([]);

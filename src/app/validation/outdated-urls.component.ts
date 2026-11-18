@@ -15,7 +15,7 @@ import {
  * since moved (see `urlRewrites`). */
 export function findOutdatedUrls(database: GedcomDatabase): GedcomSource[] {
   return Object.values(database.sources).filter(
-    (source) => outdatedUrlsToUpdate(database, source).length > 0,
+    (source) => outdatedUrlsToUpdate(source).length > 0,
   );
 }
 
@@ -49,7 +49,7 @@ export class OutdatedUrlsComponent {
 
   readonly rows = computed(() =>
     this.sources().map((source) => {
-      const urls = outdatedUrlsToUpdate(this.ancestryDatabase(), source);
+      const urls = outdatedUrlsToUpdate(source);
       const hasSuggestion = urls.some((url) => url.newUrl !== undefined);
       return {
         source,
