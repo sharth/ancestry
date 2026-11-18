@@ -34,6 +34,7 @@ import { confirmUnsavedChangesGuard } from "./unsaved-changes.guard";
 import { BibliographyWithoutTitleComponent } from "./validation/bibliography-without-title.component";
 import { DuplicateCallNumbersComponent } from "./validation/duplicate-call-numbers.component";
 import { DuplicateRepositoriesComponent } from "./validation/duplicate-repositories.component";
+import { DuplicateSourcesComponent } from "./validation/duplicate-sources.component";
 import { OutdatedUrlsComponent } from "./validation/outdated-urls.component";
 import { SourceWarningsComponent } from "./validation/source-warnings.component";
 import { SourcesWithoutRepositoriesComponent } from "./validation/sources-without-repositories.component";
@@ -269,6 +270,12 @@ export const routes: Routes = [
       {
         path: "outdated-urls",
         component: OutdatedUrlsComponent,
+        resources: gedcomResources,
+        canDeactivate: [confirmUnsavedChangesGuard],
+      },
+      {
+        path: "duplicate-sources",
+        component: DuplicateSourcesComponent,
         resources: gedcomResources,
         canDeactivate: [confirmUnsavedChangesGuard],
       },
