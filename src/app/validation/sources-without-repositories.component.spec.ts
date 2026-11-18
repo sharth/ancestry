@@ -1,13 +1,9 @@
 import { inputBinding, signal } from "@angular/core";
-import { TestBed } from "@angular/core/testing";
 import { provideRouter } from "@angular/router";
 import { render, screen } from "@testing-library/angular/zoneless";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
-import {
-  AncestryService,
-  newGedcomResourceValue,
-} from "../../database/ancestry.service";
+import { newGedcomResourceValue } from "../../database/ancestry.service";
 import {
   newGedcomDatabase,
   type GedcomDatabase,
@@ -103,7 +99,7 @@ describe("SourcesWithoutRepositoriesComponent", () => {
     ).toBeTruthy();
   });
 
-  it("reviews or submits every suggestion for a source as one edit", async () => {
+  it("fixes every suggestion for a source as one edit", async () => {
     const source = newGedcomSource({
       xref: "@S1@",
       text: "https://www.newspapers.com/clip/1/\nhttps://www.newspapers.com/clip/2/",
@@ -124,41 +120,21 @@ describe("SourcesWithoutRepositoriesComponent", () => {
       ],
       waitForStableOnRender: true,
     });
-    const component = fixture.componentInstance;
-    const ancestryService = TestBed.inject(AncestryService);
-    vi.spyOn(ancestryService, "requestWritePermission").mockResolvedValue(true);
-    const updateGedcomDatabaseSpy = vi
-      .spyOn(ancestryService, "updateGedcomDatabase")
-      .mockResolvedValue(undefined);
-    const showModalSpy = vi
-      .spyOn(component.editDialog(), "showModal")
-      .mockResolvedValue(undefined);
+    const [row] = fixture.componentInstance.rows();
 
     // One pair of buttons for the source, not one per URL.
-    screen
-      .getByRole("button", { name: "Open editor with proposed changes" })
-      .click();
-    expect(showModalSpy).toHaveBeenCalledTimes(1);
-    expect(component.reviewing()?.source).toBe(source);
-    expect(component.reviewing()?.suggestions.map((s) => s.url)).toEqual([
+    expect(
+      screen.getAllByRole("button", { name: "Submit changes as proposed" }),
+    ).toHaveLength(1);
+    expect(row?.suggestions.map((s) => s.url)).toEqual([
       "https://www.newspapers.com/clip/1/",
       "https://www.newspapers.com/clip/2/",
     ]);
-    // The source, then the repository the suggestions create.
-    expect(component.reviewTabs().map((tab) => tab.type)).toEqual([
-      "SOUR",
-      "REPO",
-    ]);
-
-    screen.getByRole("button", { name: "Submit changes as proposed" }).click();
-    await vi.waitFor(() => {
-      expect(updateGedcomDatabaseSpy).toHaveBeenCalledTimes(1);
-    });
-    const saved = updateGedcomDatabaseSpy.mock.calls[0]?.[0];
-    expect(saved?.sources["@S1@"]?.repositoryLinks).toHaveLength(1);
-    expect(
-      saved?.sources["@S1@"]?.repositoryLinks[0]?.callNumbers,
-    ).toHaveLength(2);
+    const links = row?.fixedDatabase?.sources["@S1@"]?.repositoryLinks;
+    expect(links).toHaveLength(1);
+    expect(links?.[0]?.callNumbers).toHaveLength(2);
+    // The source, then the repository the fix creates.
+    expect(row?.editorTabs.map((tab) => tab.type)).toEqual(["SOUR", "REPO"]);
   });
 
   it("shows the before and proposed-after GEDCOM for the edit", async () => {

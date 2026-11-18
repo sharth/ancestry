@@ -5,59 +5,14 @@
     These sources have a bibliography (_BIBL) but no title. The suggested fix
     moves the bibliography into the title.
   </p>
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Source</th>
-        <th>Bibliography</th>
-        <th>Fix</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (row of rows(); track row.source.xref) {
-        <tr>
-          <td>
-            <a [routerLink]="['/source', row.source.xref]">
-              {{ row.source.abbr || row.source.xref }}
-            </a>
-          </td>
-          <td class="text-break">{{ row.bibliography }}</td>
-          <td>
-            <div class="btn-group-vertical">
-              <button
-                type="button"
-                class="btn btn-sm btn-outline-primary"
-                (click)="review(row.source)"
-              >
-                Open editor with proposed changes
-              </button>
-              <button
-                type="button"
-                class="btn btn-sm btn-outline-success"
-                (click)="submit(row.source)"
-              >
-                Submit changes as proposed
-              </button>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="3">
-            @for (d of row.differences; track $index) {
-              <app-gedcom-diff
-                [oldGedcomRecord]="d.originalGedcomRecord"
-                [newGedcomRecord]="d.updatedGedcomRecord"
-              />
-            }
-          </td>
-        </tr>
-      }
-    </tbody>
-  </table>
+  <app-validation-table [columns]="['Source', 'Bibliography']" [rows]="rows()">
+    <ng-template let-row>
+      <div role="cell">
+        <a [routerLink]="['/source', row.source.xref]">
+          {{ row.source.abbr || row.source.xref }}
+        </a>
+      </div>
+      <div role="cell">{{ row.bibliography }}</div>
+    </ng-template>
+  </app-validation-table>
 }
-
-<app-gedcom-editor-dialog
-  #editDialog
-  [tabs]="reviewTabs()"
-  [ancestryDatabase]="reviewDatabase()"
-/>

@@ -5,6 +5,7 @@ import type { GedcomResourceValue } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import type { GedcomSource } from "../../gedcom/gedcomSource";
 import { RepositoryCallNumberComponent } from "../repository-call-number/repository-call-number.component";
+import { ValidationTableComponent } from "./validation-table.component";
 
 interface SourceUse {
   source: GedcomSource;
@@ -17,15 +18,22 @@ interface SourceUse {
  */
 @Component({
   selector: "app-duplicate-call-numbers",
-  imports: [RouterModule, RepositoryCallNumberComponent],
+  imports: [
+    RouterModule,
+    RepositoryCallNumberComponent,
+    ValidationTableComponent,
+  ],
   templateUrl: "./duplicate-call-numbers.component.html",
 })
 export class DuplicateCallNumbersComponent {
   readonly gedcom = input.required<GedcomResourceValue>();
   readonly ancestryDatabase = computed(() => this.gedcom().gedcomDatabase);
 
-  readonly duplicateCallNumbers = computed(() =>
-    findDuplicateCallNumbers(this.ancestryDatabase()),
+  readonly rows = computed(() =>
+    findDuplicateCallNumbers(this.ancestryDatabase()).map((duplicate) => ({
+      key: duplicate.callNumber,
+      ...duplicate,
+    })),
   );
 }
 

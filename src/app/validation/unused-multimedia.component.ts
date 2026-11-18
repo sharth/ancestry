@@ -5,20 +5,24 @@ import type { GedcomResourceValue } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import type { GedcomRecord } from "../../gedcom/gedcomRecord";
 import type { GedcomSourceCitation } from "../../gedcom/gedcomSourceCitation";
+import { ValidationTableComponent } from "./validation-table.component";
 
 /** Lists the multimedia records that no multimedia link anywhere in the
  * database points to. */
 @Component({
   selector: "app-unused-multimedia",
-  imports: [RouterModule],
+  imports: [RouterModule, ValidationTableComponent],
   templateUrl: "./unused-multimedia.component.html",
 })
 export class UnusedMultimediaComponent {
   readonly gedcom = input.required<GedcomResourceValue>();
   readonly ancestryDatabase = computed(() => this.gedcom().gedcomDatabase);
 
-  readonly unusedMultimedia = computed(() =>
-    findUnusedMultimedia(this.ancestryDatabase()),
+  readonly rows = computed(() =>
+    findUnusedMultimedia(this.ancestryDatabase()).map((multimedia) => ({
+      key: multimedia.xref,
+      multimedia,
+    })),
   );
 }
 

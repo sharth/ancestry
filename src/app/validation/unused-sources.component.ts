@@ -6,19 +6,23 @@ import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { getFamilySourceCitations } from "../../gedcom/gedcomFamily";
 import { getIndividualSourceCitations } from "../../gedcom/gedcomIndividual";
 import type { GedcomRecord } from "../../gedcom/gedcomRecord";
+import { ValidationTableComponent } from "./validation-table.component";
 
 /** Lists the sources that no citation anywhere in the database points to. */
 @Component({
   selector: "app-unused-sources",
-  imports: [RouterModule],
+  imports: [RouterModule, ValidationTableComponent],
   templateUrl: "./unused-sources.component.html",
 })
 export class UnusedSourcesComponent {
   readonly gedcom = input.required<GedcomResourceValue>();
   readonly ancestryDatabase = computed(() => this.gedcom().gedcomDatabase);
 
-  readonly unusedSources = computed(() =>
-    findUnusedSources(this.ancestryDatabase()),
+  readonly rows = computed(() =>
+    findUnusedSources(this.ancestryDatabase()).map((source) => ({
+      key: source.xref,
+      source,
+    })),
   );
 }
 

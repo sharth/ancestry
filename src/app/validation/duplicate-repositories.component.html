@@ -6,69 +6,26 @@
     moves every source's citation of the others to it (combining call numbers
     when a source cited more than one), and deletes the others.
   </p>
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Keep</th>
-        <th>Merge and delete</th>
-        <th>Fix</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (row of rows(); track row.group.kept.xref) {
-        <tr>
-          <td>{{ row.group.kept.name }}</td>
-          <td>
-            <a [routerLink]="['/repository', row.group.kept.xref]">
-              {{ row.group.kept.xref }}
+  <app-validation-table
+    [columns]="['Name', 'Keep', 'Merge and delete']"
+    [rows]="rows()"
+  >
+    <ng-template let-row>
+      <div role="cell">{{ row.group.kept.name }}</div>
+      <div role="cell">
+        <a [routerLink]="['/repository', row.group.kept.xref]">
+          {{ row.group.kept.xref }}
+        </a>
+      </div>
+      <div role="cell">
+        @for (duplicate of row.group.duplicates; track duplicate.xref) {
+          <div>
+            <a [routerLink]="['/repository', duplicate.xref]">
+              {{ duplicate.xref }}
             </a>
-          </td>
-          <td>
-            @for (duplicate of row.group.duplicates; track duplicate.xref) {
-              <div>
-                <a [routerLink]="['/repository', duplicate.xref]">
-                  {{ duplicate.xref }}
-                </a>
-              </div>
-            }
-          </td>
-          <td>
-            <div class="btn-group-vertical">
-              <button
-                type="button"
-                class="btn btn-sm btn-outline-primary"
-                (click)="review(row.group)"
-              >
-                Open editor with proposed changes
-              </button>
-              <button
-                type="button"
-                class="btn btn-sm btn-outline-success"
-                (click)="submit(row.group)"
-              >
-                Submit changes as proposed
-              </button>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="4">
-            @for (d of row.differences; track $index) {
-              <app-gedcom-diff
-                [oldGedcomRecord]="d.originalGedcomRecord"
-                [newGedcomRecord]="d.updatedGedcomRecord"
-              />
-            }
-          </td>
-        </tr>
-      }
-    </tbody>
-  </table>
+          </div>
+        }
+      </div>
+    </ng-template>
+  </app-validation-table>
 }
-
-<app-gedcom-editor-dialog
-  #editDialog
-  [tabs]="reviewTabs()"
-  [ancestryDatabase]="reviewDatabase()"
-/>

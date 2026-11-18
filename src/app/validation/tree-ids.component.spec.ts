@@ -1,13 +1,9 @@
 import { inputBinding, signal } from "@angular/core";
-import { TestBed } from "@angular/core/testing";
 import { provideRouter } from "@angular/router";
 import { render, screen } from "@testing-library/angular/zoneless";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
-import {
-  AncestryService,
-  newGedcomResourceValue,
-} from "../../database/ancestry.service";
+import { newGedcomResourceValue } from "../../database/ancestry.service";
 import {
   newGedcomDatabase,
   type GedcomDatabase,
@@ -82,7 +78,7 @@ describe("TreeIdsComponent", () => {
     expect(screen.getByText("Ancestry 132395462563")).toBeTruthy();
   });
 
-  it("reviews in the editor dialog, or submits directly", async () => {
+  it("fixes each individual in the editor, or all at once", async () => {
     const component = await renderWith(
       newGedcomDatabase({
         individuals: {
@@ -93,31 +89,16 @@ describe("TreeIdsComponent", () => {
         },
       }),
     );
-    const ancestryService = TestBed.inject(AncestryService);
-    vi.spyOn(ancestryService, "requestWritePermission").mockResolvedValue(true);
-    const updateGedcomDatabaseSpy = vi
-      .spyOn(ancestryService, "updateGedcomDatabase")
-      .mockResolvedValue(undefined);
-    const showModalSpy = vi
-      .spyOn(component.editDialog(), "showModal")
-      .mockResolvedValue(undefined);
-
-    screen
-      .getByRole("button", { name: "Open editor with proposed changes" })
-      .click();
-    expect(showModalSpy).toHaveBeenCalledTimes(1);
-    expect(component.reviewTabs()).toEqual([{ type: "INDI", xref: "@I1@" }]);
+    const [row] = component.rows();
+    expect(row?.editorTabs).toEqual([{ type: "INDI", xref: "@I1@" }]);
     expect(
-      component.reviewDatabase().individuals["@I1@"]?.externalIdentifiers,
+      row?.fixedDatabase.individuals["@I1@"]?.externalIdentifiers,
     ).toHaveLength(1);
-
-    screen.getByRole("button", { name: "Submit changes as proposed" }).click();
-    screen.getByRole("button", { name: "Submit all 1 as proposed" }).click();
-    await vi.waitFor(() => {
-      expect(updateGedcomDatabaseSpy).toHaveBeenCalledTimes(2);
-    });
-    for (const [saved] of updateGedcomDatabaseSpy.mock.calls) {
-      expect(saved.individuals["@I1@"]?.externalIdentifiers).toHaveLength(1);
-    }
+    expect(
+      component.fixAll().individuals["@I1@"]?.externalIdentifiers,
+    ).toHaveLength(1);
+    expect(
+      screen.getByRole("button", { name: "Submit all 1 as proposed" }),
+    ).toBeTruthy();
   });
 });

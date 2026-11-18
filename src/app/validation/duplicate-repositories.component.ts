@@ -1,24 +1,13 @@
-import {
-  Component,
-  computed,
-  inject,
-  input,
-  signal,
-  viewChild,
-} from "@angular/core";
+import { Component, computed, input, viewChild } from "@angular/core";
 import { RouterModule } from "@angular/router";
 import { produce } from "immer";
 
-import {
-  AncestryService,
-  type GedcomResourceValue,
-} from "../../database/ancestry.service";
+import type { GedcomResourceValue } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import type { GedcomRepository } from "../../gedcom/gedcomRepository";
-import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
-import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
 import type { TabInformation } from "../gedcom-editor/gedcom-editor-interface";
 import type { ComponentWithUnsavedChanges } from "../unsaved-changes.guard";
+import { ValidationTableComponent } from "./validation-table.component";
 
 /** Repositories that share a name. The first in the file is the one kept;
  * the rest are merged into it. */
@@ -101,69 +90,31 @@ function citingSourceXrefs(
  * into its first repository. */
 @Component({
   selector: "app-duplicate-repositories",
-  imports: [RouterModule, GedcomDiffComponent, GedcomEditorDialogComponent],
+  imports: [RouterModule, ValidationTableComponent],
   templateUrl: "./duplicate-repositories.component.html",
 })
 export class DuplicateRepositoriesComponent implements ComponentWithUnsavedChanges {
-  private readonly ancestryService = inject(AncestryService);
-
   readonly gedcom = input.required<GedcomResourceValue>();
   readonly ancestryDatabase = computed(() => this.gedcom().gedcomDatabase);
 
-  readonly editDialog =
-    viewChild.required<GedcomEditorDialogComponent>("editDialog");
-
-  // The group whose merge is open in the editor dialog, if any.
-  readonly reviewing = signal<DuplicateRepositories | undefined>(undefined);
-
-  // The editor dialog opens with the merge already applied, so it can be
-  // reviewed and edited further before saving.
-  readonly reviewDatabase = computed(() => {
-    const group = this.reviewing();
-    if (group === undefined) return this.ancestryDatabase();
-    return mergeDuplicateRepositories(this.ancestryDatabase(), group);
-  });
-
-  // The kept repository, then every source whose citations moved to it.
-  readonly reviewTabs = computed<TabInformation[]>(() => {
-    const group = this.reviewing();
-    if (group === undefined) return [];
-    return [
-      { type: "REPO", xref: group.kept.xref },
-      ...citingSourceXrefs(this.ancestryDatabase(), group).map(
-        (xref): TabInformation => ({ type: "SOUR", xref }),
-      ),
-    ];
-  });
+  readonly table = viewChild(ValidationTableComponent);
 
   readonly rows = computed(() =>
     findDuplicateRepositories(this.ancestryDatabase()).map((group) => ({
+      key: group.kept.xref,
       group,
-      // The records that would actually change on disk, built from the
-      // same diff the save path uses.
-      differences: this.ancestryService.gedcomDatabaseDifferences(
-        mergeDuplicateRepositories(this.ancestryDatabase(), group),
-      ),
+      fixedDatabase: mergeDuplicateRepositories(this.ancestryDatabase(), group),
+      // The kept repository, then every source whose citations move to it.
+      editorTabs: [
+        { type: "REPO", xref: group.kept.xref },
+        ...citingSourceXrefs(this.ancestryDatabase(), group).map(
+          (xref): TabInformation => ({ type: "SOUR", xref }),
+        ),
+      ] satisfies TabInformation[],
     })),
   );
 
   hasUnsavedChanges(): boolean {
-    return this.editDialog().hasUnsavedChanges();
-  }
-
-  async review(group: DuplicateRepositories) {
-    this.reviewing.set(group);
-    await this.editDialog().showModal();
-  }
-
-  // Applies the merge directly and saves it, without opening the editor
-  // dialog.
-  async submit(group: DuplicateRepositories) {
-    const granted = await this.ancestryService.requestWritePermission();
-    if (!granted) return;
-
-    await this.ancestryService.updateGedcomDatabase(
-      mergeDuplicateRepositories(this.ancestryDatabase(), group),
-    );
+    return this.table()?.hasUnsavedChanges() ?? false;
   }
 }

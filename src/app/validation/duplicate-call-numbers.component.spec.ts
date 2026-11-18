@@ -41,7 +41,7 @@ describe("DuplicateCallNumbersComponent", () => {
       .queryAllByRole("row")
       .slice(1)
       .map((row) =>
-        [row.querySelector("td"), ...row.querySelectorAll("li")]
+        [row.querySelector('[role="cell"]'), ...row.querySelectorAll("li")]
           .map((cell) => cell?.textContent.replace(/\s+/g, " ").trim())
           .join(" | "),
       );

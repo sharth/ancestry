@@ -1,13 +1,9 @@
 import { inputBinding, signal } from "@angular/core";
-import { TestBed } from "@angular/core/testing";
 import { provideRouter } from "@angular/router";
 import { render, screen } from "@testing-library/angular/zoneless";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
-import {
-  AncestryService,
-  newGedcomResourceValue,
-} from "../../database/ancestry.service";
+import { newGedcomResourceValue } from "../../database/ancestry.service";
 import {
   newGedcomDatabase,
   type GedcomDatabase,
@@ -136,35 +132,15 @@ describe("DuplicateRepositoriesComponent", () => {
     expect(document.body.textContent).not.toContain("@R3@ REPO");
   });
 
-  it("reviews in the editor dialog, or submits directly", async () => {
+  it("fixes each group by merging it into the kept repository", async () => {
     const component = await renderWith(database);
-    const ancestryService = TestBed.inject(AncestryService);
-    vi.spyOn(ancestryService, "requestWritePermission").mockResolvedValue(true);
-    const updateGedcomDatabaseSpy = vi
-      .spyOn(ancestryService, "updateGedcomDatabase")
-      .mockResolvedValue(undefined);
-    const showModalSpy = vi
-      .spyOn(component.editDialog(), "showModal")
-      .mockResolvedValue(undefined);
-
-    screen
-      .getByRole("button", { name: "Open editor with proposed changes" })
-      .click();
-    expect(showModalSpy).toHaveBeenCalledTimes(1);
-    expect(component.reviewTabs()).toEqual([
+    const [row] = component.rows();
+    expect(row?.editorTabs).toEqual([
       { type: "REPO", xref: "@R1@" },
       { type: "SOUR", xref: "@S1@" },
       { type: "SOUR", xref: "@S2@" },
       { type: "SOUR", xref: "@S3@" },
     ]);
-    expect(component.reviewDatabase().repositories["@R3@"]).toBeUndefined();
-
-    screen.getByRole("button", { name: "Submit changes as proposed" }).click();
-    await vi.waitFor(() => {
-      expect(updateGedcomDatabaseSpy).toHaveBeenCalledTimes(1);
-    });
-    expect(
-      updateGedcomDatabaseSpy.mock.calls[0]?.[0].repositories["@R3@"],
-    ).toBeUndefined();
+    expect(row?.fixedDatabase.repositories["@R3@"]).toBeUndefined();
   });
 });

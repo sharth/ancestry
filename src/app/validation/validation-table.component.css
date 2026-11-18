@@ -1,0 +1,69 @@
+app-validation-table {
+  display: block;
+  /* The header row's fixed height, so each row knows where to stick: just
+     below it. Header labels are kept to one line to fit. */
+  --validation-table-header-height: 2.5rem;
+}
+
+app-validation-table .grid-table {
+  width: 100%;
+  border: 1px solid #dee2e6;
+  border-top: 0;
+}
+
+app-validation-table .grid-row {
+  display: grid;
+  /* --columns is set from the component; each track is minmax(0, ...) so a
+     long URL can't push a row past the page's right edge, and fixed sizes
+     (not `auto`) keep every row's columns lined up, since each row is its
+     own grid. */
+  grid-template-columns: var(--columns);
+}
+
+app-validation-table .grid-row > :is([role="columnheader"], [role="cell"]) {
+  padding: 0.5rem 0.75rem;
+  border-top: 1px solid #dee2e6;
+  overflow-wrap: break-word;
+}
+
+/* Sticks within the whole table, just below the page header. */
+app-validation-table .header-row {
+  position: sticky;
+  top: var(--app-header-height);
+  z-index: 2;
+  height: var(--validation-table-header-height);
+  font-weight: bold;
+  background-color: #fff;
+  box-shadow: 0 1px 0 #dee2e6;
+}
+
+app-validation-table .header-row > [role="columnheader"] {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+app-validation-table .striped > [role="cell"] {
+  background-color: rgb(0 0 0 / 2.5%);
+}
+
+/* Each row wraps itself and its diff in one box, so the row's
+   `position: sticky` sticks only within that box -- it releases once the
+   row's diff has fully scrolled past, right as the next row reaches the
+   top. */
+app-validation-table .row-section {
+  position: relative;
+}
+
+app-validation-table .sticky-row {
+  position: sticky;
+  top: calc(var(--app-header-height) + var(--validation-table-header-height));
+  z-index: 1;
+  background-color: #fff;
+  box-shadow: 0 1px 0 #dee2e6;
+}
+
+app-validation-table .diff-content {
+  padding: 0.5rem 0.75rem 1rem 0.75rem;
+  border-top: 1px solid #dee2e6;
+}
