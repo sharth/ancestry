@@ -1,0 +1,14 @@
+/* Stays in view below the sticky header while the page scrolls. */
+:host {
+  display: block;
+  position: sticky;
+  top: calc(var(--app-header-height) + 0.5rem);
+  z-index: 1020; /* Bootstrap's sticky-top, below the header */
+}
+
+pre {
+  max-height: 40vh;
+  overflow: auto;
+  white-space: pre-wrap;
+  font-size: 0.8em;
+}
