@@ -9,7 +9,7 @@
   <button
     type="button"
     class="btn btn-outline-success mb-3"
-    (click)="submitAllSuggestions.emit(individuals())"
+    (click)="submit(individuals())"
   >
     Submit all {{ rows().length }} as proposed
   </button>
@@ -39,14 +39,14 @@
               <button
                 type="button"
                 class="btn btn-sm btn-outline-primary"
-                (click)="reviewSuggestion.emit(row.individual)"
+                (click)="review(row.individual)"
               >
                 Open editor with proposed changes
               </button>
               <button
                 type="button"
                 class="btn btn-sm btn-outline-success"
-                (click)="submitSuggestion.emit(row.individual)"
+                (click)="submit([row.individual])"
               >
                 Submit changes as proposed
               </button>
@@ -67,3 +67,9 @@
     </tbody>
   </table>
 }
+
+<app-gedcom-editor-dialog
+  #editDialog
+  [tabs]="reviewTabs()"
+  [ancestryDatabase]="reviewDatabase()"
+/>

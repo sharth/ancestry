@@ -1,16 +1,18 @@
-import { inputBinding, outputBinding, signal } from "@angular/core";
+import { inputBinding, signal } from "@angular/core";
+import { TestBed } from "@angular/core/testing";
 import { provideRouter } from "@angular/router";
 import { render, screen } from "@testing-library/angular/zoneless";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
+import {
+  AncestryService,
+  newGedcomResourceValue,
+} from "../../database/ancestry.service";
 import {
   newGedcomDatabase,
   type GedcomDatabase,
 } from "../../gedcom/gedcomDatabase";
-import {
-  newGedcomIndividual,
-  type GedcomIndividual,
-} from "../../gedcom/gedcomIndividual";
+import { newGedcomIndividual } from "../../gedcom/gedcomIndividual";
 import { newGedcomName } from "../../gedcom/gedcomName";
 import { newGedcomRecord } from "../../gedcom/gedcomRecord";
 import { TreeIdsComponent } from "./tree-ids.component";
@@ -20,28 +22,18 @@ function fsftid(value: string) {
 }
 
 describe("TreeIdsComponent", () => {
-  async function renderWith(
-    database: GedcomDatabase,
-    reviewed: GedcomIndividual[] = [],
-    submitted: GedcomIndividual[] = [],
-    submittedAll: GedcomIndividual[][] = [],
-  ) {
-    await render(TreeIdsComponent, {
+  async function renderWith(database: GedcomDatabase) {
+    const { fixture } = await render(TreeIdsComponent, {
       providers: [provideRouter([])],
       bindings: [
-        inputBinding("ancestryDatabase", signal(database)),
-        outputBinding<GedcomIndividual>("reviewSuggestion", (i) =>
-          reviewed.push(i),
-        ),
-        outputBinding<GedcomIndividual>("submitSuggestion", (i) =>
-          submitted.push(i),
-        ),
-        outputBinding<GedcomIndividual[]>("submitAllSuggestions", (i) =>
-          submittedAll.push(i),
+        inputBinding(
+          "gedcom",
+          signal(newGedcomResourceValue({ gedcomDatabase: database })),
         ),
       ],
       waitForStableOnRender: true,
     });
+    return fixture.componentInstance;
   }
 
   it("says so when no individual has a _FSFTID or _AMTID", async () => {
@@ -90,11 +82,8 @@ describe("TreeIdsComponent", () => {
     expect(screen.getByText("Ancestry 132395462563")).toBeTruthy();
   });
 
-  it("hands review, submit and submit all back to the page", async () => {
-    const reviewed: GedcomIndividual[] = [];
-    const submitted: GedcomIndividual[] = [];
-    const submittedAll: GedcomIndividual[][] = [];
-    await renderWith(
+  it("reviews in the editor dialog, or submits directly", async () => {
+    const component = await renderWith(
       newGedcomDatabase({
         individuals: {
           "@I1@": newGedcomIndividual({
@@ -103,21 +92,32 @@ describe("TreeIdsComponent", () => {
           }),
         },
       }),
-      reviewed,
-      submitted,
-      submittedAll,
     );
+    const ancestryService = TestBed.inject(AncestryService);
+    vi.spyOn(ancestryService, "requestWritePermission").mockResolvedValue(true);
+    const updateGedcomDatabaseSpy = vi
+      .spyOn(ancestryService, "updateGedcomDatabase")
+      .mockResolvedValue(undefined);
+    const showModalSpy = vi
+      .spyOn(component.editDialog(), "showModal")
+      .mockResolvedValue(undefined);
 
     screen
       .getByRole("button", { name: "Open editor with proposed changes" })
       .click();
+    expect(showModalSpy).toHaveBeenCalledTimes(1);
+    expect(component.reviewTabs()).toEqual([{ type: "INDI", xref: "@I1@" }]);
+    expect(
+      component.reviewDatabase().individuals["@I1@"]?.externalIdentifiers,
+    ).toHaveLength(1);
+
     screen.getByRole("button", { name: "Submit changes as proposed" }).click();
     screen.getByRole("button", { name: "Submit all 1 as proposed" }).click();
-
-    expect(reviewed.map((i) => i.xref)).toEqual(["@I1@"]);
-    expect(submitted.map((i) => i.xref)).toEqual(["@I1@"]);
-    expect(submittedAll.map((all) => all.map((i) => i.xref))).toEqual([
-      ["@I1@"],
-    ]);
+    await vi.waitFor(() => {
+      expect(updateGedcomDatabaseSpy).toHaveBeenCalledTimes(2);
+    });
+    for (const [saved] of updateGedcomDatabaseSpy.mock.calls) {
+      expect(saved.individuals["@I1@"]?.externalIdentifiers).toHaveLength(1);
+    }
   });
 });

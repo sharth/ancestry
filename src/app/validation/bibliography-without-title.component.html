@@ -28,14 +28,14 @@
               <button
                 type="button"
                 class="btn btn-sm btn-outline-primary"
-                (click)="reviewSuggestion.emit(row.source)"
+                (click)="review(row.source)"
               >
                 Open editor with proposed changes
               </button>
               <button
                 type="button"
                 class="btn btn-sm btn-outline-success"
-                (click)="submitSuggestion.emit(row.source)"
+                (click)="submit(row.source)"
               >
                 Submit changes as proposed
               </button>
@@ -56,3 +56,9 @@
     </tbody>
   </table>
 }
+
+<app-gedcom-editor-dialog
+  #editDialog
+  [tabs]="reviewTabs()"
+  [ancestryDatabase]="reviewDatabase()"
+/>

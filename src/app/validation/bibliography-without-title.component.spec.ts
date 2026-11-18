@@ -1,14 +1,19 @@
-import { inputBinding, outputBinding, signal } from "@angular/core";
+import { inputBinding, signal } from "@angular/core";
+import { TestBed } from "@angular/core/testing";
 import { provideRouter } from "@angular/router";
 import { render, screen } from "@testing-library/angular/zoneless";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
+import {
+  AncestryService,
+  newGedcomResourceValue,
+} from "../../database/ancestry.service";
 import {
   newGedcomDatabase,
   type GedcomDatabase,
 } from "../../gedcom/gedcomDatabase";
 import { newGedcomRecord } from "../../gedcom/gedcomRecord";
-import { newGedcomSource, type GedcomSource } from "../../gedcom/gedcomSource";
+import { newGedcomSource } from "../../gedcom/gedcomSource";
 import { BibliographyWithoutTitleComponent } from "./bibliography-without-title.component";
 
 function bibl(value: string) {
@@ -16,24 +21,18 @@ function bibl(value: string) {
 }
 
 describe("BibliographyWithoutTitleComponent", () => {
-  async function renderWith(
-    database: GedcomDatabase,
-    reviewed: GedcomSource[] = [],
-    submitted: GedcomSource[] = [],
-  ) {
-    await render(BibliographyWithoutTitleComponent, {
+  async function renderWith(database: GedcomDatabase) {
+    const { fixture } = await render(BibliographyWithoutTitleComponent, {
       providers: [provideRouter([])],
       bindings: [
-        inputBinding("ancestryDatabase", signal(database)),
-        outputBinding<GedcomSource>("reviewSuggestion", (s) =>
-          reviewed.push(s),
-        ),
-        outputBinding<GedcomSource>("submitSuggestion", (s) =>
-          submitted.push(s),
+        inputBinding(
+          "gedcom",
+          signal(newGedcomResourceValue({ gedcomDatabase: database })),
         ),
       ],
       waitForStableOnRender: true,
     });
+    return fixture.componentInstance;
   }
 
   it("says so when no untitled source has a bibliography", async () => {
@@ -85,25 +84,38 @@ describe("BibliographyWithoutTitleComponent", () => {
     );
   });
 
-  it("hands review and submit back to the page", async () => {
-    const reviewed: GedcomSource[] = [];
-    const submitted: GedcomSource[] = [];
+  it("reviews in the editor dialog, or submits directly", async () => {
     const source = newGedcomSource({
       xref: "@S1@",
       unknownRecords: [bibl("Bibliography")],
     });
-    await renderWith(
+    const component = await renderWith(
       newGedcomDatabase({ sources: { "@S1@": source } }),
-      reviewed,
-      submitted,
     );
+    const ancestryService = TestBed.inject(AncestryService);
+    vi.spyOn(ancestryService, "requestWritePermission").mockResolvedValue(true);
+    const updateGedcomDatabaseSpy = vi
+      .spyOn(ancestryService, "updateGedcomDatabase")
+      .mockResolvedValue(undefined);
+    const showModalSpy = vi
+      .spyOn(component.editDialog(), "showModal")
+      .mockResolvedValue(undefined);
 
     screen
       .getByRole("button", { name: "Open editor with proposed changes" })
       .click();
-    screen.getByRole("button", { name: "Submit changes as proposed" }).click();
+    expect(showModalSpy).toHaveBeenCalledTimes(1);
+    expect(component.reviewTabs()).toEqual([{ type: "SOUR", xref: "@S1@" }]);
+    expect(component.reviewDatabase().sources["@S1@"]?.title).toBe(
+      "Bibliography",
+    );
 
-    expect(reviewed.map((s) => s.xref)).toEqual(["@S1@"]);
-    expect(submitted.map((s) => s.xref)).toEqual(["@S1@"]);
+    screen.getByRole("button", { name: "Submit changes as proposed" }).click();
+    await vi.waitFor(() => {
+      expect(updateGedcomDatabaseSpy).toHaveBeenCalledTimes(1);
+    });
+    expect(
+      updateGedcomDatabaseSpy.mock.calls[0]?.[0].sources["@S1@"]?.title,
+    ).toBe("Bibliography");
   });
 });

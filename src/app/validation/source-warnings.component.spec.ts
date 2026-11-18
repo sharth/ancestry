@@ -1,0 +1,306 @@
+import { inputBinding, signal, computed } from "@angular/core";
+import { TestBed, type ComponentFixture } from "@angular/core/testing";
+import { provideRouter } from "@angular/router";
+import { render, screen } from "@testing-library/angular/zoneless";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import {
+  AncestryService,
+  newGedcomResourceValue,
+} from "../../database/ancestry.service";
+import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
+import { newGedcomRepository } from "../../gedcom/gedcomRepository";
+import { newGedcomRepositoryLink } from "../../gedcom/gedcomRepositoryLink";
+import { newGedcomSource } from "../../gedcom/gedcomSource";
+import type {
+  MergeRepositoryLinksSuggestion,
+  UrlRepositorySuggestion,
+} from "./source-validators";
+import { SourceWarningsComponent } from "./source-warnings.component";
+
+describe("SourceWarningsComponent", () => {
+  let component: SourceWarningsComponent;
+  let fixture: ComponentFixture<SourceWarningsComponent>;
+  let ancestryService: AncestryService;
+
+  // S1 already cites a repository; a source with none shows its URL
+  // suggestions in the "Sources without repositories" tab instead.
+  const repository = newGedcomRepository({ xref: "@R1@", name: "Library" });
+  const source = newGedcomSource({
+    xref: "S1",
+    text: "Found at https://example.com/record",
+    repositoryLinks: [newGedcomRepositoryLink({ repositoryXref: "@R1@" })],
+  });
+  const urlSuggestion: UrlRepositorySuggestion = {
+    fieldName: "text",
+    url: "https://example.com/record",
+    standalone: false,
+    suggestedName: "example",
+    matchedRepository: undefined,
+  };
+
+  beforeEach(async () => {
+    const ancestryDatabase = signal(
+      newGedcomDatabase({
+        sources: { [source.xref]: source },
+        repositories: { [repository.xref]: repository },
+      }),
+    );
+
+    const renderResult = await render(SourceWarningsComponent, {
+      providers: [provideRouter([])],
+      bindings: [
+        inputBinding(
+          "gedcom",
+          computed(() =>
+            newGedcomResourceValue({ gedcomDatabase: ancestryDatabase() }),
+          ),
+        ),
+      ],
+      waitForStableOnRender: true,
+    });
+    fixture = renderResult.fixture;
+    component = fixture.componentInstance;
+    ancestryService = TestBed.inject(AncestryService);
+  });
+
+  it("should create", () => {
+    expect(component).toBeTruthy();
+  });
+
+  it("hasUnsavedChanges delegates to the edit dialog", () => {
+    expect(component.hasUnsavedChanges()).toBe(false);
+  });
+
+  it("lists a warning with a button to review the suggested fix", async () => {
+    expect(
+      await screen.findByText(/Open editor with proposed changes/),
+    ).toBeTruthy();
+  });
+
+  it("shows the before and proposed-after GEDCOM for the suggestion", async () => {
+    await screen.findByText(/Open editor with proposed changes/);
+    const text = (fixture.nativeElement as HTMLElement).textContent;
+    expect(text).toContain("1 TEXT Found at https://example.com/record");
+    expect(text).toContain("1 REPO @R2@");
+    expect(text).toContain("0 @R2@ REPO");
+  });
+
+  it("also offers a button to submit the suggested fix directly", async () => {
+    expect(await screen.findByText(/Submit changes as proposed/)).toBeTruthy();
+  });
+
+  // Regression test: the proposed-after preview used to be built straight
+  // from applyUrlSuggestion's output rather than through
+  // AncestryService.compareGedcomDatabase(), so it could drift from what
+  // actually gets written to disk. This confirms the preview goes through
+  // the same diff the save path uses.
+  it("builds the preview from AncestryService.compareGedcomDatabase", async () => {
+    await screen.findByText(/Open editor with proposed changes/);
+    const compareSpy = vi.spyOn(ancestryService, "compareGedcomDatabase");
+
+    const differences = component.differencesForUrlSuggestions(source, [
+      urlSuggestion,
+    ]);
+
+    expect(compareSpy).toHaveBeenCalled();
+    expect(differences.some((d) => d.updatedGedcomRecord?.tag === "SOUR")).toBe(
+      true,
+    );
+  });
+
+  it("submitUrlSuggestions applies the suggestion and saves it directly", async () => {
+    vi.spyOn(ancestryService, "requestWritePermission").mockResolvedValue(true);
+    const updateGedcomDatabaseSpy = vi
+      .spyOn(ancestryService, "updateGedcomDatabase")
+      .mockResolvedValue(undefined);
+
+    await component.submitUrlSuggestions(source, [urlSuggestion]);
+
+    expect(updateGedcomDatabaseSpy).toHaveBeenCalledTimes(1);
+    const savedDatabase = updateGedcomDatabaseSpy.mock.calls[0]?.[0];
+    expect(savedDatabase?.repositories["@R2@"]).toBeDefined();
+  });
+
+  it("submitUrlSuggestions does nothing when write permission is denied", async () => {
+    vi.spyOn(ancestryService, "requestWritePermission").mockResolvedValue(
+      false,
+    );
+    const updateGedcomDatabaseSpy = vi.spyOn(
+      ancestryService,
+      "updateGedcomDatabase",
+    );
+
+    await component.submitUrlSuggestions(source, [urlSuggestion]);
+
+    expect(updateGedcomDatabaseSpy).not.toHaveBeenCalled();
+  });
+});
+
+describe("SourceWarningsComponent merge repository links suggestion", () => {
+  let component: SourceWarningsComponent;
+  let fixture: ComponentFixture<SourceWarningsComponent>;
+  let ancestryService: AncestryService;
+
+  const repository = newGedcomRepository({ xref: "@R1@", name: "Example" });
+  const source = newGedcomSource({
+    xref: "@S1@",
+    repositoryLinks: [
+      newGedcomRepositoryLink({
+        repositoryXref: "@R1@",
+        callNumbers: ["one"],
+      }),
+      newGedcomRepositoryLink({
+        repositoryXref: "@R1@",
+        callNumbers: ["two"],
+      }),
+    ],
+  });
+  const mergeSuggestion: MergeRepositoryLinksSuggestion = {
+    repositoryXref: "@R1@",
+  };
+
+  beforeEach(async () => {
+    const ancestryDatabase = signal(
+      newGedcomDatabase({
+        sources: { [source.xref]: source },
+        repositories: { [repository.xref]: repository },
+      }),
+    );
+
+    const renderResult = await render(SourceWarningsComponent, {
+      providers: [provideRouter([])],
+      bindings: [
+        inputBinding(
+          "gedcom",
+          computed(() =>
+            newGedcomResourceValue({ gedcomDatabase: ancestryDatabase() }),
+          ),
+        ),
+      ],
+      waitForStableOnRender: true,
+    });
+    fixture = renderResult.fixture;
+    component = fixture.componentInstance;
+    ancestryService = TestBed.inject(AncestryService);
+  });
+
+  it("lists a warning with a button to review the merge suggestion", async () => {
+    expect(await screen.findByText(/Merge repository citations/)).toBeTruthy();
+  });
+
+  // Each preview re-serializes the database, so it's built once per
+  // database rather than from the template on every change detection.
+  it("doesn't rebuild the preview on change detection", async () => {
+    await screen.findByText(/Merge repository citations/);
+    const differencesSpy = vi.spyOn(component, "differencesForMergeSuggestion");
+
+    // Any change to a signal the page's template reads refreshes the page,
+    // e.g. picking a suggestion to review in the editor dialog.
+    component.reviewMergeSuggestion(source, mergeSuggestion);
+    await fixture.whenStable();
+
+    expect(differencesSpy).not.toHaveBeenCalled();
+  });
+
+  it("submitMergeSuggestion merges the links and saves it directly", async () => {
+    vi.spyOn(ancestryService, "requestWritePermission").mockResolvedValue(true);
+    const updateGedcomDatabaseSpy = vi
+      .spyOn(ancestryService, "updateGedcomDatabase")
+      .mockResolvedValue(undefined);
+
+    await component.submitMergeSuggestion(source, mergeSuggestion);
+
+    expect(updateGedcomDatabaseSpy).toHaveBeenCalledTimes(1);
+    const savedDatabase = updateGedcomDatabaseSpy.mock.calls[0]?.[0];
+    expect(savedDatabase?.sources[source.xref]?.repositoryLinks).toEqual([
+      { repositoryXref: "@R1@", callNumbers: ["one", "two"] },
+    ]);
+  });
+
+  it("submitMergeSuggestion does nothing when write permission is denied", async () => {
+    vi.spyOn(ancestryService, "requestWritePermission").mockResolvedValue(
+      false,
+    );
+    const updateGedcomDatabaseSpy = vi.spyOn(
+      ancestryService,
+      "updateGedcomDatabase",
+    );
+
+    await component.submitMergeSuggestion(source, mergeSuggestion);
+
+    expect(updateGedcomDatabaseSpy).not.toHaveBeenCalled();
+  });
+});
+
+describe("SourceWarningsComponent sticky header", () => {
+  it("scopes each warning's sticky row to its own section, one per diff", async () => {
+    // Each source already cites a repository; a source with none shows its
+    // URL suggestions in the "Sources without repositories" section instead.
+    const linkToLibrary = newGedcomRepositoryLink({ repositoryXref: "@R1@" });
+    const ancestryDatabase = signal(
+      newGedcomDatabase({
+        repositories: {
+          "@R1@": newGedcomRepository({ xref: "@R1@", name: "Library" }),
+        },
+        sources: {
+          S1: newGedcomSource({
+            xref: "S1",
+            repositoryLinks: [linkToLibrary],
+            title:
+              "Newfoundland Virtal Records, 1892, Birth of Catherine Cooper https://familysearch.org/ark:/61903/3:1:S3HT-61DS-32F?cc=1790939&wc=M61G-RM3%3A144853601",
+          }),
+          S2: newGedcomSource({
+            xref: "S2",
+            repositoryLinks: [linkToLibrary],
+            title:
+              "Second Source https://www.ancestry.com/discoveryui-content/view/123456:7890?tid=111&pid=181",
+          }),
+          S3: newGedcomSource({
+            xref: "S3",
+            repositoryLinks: [linkToLibrary],
+            title:
+              "Jackson Daily News, Obituary, 1910 https://www.newspapers.com/clip/56286648/jackson-daily-news/",
+          }),
+        },
+      }),
+    );
+
+    await render(SourceWarningsComponent, {
+      providers: [provideRouter([])],
+      bindings: [
+        inputBinding(
+          "gedcom",
+          computed(() =>
+            newGedcomResourceValue({ gedcomDatabase: ancestryDatabase() }),
+          ),
+        ),
+      ],
+      waitForStableOnRender: true,
+    });
+
+    await screen.findAllByText(/Submit changes as proposed/);
+
+    // One `.sticky-row` per warning with a diff, each the first child of
+    // its own `.diff-section`. That's what scopes a `position: sticky`
+    // row's "stuck" range to just its own section: the containing block a
+    // sticky element sticks within is the nearest block-level ancestor,
+    // so each row only ever competes for the top of the page with the
+    // content inside its own section, never a different warning's row --
+    // unlike putting them all in one shared `<table>`, which is what let
+    // two different warnings' sticky rows render on top of each other
+    // (the bug in #444).
+    const sections = Array.from(
+      document.querySelectorAll<HTMLElement>(".diff-section"),
+    );
+    expect(sections).toHaveLength(3);
+    for (const section of sections) {
+      const stickyRows = section.querySelectorAll(".sticky-row");
+      expect(stickyRows).toHaveLength(1);
+      expect(section.firstElementChild).toBe(stickyRows[0]);
+      expect(getComputedStyle(stickyRows[0] as HTMLElement).position).toBe(
+        "sticky",
+      );
+    }
+  });
+});

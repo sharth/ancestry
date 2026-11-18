@@ -1,14 +1,19 @@
-import { inputBinding, outputBinding, signal } from "@angular/core";
+import { inputBinding, signal } from "@angular/core";
+import { TestBed } from "@angular/core/testing";
 import { provideRouter } from "@angular/router";
 import { render, screen } from "@testing-library/angular/zoneless";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
+import {
+  AncestryService,
+  newGedcomResourceValue,
+} from "../../database/ancestry.service";
 import {
   newGedcomDatabase,
   type GedcomDatabase,
 } from "../../gedcom/gedcomDatabase";
 import { newGedcomRepositoryLink } from "../../gedcom/gedcomRepositoryLink";
-import { newGedcomSource, type GedcomSource } from "../../gedcom/gedcomSource";
+import { newGedcomSource } from "../../gedcom/gedcomSource";
 import { OutdatedUrlsComponent } from "./outdated-urls.component";
 
 const oldUrl =
@@ -34,28 +39,18 @@ const database = newGedcomDatabase({
 });
 
 describe("OutdatedUrlsComponent", () => {
-  async function renderWith(
-    gedcomDatabase: GedcomDatabase,
-    reviewed: GedcomSource[] = [],
-    submitted: GedcomSource[] = [],
-    submittedAll: GedcomSource[][] = [],
-  ) {
-    await render(OutdatedUrlsComponent, {
+  async function renderWith(gedcomDatabase: GedcomDatabase) {
+    const { fixture } = await render(OutdatedUrlsComponent, {
       providers: [provideRouter([])],
       bindings: [
-        inputBinding("ancestryDatabase", signal(gedcomDatabase)),
-        outputBinding<GedcomSource>("reviewSuggestion", (s) =>
-          reviewed.push(s),
-        ),
-        outputBinding<GedcomSource>("submitSuggestion", (s) =>
-          submitted.push(s),
-        ),
-        outputBinding<GedcomSource[]>("submitAllSuggestions", (s) =>
-          submittedAll.push(s),
+        inputBinding(
+          "gedcom",
+          signal(newGedcomResourceValue({ gedcomDatabase: gedcomDatabase })),
         ),
       ],
       waitForStableOnRender: true,
     });
+    return fixture.componentInstance;
   }
 
   it("says so when no call number is an outdated URL", async () => {
@@ -99,22 +94,36 @@ describe("OutdatedUrlsComponent", () => {
     expect(screen.queryAllByRole("button")).toEqual([]);
   });
 
-  it("hands review, submit and submit all back to the page", async () => {
-    const reviewed: GedcomSource[] = [];
-    const submitted: GedcomSource[] = [];
-    const submittedAll: GedcomSource[][] = [];
-    await renderWith(database, reviewed, submitted, submittedAll);
+  it("reviews in the editor dialog, or submits directly", async () => {
+    const component = await renderWith(database);
+    const ancestryService = TestBed.inject(AncestryService);
+    vi.spyOn(ancestryService, "requestWritePermission").mockResolvedValue(true);
+    const updateGedcomDatabaseSpy = vi
+      .spyOn(ancestryService, "updateGedcomDatabase")
+      .mockResolvedValue(undefined);
+    const showModalSpy = vi
+      .spyOn(component.editDialog(), "showModal")
+      .mockResolvedValue(undefined);
 
     screen
       .getByRole("button", { name: "Open editor with proposed changes" })
       .click();
+    expect(showModalSpy).toHaveBeenCalledTimes(1);
+    expect(component.reviewTabs()).toEqual([{ type: "SOUR", xref: "@S1@" }]);
+    expect(
+      component.reviewDatabase().sources["@S1@"]?.repositoryLinks[0]
+        ?.callNumbers,
+    ).toEqual([newUrl]);
+
     screen.getByRole("button", { name: "Submit changes as proposed" }).click();
     screen.getByRole("button", { name: "Submit all 1 as proposed" }).click();
-
-    expect(reviewed.map((s) => s.xref)).toEqual(["@S1@"]);
-    expect(submitted.map((s) => s.xref)).toEqual(["@S1@"]);
-    expect(submittedAll.map((all) => all.map((s) => s.xref))).toEqual([
-      ["@S1@"],
-    ]);
+    await vi.waitFor(() => {
+      expect(updateGedcomDatabaseSpy).toHaveBeenCalledTimes(2);
+    });
+    for (const [saved] of updateGedcomDatabaseSpy.mock.calls) {
+      expect(saved.sources["@S1@"]?.repositoryLinks[0]?.callNumbers).toEqual([
+        newUrl,
+      ]);
+    }
   });
 });

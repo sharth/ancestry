@@ -1,6 +1,7 @@
 import { Component, computed, input } from "@angular/core";
 import { RouterModule } from "@angular/router";
 
+import type { GedcomResourceValue } from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import type { GedcomSource } from "../../gedcom/gedcomSource";
 import { RepositoryCallNumberComponent } from "../repository-call-number/repository-call-number.component";
@@ -20,7 +21,8 @@ interface SourceUse {
   templateUrl: "./duplicate-call-numbers.component.html",
 })
 export class DuplicateCallNumbersComponent {
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  readonly gedcom = input.required<GedcomResourceValue>();
+  readonly ancestryDatabase = computed(() => this.gedcom().gedcomDatabase);
 
   readonly duplicateCallNumbers = computed(() =>
     findDuplicateCallNumbers(this.ancestryDatabase()),

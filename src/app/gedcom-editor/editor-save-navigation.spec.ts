@@ -188,8 +188,8 @@ describe("saving the GEDCOM editor from every entry point", () => {
     });
   }
 
-  // The validation page's editor dialog is wired up differently from the
-  // others (it's always present in the template, opened by a "review this
+  // The validation checks' editor dialogs are wired up differently from
+  // the others (always present in the template, opened by a "review this
   // suggestion" button rather than an "Edit"/"Add" pencil button), so it
   // gets its own case rather than fitting the table above -- but it
   // renders the same shared <form>, so the same bug applied here too.
@@ -199,13 +199,9 @@ describe("saving the GEDCOM editor from every entry point", () => {
       .mockResolvedValue(undefined);
     const confirmSpy = vi.spyOn(window, "confirm");
 
-    await router.navigateByUrl("/validation");
-
     // The fixture's source has no repository, so its URL suggestion is
     // under the "Sources without repositories" tab.
-    (
-      await screen.findByRole("tab", { name: /^Sources without repositories/ })
-    ).click();
+    await router.navigateByUrl("/validation/sources-without-repositories");
 
     const reviewButton = await screen.findByText(/Open editor with proposed/);
     reviewButton.click();
@@ -225,7 +221,7 @@ describe("saving the GEDCOM editor from every entry point", () => {
       expect(updateGedcomDatabaseSpy).toHaveBeenCalled();
     });
 
-    expect(router.url).toBe("/validation");
+    expect(router.url).toBe("/validation/sources-without-repositories");
     expect(confirmSpy).not.toHaveBeenCalled();
 
     await router.navigateByUrl("/settings");
