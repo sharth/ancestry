@@ -4,36 +4,48 @@ import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomRepositoryLink } from "../../gedcom/gedcomRepositoryLink";
 import { newGedcomSource } from "../../gedcom/gedcomSource";
 import {
-  applyIrishGenealogyUrlSuggestion,
-  irishGenealogyUrlsToUpdate,
-  newIrishGenealogyUrl,
-} from "./apply-irish-genealogy-url-suggestion.util";
+  applyOutdatedUrlSuggestion,
+  outdatedUrlsToUpdate,
+  outdatedUrl,
+} from "./apply-outdated-url-suggestion.util";
 
 const oldUrl =
   "https://civilrecords.irishgenealogy.ie/churchrecords/details-civil/9cbd434898349";
 const newUrl = "https://www.irishgenealogy.ie/view/?record_id=cide-4898349";
 
-describe("newIrishGenealogyUrl", () => {
-  it("drops the six character prefix and keeps the record number", () => {
-    expect(newIrishGenealogyUrl(oldUrl)).toBe(newUrl);
-    expect(newIrishGenealogyUrl(oldUrl.replace("https:", "http:"))).toBe(
-      newUrl,
-    );
+describe("outdatedUrl", () => {
+  it("rewrites an old IrishGenealogy.ie civil record URL", () => {
+    expect(outdatedUrl(oldUrl)?.newUrl).toBe(newUrl);
+    expect(outdatedUrl(oldUrl.replace("https:", "http:"))?.newUrl).toBe(newUrl);
+  });
+
+  it("rewrites an old Ancestry record URL", () => {
+    expect(
+      outdatedUrl(
+        "https://www.ancestry.com/discoveryui-content/view/150996143:60525",
+      ),
+    ).toEqual({
+      site: "Ancestry",
+      oldUrl:
+        "https://www.ancestry.com/discoveryui-content/view/150996143:60525",
+      newUrl:
+        "https://www.ancestry.com/search/collections/60525/records/150996143",
+    });
   });
 
   it("leaves anything else alone", () => {
-    expect(newIrishGenealogyUrl(newUrl)).toBeUndefined();
-    expect(newIrishGenealogyUrl("MS 123")).toBeUndefined();
+    expect(outdatedUrl(newUrl)).toBeUndefined();
+    expect(outdatedUrl("MS 123")).toBeUndefined();
     expect(
-      newIrishGenealogyUrl(
+      outdatedUrl(
         "https://civilrecords.irishgenealogy.ie/churchrecords/details/9cbd434898349",
       ),
     ).toBeUndefined();
-    expect(newIrishGenealogyUrl(`See ${oldUrl}`)).toBeUndefined();
+    expect(outdatedUrl(`See ${oldUrl}`)).toBeUndefined();
   });
 });
 
-describe("applyIrishGenealogyUrlSuggestion", () => {
+describe("applyOutdatedUrlSuggestion", () => {
   it("replaces only the old URLs on the given sources", () => {
     const source = newGedcomSource({
       xref: "@S1@",
@@ -53,9 +65,11 @@ describe("applyIrishGenealogyUrlSuggestion", () => {
         }),
       ],
     });
-    expect(irishGenealogyUrlsToUpdate(source)).toEqual([{ oldUrl, newUrl }]);
+    expect(outdatedUrlsToUpdate(source)).toEqual([
+      { site: "IrishGenealogy.ie", oldUrl, newUrl },
+    ]);
 
-    const database = applyIrishGenealogyUrlSuggestion(
+    const database = applyOutdatedUrlSuggestion(
       newGedcomDatabase({ sources: { "@S1@": source, "@S2@": other } }),
       ["@S1@"],
     );

@@ -9,7 +9,7 @@ import {
 } from "../../gedcom/gedcomDatabase";
 import { newGedcomRepositoryLink } from "../../gedcom/gedcomRepositoryLink";
 import { newGedcomSource, type GedcomSource } from "../../gedcom/gedcomSource";
-import { IrishGenealogyUrlsComponent } from "./irish-genealogy-urls.component";
+import { OutdatedUrlsComponent } from "./outdated-urls.component";
 
 const oldUrl =
   "https://civilrecords.irishgenealogy.ie/churchrecords/details-civil/9cbd434898349";
@@ -31,14 +31,14 @@ const database = newGedcomDatabase({
   },
 });
 
-describe("IrishGenealogyUrlsComponent", () => {
+describe("OutdatedUrlsComponent", () => {
   async function renderWith(
     gedcomDatabase: GedcomDatabase,
     reviewed: GedcomSource[] = [],
     submitted: GedcomSource[] = [],
     submittedAll: GedcomSource[][] = [],
   ) {
-    await render(IrishGenealogyUrlsComponent, {
+    await render(OutdatedUrlsComponent, {
       providers: [provideRouter([])],
       bindings: [
         inputBinding("ancestryDatabase", signal(gedcomDatabase)),
@@ -56,17 +56,13 @@ describe("IrishGenealogyUrlsComponent", () => {
     });
   }
 
-  it("says so when no call number is an old URL", async () => {
+  it("says so when no call number is an outdated URL", async () => {
     await renderWith(
       newGedcomDatabase({
         sources: { "@S2@": newGedcomSource({ xref: "@S2@" }) },
       }),
     );
-    expect(
-      screen.getByText(
-        "No call number is an old IrishGenealogy.ie civil record URL.",
-      ),
-    ).toBeTruthy();
+    expect(screen.getByText("No call number is an outdated URL.")).toBeTruthy();
   });
 
   it("links the source, the old URL and the new URL, with the proposed diff", async () => {

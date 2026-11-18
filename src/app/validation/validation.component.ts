@@ -24,8 +24,8 @@ import {
   applyBibliographyTitleSuggestion,
   bibliographyForMissingTitle,
 } from "./apply-bibliography-title-suggestion.util";
-import { applyIrishGenealogyUrlSuggestion } from "./apply-irish-genealogy-url-suggestion.util";
 import { applyMergeRepositoryLinksSuggestion } from "./apply-merge-repository-links-suggestion.util";
+import { applyOutdatedUrlSuggestion } from "./apply-outdated-url-suggestion.util";
 import { applyTreeIdSuggestion } from "./apply-tree-id-suggestion.util";
 import { applyUrlSuggestions } from "./apply-url-suggestion.util";
 import { BibliographyWithoutTitleComponent } from "./bibliography-without-title.component";
@@ -34,9 +34,9 @@ import {
   findDuplicateCallNumbers,
 } from "./duplicate-call-numbers.component";
 import {
-  findIrishGenealogyUrlsToUpdate,
-  IrishGenealogyUrlsComponent,
-} from "./irish-genealogy-urls.component";
+  findOutdatedUrls,
+  OutdatedUrlsComponent,
+} from "./outdated-urls.component";
 import {
   sourceValidators,
   type MergeRepositoryLinksSuggestion,
@@ -76,7 +76,7 @@ type ReviewState =
       source: GedcomSource;
     }
   | {
-      kind: "irish-genealogy";
+      kind: "outdated-url";
       source: GedcomSource;
     }
   | {
@@ -92,7 +92,7 @@ const tabs = [
   { id: "unused-multimedia", label: "Unused multimedia" },
   { id: "bibliography-without-title", label: "Bibliography without title" },
   { id: "tree-ids", label: "Tree ids" },
-  { id: "irish-genealogy-urls", label: "IrishGenealogy.ie URLs" },
+  { id: "outdated-urls", label: "Outdated URLs" },
 ] as const;
 
 type TabId = (typeof tabs)[number]["id"];
@@ -119,7 +119,7 @@ interface TableRow {
     SourcesWithoutRepositoriesComponent,
     BibliographyWithoutTitleComponent,
     TreeIdsComponent,
-    IrishGenealogyUrlsComponent,
+    OutdatedUrlsComponent,
   ],
   templateUrl: "./validation.component.html",
   styleUrl: "./validation.component.css",
@@ -156,7 +156,7 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
         (source) => bibliographyForMissingTitle(source) !== undefined,
       ).length,
       "tree-ids": findTreeIdsToConvert(database).length,
-      "irish-genealogy-urls": findIrishGenealogyUrlsToUpdate(database).length,
+      "outdated-urls": findOutdatedUrls(database).length,
     };
   });
 
@@ -245,8 +245,8 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
         state.individual.xref,
       ]);
     }
-    if (state.kind === "irish-genealogy") {
-      return applyIrishGenealogyUrlSuggestion(this.ancestryDatabase(), [
+    if (state.kind === "outdated-url") {
+      return applyOutdatedUrlSuggestion(this.ancestryDatabase(), [
         state.source.xref,
       ]);
     }
@@ -369,15 +369,15 @@ export class ValidationComponent implements ComponentWithUnsavedChanges {
     this.reviewState.set({ kind: "tree-id", individual });
   }
 
-  reviewIrishGenealogyUrlSuggestion(source: GedcomSource) {
-    this.reviewState.set({ kind: "irish-genealogy", source });
+  reviewOutdatedUrlSuggestion(source: GedcomSource) {
+    this.reviewState.set({ kind: "outdated-url", source });
   }
 
-  async submitIrishGenealogyUrlSuggestions(sources: GedcomSource[]) {
+  async submitOutdatedUrlSuggestions(sources: GedcomSource[]) {
     const granted = await this.ancestryService.requestWritePermission();
     if (!granted) return;
 
-    const database = applyIrishGenealogyUrlSuggestion(
+    const database = applyOutdatedUrlSuggestion(
       this.ancestryDatabase(),
       sources.map((source) => source.xref),
     );

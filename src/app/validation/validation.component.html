@@ -192,14 +192,14 @@
       (submitAllSuggestions)="submitTreeIdSuggestions($event)"
     />
   }
-  @case ("irish-genealogy-urls") {
-    <app-irish-genealogy-urls
+  @case ("outdated-urls") {
+    <app-outdated-urls
       [ancestryDatabase]="ancestryDatabase()"
       (reviewSuggestion)="
-        reviewIrishGenealogyUrlSuggestion($event); editDialog.showModal()
+        reviewOutdatedUrlSuggestion($event); editDialog.showModal()
       "
-      (submitSuggestion)="submitIrishGenealogyUrlSuggestions([$event])"
-      (submitAllSuggestions)="submitIrishGenealogyUrlSuggestions($event)"
+      (submitSuggestion)="submitOutdatedUrlSuggestions([$event])"
+      (submitAllSuggestions)="submitOutdatedUrlSuggestions($event)"
     />
   }
 }

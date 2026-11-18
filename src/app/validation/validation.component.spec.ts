@@ -117,7 +117,7 @@ describe("ValidationComponent", () => {
       "Unused multimedia": "0",
       "Bibliography without title": "0",
       "Tree ids": "0",
-      "IrishGenealogy.ie URLs": "0",
+      "Outdated URLs": "0",
     });
   });
 

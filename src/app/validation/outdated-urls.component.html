@@ -1,10 +1,10 @@
 @if (rows().length === 0) {
-  <p>No call number is an old IrishGenealogy.ie civil record URL.</p>
+  <p>No call number is an outdated URL.</p>
 } @else {
   <p>
-    These call numbers link to IrishGenealogy.ie civil records at their old
-    addresses. The suggested fix replaces each with the record's new address.
-    Open both links to check they show the same record.
+    These call numbers link to pages at addresses their site has since moved.
+    The suggested fix replaces each with the page's new address. Open both links
+    to check they show the same record.
   </p>
   <button
     type="button"
@@ -31,6 +31,7 @@
           </td>
           <td>
             @for (url of row.urls; track $index) {
+              <div class="fw-semibold">{{ url.site }}</div>
               <dl class="row mb-0">
                 <dt class="col-auto">Old</dt>
                 <dd class="col mb-0">
