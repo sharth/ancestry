@@ -87,7 +87,8 @@ GEDCOM file is loaded yet.
 
 Routes are configured with `withComponentInputBinding()` and `withRouterResources()` (`app.config.ts`), so
 route params (`xref`) and route resources bind directly to matching `input.required<...>()` properties.
-Every data-bearing route, child routes included, declares `resources: gedcomResources`, which binds
+Every data-bearing top-level route declares `resources: gedcomResources` (child routes inherit their
+parent's resources, so tab routes don't repeat it), which binds
 `AncestryService.gedcomResource` to the page's `gedcom` input (the loaded file: handles, records and the
 parsed `gedcomDatabase`); pages derive `ancestryDatabase = computed(() => this.gedcom().gedcomDatabase)`.
 The router keeps that input in step with the resource, so after a save the page sees the reloaded file in

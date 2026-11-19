@@ -50,10 +50,7 @@ export const routes: Routes = [
     canActivate: [ancestryDatabaseGuard],
     resources: gedcomResources,
   },
-  {
-    path: "settings",
-    component: SettingsComponent,
-  },
+  { path: "settings", component: SettingsComponent },
   {
     path: "search",
     component: SearchComponent,
@@ -75,22 +72,10 @@ export const routes: Routes = [
     canDeactivate: [confirmUnsavedChangesGuard],
     children: [
       { path: "", redirectTo: "facts", pathMatch: "full" },
-      {
-        path: "facts",
-        component: IndividualFactsComponent,
-      },
-      {
-        path: "ancestors",
-        component: IndividualAncestorsComponent,
-      },
-      {
-        path: "sources",
-        component: IndividualSourcesComponent,
-      },
-      {
-        path: "gedcom",
-        component: IndividualGedcomComponent,
-      },
+      { path: "facts", component: IndividualFactsComponent },
+      { path: "ancestors", component: IndividualAncestorsComponent },
+      { path: "sources", component: IndividualSourcesComponent },
+      { path: "gedcom", component: IndividualGedcomComponent },
     ],
   },
   {
@@ -108,18 +93,9 @@ export const routes: Routes = [
     canDeactivate: [confirmUnsavedChangesGuard],
     children: [
       { path: "", redirectTo: "facts", pathMatch: "full" },
-      {
-        path: "facts",
-        component: FamilyFactsComponent,
-      },
-      {
-        path: "sources",
-        component: FamilySourcesComponent,
-      },
-      {
-        path: "gedcom",
-        component: FamilyGedcomComponent,
-      },
+      { path: "facts", component: FamilyFactsComponent },
+      { path: "sources", component: FamilySourcesComponent },
+      { path: "gedcom", component: FamilyGedcomComponent },
     ],
   },
   {
@@ -151,18 +127,9 @@ export const routes: Routes = [
     canDeactivate: [confirmUnsavedChangesGuard],
     children: [
       { path: "", redirectTo: "overview", pathMatch: "full" },
-      {
-        path: "overview",
-        component: SourceOverviewComponent,
-      },
-      {
-        path: "citations",
-        component: SourceCitationsComponent,
-      },
-      {
-        path: "gedcom",
-        component: SourceGedcomComponent,
-      },
+      { path: "overview", component: SourceOverviewComponent },
+      { path: "citations", component: SourceCitationsComponent },
+      { path: "gedcom", component: SourceGedcomComponent },
     ],
   },
   {
@@ -227,14 +194,8 @@ export const routes: Routes = [
         component: DuplicateCallNumbersComponent,
         canDeactivate: [confirmUnsavedChangesGuard],
       },
-      {
-        path: "unused-sources",
-        component: UnusedSourcesComponent,
-      },
-      {
-        path: "unused-multimedia",
-        component: UnusedMultimediaComponent,
-      },
+      { path: "unused-sources", component: UnusedSourcesComponent },
+      { path: "unused-multimedia", component: UnusedMultimediaComponent },
       {
         path: "bibliography-without-title",
         component: BibliographyWithoutTitleComponent,
