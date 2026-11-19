@@ -78,22 +78,18 @@ export const routes: Routes = [
       {
         path: "facts",
         component: IndividualFactsComponent,
-        resources: gedcomResources,
       },
       {
         path: "ancestors",
         component: IndividualAncestorsComponent,
-        resources: gedcomResources,
       },
       {
         path: "sources",
         component: IndividualSourcesComponent,
-        resources: gedcomResources,
       },
       {
         path: "gedcom",
         component: IndividualGedcomComponent,
-        resources: gedcomResources,
       },
     ],
   },
@@ -115,17 +111,14 @@ export const routes: Routes = [
       {
         path: "facts",
         component: FamilyFactsComponent,
-        resources: gedcomResources,
       },
       {
         path: "sources",
         component: FamilySourcesComponent,
-        resources: gedcomResources,
       },
       {
         path: "gedcom",
         component: FamilyGedcomComponent,
-        resources: gedcomResources,
       },
     ],
   },
@@ -161,17 +154,14 @@ export const routes: Routes = [
       {
         path: "overview",
         component: SourceOverviewComponent,
-        resources: gedcomResources,
       },
       {
         path: "citations",
         component: SourceCitationsComponent,
-        resources: gedcomResources,
       },
       {
         path: "gedcom",
         component: SourceGedcomComponent,
-        resources: gedcomResources,
       },
     ],
   },
@@ -225,59 +215,49 @@ export const routes: Routes = [
       {
         path: "source-warnings",
         component: SourceWarningsComponent,
-        resources: gedcomResources,
         canDeactivate: [confirmUnsavedChangesGuard],
       },
       {
         path: "sources-without-repositories",
         component: SourcesWithoutRepositoriesComponent,
-        resources: gedcomResources,
         canDeactivate: [confirmUnsavedChangesGuard],
       },
       {
         path: "duplicate-call-numbers",
         component: DuplicateCallNumbersComponent,
-        resources: gedcomResources,
         canDeactivate: [confirmUnsavedChangesGuard],
       },
       {
         path: "unused-sources",
         component: UnusedSourcesComponent,
-        resources: gedcomResources,
       },
       {
         path: "unused-multimedia",
         component: UnusedMultimediaComponent,
-        resources: gedcomResources,
       },
       {
         path: "bibliography-without-title",
         component: BibliographyWithoutTitleComponent,
-        resources: gedcomResources,
         canDeactivate: [confirmUnsavedChangesGuard],
       },
       {
         path: "duplicate-repositories",
         component: DuplicateRepositoriesComponent,
-        resources: gedcomResources,
         canDeactivate: [confirmUnsavedChangesGuard],
       },
       {
         path: "tree-ids",
         component: TreeIdsComponent,
-        resources: gedcomResources,
         canDeactivate: [confirmUnsavedChangesGuard],
       },
       {
         path: "outdated-urls",
         component: OutdatedUrlsComponent,
-        resources: gedcomResources,
         canDeactivate: [confirmUnsavedChangesGuard],
       },
       {
         path: "duplicate-sources",
         component: DuplicateSourcesComponent,
-        resources: gedcomResources,
         canDeactivate: [confirmUnsavedChangesGuard],
       },
     ],

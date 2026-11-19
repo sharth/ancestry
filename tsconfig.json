@@ -32,6 +32,8 @@
     "strictInputAccessModifiers": true,
     "strictStandalone": true,
     "strictTemplates": true,
+    "strictNgTemplateTypes": true,
+    "strictUnknownElements": true,
     "strictUnclaimedEventNames": true,
     "extendedDiagnostics": {
       "defaultCategory": "error"
