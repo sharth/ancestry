@@ -50,10 +50,7 @@ export const routes: Routes = [
     canActivate: [ancestryDatabaseGuard],
     resources: gedcomResources,
   },
-  {
-    path: "settings",
-    component: SettingsComponent,
-  },
+  { path: "settings", component: SettingsComponent },
   {
     path: "search",
     component: SearchComponent,
@@ -75,26 +72,10 @@ export const routes: Routes = [
     canDeactivate: [confirmUnsavedChangesGuard],
     children: [
       { path: "", redirectTo: "facts", pathMatch: "full" },
-      {
-        path: "facts",
-        component: IndividualFactsComponent,
-        resources: gedcomResources,
-      },
-      {
-        path: "ancestors",
-        component: IndividualAncestorsComponent,
-        resources: gedcomResources,
-      },
-      {
-        path: "sources",
-        component: IndividualSourcesComponent,
-        resources: gedcomResources,
-      },
-      {
-        path: "gedcom",
-        component: IndividualGedcomComponent,
-        resources: gedcomResources,
-      },
+      { path: "facts", component: IndividualFactsComponent },
+      { path: "ancestors", component: IndividualAncestorsComponent },
+      { path: "sources", component: IndividualSourcesComponent },
+      { path: "gedcom", component: IndividualGedcomComponent },
     ],
   },
   {
@@ -112,21 +93,9 @@ export const routes: Routes = [
     canDeactivate: [confirmUnsavedChangesGuard],
     children: [
       { path: "", redirectTo: "facts", pathMatch: "full" },
-      {
-        path: "facts",
-        component: FamilyFactsComponent,
-        resources: gedcomResources,
-      },
-      {
-        path: "sources",
-        component: FamilySourcesComponent,
-        resources: gedcomResources,
-      },
-      {
-        path: "gedcom",
-        component: FamilyGedcomComponent,
-        resources: gedcomResources,
-      },
+      { path: "facts", component: FamilyFactsComponent },
+      { path: "sources", component: FamilySourcesComponent },
+      { path: "gedcom", component: FamilyGedcomComponent },
     ],
   },
   {
@@ -158,21 +127,9 @@ export const routes: Routes = [
     canDeactivate: [confirmUnsavedChangesGuard],
     children: [
       { path: "", redirectTo: "overview", pathMatch: "full" },
-      {
-        path: "overview",
-        component: SourceOverviewComponent,
-        resources: gedcomResources,
-      },
-      {
-        path: "citations",
-        component: SourceCitationsComponent,
-        resources: gedcomResources,
-      },
-      {
-        path: "gedcom",
-        component: SourceGedcomComponent,
-        resources: gedcomResources,
-      },
+      { path: "overview", component: SourceOverviewComponent },
+      { path: "citations", component: SourceCitationsComponent },
+      { path: "gedcom", component: SourceGedcomComponent },
     ],
   },
   {
@@ -225,59 +182,43 @@ export const routes: Routes = [
       {
         path: "source-warnings",
         component: SourceWarningsComponent,
-        resources: gedcomResources,
         canDeactivate: [confirmUnsavedChangesGuard],
       },
       {
         path: "sources-without-repositories",
         component: SourcesWithoutRepositoriesComponent,
-        resources: gedcomResources,
         canDeactivate: [confirmUnsavedChangesGuard],
       },
       {
         path: "duplicate-call-numbers",
         component: DuplicateCallNumbersComponent,
-        resources: gedcomResources,
         canDeactivate: [confirmUnsavedChangesGuard],
       },
-      {
-        path: "unused-sources",
-        component: UnusedSourcesComponent,
-        resources: gedcomResources,
-      },
-      {
-        path: "unused-multimedia",
-        component: UnusedMultimediaComponent,
-        resources: gedcomResources,
-      },
+      { path: "unused-sources", component: UnusedSourcesComponent },
+      { path: "unused-multimedia", component: UnusedMultimediaComponent },
       {
         path: "bibliography-without-title",
         component: BibliographyWithoutTitleComponent,
-        resources: gedcomResources,
         canDeactivate: [confirmUnsavedChangesGuard],
       },
       {
         path: "duplicate-repositories",
         component: DuplicateRepositoriesComponent,
-        resources: gedcomResources,
         canDeactivate: [confirmUnsavedChangesGuard],
       },
       {
         path: "tree-ids",
         component: TreeIdsComponent,
-        resources: gedcomResources,
         canDeactivate: [confirmUnsavedChangesGuard],
       },
       {
         path: "outdated-urls",
         component: OutdatedUrlsComponent,
-        resources: gedcomResources,
         canDeactivate: [confirmUnsavedChangesGuard],
       },
       {
         path: "duplicate-sources",
         component: DuplicateSourcesComponent,
-        resources: gedcomResources,
         canDeactivate: [confirmUnsavedChangesGuard],
       },
     ],
