@@ -1,18 +1,19 @@
 @if (rows().length === 0) {
-  <p>No two sources share a title.</p>
+  <p>No two sources share an abbreviation.</p>
 } @else {
   <p>
-    These sources share a title. The suggested fix keeps the first one, points
-    every citation of the others at it, carries over their repository and
-    multimedia links, and deletes them. Where they conflict, the merge keeps the
-    first source's value and drops the other's; open the editor to keep it.
+    These sources share an abbreviation (ABBR). The suggested fix keeps the
+    first one, points every citation of the others at it, carries over their
+    repository and multimedia links, and deletes them. Where they conflict, the
+    merge keeps the first source's value and drops the other's; open the editor
+    to keep it.
   </p>
   <app-validation-table
-    [columns]="['Title', 'Sources', 'Conflicts']"
+    [columns]="['Abbreviation', 'Sources', 'Conflicts']"
     [rows]="rows()"
   >
     <ng-template let-row>
-      <div role="cell">{{ row.group.title }}</div>
+      <div role="cell">{{ row.abbr }}</div>
       <div role="cell">
         <div>
           <a [routerLink]="['/source', row.group.kept.xref]">{{

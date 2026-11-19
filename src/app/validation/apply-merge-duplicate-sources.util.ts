@@ -10,10 +10,9 @@ import {
 import type { GedcomSource } from "../../gedcom/gedcomSource";
 import type { GedcomSourceCitation } from "../../gedcom/gedcomSourceCitation";
 
-/** Sources sharing one title: the first in file order is kept, and the rest
- * are merged into it. */
+/** Sources to merge: the first in file order is kept, and the rest are
+ * merged into it. */
 export interface DuplicateSources {
-  title: string;
   kept: GedcomSource;
   duplicates: GedcomSource[];
 }
@@ -29,7 +28,7 @@ export function mergeConflicts(group: DuplicateSources): string[] {
         conflicts.push(`${tag} of ${duplicate.xref}`);
       }
     };
-    differs("ABBR", group.kept.abbr, duplicate.abbr);
+    differs("TITL", group.kept.title, duplicate.title);
     differs("TEXT", group.kept.text, duplicate.text);
     for (const record of duplicate.unknownRecords) {
       if (
@@ -128,7 +127,7 @@ export function applyMergeDuplicateSources(
 }
 
 function mergeSourceInto(kept: GedcomSource, duplicate: GedcomSource) {
-  if (kept.abbr === "") kept.abbr = duplicate.abbr;
+  if (kept.title === "") kept.title = duplicate.title;
   if (kept.text === "") kept.text = duplicate.text;
 
   for (const link of duplicate.repositoryLinks) {
