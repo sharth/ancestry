@@ -183,6 +183,26 @@ describe("GedcomEditorComponent Integration", () => {
       ]);
     });
 
+    it("keeps edits when another tab is opened", () => {
+      const individual = component.form.individuals["@I0@"];
+      assert(individual);
+      individual().value.update(
+        produce((draft) => {
+          draft.names = [newGedcomName({ givenName: "John", surname: "Doe" })];
+        }),
+      );
+
+      const xref = component.openNewSource();
+
+      expect(component.workingDatabase().individuals["@I0@"]?.names).toEqual([
+        newGedcomName({ givenName: "John", surname: "Doe" }),
+      ]);
+      expect(component.workingDatabase().sources[xref]).toEqual(
+        newGedcomSource({ xref }),
+      );
+      expect(component.activeTab()).toEqual({ type: "SOUR", xref });
+    });
+
     it("can edit a record that isn't open as a tab", () => {
       fixture.componentRef.setInput("tabs", [
         { type: "SOUR", xref: "@SOUR300@" },
