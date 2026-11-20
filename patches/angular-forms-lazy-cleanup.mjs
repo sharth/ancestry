@@ -8,8 +8,9 @@
 // grows the tab to ~4 GB and crashes it. Walking `materializedChildren()`
 // visits the same nodes the sweep can clean up, without creating new ones.
 //
-// Runs as `postinstall`. Once the installed @angular/forms has the fix, this
-// fails loudly so we remember to delete it.
+// Runs as `postinstall`. If the installed @angular/forms no longer has the
+// loop this replaces (fixed upstream, or already patched), this fails so we
+// remember to delete it.
 
 import { readFileSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
@@ -29,14 +30,11 @@ const after =
   "      this.markStructuresLive(child.structure, liveStructures);";
 
 const source = readFileSync(file, "utf8");
-if (source.includes(after)) {
-  // Already patched (postinstall ran twice), nothing to do.
-} else if (source.includes(before)) {
-  writeFileSync(file, source.replace(before, after));
-} else {
+if (!source.includes(before)) {
   throw new Error(
     `${file} no longer contains the markStructuresLive loop this patch ` +
       `replaces. If angular/angular#70627 is fixed, delete ` +
       `patches/angular-forms-lazy-cleanup.mjs and its postinstall script.`,
   );
 }
+writeFileSync(file, source.replace(before, after));
