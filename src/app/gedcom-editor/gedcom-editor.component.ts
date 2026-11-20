@@ -21,6 +21,7 @@ import { displayGedcomName } from "../../gedcom/gedcomName";
 import { newGedcomRepository } from "../../gedcom/gedcomRepository";
 import { newGedcomSource } from "../../gedcom/gedcomSource";
 import { newGedcomSubmitter } from "../../gedcom/gedcomSubmitter";
+import { syncFamilyLinks } from "../../util/family-links";
 import { FileExistsError } from "../../util/file-system";
 import { multimediaFilePathProblem } from "../../util/multimedia-file-name";
 import {
@@ -143,6 +144,13 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   // fixed; without it, the form builds a node for every field in the file.
   readonly form = form(this.workingDatabase);
 
+  // What submit writes: workingDatabase() with each individual's FAMS/FAMC
+  // brought in line with the families' HUSB/WIFE/CHIL. The family editor
+  // owns membership, and FAMS/FAMC aren't edited directly.
+  readonly savedDatabase = computed(() =>
+    syncFamilyLinks(this.ancestryDatabase(), this.workingDatabase()),
+  );
+
   readonly differences = computed(() => {
     // Every record currently open as a tab should show its Gedcom, even if
     // the user hasn't changed anything -- otherwise opening an unedited
@@ -151,7 +159,7 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     // incidental header DATE/VERS stamp, or another tab's edits).
     const openXrefs = new Set(this.openTabs().map((tab) => tab.xref));
     return this.ancestryService.gedcomDatabaseDifferences(
-      this.workingDatabase(),
+      this.savedDatabase(),
       openXrefs,
     );
   });
@@ -362,7 +370,7 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     // the edits intact, so the user can fix it and submit again.
     try {
       await this.copyPendingMultimediaFiles();
-      await this.ancestryService.updateGedcomDatabase(this.workingDatabase());
+      await this.ancestryService.updateGedcomDatabase(this.savedDatabase());
     } catch (error) {
       console.error(error);
       alert(`Couldn't save: ${(error as Error).message}`);
