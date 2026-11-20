@@ -218,7 +218,9 @@ describe("AncestryService save history", () => {
     const savedText = await readFile();
     const [save] = await ancestryService.dexieDatabase.saves.toArray();
 
-    useFile();
+    vi.spyOn(ancestryService, "storedGedcomFileHandle").mockResolvedValue(
+      fileHandle,
+    );
     await ancestryService.restoreGedcomSave(save?.id ?? -1);
 
     expect(await readFile()).toBe(MINIMAL_GEDCOM_TEXT);
@@ -227,5 +229,23 @@ describe("AncestryService save history", () => {
       MINIMAL_GEDCOM_TEXT,
       savedText,
     ]);
+  });
+
+  it("restores without the loaded file, e.g. when it no longer parses", async () => {
+    await ancestryService.dexieDatabase.saves.add({
+      savedAt: new Date(),
+      gedcomFilename: "history.ged",
+      gedcomText: MINIMAL_GEDCOM_TEXT,
+    });
+    await writeFile("0 @I1@ INDI\n1 FAMS @F404@\n0 TRLR\n");
+    ancestryService.gedcomResource.set(undefined);
+    vi.spyOn(ancestryService, "storedGedcomFileHandle").mockResolvedValue(
+      fileHandle,
+    );
+    const [save] = await ancestryService.dexieDatabase.saves.toArray();
+
+    await ancestryService.restoreGedcomSave(save?.id ?? -1);
+
+    expect(await readFile()).toBe(MINIMAL_GEDCOM_TEXT);
   });
 });
