@@ -102,10 +102,10 @@
           }
         }
         @case ("FAM") {
-          @if (form.families[tabInformation.xref]; as family) {
+          @if (form.families[tabInformation.xref]) {
             <app-input-family
-              [workingDatabase]="workingDatabase()"
-              [formField]="family"
+              [databaseForm]="form"
+              [xref]="tabInformation.xref"
             />
           }
         }
