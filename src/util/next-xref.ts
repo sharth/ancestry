@@ -1,5 +1,9 @@
 import type { GedcomDatabase } from "../gedcom/gedcomDatabase";
-import type { GedcomSourceCitation } from "../gedcom/gedcomSourceCitation";
+import {
+  xrefsLinkedFromFamily,
+  xrefsLinkedFromIndividual,
+  xrefsLinkedFromSource,
+} from "./linked-xrefs";
 
 export function calculateNextIndividualXref(gedcomDatabase: GedcomDatabase) {
   return calculateNextXref(gedcomDatabase, "I");
@@ -38,37 +42,13 @@ function* usedXrefs(gedcomDatabase: GedcomDatabase): Generator<string> {
   for (const individual of Object.values(gedcomDatabase.individuals)) {
     yield* individual.parentOfFamilyXrefs;
     yield* individual.childOfFamilyXrefs;
-    yield* usedXrefsFromSourceCitations(individual.sex.citations);
-    for (const name of individual.names) {
-      yield* usedXrefsFromSourceCitations(name.citations);
-    }
-    for (const fact of individual.facts) {
-      yield* fact.sharedWith.map((sharedWith) => sharedWith.xref);
-      yield* usedXrefsFromSourceCitations(fact.citations);
-    }
+    yield* xrefsLinkedFromIndividual(individual);
   }
   for (const family of Object.values(gedcomDatabase.families)) {
-    yield family.husbandXref;
-    yield family.wifeXref;
-    yield* family.childXrefs;
-    yield* usedXrefsFromSourceCitations(family.citations);
-    for (const fact of family.facts) {
-      yield* fact.sharedWith.map((sharedWith) => sharedWith.xref);
-      yield* usedXrefsFromSourceCitations(fact.citations);
-    }
+    yield* xrefsLinkedFromFamily(family);
   }
   for (const source of Object.values(gedcomDatabase.sources)) {
-    yield* source.repositoryLinks.map((link) => link.repositoryXref);
-    yield* source.multimediaLinks.map((link) => link.xref);
-  }
-}
-
-function* usedXrefsFromSourceCitations(
-  citations: GedcomSourceCitation[],
-): Generator<string> {
-  for (const citation of citations) {
-    yield citation.sourceXref;
-    yield* citation.multimediaLinks.map((link) => link.xref);
+    yield* xrefsLinkedFromSource(source);
   }
 }
 

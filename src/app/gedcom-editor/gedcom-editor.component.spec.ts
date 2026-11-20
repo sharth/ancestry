@@ -221,6 +221,115 @@ describe("GedcomEditorComponent Integration", () => {
     });
   });
 
+  describe("deleteRecord tests", () => {
+    // The tabs input opens a new individual, which gets @I1@.
+    const newIndividual = { type: "INDI", xref: "@I1@" } as const;
+    const stockIndividual = { type: "INDI", xref: "@I0@" } as const;
+    const stockFamily = { type: "FAM", xref: "@F0@" } as const;
+
+    it("keeps the record and its tab, but leaves it out of what's saved", () => {
+      component.deleteRecord(newIndividual);
+
+      expect(component.workingDatabase().individuals["@I1@"]).toBeDefined();
+      expect(component.openTabs()).toEqual([newIndividual]);
+      expect(component.activeTab()).toEqual(newIndividual);
+      expect(component.savedDatabase().individuals["@I1@"]).toBeUndefined();
+      expect(component.hasUnsavedChanges()).toBe(true);
+    });
+
+    it("disables the deleted record's form", () => {
+      const individualField = component.form.individuals["@I1@"];
+      assert(individualField);
+      expect(individualField().disabled()).toBe(false);
+
+      component.deleteRecord(newIndividual);
+
+      expect(individualField().disabled()).toBe(true);
+    });
+
+    it("doesn't hand the deleted record's xref out again", () => {
+      component.deleteRecord(newIndividual);
+
+      expect(component.openNewIndividual()).toBe("@I2@");
+    });
+
+    it("keeps edits made before the delete when it's undone", () => {
+      component.workingDatabase.update((database) =>
+        produce(database, (draft) => {
+          const individual = draft.individuals["@I1@"];
+          assert(individual);
+          individual.names = [newGedcomName({ givenName: "Edited" })];
+        }),
+      );
+
+      component.deleteRecord(newIndividual);
+      component.undoDelete(newIndividual);
+
+      expect(component.deletedXrefs().size).toBe(0);
+      expect(
+        component.savedDatabase().individuals["@I1@"]?.names[0]?.givenName,
+      ).toBe("Edited");
+      expect(component.form.individuals["@I1@"]?.().disabled()).toBe(false);
+    });
+
+    it("is invalid while an unopened record links to the deleted one", () => {
+      component.openTab(stockIndividual);
+
+      component.deleteRecord(stockIndividual);
+
+      expect(component.form().invalid()).toBe(true);
+      expect(component.referrersOfDeleted().get("@I0@")).toEqual([stockFamily]);
+    });
+
+    it("is invalid while an open record links to the deleted one, until the link is removed", () => {
+      component.openTab(stockIndividual);
+      component.openTab(stockFamily);
+      component.deleteRecord(stockIndividual);
+
+      expect(component.form().invalid()).toBe(true);
+      expect(component.referrersOfDeleted().get("@I0@")).toEqual([stockFamily]);
+
+      component.workingDatabase.update((database) =>
+        produce(database, (draft) => {
+          const family = draft.families["@F0@"];
+          assert(family);
+          family.husbandXref = "";
+        }),
+      );
+
+      expect(component.form().invalid()).toBe(false);
+      expect(component.referrersOfDeleted().size).toBe(0);
+    });
+
+    it("doesn't save while the form is invalid", async () => {
+      const update = vi
+        .spyOn(ancestryService, "updateGedcomDatabase")
+        .mockResolvedValue(undefined);
+      component.openTab(stockIndividual);
+      component.deleteRecord(stockIndividual);
+
+      await component.submitForm(new Event("submit"));
+
+      expect(update).not.toHaveBeenCalled();
+    });
+
+    it("drops the members' links to a deleted family when saving", async () => {
+      const update = vi
+        .spyOn(ancestryService, "updateGedcomDatabase")
+        .mockResolvedValue(undefined);
+      component.openTab(stockFamily);
+      component.deleteRecord(stockFamily);
+
+      expect(component.form().invalid()).toBe(false);
+      await component.submitForm(new Event("submit"));
+
+      const saved = update.mock.calls[0]?.[0];
+      assert(saved);
+      expect(saved.families["@F0@"]).toBeUndefined();
+      expect(saved.individuals["@I0@"]?.parentOfFamilyXrefs).toEqual([]);
+    });
+  });
+
   describe("submitForm tests", () => {
     // The page picks up the saved file through its route's resources, so
     // saving needs no navigation to refresh it.
