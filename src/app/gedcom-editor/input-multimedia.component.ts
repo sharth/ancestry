@@ -19,6 +19,7 @@ import {
   multimediaFileName,
   multimediaFilePathProblem,
 } from "../../util/multimedia-file-name";
+import { pdfPageCount, pdfPageToPng } from "../../util/pdf-to-png";
 import { MultimediaPreviewComponent } from "../multimedia/multimedia-preview.component";
 import { GEDCOM_EDITOR } from "./gedcom-editor-interface";
 
@@ -70,6 +71,62 @@ export class InputMultimediaComponent implements FormValueControl<GedcomMultimed
         : undefined),
   });
 
+  // A PDF just picked with Browse..., which can't be cropped (CROP is in
+  // pixels), so the user is offered to convert one of its pages to a PNG.
+  readonly pickedPdf = signal<File | undefined>(undefined);
+  readonly pdfPageCount = resource({
+    params: () => this.pickedPdf(),
+    loader: ({ params }) => pdfPageCount(params),
+  });
+  readonly pdfPages = computed(() =>
+    Array.from({ length: this.pdfPageCount.value() ?? 0 }, (_, i) => i + 1),
+  );
+  readonly pdfPage = signal(1);
+  readonly pdfConverting = signal(false);
+
+  onPdfPageChange(event: Event) {
+    this.pdfPage.set(Number((event.target as HTMLSelectElement).value));
+  }
+
+  // Replaces the picked PDF with a PNG of one of its pages, as a pending
+  // file copied into the data folder on submit. The PDF itself isn't kept.
+  async convertPdfToPng() {
+    const pdf = this.pickedPdf();
+    if (!pdf) {
+      return;
+    }
+    const page = this.pdfPage();
+    const multiplePages = this.pdfPages().length > 1;
+    this.pdfConverting.set(true);
+    try {
+      const png = await pdfPageToPng(pdf, page);
+      const stem = pdf.name.replace(/\.pdf$/i, "");
+      const file = new File(
+        [png],
+        multiplePages ? `${stem} page ${page}.png` : `${stem}.png`,
+        { type: "image/png" },
+      );
+      this.sourceFileName.update(
+        (name) => `${name} (${multiplePages ? `page ${page}, ` : ""}as PNG)`,
+      );
+      this.value.update((m) => ({
+        ...m,
+        filePath:
+          m.pendingFile && !this.useDefaultFileName()
+            ? m.filePath.replace(/\.pdf$/i, "") + ".png"
+            : multimediaFileName(m.xref, m.title, file.name),
+        mediaType: file.type,
+        pendingFile: file,
+      }));
+      this.pickedPdf.set(undefined);
+    } catch (e) {
+      console.error(e);
+      alert("Couldn't convert this PDF to a PNG.");
+    } finally {
+      this.pdfConverting.set(false);
+    }
+  }
+
   // The title input's own handler (not an effect): while the default name
   // is in use, renaming the record renames the file it will be copied to.
   onTitleInput(event: Event) {
@@ -113,6 +170,12 @@ export class InputMultimediaComponent implements FormValueControl<GedcomMultimed
       // relative to the data folder.
       const relativePath = await directoryHandle.resolve(fileHandle);
       this.useDefaultFileName.set(true);
+      this.pdfPage.set(1);
+      this.pickedPdf.set(
+        file.type === "application/pdf" || /\.pdf$/i.test(file.name)
+          ? file
+          : undefined,
+      );
       this.sourceFileName.set(relativePath?.join("/") ?? file.name);
       this.value.update((m) => ({
         ...m,

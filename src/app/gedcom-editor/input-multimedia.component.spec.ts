@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomMultimedia } from "../../gedcom/gedcomMultimedia";
+import { testPdf } from "../../util/test-pdf";
 import {
   GEDCOM_EDITOR,
   type GedcomEditorInterface,
@@ -230,6 +231,100 @@ describe("InputMultimediaComponent", () => {
 
       expect(component.value().pendingFile).toBeUndefined();
       expect(component.value().filePath).toBe("census.png");
+    });
+
+    describe("PDFs", () => {
+      function pickPdf(pdf: File) {
+        vi.spyOn(window, "showOpenFilePicker").mockResolvedValue([
+          {
+            getFile: () => Promise.resolve(pdf),
+          } as unknown as FileSystemFileHandle,
+        ]);
+      }
+
+      beforeEach(() => {
+        vi.spyOn(
+          component.ancestryService,
+          "multimediaFileExists",
+        ).mockResolvedValue(false);
+      });
+
+      it("doesn't offer to convert other files", async () => {
+        await component.browseFile();
+        await fixture.whenStable();
+
+        expect(
+          screen.queryByRole("button", { name: "Convert to PNG" }),
+        ).toBeNull();
+      });
+
+      it("converts a one-page PDF to a pending PNG", async () => {
+        pickPdf(testPdf("census.pdf", [[72, 36]]));
+
+        await component.browseFile();
+        await fixture.whenStable();
+        expect(component.value().filePath).toBe("O12 1901 Census.pdf");
+        expect(screen.queryByRole("combobox", { name: "Page" })).toBeNull();
+
+        await component.convertPdfToPng();
+        await fixture.whenStable();
+
+        const { pendingFile, filePath, mediaType } = component.value();
+        expect(pendingFile?.name).toBe("census.png");
+        expect(pendingFile?.type).toBe("image/png");
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const image = await createImageBitmap(pendingFile!);
+        expect([image.width, image.height]).toEqual([200, 100]);
+        expect(filePath).toBe("O12 1901 Census.png");
+        expect(mediaType).toBe("image/png");
+        expect(
+          screen.getByLabelText<HTMLInputElement>("Source File").value,
+        ).toBe("census.pdf (as PNG)");
+        expect(
+          screen.queryByRole("button", { name: "Convert to PNG" }),
+        ).toBeNull();
+      });
+
+      it("converts the chosen page of a multi-page PDF", async () => {
+        pickPdf(
+          testPdf("census.pdf", [
+            [72, 72],
+            [144, 72],
+          ]),
+        );
+
+        await component.browseFile();
+        await vi.waitFor(() => {
+          fixture.detectChanges();
+          expect(screen.getByRole("combobox", { name: "Page" })).toBeTruthy();
+        });
+        const select = screen.getByRole<HTMLSelectElement>("combobox", {
+          name: "Page",
+        });
+        select.value = "2";
+        select.dispatchEvent(new Event("change"));
+        screen.getByRole("button", { name: "Convert to PNG" }).click();
+        await vi.waitFor(() => {
+          expect(component.value().mediaType).toBe("image/png");
+        });
+
+        const { pendingFile } = component.value();
+        expect(pendingFile?.name).toBe("census page 2.png");
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const image = await createImageBitmap(pendingFile!);
+        expect([image.width, image.height]).toEqual([400, 200]);
+      });
+
+      it("keeps a custom file name, with a .png extension", async () => {
+        pickPdf(testPdf("census.pdf", [[72, 72]]));
+
+        await component.browseFile();
+        await fixture.whenStable();
+        typeInto("File Path", "scans/Smith census.pdf");
+        await component.convertPdfToPng();
+
+        expect(component.value().filePath).toBe("scans/Smith census.png");
+      });
     });
   });
 });

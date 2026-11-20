@@ -28,6 +28,35 @@
   </button>
 </div>
 
+@if (pickedPdf()) {
+  <div class="alert alert-info d-flex flex-wrap align-items-center gap-2 py-2">
+    <span class="flex-grow-1"
+      >PDFs can't be cropped. Convert to a PNG image instead?</span
+    >
+    @if (pdfPages().length > 1) {
+      <select
+        class="form-select form-select-sm w-auto"
+        aria-label="Page"
+        (change)="onPdfPageChange($event)"
+      >
+        @for (page of pdfPages(); track page) {
+          <option [value]="page" [selected]="page === pdfPage()">
+            Page {{ page }} of {{ pdfPages().length }}
+          </option>
+        }
+      </select>
+    }
+    <button
+      class="btn btn-sm btn-primary"
+      type="button"
+      [disabled]="pdfConverting()"
+      (click)="convertPdfToPng()"
+    >
+      Convert to PNG
+    </button>
+  </div>
+}
+
 <div class="input-group has-validation">
   <label class="input-group-text path-label" for="filePath">File Path</label>
   <input
