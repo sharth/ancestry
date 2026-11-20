@@ -70,6 +70,16 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   readonly ancestryDatabase = input.required<GedcomDatabase>();
   readonly finished = output();
 
+  readonly savedFactIds = computed<ReadonlySet<number>>(() => {
+    const database = this.ancestryDatabase();
+    return new Set(
+      [
+        ...Object.values(database.individuals),
+        ...Object.values(database.families),
+      ].flatMap((record) => record.facts.map((fact) => fact.id)),
+    );
+  });
+
   // `tabs()` with each xref resolved: an empty xref means "create a new
   // record of this type," so we calculate the next available xref for it.
   readonly effectiveTabs = computed<TabInformation[]>(() => {
