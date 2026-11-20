@@ -6,7 +6,7 @@
       class="tab-list d-flex flex-wrap gap-1 align-items-center"
       role="tablist"
     >
-      @for (item of xrefsIncludedInView(); track item.xref) {
+      @for (item of openTabs(); track item.xref) {
         <div class="btn-group" role="group">
           <button
             type="button"
@@ -79,7 +79,7 @@
     </details>
   </div>
 
-  @for (tabInformation of xrefsIncludedInView(); track tabInformation.xref) {
+  @for (tabInformation of openTabs(); track tabInformation.xref) {
     @let isActive =
       activeTab()?.type === tabInformation.type &&
       activeTab()?.xref === tabInformation.xref;

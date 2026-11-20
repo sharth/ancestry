@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
+    "postinstall": "patch-package --error-on-fail --error-on-warn",
     "prestart": "npm ls --depth=0 > /dev/null",
     "start": "ng serve --configuration development",
     "prebuild": "npm ls --depth=0 > /dev/null",
@@ -45,6 +46,7 @@
     "eslint-plugin-testing-library": "^7.16.2",
     "immer": "^11.2.10",
     "oxfmt": "^0.78.0",
+    "patch-package": "^8.0.1",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.72.2",
     "vitest": "^5.1.0"
