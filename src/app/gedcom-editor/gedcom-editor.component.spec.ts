@@ -136,18 +136,16 @@ describe("GedcomEditorComponent Integration", () => {
     });
   });
 
-  describe("effectiveTabs tests", () => {
+  describe("openTabs tests", () => {
     it("resolves an empty xref to the next available one", () => {
       fixture.componentRef.setInput("tabs", [{ type: "INDI", xref: "" }]);
-      expect(component.effectiveTabs()).toEqual([
-        { type: "INDI", xref: "@I1@" },
-      ]);
+      expect(component.openTabs()).toEqual([{ type: "INDI", xref: "@I1@" }]);
     });
     it("keeps a provided xref as-is", () => {
       fixture.componentRef.setInput("tabs", [
         { type: "SOUR", xref: "@SOUR300@" },
       ]);
-      expect(component.effectiveTabs()).toEqual([
+      expect(component.openTabs()).toEqual([
         { type: "SOUR", xref: "@SOUR300@" },
       ]);
     });
