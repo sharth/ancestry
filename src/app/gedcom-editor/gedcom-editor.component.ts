@@ -125,74 +125,18 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     });
   });
 
-  // The set of xrefs that are currently being modified by the form.
-  // - Adding an xref to the set will cause it to be included in the form.
-  // - Removing an xref from the set will cause it to be removed from the
-  //   form, but any changes made will be maintained in workingDatabase().
+  // The records open as tabs in the editor. Opening a tab adds to this;
+  // every record, open or not, is editable through `form` and keeps its
+  // changes in workingDatabase().
   readonly xrefsIncludedInView = linkedSignal<TabInformation[]>(() =>
     this.effectiveTabs(),
   );
 
-  // A GedcomDatabase made up of only the xrefs found in `xrefsIncludedInView`.
-  // Any changes will be persisted in workingDatabase().
-  // This will be used in the Angular Signal Forms. The indirection is required,
-  // because if we used `form = form(this.workingDatabase)`, that call would take a few seconds.
-  readonly workingDatabaseView = linkedSignal<GedcomDatabase>(
-    () => ({
-      submitters: filteredProperties(
-        this.workingDatabase().submitters,
-        this.xrefsIncludedInView()
-          .filter((tabInformation) => tabInformation.type === "SUBM")
-          .map((tabInformation) => tabInformation.xref),
-      ),
-      individuals: filteredProperties(
-        this.workingDatabase().individuals,
-        this.xrefsIncludedInView()
-          .filter((tabInformation) => tabInformation.type === "INDI")
-          .map((tabInformation) => tabInformation.xref),
-      ),
-      families: filteredProperties(
-        this.workingDatabase().families,
-        this.xrefsIncludedInView()
-          .filter((tabInformation) => tabInformation.type === "FAM")
-          .map((tabInformation) => tabInformation.xref),
-      ),
-      sources: filteredProperties(
-        this.workingDatabase().sources,
-        this.xrefsIncludedInView()
-          .filter((tabInformation) => tabInformation.type === "SOUR")
-          .map((tabInformation) => tabInformation.xref),
-      ),
-      repositories: filteredProperties(
-        this.workingDatabase().repositories,
-        this.xrefsIncludedInView()
-          .filter((tabInformation) => tabInformation.type === "REPO")
-          .map((tabInformation) => tabInformation.xref),
-      ),
-      multimedias: filteredProperties(
-        this.workingDatabase().multimedias,
-        this.xrefsIncludedInView()
-          .filter((tabInformation) => tabInformation.type === "OBJE")
-          .map((tabInformation) => tabInformation.xref),
-      ),
-    }),
-    {
-      set: (updates: GedcomDatabase) => {
-        this.workingDatabase.update((database) =>
-          produce(database, (draft) => {
-            Object.assign(draft.submitters, updates.submitters);
-            Object.assign(draft.individuals, updates.individuals);
-            Object.assign(draft.families, updates.families);
-            Object.assign(draft.sources, updates.sources);
-            Object.assign(draft.repositories, updates.repositories);
-            Object.assign(draft.multimedias, updates.multimedias);
-          }),
-        );
-      },
-    },
-  );
-
-  readonly form = form(this.workingDatabaseView);
+  // Signal Forms only creates a field node when something reads it, so this
+  // costs nothing for records that aren't open. That relies on
+  // patches/angular-forms-lazy-cleanup.mjs until angular/angular#70627 is
+  // fixed; without it, the form builds a node for every field in the file.
+  readonly form = form(this.workingDatabase);
 
   readonly differences = computed(() => {
     // Every record currently open as a tab should show its Gedcom, even if
@@ -455,20 +399,4 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   cancelForm() {
     this.finished.emit();
   }
-}
-
-function filteredProperties<T>(
-  record: Record<string, T>,
-  includedKeys: string[],
-): Record<string, T> {
-  const result: Record<string, T> = {};
-
-  for (const key of includedKeys) {
-    const value = record[key];
-    if (value) {
-      result[key] = value;
-    }
-  }
-
-  return result;
 }

@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
+    "postinstall": "node patches/angular-forms-lazy-cleanup.mjs",
     "prestart": "npm ls --depth=0 > /dev/null",
     "start": "ng serve --configuration development",
     "prebuild": "npm ls --depth=0 > /dev/null",
