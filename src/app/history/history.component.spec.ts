@@ -1,14 +1,11 @@
-import { inputBinding, signal } from "@angular/core";
 import { TestBed } from "@angular/core/testing";
+import { provideRouter } from "@angular/router";
 import { render, screen } from "@testing-library/angular/zoneless";
 import { userEvent } from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
-import {
-  AncestryService,
-  newGedcomResourceValue,
-} from "../../database/ancestry.service";
-import { newGedcomRecord, parseGedcomRecords } from "../../gedcom/gedcomRecord";
+import { AncestryService } from "../../database/ancestry.service";
+import { newGedcomRecord } from "../../gedcom/gedcomRecord";
 import { HistoryComponent, differingGedcomRecords } from "./history.component";
 
 const OLD_TEXT = ["0 HEAD", "0 @I1@ INDI", "1 NAME John /Doe/", "0 TRLR"].join(
@@ -45,18 +42,29 @@ describe("differingGedcomRecords", () => {
 
 describe("HistoryComponent", () => {
   let ancestryService: AncestryService;
-  const fileHandle = { name: "tree.ged" } as FileSystemFileHandle;
+
+  // A stand-in for the stored data source's file, holding `text`.
+  function storeFile(text: string | null) {
+    vi.spyOn(
+      AncestryService.prototype,
+      "storedGedcomFileHandle",
+    ).mockResolvedValue(
+      text === null
+        ? undefined
+        : ({
+            name: "tree.ged",
+            getFile: () => Promise.resolve(new File([text], "tree.ged")),
+          } as FileSystemFileHandle),
+    );
+  }
 
   // Renders the page, then fills the save history, which the page picks
   // up live. (TestBed can't be injected from before render().)
-  async function setup(
-    gedcom = newGedcomResourceValue({
-      gedcomFileHandle: fileHandle,
-      gedcomRecords: parseGedcomRecords(NEW_TEXT),
-    }),
-  ) {
+  // null stands for the example data, which has no file.
+  async function setup(text: string | null = NEW_TEXT) {
+    storeFile(text);
     await render(HistoryComponent, {
-      bindings: [inputBinding("gedcom", signal(gedcom))],
+      providers: [provideRouter([])],
       waitForStableOnRender: true,
     });
     ancestryService = TestBed.inject(AncestryService);
@@ -74,6 +82,10 @@ describe("HistoryComponent", () => {
       },
     ]);
   }
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
 
   it("lists only this file's saves", async () => {
     await setup();
@@ -109,9 +121,20 @@ describe("HistoryComponent", () => {
     });
   });
 
-  it("explains that the example data has no history", async () => {
-    await setup(newGedcomResourceValue());
+  it("still lists and restores saves when the current file can't be read", async () => {
+    await setup("not a GEDCOM line");
 
-    expect(screen.getByText(/example data can't be saved/)).toBeTruthy();
+    await userEvent.click(
+      await screen.findByRole("button", { name: "Show differences" }),
+    );
+
+    expect(screen.getByText(/can't be read as GEDCOM/)).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Restore" })).toBeTruthy();
+  });
+
+  it("explains that the example data has no history", async () => {
+    await setup(null);
+
+    expect(await screen.findByText(/example data can't be saved/)).toBeTruthy();
   });
 });
