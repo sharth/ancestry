@@ -42,13 +42,30 @@ interface DatabaseState {
   rootIndividualXref?: string;
 }
 
+/** A copy of the GEDCOM file as it was just before a save overwrote it,
+ * kept so the save can be undone. */
+export interface GedcomSave {
+  id?: number;
+  // When the save that replaced this text happened.
+  savedAt: Date;
+  // The name of the file the text came from, so each file only lists its
+  // own history.
+  gedcomFilename: string;
+  gedcomText: string;
+}
+
 class DexieDatabase extends Dexie {
   metadata!: Dexie.Table<DatabaseState, number>;
+  saves!: Dexie.Table<GedcomSave, number>;
 
   constructor() {
     super("AncestryDatabase");
     this.version(6).stores({
       metadata: "++id",
+    });
+    this.version(7).stores({
+      metadata: "++id",
+      saves: "++id, gedcomFilename",
     });
   }
 }
@@ -226,14 +243,38 @@ export class AncestryService {
       gedcomDatabase,
     );
 
+    await this.writeGedcomText(text.join("\n") + "\n");
+  }
+
+  /** Overwrites the GEDCOM file with an earlier save's text. The file as it
+   * is now is kept in the history first, so a restore can be undone too. */
+  async restoreGedcomSave(id: number) {
+    const save = await this.dexieDatabase.saves.get(id);
+    if (save == undefined) {
+      throw new Error(`No saved copy with id ${id}`);
+    }
+    await this.writeGedcomText(save.gedcomText);
+  }
+
+  // Writes `text` to the loaded GEDCOM file, first keeping what the file
+  // holds now in the save history.
+  private async writeGedcomText(text: string) {
     const gedcomFileHandle = this.gedcomResource.value()?.gedcomFileHandle;
     if (gedcomFileHandle == undefined) {
       throw new Error("No GEDCOM file handle available");
     }
 
+    // Read the file again rather than using the loaded text, in case it
+    // changed on disk since it was loaded.
+    const previousText = await (await gedcomFileHandle.getFile()).text();
+    await this.dexieDatabase.saves.add({
+      savedAt: new Date(),
+      gedcomFilename: gedcomFileHandle.name,
+      gedcomText: previousText,
+    });
+
     const writableStream = await gedcomFileHandle.createWritable();
-    await writableStream.write(text.join("\n"));
-    await writableStream.write("\n");
+    await writableStream.write(text);
     await writableStream.close();
     this.gedcomResource.reload();
   }
