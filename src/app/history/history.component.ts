@@ -1,12 +1,12 @@
 import { DatePipe, DecimalPipe } from "@angular/common";
-import { Component, computed, inject, input, signal } from "@angular/core";
+import { Component, computed, inject, resource, signal } from "@angular/core";
 import { rxResource } from "@angular/core/rxjs-interop";
+import { RouterLink } from "@angular/router";
 import { liveQuery } from "dexie";
 import { from } from "rxjs";
 
 import {
   AncestryService,
-  type GedcomResourceValue,
   type GedcomSave,
 } from "../../database/ancestry.service";
 import {
@@ -49,16 +49,38 @@ export function differingGedcomRecords(
 
 @Component({
   selector: "app-history",
-  imports: [DatePipe, DecimalPipe, GedcomDiffComponent],
+  imports: [DatePipe, DecimalPipe, GedcomDiffComponent, RouterLink],
   templateUrl: "./history.component.html",
 })
 export class HistoryComponent {
   private readonly ancestryService = inject(AncestryService);
-  readonly gedcom = input.required<GedcomResourceValue>();
 
-  readonly gedcomFilename = computed(
-    () => this.gedcom().gedcomFileHandle?.name,
+  // The GEDCOM file as it is on disk. Read directly rather than through the
+  // app's parsed copy, so this page still works (and can restore) after a
+  // save leaves the file in a state that fails to parse.
+  readonly file = resource({
+    loader: async () => {
+      const handle = await this.ancestryService.storedGedcomFileHandle();
+      if (handle == undefined) return undefined;
+      return { name: handle.name, text: await (await handle.getFile()).text() };
+    },
+  });
+
+  readonly gedcomFilename = computed(() =>
+    this.file.hasValue() ? this.file.value().name : undefined,
   );
+
+  // The current file's records, or undefined if even its lines can't be
+  // read as GEDCOM.
+  readonly currentGedcomRecords = computed(() => {
+    const text = this.file.hasValue() ? this.file.value().text : undefined;
+    if (text == undefined) return undefined;
+    try {
+      return parseGedcomRecords(text);
+    } catch {
+      return undefined;
+    }
+  });
 
   // This file's saved copies, newest first. Updates by itself when a save
   // or restore adds one.
@@ -79,12 +101,16 @@ export class HistoryComponent {
   // The save whose differences from the current file are shown.
   readonly selectedSave = signal<GedcomSave | undefined>(undefined);
 
+  // Undefined when the current file can't be compared.
   readonly differences = computed(() => {
     const save = this.selectedSave();
-    if (save == undefined) return [];
+    const currentGedcomRecords = this.currentGedcomRecords();
+    if (save == undefined || currentGedcomRecords == undefined) {
+      return undefined;
+    }
     return differingGedcomRecords(
       parseGedcomRecords(save.gedcomText),
-      this.gedcom().gedcomRecords,
+      currentGedcomRecords,
     );
   });
 
@@ -100,5 +126,6 @@ export class HistoryComponent {
     if (!granted) return;
     await this.ancestryService.restoreGedcomSave(save.id);
     this.selectedSave.set(undefined);
+    this.file.reload();
   }
 }

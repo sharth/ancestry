@@ -50,13 +50,20 @@
                   <p class="small text-muted">
                     Left: this saved copy. Right: the file as it is now.
                   </p>
-                  @for (d of differences(); track $index) {
-                    <app-gedcom-diff
-                      [oldGedcomRecord]="d.oldGedcomRecord"
-                      [newGedcomRecord]="d.newGedcomRecord"
-                    />
-                  } @empty {
-                    <p class="mb-0">Same as the current file.</p>
+                  @if (differences(); as differences) {
+                    @for (d of differences; track $index) {
+                      <app-gedcom-diff
+                        [oldGedcomRecord]="d.oldGedcomRecord"
+                        [newGedcomRecord]="d.newGedcomRecord"
+                      />
+                    } @empty {
+                      <p class="mb-0">Same as the current file.</p>
+                    }
+                  } @else {
+                    <p class="mb-0">
+                      The current file can't be read as GEDCOM, so there's
+                      nothing to compare against. Restoring still works.
+                    </p>
                   }
                 </td>
               </tr>
@@ -65,7 +72,12 @@
         </tbody>
       </table>
     }
-  } @else {
+  } @else if (file.error()) {
+    <p>
+      The GEDCOM file couldn't be read. You may need to allow access again in
+      <a routerLink="/settings">Settings</a>.
+    </p>
+  } @else if (!file.isLoading()) {
     <p>
       Save history is kept for a GEDCOM file opened from your computer. The
       example data can't be saved, so it has no history.

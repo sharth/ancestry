@@ -224,11 +224,8 @@ export const routes: Routes = [
       },
     ],
   },
-  {
-    path: "history",
-    component: HistoryComponent,
-    canActivate: [ancestryDatabaseGuard],
-    resources: gedcomResources,
-  },
+  // No guard or resources: the page reads the file itself, so it can still
+  // restore an earlier save when the current file fails to parse.
+  { path: "history", component: HistoryComponent },
   { path: "**", component: PageNotFoundComponent },
 ];
