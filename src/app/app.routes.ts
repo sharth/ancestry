@@ -9,6 +9,7 @@ import { FamilyFactsComponent } from "./family/family-facts.component";
 import { FamilyGedcomComponent } from "./family/family-gedcom.component";
 import { FamilySourcesComponent } from "./family/family-sources.component";
 import { FamilyComponent } from "./family/family.component";
+import { HistoryComponent } from "./history/history.component";
 import { IndexComponent } from "./index/index.component";
 import { IndividualAncestorsComponent } from "./individual/individual-ancestors.component";
 import { IndividualFactsComponent } from "./individual/individual-facts.component";
@@ -222,6 +223,12 @@ export const routes: Routes = [
         canDeactivate: [confirmUnsavedChangesGuard],
       },
     ],
+  },
+  {
+    path: "history",
+    component: HistoryComponent,
+    canActivate: [ancestryDatabaseGuard],
+    resources: gedcomResources,
   },
   { path: "**", component: PageNotFoundComponent },
 ];
