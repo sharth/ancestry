@@ -52,12 +52,15 @@ const family = buildDatabase([
   ["@F1@", "@MGF@", "@FGM@", ["@MDAD@", "@FAUNT@"]],
   ["@F2@", "@MDAD@", "@FMOM@", ["@MROOT@", "@FSIS@"]],
   ["@F3@", "@MUNCLEINLAW@", "@FAUNT@", ["@MCOUSIN@"]],
-  ["@F4@", "@MCOUSIN@", "", ["@FCOUSINKID@"]],
-  ["@F5@", "", "@FSIS@", ["@MNEPHEW@"]],
+  ["@F4@", "@MCOUSIN@", "@FCOUSINWIFE@", ["@FCOUSINKID@"]],
+  ["@F5@", "@MSISHUSBAND@", "@FSIS@", ["@MNEPHEW@"]],
   ["@F6@", "@MROOT@", "@FWIFE@", ["@UKID@"]],
-  ["@F7@", "@UKID@", "", ["@MGRANDSON@"]],
+  ["@F7@", "@UKID@", "@FKIDWIFE@", ["@MGRANDSON@"]],
   ["@F8@", "@MDAD@", "@FSTEPMOM@", ["@MHALFBRO@"]],
   ["@F9@", "", "", ["@MLONE1@", "@FLONE2@"]],
+  ["@F10@", "@MWIFEDAD@", "", ["@FWIFE@", "@MWIFEBRO@"]],
+  ["@F11@", "@MWIFEEX@", "@FWIFE@", ["@MSTEPSON@"]],
+  ["@F12@", "@MWIFEBRO@", "", ["@MWIFENEPHEW@"]],
 ]);
 
 describe("describeRelationship", () => {
@@ -83,10 +86,23 @@ describe("describeRelationship", () => {
     expect(describeFromRoot(targetXref)).toBe(relationship);
   });
 
-  it("finds no relationship through marriage alone", () => {
-    expect(describeFromRoot("@MUNCLEINLAW@")).toBeUndefined();
-    expect(describeFromRoot("@FSTEPMOM@")).toBeUndefined();
-  });
+  it.each([
+    ["@FSTEPMOM@", "stepmother"],
+    ["@MSTEPSON@", "stepson"],
+    ["@MWIFEDAD@", "father-in-law"],
+    ["@MWIFEBRO@", "brother-in-law"],
+    ["@MSISHUSBAND@", "brother-in-law"],
+    ["@FKIDWIFE@", "daughter-in-law"],
+    ["@MUNCLEINLAW@", "husband of the aunt"],
+    ["@FCOUSINWIFE@", "wife of the first cousin"],
+    ["@MWIFENEPHEW@", "nephew of the wife"],
+    ["@MWIFEEX@", "husband of the wife"],
+  ])(
+    "describes %s through marriage as the root's %s",
+    (targetXref, relationship) => {
+      expect(describeFromRoot(targetXref)).toBe(relationship);
+    },
+  );
 
   it("finds no relationship to someone unconnected", () => {
     expect(describeFromRoot("@MLONE1@")).toBeUndefined();
