@@ -23,3 +23,19 @@
   z-index: 1020; /* Bootstrap's sticky z-index, above floating labels */
   background-color: var(--bs-body-bg);
 }
+
+/* Covers a deleted record's (disabled) form, keeping the notice and its
+   Undo button in view while the form scrolls under it. */
+.deleted-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1010; /* below the sticky tab bar */
+  padding: 1rem;
+}
+
+.deleted-overlay .card {
+  position: sticky;
+  top: 4rem;
+  max-width: 32rem;
+  margin-inline: auto;
+}
