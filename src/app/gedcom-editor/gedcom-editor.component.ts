@@ -128,7 +128,7 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   // The records open as tabs in the editor. Opening a tab adds to this;
   // every record, open or not, is editable through `form` and keeps its
   // changes in workingDatabase().
-  readonly xrefsIncludedInView = linkedSignal<TabInformation[]>(() =>
+  readonly openTabs = linkedSignal<TabInformation[]>(() =>
     this.effectiveTabs(),
   );
 
@@ -141,15 +141,13 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   readonly differences = computed(() => {
     // Every record currently open as a tab should show its Gedcom, even if
     // the user hasn't changed anything -- otherwise opening an unedited
-    // record just hides the Gedcom Delta section entirely. Records outside
-    // the view only show up here when they genuinely differ (e.g. an
+    // record just hides the Gedcom Delta section entirely. Records that
+    // aren't open only show up here when they genuinely differ (e.g. an
     // incidental header DATE/VERS stamp, or another tab's edits).
-    const viewXrefs = new Set(
-      this.xrefsIncludedInView().map((tab) => tab.xref),
-    );
+    const openXrefs = new Set(this.openTabs().map((tab) => tab.xref));
     return this.ancestryService.gedcomDatabaseDifferences(
       this.workingDatabase(),
-      viewXrefs,
+      openXrefs,
     );
   });
 
@@ -237,19 +235,16 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
 
     // Include the xref in the list of editable tabs.
     if (
-      !this.xrefsIncludedInView().some(
+      !this.openTabs().some(
         (other) =>
           other.type == tabInformation.type &&
           other.xref == tabInformation.xref,
       )
     ) {
-      this.xrefsIncludedInView.update((xrefsIncludedInView) => [
-        ...xrefsIncludedInView,
-        tabInformation,
-      ]);
+      this.openTabs.update((openTabs) => [...openTabs, tabInformation]);
     }
 
-    // Update the view to look at this xref.
+    // Switch to this xref's tab.
     this.activeTab.set(tabInformation);
   }
 

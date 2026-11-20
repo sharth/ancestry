@@ -626,7 +626,7 @@ describe("GedcomEditorComponent opening an existing record", () => {
     await renderResult.fixture.whenStable();
 
     const component = renderResult.fixture.componentInstance;
-    expect(component.xrefsIncludedInView()).toEqual([
+    expect(component.openTabs()).toEqual([
       { type: "OBJE", xref: "@M0@" },
       { type: "SOUR", xref: "@S1@" },
     ]);
