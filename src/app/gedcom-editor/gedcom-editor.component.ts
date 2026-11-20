@@ -134,7 +134,7 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
 
   // Signal Forms only creates a field node when something reads it, so this
   // costs nothing for records that aren't open. That relies on
-  // patches/angular-forms-lazy-cleanup.mjs until angular/angular#70627 is
+  // patches/@angular+forms+*.patch until angular/angular#70627 is
   // fixed; without it, the form builds a node for every field in the file.
   readonly form = form(this.workingDatabase);
 

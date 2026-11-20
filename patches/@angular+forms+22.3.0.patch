@@ -1,0 +1,13 @@
+diff --git a/node_modules/@angular/forms/fesm2022/_validation_errors-chunk.mjs b/node_modules/@angular/forms/fesm2022/_validation_errors-chunk.mjs
+index 42d1a94..cac6567 100755
+--- a/node_modules/@angular/forms/fesm2022/_validation_errors-chunk.mjs
++++ b/node_modules/@angular/forms/fesm2022/_validation_errors-chunk.mjs
+@@ -1756,7 +1756,7 @@ class FormFieldManager {
+   }
+   markStructuresLive(structure, liveStructures) {
+     liveStructures.add(structure);
+-    for (const child of structure.children()) {
++    for (const child of structure.materializedChildren()) {
+       this.markStructuresLive(child.structure, liveStructures);
+     }
+   }
