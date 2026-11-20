@@ -15,6 +15,10 @@ npm run lint             # eslint --fix src
 Requires Node `^22.22.3 || ^24.15.0 || >=26.0.0` (see `@angular/core`'s `engines` field) — a slightly older
 Node 22.x will fail with a version-check error before the CLI does anything.
 
+`npm start`, `npm run build` and `npm test` first run `npm ls --depth=0`, which fails if `node_modules` no
+longer matches `package.json` (e.g. after pulling a dependency bump). Run `npm ci` when that happens; stale
+packages otherwise produce confusing failures in code that relies on the newer version.
+
 ### Running a single test / filtering
 
 ```sh
