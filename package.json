@@ -4,9 +4,12 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
+    "prestart": "npm ls --depth=0 > /dev/null",
     "start": "ng serve --configuration development",
+    "prebuild": "npm ls --depth=0 > /dev/null",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
+    "pretest": "npm ls --depth=0 > /dev/null",
     "test": "ng test --no-watch --no-progress",
     "lint": "eslint --fix src"
   },
