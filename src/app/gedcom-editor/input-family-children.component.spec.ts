@@ -50,6 +50,14 @@ describe("InputFamilyChildrenComponent", () => {
     );
   });
 
+  it("labels each child picker Child", () => {
+    const element = fixture.nativeElement as HTMLElement;
+    const labels = [...element.querySelectorAll("label")].map((label) =>
+      label.textContent.trim(),
+    );
+    expect(labels).toEqual(["Child", "Child"]);
+  });
+
   it("appends an empty child when Add child is clicked", async () => {
     const user = userEvent.setup();
     const element = fixture.nativeElement as HTMLElement;
