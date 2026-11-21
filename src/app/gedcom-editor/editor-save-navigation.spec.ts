@@ -163,6 +163,13 @@ describe("saving the GEDCOM editor from every entry point", () => {
         expect(dialog.open).toBe(true);
       });
 
+      // The editor sits in an @defer block, which creates its DOM (the
+      // <form> included) one pass before it binds the editor's inputs.
+      // Submitting in between reads `ancestryDatabase` before it's set, so
+      // wait for a tab button: they only render once the inputs are bound.
+      await vi.waitFor(() => {
+        expect(dialog.querySelector("[role=tablist] button")).toBeTruthy();
+      });
       const form = dialog.querySelector("form");
       expect(form).toBeTruthy();
       form?.requestSubmit();
