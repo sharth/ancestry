@@ -1,6 +1,6 @@
 import { inputBinding, signal } from "@angular/core";
 import type { ComponentFixture } from "@angular/core/testing";
-import { render } from "@testing-library/angular/zoneless";
+import { render, screen } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
@@ -22,5 +22,10 @@ describe("InputFamilyComponent", () => {
 
   it("should create", () => {
     expect(component).toBeTruthy();
+  });
+
+  it("labels the husband and wife pickers", () => {
+    expect(screen.getByLabelText("Husband")).toBeTruthy();
+    expect(screen.getByLabelText("Wife")).toBeTruthy();
   });
 });
