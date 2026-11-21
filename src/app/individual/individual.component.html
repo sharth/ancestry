@@ -2,6 +2,30 @@
   <h2>Name</h2>
   <p>{{ vm.name }}</p>
 
+  <h2>Relationship</h2>
+  @if (vm.root; as root) {
+    @if (root.xref === xref()) {
+      <p>This is the root person.</p>
+    } @else if (root.relationship) {
+      <p>
+        {{ root.relationship }}
+        of
+        <a [routerLink]="['/individual', root.xref]">{{ root.name }}</a>
+      </p>
+    } @else {
+      <p class="text-body-secondary">
+        No relationship to
+        <a [routerLink]="['/individual', root.xref]">{{ root.name }}</a>
+        found.
+      </p>
+    }
+  } @else {
+    <p class="text-body-secondary">
+      Choose a root person in <a routerLink="/settings">Settings</a> to see how
+      this person is related to them.
+    </p>
+  }
+
   <h2>Sex</h2>
   <!-- TODO: Include the citations. -->
   <p>{{ vm.sex }}</p>
