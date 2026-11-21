@@ -28,7 +28,7 @@ export function describeRelationship(
     return gendered(sex, "husband", "wife", "spouse");
   }
 
-  const generations = closestCommonAncestry(gedcomDatabase, root, target);
+  const generations = closestCommonAncestor(gedcomDatabase, root, target);
   if (generations !== undefined) {
     return relationshipName(generations.root, generations.target, sex, {
       half: generations.half,
@@ -222,7 +222,7 @@ function ancestry(
 // common ancestor. A shared family (both parents, or whichever are recorded)
 // is a full relationship; sharing only one parent at the closest distance
 // makes it a half relationship.
-function closestCommonAncestry(
+function closestCommonAncestor(
   gedcomDatabase: GedcomDatabase,
   root: GedcomIndividual,
   target: GedcomIndividual,
@@ -397,7 +397,7 @@ function describeMarriagePath(
       });
     }
     if (start.xref === end.xref) return;
-    const generations = closestCommonAncestry(gedcomDatabase, start, end);
+    const generations = closestCommonAncestor(gedcomDatabase, start, end);
     if (generations === undefined) return;
     terms.push({
       name: relationshipName(
