@@ -12,6 +12,10 @@ import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { displayGedcomName } from "../../gedcom/gedcomName";
 import { GEDCOM_EDITOR } from "./gedcom-editor-interface";
 
+// Gives each picker its own <select> id, so its <label for> points at it
+// rather than at the first picker on the page.
+let nextId = 0;
+
 @Component({
   selector: "app-input-individual-xref",
   imports: [FormField],
@@ -23,6 +27,7 @@ export class InputIndividualXrefComponent implements FormValueControl<string> {
 
   readonly workingDatabase = input.required<GedcomDatabase>();
   readonly label = input<string>("Individual");
+  readonly id = `individual-xref-${nextId++}`;
 
   readonly value = model<string>("");
   readonly form = form(this.value);
