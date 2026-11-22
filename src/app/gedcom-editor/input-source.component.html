@@ -1,28 +1,28 @@
 <div class="form-floating">
   <textarea
-    id="abbr"
+    [id]="id + '-abbr'"
     class="form-control h-auto"
     [formField]="form.abbr"
   ></textarea>
-  <label for="abbr">Short Title</label>
+  <label [for]="id + '-abbr'">Short Title</label>
 </div>
 
 <div class="form-floating">
   <textarea
-    id="title"
+    [id]="id + '-title'"
     class="form-control h-auto"
     [formField]="form.title"
   ></textarea>
-  <label for="title">Title</label>
+  <label [for]="id + '-title'">Title</label>
 </div>
 
 <div class="form-floating">
   <textarea
-    id="text"
+    [id]="id + '-text'"
     class="form-control h-auto"
     [formField]="form.text"
   ></textarea>
-  <label for="text">Text</label>
+  <label [for]="id + '-text'">Text</label>
 </div>
 
 <app-input-repository-links

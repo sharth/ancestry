@@ -15,6 +15,7 @@ import {
   newGedcomMultimedia,
   type GedcomMultimedia,
 } from "../../gedcom/gedcomMultimedia";
+import { IdGenerator } from "../../util/id-generator";
 import {
   multimediaFileName,
   multimediaFilePathProblem,
@@ -34,6 +35,7 @@ import { GEDCOM_EDITOR } from "./gedcom-editor-interface";
   },
 })
 export class InputMultimediaComponent implements FormValueControl<GedcomMultimedia> {
+  readonly id = inject(IdGenerator).getId("input-multimedia");
   readonly ancestryService = inject(AncestryService);
   readonly gedcomEditor = inject(GEDCOM_EDITOR, { optional: true });
   readonly workingDatabase = input.required<GedcomDatabase>();
@@ -55,11 +57,6 @@ export class InputMultimediaComponent implements FormValueControl<GedcomMultimed
   // Whether a pending file's path is the default name ("<xref> <title>.ext"),
   // which follows the title as it's edited, rather than one the user chose.
   readonly useDefaultFileName = signal(true);
-  // Name (and id prefix) of the Default/Custom filename radio buttons,
-  // unique per record so several open editors don't share one group.
-  readonly fileNameModeName = computed(
-    () => `fileNameMode-${this.value().xref.replaceAll("@", "")}`,
-  );
   readonly filePathProblem = resource({
     params: () =>
       this.pendingFile() ? { filePath: this.value().filePath } : undefined,

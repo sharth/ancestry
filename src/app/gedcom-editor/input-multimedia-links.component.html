@@ -17,7 +17,7 @@
         <div class="form-floating flex-grow-1">
           <select
             #focusTarget
-            id="media_{{ $index }}"
+            [id]="id + '-media-' + $index"
             class="form-select"
             [formField]="formEntry.xref"
           >
@@ -28,7 +28,7 @@
               </option>
             }
           </select>
-          <label for="media_{{ $index }}">Multimedia Record</label>
+          <label [for]="id + '-media-' + $index">Multimedia Record</label>
         </div>
         @if (gedcomEditor) {
           <button
@@ -55,10 +55,10 @@
         <input
           class="form-control"
           type="text"
-          id="title_{{ $index }}"
+          [id]="id + '-title-' + $index"
           [formField]="formEntry.title"
         />
-        <label for="title_{{ $index }}">Custom Title</label>
+        <label [for]="id + '-title-' + $index">Custom Title</label>
       </div>
       @if (multimedia?.mediaType?.startsWith("image/")) {
         <h6 class="mt-2">Crop</h6>

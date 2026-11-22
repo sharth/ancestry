@@ -101,7 +101,7 @@
             @let rootXref = gedcomResource.value()?.rootIndividualXref ?? "";
             <div class="form-floating">
               <select
-                id="root-individual"
+                [id]="id + '-root-individual'"
                 #rootSelect
                 class="form-select"
                 (change)="setRootIndividual(rootSelect.value)"
@@ -116,7 +116,7 @@
                   </option>
                 }
               </select>
-              <label for="root-individual">Root person</label>
+              <label [for]="id + '-root-individual'">Root person</label>
             </div>
           </div>
 

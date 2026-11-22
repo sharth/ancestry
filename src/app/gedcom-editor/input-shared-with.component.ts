@@ -4,11 +4,13 @@ import {
   input,
   model,
   type QueryList,
+  inject,
 } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import type { GedcomFactSharedWith } from "../../gedcom/gedcomFact";
+import { IdGenerator } from "../../util/id-generator";
 import { InputIndividualXrefComponent } from "./input-individual-xref.component";
 
 @Component({
@@ -20,6 +22,7 @@ import { InputIndividualXrefComponent } from "./input-individual-xref.component"
 export class InputSharedWithComponent implements FormValueControl<
   GedcomFactSharedWith[]
 > {
+  readonly id = inject(IdGenerator).getId("input-shared-with");
   readonly workingDatabase = input.required<GedcomDatabase>();
   readonly value = model<GedcomFactSharedWith[]>([]);
   readonly form = form(this.value);

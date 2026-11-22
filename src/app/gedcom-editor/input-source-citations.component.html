@@ -23,26 +23,26 @@
       <div class="form-floating">
         <input
           class="form-control"
-          id="page_{{ $index }}"
+          [id]="id + '-page-' + $index"
           [formField]="formGroup.page"
         />
-        <label for="page_{{ $index }}">Page</label>
+        <label [for]="id + '-page-' + $index">Page</label>
       </div>
       <div class="form-floating">
         <input
           class="form-control"
-          id="quality_{{ $index }}"
+          [id]="id + '-quality-' + $index"
           [formField]="formGroup.quality"
         />
-        <label for="quality_{{ $index }}">Quality</label>
+        <label [for]="id + '-quality-' + $index">Quality</label>
       </div>
       <div class="form-floating">
         <textarea
           class="form-control"
-          id="text_{{ $index }}"
+          [id]="id + '-text-' + $index"
           [formField]="formGroup.text"
         ></textarea>
-        <label for="text_{{ $index }}">Text</label>
+        <label [for]="id + '-text-' + $index">Text</label>
       </div>
       <app-input-multimedia-links
         [formField]="formGroup.multimediaLinks"

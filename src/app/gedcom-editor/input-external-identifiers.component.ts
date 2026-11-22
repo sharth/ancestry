@@ -1,4 +1,11 @@
-import { Component, computed, input, model, signal } from "@angular/core";
+import {
+  Component,
+  computed,
+  input,
+  model,
+  signal,
+  inject,
+} from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
@@ -11,6 +18,7 @@ import {
   externalIdentifierLink,
   familySearchPersonIdType,
 } from "../../util/external-identifier-link";
+import { IdGenerator } from "../../util/id-generator";
 
 @Component({
   selector: "app-input-external-identifiers",
@@ -21,6 +29,7 @@ import {
 export class InputExternalIdentifiersComponent implements FormValueControl<
   GedcomExternalIdentifier[]
 > {
+  readonly id = inject(IdGenerator).getId("input-external-identifiers");
   readonly workingDatabase = input.required<GedcomDatabase>();
   readonly value = model<GedcomExternalIdentifier[]>([]);
   readonly form = form(this.value);

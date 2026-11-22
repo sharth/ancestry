@@ -11,6 +11,7 @@ import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { displayGedcomName } from "../../gedcom/gedcomName";
+import { IdGenerator } from "../../util/id-generator";
 import { GEDCOM_EDITOR } from "./gedcom-editor-interface";
 
 @Component({
@@ -20,6 +21,7 @@ import { GEDCOM_EDITOR } from "./gedcom-editor-interface";
   styleUrl: "./input.component.css",
 })
 export class InputSourceXrefComponent implements FormValueControl<string> {
+  readonly id = inject(IdGenerator).getId("input-source-xref");
   readonly gedcomEditor = inject(GEDCOM_EDITOR, { optional: true });
 
   readonly workingDatabase = input.required<GedcomDatabase>();

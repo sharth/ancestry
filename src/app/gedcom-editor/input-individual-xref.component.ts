@@ -21,10 +21,10 @@ import { GEDCOM_EDITOR } from "./gedcom-editor-interface";
 })
 export class InputIndividualXrefComponent implements FormValueControl<string> {
   readonly gedcomEditor = inject(GEDCOM_EDITOR, { optional: true });
+  readonly id = inject(IdGenerator).getId("input-individual-xref");
 
   readonly workingDatabase = input.required<GedcomDatabase>();
   readonly label = input<string>("Individual");
-  readonly id = inject(IdGenerator).getId("input-individual-xref");
 
   readonly value = model<string>("");
   readonly form = form(this.value);
