@@ -1,26 +1,33 @@
-<app-input-individual-xref
-  [formField]="form.husbandXref"
-  label="Husband"
-  [workingDatabase]="workingDatabase()"
-></app-input-individual-xref>
+@if (family(); as family) {
+  <app-input-individual-xref
+    [value]="family.husbandXref"
+    label="Husband"
+    (valueChange)="updateFamilyMembers({ husbandXref: $event })"
+    [workingDatabase]="value()"
+  ></app-input-individual-xref>
 
-<app-input-individual-xref
-  [formField]="form.wifeXref"
-  label="Wife"
-  [workingDatabase]="workingDatabase()"
-></app-input-individual-xref>
+  <app-input-individual-xref
+    [value]="family.wifeXref"
+    label="Wife"
+    (valueChange)="updateFamilyMembers({ wifeXref: $event })"
+    [workingDatabase]="value()"
+  ></app-input-individual-xref>
 
-<app-input-family-children
-  [formField]="form.childXrefs"
-  [workingDatabase]="workingDatabase()"
-></app-input-family-children>
+  <app-input-family-children
+    [value]="family.childXrefs"
+    (valueChange)="updateFamilyMembers({ childXrefs: $event })"
+    [workingDatabase]="value()"
+  ></app-input-family-children>
+}
 
-<app-input-family-facts
-  [formField]="form.facts"
-  [workingDatabase]="workingDatabase()"
-></app-input-family-facts>
+@if (familyForm(); as familyForm) {
+  <app-input-family-facts
+    [formField]="familyForm.facts"
+    [workingDatabase]="value()"
+  ></app-input-family-facts>
 
-<app-input-source-citations
-  [formField]="form.citations"
-  [workingDatabase]="workingDatabase()"
-></app-input-source-citations>
+  <app-input-source-citations
+    [formField]="familyForm.citations"
+    [workingDatabase]="value()"
+  ></app-input-source-citations>
+}
