@@ -43,10 +43,12 @@ export const urlRewrites: readonly UrlRewrite[] = [
     },
   },
   {
-    // A record is <record id>:<collection id>.
+    // A record is <record id>:<collection id>. The query string and
+    // fragment (e.g. ?indiv=try&viewrecord=1) only say how the record was
+    // reached, so they're dropped.
     site: "Ancestry",
     pattern:
-      /^https?:\/\/(?:www\.)?ancestry\.com\/discoveryui-content\/view\/(\d+):(\d+)\/?$/i,
+      /^https?:\/\/(?:www\.)?ancestry\.com\/discoveryui-content\/view\/(\d+):(\d+)\/?(?:[?#]\S*)?$/i,
     replacement: ([, record, collection]) =>
       `https://www.ancestry.com/search/collections/${collection}/records/${record}`,
   },

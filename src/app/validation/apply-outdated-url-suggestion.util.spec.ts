@@ -67,6 +67,17 @@ describe("outdatedUrl", () => {
     });
   });
 
+  it("drops the query string from an old Ancestry record URL", () => {
+    const oldUrl =
+      "https://www.ancestry.com/discoveryui-content/view/45942789:60901?indiv=try&viewrecord=1&r=an";
+    expect(outdatedUrl(oldUrl, deathSource)).toEqual({
+      site: "Ancestry",
+      oldUrl,
+      newUrl:
+        "https://www.ancestry.com/search/collections/60901/records/45942789",
+    });
+  });
+
   it("leaves anything else alone", () => {
     expect(outdatedUrl(newUrl, deathSource)).toBeUndefined();
     expect(outdatedUrl("MS 123", deathSource)).toBeUndefined();
