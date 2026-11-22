@@ -10,6 +10,7 @@ import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { displayGedcomName } from "../../gedcom/gedcomName";
+import { IdGenerator } from "../../util/id-generator";
 import { GEDCOM_EDITOR } from "./gedcom-editor-interface";
 
 @Component({
@@ -23,6 +24,7 @@ export class InputIndividualXrefComponent implements FormValueControl<string> {
 
   readonly workingDatabase = input.required<GedcomDatabase>();
   readonly label = input<string>("Individual");
+  readonly id = inject(IdGenerator).getId("input-individual-xref");
 
   readonly value = model<string>("");
   readonly form = form(this.value);

@@ -2,7 +2,7 @@ import { Component, input, inputBinding, signal } from "@angular/core";
 import { FormField, form } from "@angular/forms/signals";
 import { render, screen } from "@testing-library/angular/zoneless";
 import { userEvent } from "@testing-library/user-event";
-import { assert, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import {
   type GedcomDatabase,
@@ -85,8 +85,15 @@ describe("InputFamilyComponent", () => {
   it("labels the husband and wife pickers", async () => {
     await renderFamily("@F1@");
 
-    expect(screen.getByLabelText("Husband")).toBeTruthy();
-    expect(screen.getByLabelText("Wife")).toBeTruthy();
+    // Each label must point at its own picker, not the first one on the page.
+    const husband = screen.getByRole<HTMLSelectElement>("combobox", {
+      name: "Husband",
+    });
+    const wife = screen.getByRole<HTMLSelectElement>("combobox", {
+      name: "Wife",
+    });
+    expect(husband.value).toBe("@I1@");
+    expect(wife.value).toBe("@I2@");
   });
 
   it("drops FAMC from a child removed from the family, and marks the form dirty", async () => {
@@ -104,11 +111,10 @@ describe("InputFamilyComponent", () => {
   it("moves FAMS from the old wife to the new one", async () => {
     const host = await renderFamily("@F1@");
 
-    // By position: every picker's <select> has id="individual", so its
-    // label only finds the first one.
-    const [, wifeSelect] = screen.getAllByRole<HTMLSelectElement>("combobox");
-    assert.isOk(wifeSelect);
-    await userEvent.selectOptions(wifeSelect, "@I4@");
+    await userEvent.selectOptions(
+      screen.getByRole("combobox", { name: "Wife" }),
+      "@I4@",
+    );
 
     const reloaded = reload(host.workingDatabase());
     expect(reloaded.families["@F1@"]?.wifeXref).toBe("@I4@");
@@ -119,13 +125,15 @@ describe("InputFamilyComponent", () => {
   it("adds FAMS and FAMC for the members of a new family", async () => {
     const host = await renderFamily("@F2@");
 
-    const [husbandSelect] = screen.getAllByRole<HTMLSelectElement>("combobox");
-    assert.isOk(husbandSelect);
-    await userEvent.selectOptions(husbandSelect, "@I1@");
+    await userEvent.selectOptions(
+      screen.getByRole("combobox", { name: "Husband" }),
+      "@I1@",
+    );
     await userEvent.click(screen.getByRole("button", { name: "Add child" }));
-    const childSelect = screen.getAllByRole<HTMLSelectElement>("combobox")[2];
-    assert.isOk(childSelect);
-    await userEvent.selectOptions(childSelect, "@I4@");
+    await userEvent.selectOptions(
+      screen.getByRole("combobox", { name: "Child" }),
+      "@I4@",
+    );
 
     const reloaded = reload(host.workingDatabase());
     expect(reloaded.families["@F2@"]?.husbandXref).toBe("@I1@");

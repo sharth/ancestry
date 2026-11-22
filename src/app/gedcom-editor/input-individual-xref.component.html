@@ -1,6 +1,6 @@
 <div class="d-flex gap-2 align-items-center">
   <div class="form-floating flex-grow-1">
-    <select id="individual" #focusTarget class="form-select" [formField]="form">
+    <select [id]="id" #focusTarget class="form-select" [formField]="form">
       <option selected value="">Individuals...</option>
       @for (
         individual of Object.values(workingDatabase().individuals);
@@ -16,7 +16,7 @@
         </option>
       }
     </select>
-    <label for="individual">{{ label() }}</label>
+    <label [for]="id">{{ label() }}</label>
   </div>
   <button
     type="button"
