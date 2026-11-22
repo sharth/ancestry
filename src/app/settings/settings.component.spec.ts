@@ -1,5 +1,5 @@
 import { TestBed, type ComponentFixture } from "@angular/core/testing";
-import { render } from "@testing-library/angular/zoneless";
+import { render, within } from "@testing-library/angular/zoneless";
 import {
   afterEach,
   aroundEach,
@@ -135,7 +135,9 @@ describe("SettingsComponent", () => {
     const select = await vi.waitFor(async () => {
       await fixture.whenStable();
       const select =
-        componentElement.querySelector<HTMLSelectElement>("#root-individual");
+        within(componentElement).getByLabelText<HTMLSelectElement>(
+          "Root person",
+        );
       assert.isOk(select);
       return select;
     });

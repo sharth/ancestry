@@ -13,6 +13,7 @@ import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomName, type GedcomName } from "../../gedcom/gedcomName";
+import { IdGenerator } from "../../util/id-generator";
 import { InputSourceCitationsComponent } from "./input-source-citations.component";
 
 @Component({
@@ -24,6 +25,7 @@ import { InputSourceCitationsComponent } from "./input-source-citations.componen
 export class InputIndividualNamesComponent implements FormValueControl<
   GedcomName[]
 > {
+  readonly id = inject(IdGenerator).getId("input-individual-names");
   private readonly _injector = inject(Injector);
 
   readonly workingDatabase = input.required<GedcomDatabase>();

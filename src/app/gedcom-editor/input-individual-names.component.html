@@ -20,50 +20,50 @@
           <input
             #focusTarget
             class="form-control"
-            id="prefix_{{ $index }}"
+            [id]="id + '-prefix-' + $index"
             [formField]="name.prefix"
           />
-          <label for="prefix_{{ $index }}">Prefix</label>
+          <label [for]="id + '-prefix-' + $index">Prefix</label>
         </div>
         <div class="form-floating">
           <input
             class="form-control"
-            id="given_{{ $index }}"
+            [id]="id + '-given-' + $index"
             [formField]="name.givenName"
           />
-          <label for="given_{{ $index }}">Given Name</label>
+          <label [for]="id + '-given-' + $index">Given Name</label>
         </div>
         <div class="form-floating">
           <input
             class="form-control"
-            id="nick_{{ $index }}"
+            [id]="id + '-nick-' + $index"
             [formField]="name.nickName"
           />
-          <label for="nick_{{ $index }}">Nickname</label>
+          <label [for]="id + '-nick-' + $index">Nickname</label>
         </div>
         <div class="form-floating">
           <input
             class="form-control"
-            id="surnamePrefix_{{ $index }}"
+            [id]="id + '-surname-prefix-' + $index"
             [formField]="name.surnamePrefix"
           />
-          <label for="surnamePrefix_{{ $index }}">Surname Prefix</label>
+          <label [for]="id + '-surname-prefix-' + $index">Surname Prefix</label>
         </div>
         <div class="form-floating">
           <input
             class="form-control"
-            id="surname_{{ $index }}"
+            [id]="id + '-surname-' + $index"
             [formField]="name.surname"
           />
-          <label for="surname_{{ $index }}">Surname</label>
+          <label [for]="id + '-surname-' + $index">Surname</label>
         </div>
         <div class="form-floating">
           <input
             class="form-control"
-            id="suffix_{{ $index }}"
+            [id]="id + '-suffix-' + $index"
             [formField]="name.suffix"
           />
-          <label for="suffix_{{ $index }}">Suffix</label>
+          <label [for]="id + '-suffix-' + $index">Suffix</label>
         </div>
       </div>
       <app-input-source-citations

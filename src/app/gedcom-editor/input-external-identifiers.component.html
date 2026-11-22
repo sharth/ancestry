@@ -1,6 +1,6 @@
 <details open>
   <summary>External Trees ({{ form.length }})</summary>
-  <datalist id="externalIdentifierTypes">
+  <datalist [id]="id + '-external-identifier-types'">
     @for (type of knownTypes(); track type) {
       <option [value]="type"></option>
     }
@@ -17,20 +17,22 @@
         <input
           class="form-control"
           type="text"
-          id="externalIdentifierId_{{ $index }}"
+          [id]="id + '-external-identifier-id-' + $index"
           [formField]="externalIdentifier.id"
         />
-        <label for="externalIdentifierId_{{ $index }}">ID</label>
+        <label [for]="id + '-external-identifier-id-' + $index">ID</label>
       </div>
       <div class="form-floating" style="flex: 2">
         <input
           class="form-control"
           type="url"
-          list="externalIdentifierTypes"
-          id="externalIdentifierType_{{ $index }}"
+          [attr.list]="id + '-external-identifier-types'"
+          [id]="id + '-external-identifier-type-' + $index"
           [formField]="externalIdentifier.type"
         />
-        <label for="externalIdentifierType_{{ $index }}">Type (URI)</label>
+        <label [for]="id + '-external-identifier-type-' + $index"
+          >Type (URI)</label
+        >
       </div>
       <div style="width: 8rem">
         @if (links()[$index]; as link) {
@@ -52,13 +54,13 @@
     <input
       class="form-control"
       type="url"
-      id="externalIdentifierUrl"
+      [id]="id + '-external-identifier-url'"
       placeholder="Paste a FamilySearch or Ancestry person link"
       #urlInput
       [value]="pastedUrl()"
       (input)="addFromUrl(urlInput.value)"
     />
-    <label for="externalIdentifierUrl">
+    <label [for]="id + '-external-identifier-url'">
       Paste a FamilySearch or Ancestry person link to add it
     </label>
     @if (pastedUrl() !== "") {

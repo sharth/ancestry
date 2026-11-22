@@ -1,6 +1,11 @@
 <div class="d-flex gap-2 align-items-center">
   <div class="form-floating flex-grow-1">
-    <select id="xref" #focusTarget class="form-select" [formField]="form">
+    <select
+      [id]="id + '-xref'"
+      #focusTarget
+      class="form-select"
+      [formField]="form"
+    >
       <option selected value="">Sources...</option>
       @for (source of sources(); track source.xref) {
         <option value="{{ source.xref }}">
@@ -12,7 +17,7 @@
         </option>
       }
     </select>
-    <label for="xref">Source</label>
+    <label [for]="id + '-xref'">Source</label>
   </div>
   <button
     type="button"

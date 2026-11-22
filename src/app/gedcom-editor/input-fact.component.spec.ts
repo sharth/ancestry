@@ -1,6 +1,6 @@
 import { inputBinding, signal } from "@angular/core";
 import type { ComponentFixture } from "@angular/core/testing";
-import { render } from "@testing-library/angular/zoneless";
+import { render, within } from "@testing-library/angular/zoneless";
 import { assert, beforeEach, describe, expect, it } from "vitest";
 
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
@@ -40,7 +40,7 @@ describe("InputFactComponent", () => {
 
   it("should focus the tag select element when focus() is called", () => {
     const element = fixture.nativeElement as HTMLElement;
-    const tagSelect = element.querySelector<HTMLSelectElement>("select#tag");
+    const tagSelect = within(element).getByLabelText<HTMLSelectElement>("Tag");
     assert.isOk(tagSelect);
 
     component.focus();
@@ -57,7 +57,7 @@ describe("InputFactComponent", () => {
 
   it("should render the tag select options sorted alphabetically", () => {
     const element = fixture.nativeElement as HTMLElement;
-    const tagSelect = element.querySelector<HTMLSelectElement>("select#tag");
+    const tagSelect = within(element).getByLabelText<HTMLSelectElement>("Tag");
     assert.isOk(tagSelect);
 
     const optionLabels = [...tagSelect.options].map((option) => option.text);
@@ -68,10 +68,9 @@ describe("InputFactComponent", () => {
   it("offers the given fact types", async () => {
     const element = fixture.nativeElement as HTMLElement;
     const tagValues = () =>
-      [
-        ...(element.querySelector<HTMLSelectElement>("select#tag")?.options ??
-          []),
-      ].map((option) => option.value);
+      [...within(element).getByLabelText<HTMLSelectElement>("Tag").options].map(
+        (option) => option.value,
+      );
     expect(tagValues()).toContain("BIRT");
     expect(tagValues()).not.toContain("MARR");
 

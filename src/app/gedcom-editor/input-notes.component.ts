@@ -1,8 +1,9 @@
-import { Component, input, model } from "@angular/core";
+import { Component, input, model, inject } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomNote, type GedcomNote } from "../../gedcom/gedcomNote";
+import { IdGenerator } from "../../util/id-generator";
 
 @Component({
   selector: "app-input-notes",
@@ -11,6 +12,7 @@ import { newGedcomNote, type GedcomNote } from "../../gedcom/gedcomNote";
   styleUrl: "./input.component.css",
 })
 export class InputNotesComponent implements FormValueControl<GedcomNote[]> {
+  readonly id = inject(IdGenerator).getId("input-notes");
   readonly workingDatabase = input.required<GedcomDatabase>();
   readonly value = model<GedcomNote[]>([]);
   readonly form = form(this.value);

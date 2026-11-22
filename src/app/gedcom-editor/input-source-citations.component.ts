@@ -4,6 +4,7 @@ import {
   input,
   model,
   type QueryList,
+  inject,
 } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 
@@ -12,6 +13,7 @@ import {
   newGedcomSourceCitation,
   type GedcomSourceCitation,
 } from "../../gedcom/gedcomSourceCitation";
+import { IdGenerator } from "../../util/id-generator";
 import { InputMultimediaLinksComponent } from "./input-multimedia-links.component";
 import { InputNotesComponent } from "./input-notes.component";
 import { InputSourceXrefComponent } from "./input-source-xref.component";
@@ -30,6 +32,7 @@ import { InputSourceXrefComponent } from "./input-source-xref.component";
 export class InputSourceCitationsComponent implements FormValueControl<
   GedcomSourceCitation[]
 > {
+  readonly id = inject(IdGenerator).getId("input-source-citations");
   readonly workingDatabase = input.required<GedcomDatabase>();
   readonly value = model<GedcomSourceCitation[]>([]);
   readonly form = form(this.value);

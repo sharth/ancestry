@@ -20,6 +20,7 @@ import {
   type GedcomMultimediaCrop,
   type GedcomMultimediaLink,
 } from "../../gedcom/gedcomMultimediaLink";
+import { IdGenerator } from "../../util/id-generator";
 import { GEDCOM_EDITOR } from "./gedcom-editor-interface";
 import { InputMultimediaCropComponent } from "./input-multimedia-crop.component";
 
@@ -32,6 +33,7 @@ import { InputMultimediaCropComponent } from "./input-multimedia-crop.component"
 export class InputMultimediaLinksComponent implements FormValueControl<
   GedcomMultimediaLink[]
 > {
+  readonly id = inject(IdGenerator).getId("input-multimedia-links");
   private readonly _injector = inject(Injector);
   readonly gedcomEditor = inject(GEDCOM_EDITOR, { optional: true });
 

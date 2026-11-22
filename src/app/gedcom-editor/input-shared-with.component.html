@@ -19,10 +19,10 @@
       <div class="form-floating">
         <input
           class="form-control"
-          id="role_{{ $index }}"
+          [id]="id + '-role-' + $index"
           [formField]="formGroup.role"
         />
-        <label for="role_{{ $index }}">Role</label>
+        <label [for]="id + '-role-' + $index">Role</label>
       </div>
     </details>
   }

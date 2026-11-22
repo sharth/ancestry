@@ -1,5 +1,5 @@
 <div class="form-floating">
-  <select id="xref" class="form-select" [formField]="form">
+  <select [id]="id + '-xref'" class="form-select" [formField]="form">
     <option selected value="">Repositories...</option>
     @for (repository of repositories(); track repository.xref) {
       <option value="{{ repository.xref }}">
@@ -7,5 +7,5 @@
       </option>
     }
   </select>
-  <label for="xref">Repository</label>
+  <label [for]="id + '-xref'">Repository</label>
 </div>

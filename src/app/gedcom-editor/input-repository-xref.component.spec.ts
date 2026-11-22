@@ -1,6 +1,6 @@
 import { inputBinding, signal } from "@angular/core";
 import type { ComponentFixture } from "@angular/core/testing";
-import { render } from "@testing-library/angular/zoneless";
+import { render, within } from "@testing-library/angular/zoneless";
 import { assert, beforeEach, describe, expect, it } from "vitest";
 
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
@@ -39,7 +39,8 @@ describe("InputRepositoryXrefComponent", () => {
 
   it("should focus the select element when focus() is called", async () => {
     const element = fixture.nativeElement as HTMLElement;
-    const select = element.querySelector<HTMLSelectElement>("select#xref");
+    const select =
+      within(element).getByLabelText<HTMLSelectElement>("Repository");
     assert.isOk(select);
 
     component.focus();

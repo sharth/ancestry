@@ -2,19 +2,19 @@
   <input
     class="form-control h-auto"
     [formField]="form.title"
-    id="title"
+    [id]="id + '-title'"
     (input)="onTitleInput($event)"
   />
-  <label for="title">Title</label>
+  <label [for]="id + '-title'">Title</label>
 </div>
 
 <div class="input-group">
-  <label class="input-group-text path-label" for="sourceFile"
+  <label class="input-group-text path-label" [for]="id + '-source-file'"
     >Source File</label
   >
   <input
     class="form-control"
-    id="sourceFile"
+    [id]="id + '-source-file'"
     readonly
     [value]="sourceFileName()"
     placeholder="Choose a file with Browse..."
@@ -29,10 +29,12 @@
 </div>
 
 <div class="input-group has-validation">
-  <label class="input-group-text path-label" for="filePath">File Path</label>
+  <label class="input-group-text path-label" [for]="id + '-file-path'"
+    >File Path</label
+  >
   <input
     class="form-control"
-    id="filePath"
+    [id]="id + '-file-path'"
     [class.is-invalid]="filePathProblem.value()"
     [class.default-file-name]="pendingFile() && useDefaultFileName()"
     [formField]="form.filePath"
@@ -42,29 +44,27 @@
     <input
       type="radio"
       class="btn-check"
-      [name]="fileNameModeName()"
-      [id]="fileNameModeName() + '-default'"
+      [name]="id + '-file-name-mode'"
+      [id]="id + '-file-name-mode-default'"
       autocomplete="off"
       [checked]="useDefaultFileName()"
       (change)="useDefaultFileNameSelected()"
     />
     <label
       class="btn btn-outline-success"
-      [for]="fileNameModeName() + '-default'"
+      [for]="id + '-file-name-mode-default'"
       >Default filename</label
     >
     <input
       type="radio"
       class="btn-check"
-      [name]="fileNameModeName()"
-      [id]="fileNameModeName() + '-custom'"
+      [name]="id + '-file-name-mode'"
+      [id]="id + '-file-name-mode-custom'"
       autocomplete="off"
       [checked]="!useDefaultFileName()"
       (change)="useDefaultFileName.set(false)"
     />
-    <label
-      class="btn btn-outline-success"
-      [for]="fileNameModeName() + '-custom'"
+    <label class="btn btn-outline-success" [for]="id + '-file-name-mode-custom'"
       >Custom filename</label
     >
   }
@@ -85,9 +85,9 @@
   <input
     class="form-control h-auto"
     [formField]="form.mediaType"
-    id="mediaType"
+    [id]="id + '-media-type'"
   />
-  <label for="mediaType">Media Type</label>
+  <label [for]="id + '-media-type'">Media Type</label>
 </div>
 
 @if (form.filePath().value()) {

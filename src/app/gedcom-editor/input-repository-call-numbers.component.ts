@@ -1,7 +1,8 @@
-import { Component, input, model } from "@angular/core";
+import { Component, input, model, inject } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
+import { IdGenerator } from "../../util/id-generator";
 
 @Component({
   selector: "app-input-repository-call-numbers",
@@ -12,6 +13,7 @@ import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 export class InputRepositoryCallNumbersComponent implements FormValueControl<
   string[]
 > {
+  readonly id = inject(IdGenerator).getId("input-repository-call-numbers");
   readonly workingDatabase = input.required<GedcomDatabase>();
 
   readonly value = model<string[]>([]);

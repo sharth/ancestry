@@ -6,6 +6,7 @@ import {
   findGedcomFilenames,
 } from "../../database/ancestry.service";
 import { fullname, surname } from "../../gedcom/gedcomIndividual";
+import { IdGenerator } from "../../util/id-generator";
 
 @Component({
   selector: "app-settings",
@@ -14,6 +15,7 @@ import { fullname, surname } from "../../gedcom/gedcomIndividual";
   styleUrl: "./settings.component.css",
 })
 export class SettingsComponent {
+  readonly id = inject(IdGenerator).getId("settings");
   private readonly ancestryService = inject(AncestryService);
   private readonly router = inject(Router);
 

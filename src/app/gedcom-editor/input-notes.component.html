@@ -15,10 +15,10 @@
         <input
           class="form-control"
           type="text"
-          id="text_{{ $index }}"
+          [id]="id + '-text-' + $index"
           [formField]="note.text"
         />
-        <label for="text_{{ $index }}">Note</label>
+        <label [for]="id + '-text-' + $index">Note</label>
       </div>
     </details>
   }

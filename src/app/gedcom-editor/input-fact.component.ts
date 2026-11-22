@@ -1,9 +1,10 @@
-import { Component, computed, input, model } from "@angular/core";
+import { Component, computed, input, model, inject } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomFact, type GedcomFact } from "../../gedcom/gedcomFact";
 import type { GedcomEventMetadata } from "../../gedcom/gedcomFactMetadata";
+import { IdGenerator } from "../../util/id-generator";
 import { InputNotesComponent } from "./input-notes.component";
 import { InputSharedWithComponent } from "./input-shared-with.component";
 import { InputSourceCitationsComponent } from "./input-source-citations.component";
@@ -22,6 +23,7 @@ import { InputSourceCitationsComponent } from "./input-source-citations.componen
   styleUrl: "./input.component.css",
 })
 export class InputFactComponent implements FormValueControl<GedcomFact> {
+  readonly id = inject(IdGenerator).getId("input-fact");
   readonly workingDatabase = input.required<GedcomDatabase>();
   readonly tags = input.required<Record<string, GedcomEventMetadata>>();
   readonly value = model<GedcomFact>(newGedcomFact());
