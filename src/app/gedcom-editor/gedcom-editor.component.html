@@ -102,12 +102,11 @@
           }
         }
         @case ("FAM") {
-          @if (form.families[tabInformation.xref]; as family) {
-            <app-input-family
-              [workingDatabase]="workingDatabase()"
-              [formField]="family"
-            />
-          }
+          <app-input-family
+            [workingDatabase]="workingDatabase()"
+            [formField]="form"
+            [xref]="tabInformation.xref"
+          />
         }
         @case ("REPO") {
           @if (form.repositories[tabInformation.xref]; as repository) {
