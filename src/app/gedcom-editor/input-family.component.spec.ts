@@ -17,27 +17,31 @@ import { parseGedcomRecords } from "../../gedcom/gedcomRecord";
 import { newGedcomSex } from "../../gedcom/gedcomSex";
 import { InputFamilyComponent } from "./input-family.component";
 
-function individual(
-  xref: string,
-  givenName: string,
-  sex: string,
-  links: { fams?: string[]; famc?: string[] } = {},
-) {
-  return newGedcomIndividual({
-    xref,
-    names: [newGedcomName({ givenName, surname: "Test" })],
-    sex: newGedcomSex({ sex }),
-    parentOfFamilyXrefs: links.fams ?? [],
-    childOfFamilyXrefs: links.famc ?? [],
-  });
-}
-
 const database = newGedcomDatabase({
   individuals: {
-    "@I1@": individual("@I1@", "Husband", "M", { fams: ["@F1@"] }),
-    "@I2@": individual("@I2@", "Wife", "F", { fams: ["@F1@"] }),
-    "@I3@": individual("@I3@", "Child", "F", { famc: ["@F1@"] }),
-    "@I4@": individual("@I4@", "Other", "F"),
+    "@I1@": newGedcomIndividual({
+      xref: "@I1@",
+      names: [newGedcomName({ givenName: "Husband", surname: "Test" })],
+      sex: newGedcomSex({ sex: "M" }),
+      parentOfFamilyXrefs: ["@F1@"],
+    }),
+    "@I2@": newGedcomIndividual({
+      xref: "@I2@",
+      names: [newGedcomName({ givenName: "Wife", surname: "Test" })],
+      sex: newGedcomSex({ sex: "F" }),
+      parentOfFamilyXrefs: ["@F1@"],
+    }),
+    "@I3@": newGedcomIndividual({
+      xref: "@I3@",
+      names: [newGedcomName({ givenName: "Child", surname: "Test" })],
+      sex: newGedcomSex({ sex: "F" }),
+      childOfFamilyXrefs: ["@F1@"],
+    }),
+    "@I4@": newGedcomIndividual({
+      xref: "@I4@",
+      names: [newGedcomName({ givenName: "Other", surname: "Test" })],
+      sex: newGedcomSex({ sex: "F" }),
+    }),
   },
   families: {
     "@F1@": newGedcomFamily({
@@ -52,11 +56,7 @@ const database = newGedcomDatabase({
 
 @Component({
   imports: [FormField, InputFamilyComponent],
-  template: `<app-input-family
-    [workingDatabase]="workingDatabase()"
-    [formField]="form"
-    [xref]="xref()"
-  />`,
+  template: `<app-input-family [formField]="form" [xref]="xref()" />`,
 })
 class HostComponent {
   readonly xref = input.required<string>();

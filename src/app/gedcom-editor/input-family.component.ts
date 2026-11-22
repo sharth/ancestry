@@ -33,7 +33,6 @@ type FamilyMembers = Pick<
   styleUrl: "./input.component.css",
 })
 export class InputFamilyComponent implements FormValueControl<GedcomDatabase> {
-  readonly workingDatabase = input.required<GedcomDatabase>();
   readonly xref = input.required<string>();
   readonly value = model<GedcomDatabase>(newGedcomDatabase());
   readonly form = form(this.value);
@@ -41,7 +40,7 @@ export class InputFamilyComponent implements FormValueControl<GedcomDatabase> {
   readonly family = computed(() => this.value().families[this.xref()]);
   readonly familyForm = computed(() => this.form.families[this.xref()]);
 
-  updateMembers(members: Partial<FamilyMembers>) {
+  updateFamilyMembers(members: Partial<FamilyMembers>) {
     const familyXref = this.xref();
     this.value.update((database) =>
       produce(database, (draft) => {

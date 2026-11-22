@@ -2,32 +2,32 @@
   <app-input-individual-xref
     [value]="family.husbandXref"
     label="Husband"
-    (valueChange)="updateMembers({ husbandXref: $event })"
-    [workingDatabase]="workingDatabase()"
+    (valueChange)="updateFamilyMembers({ husbandXref: $event })"
+    [workingDatabase]="value()"
   ></app-input-individual-xref>
 
   <app-input-individual-xref
     [value]="family.wifeXref"
     label="Wife"
-    (valueChange)="updateMembers({ wifeXref: $event })"
-    [workingDatabase]="workingDatabase()"
+    (valueChange)="updateFamilyMembers({ wifeXref: $event })"
+    [workingDatabase]="value()"
   ></app-input-individual-xref>
 
   <app-input-family-children
     [value]="family.childXrefs"
-    (valueChange)="updateMembers({ childXrefs: $event })"
-    [workingDatabase]="workingDatabase()"
+    (valueChange)="updateFamilyMembers({ childXrefs: $event })"
+    [workingDatabase]="value()"
   ></app-input-family-children>
 }
 
 @if (familyForm(); as familyForm) {
   <app-input-family-facts
     [formField]="familyForm.facts"
-    [workingDatabase]="workingDatabase()"
+    [workingDatabase]="value()"
   ></app-input-family-facts>
 
   <app-input-source-citations
     [formField]="familyForm.citations"
-    [workingDatabase]="workingDatabase()"
+    [workingDatabase]="value()"
   ></app-input-source-citations>
 }
