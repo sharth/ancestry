@@ -53,35 +53,31 @@ export class InputFamilyComponent implements FormValueControl<GedcomDatabase> {
         const childrenAfter = family.childXrefs;
 
         for (const xref of spousesBefore) {
-          const individual = draft.individuals[xref];
-          if (individual && !spousesAfter.includes(xref)) {
-            individual.parentOfFamilyXrefs =
-              individual.parentOfFamilyXrefs.filter((x) => x !== familyXref);
+          const spouse = draft.individuals[xref];
+          if (spouse && !spousesAfter.includes(xref)) {
+            spouse.parentOfFamilyXrefs = spouse.parentOfFamilyXrefs.filter(
+              (x) => x !== familyXref,
+            );
           }
         }
         for (const xref of spousesAfter) {
-          const individual = draft.individuals[xref];
-          if (
-            individual &&
-            !individual.parentOfFamilyXrefs.includes(familyXref)
-          ) {
-            individual.parentOfFamilyXrefs.push(familyXref);
+          const spouse = draft.individuals[xref];
+          if (spouse && !spouse.parentOfFamilyXrefs.includes(familyXref)) {
+            spouse.parentOfFamilyXrefs.push(familyXref);
           }
         }
         for (const xref of childrenBefore) {
-          const individual = draft.individuals[xref];
-          if (individual && !childrenAfter.includes(xref)) {
-            individual.childOfFamilyXrefs =
-              individual.childOfFamilyXrefs.filter((x) => x !== familyXref);
+          const child = draft.individuals[xref];
+          if (child && !childrenAfter.includes(xref)) {
+            child.childOfFamilyXrefs = child.childOfFamilyXrefs.filter(
+              (x) => x !== familyXref,
+            );
           }
         }
         for (const xref of childrenAfter) {
-          const individual = draft.individuals[xref];
-          if (
-            individual &&
-            !individual.childOfFamilyXrefs.includes(familyXref)
-          ) {
-            individual.childOfFamilyXrefs.push(familyXref);
+          const child = draft.individuals[xref];
+          if (child && !child.childOfFamilyXrefs.includes(familyXref)) {
+            child.childOfFamilyXrefs.push(familyXref);
           }
         }
       }),
