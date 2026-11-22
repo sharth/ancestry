@@ -52,29 +52,42 @@ export class InputFamilyComponent implements FormValueControl<GedcomDatabase> {
         const spousesAfter = [family.husbandXref, family.wifeXref];
         const childrenAfter = family.childXrefs;
 
-        for (const xref of spousesBefore) {
+        const spousesAdded = spousesAfter.filter(
+          (x) => !spousesBefore.includes(x),
+        );
+        const spousesRemoved = spousesBefore.filter(
+          (x) => !spousesAfter.includes(x),
+        );
+        const childrenAdded = childrenAfter.filter(
+          (x) => !childrenBefore.includes(x),
+        );
+        const childrenRemoved = childrenBefore.filter(
+          (x) => !childrenAfter.includes(x),
+        );
+
+        for (const xref of spousesRemoved) {
           const spouse = draft.individuals[xref];
-          if (spouse && !spousesAfter.includes(xref)) {
+          if (spouse) {
             spouse.parentOfFamilyXrefs = spouse.parentOfFamilyXrefs.filter(
               (x) => x !== familyXref,
             );
           }
         }
-        for (const xref of spousesAfter) {
+        for (const xref of spousesAdded) {
           const spouse = draft.individuals[xref];
           if (spouse && !spouse.parentOfFamilyXrefs.includes(familyXref)) {
             spouse.parentOfFamilyXrefs.push(familyXref);
           }
         }
-        for (const xref of childrenBefore) {
+        for (const xref of childrenRemoved) {
           const child = draft.individuals[xref];
-          if (child && !childrenAfter.includes(xref)) {
+          if (child) {
             child.childOfFamilyXrefs = child.childOfFamilyXrefs.filter(
               (x) => x !== familyXref,
             );
           }
         }
-        for (const xref of childrenAfter) {
+        for (const xref of childrenAdded) {
           const child = draft.individuals[xref];
           if (child && !child.childOfFamilyXrefs.includes(familyXref)) {
             child.childOfFamilyXrefs.push(familyXref);
