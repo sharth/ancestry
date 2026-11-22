@@ -16,17 +16,20 @@ function buildDatabase(
   families: [string, string, string, string[]][],
 ): GedcomDatabase {
   const gedcomDatabase = newGedcomDatabase();
-  const individual = (xref: string) => {
-    const existing = gedcomDatabase.individuals[xref];
-    if (existing) return existing;
+  const individualXrefs = families
+    .flatMap(([, husbandXref, wifeXref, childXrefs]) => [
+      husbandXref,
+      wifeXref,
+      ...childXrefs,
+    ])
+    .filter((xref) => xref !== "");
+  for (const xref of individualXrefs) {
     const sex = xref.charAt(1);
-    const created = newGedcomIndividual({
+    gedcomDatabase.individuals[xref] ??= newGedcomIndividual({
       xref,
-      sex: newGedcomSex({ sex: sex === "U" ? "" : sex }),
+      sex: newGedcomSex({ sex: sex === "M" || sex === "F" ? sex : "" }),
     });
-    gedcomDatabase.individuals[xref] = created;
-    return created;
-  };
+  }
   for (const [xref, husbandXref, wifeXref, childXrefs] of families) {
     gedcomDatabase.families[xref] = newGedcomFamily({
       xref,
@@ -35,10 +38,10 @@ function buildDatabase(
       childXrefs,
     });
     for (const parentXref of [husbandXref, wifeXref]) {
-      if (parentXref) individual(parentXref).parentOfFamilyXrefs.push(xref);
+      gedcomDatabase.individuals[parentXref]?.parentOfFamilyXrefs.push(xref);
     }
     for (const childXref of childXrefs) {
-      individual(childXref).childOfFamilyXrefs.push(xref);
+      gedcomDatabase.individuals[childXref]?.childOfFamilyXrefs.push(xref);
     }
   }
   return gedcomDatabase;
