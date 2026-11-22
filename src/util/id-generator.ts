@@ -3,7 +3,8 @@ import { Service } from "@angular/core";
 // Element ids are global to the page, but Bootstrap's floating labels need
 // `<label for>` to point at a sibling control by id. Components that render
 // a label and control get their ids from here, so two instances on the same
-// page don't share one.
+// page don't share one. Use the component's selector minus "app-" as the
+// prefix, e.g. "input-individual-xref".
 @Service()
 export class IdGenerator {
   private readonly counters = new Map<string, number>();

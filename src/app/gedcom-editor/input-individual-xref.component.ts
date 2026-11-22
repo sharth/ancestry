@@ -24,7 +24,7 @@ export class InputIndividualXrefComponent implements FormValueControl<string> {
 
   readonly workingDatabase = input.required<GedcomDatabase>();
   readonly label = input<string>("Individual");
-  readonly id = inject(IdGenerator).getId("individual-xref");
+  readonly id = inject(IdGenerator).getId("input-individual-xref");
 
   readonly value = model<string>("");
   readonly form = form(this.value);
