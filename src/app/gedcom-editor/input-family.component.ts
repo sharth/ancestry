@@ -42,8 +42,8 @@ export class InputFamilyComponent implements FormValueControl<GedcomDatabase> {
 
   updateFamilyMembers(members: Partial<FamilyMembers>) {
     const familyXref = this.xref();
-    this.value.update((database) =>
-      produce(database, (draft) => {
+    this.value.update(
+      produce((draft) => {
         const family = draft.families[familyXref];
         if (!family) return;
         const spousesBefore = [family.husbandXref, family.wifeXref];
