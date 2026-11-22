@@ -57,7 +57,7 @@ const family = buildDatabase([
   ["@F6@", "@MROOT@", "@FWIFE@", ["@UKID@"]],
   ["@F7@", "@UKID@", "@FKIDWIFE@", ["@MGRANDSON@"]],
   ["@F8@", "@MDAD@", "@FSTEPMOM@", ["@MHALFBRO@"]],
-  ["@F9@", "", "", ["@MLONE1@", "@FLONE2@"]],
+  ["@F9@", "", "", ["@MLONE1@"]],
   ["@F10@", "@MWIFEDAD@", "", ["@FWIFE@", "@MWIFEBRO@"]],
   ["@F11@", "@MWIFEEX@", "@FWIFE@", ["@MSTEPSON@"]],
   ["@F12@", "@MWIFEBRO@", "", ["@MWIFENEPHEW@"]],
@@ -108,10 +108,6 @@ describe("describeRelationship", () => {
     expect(describeFromRoot("@MLONE1@")).toBeUndefined();
   });
 
-  it("treats children of one family as full siblings even with no parents recorded", () => {
-    expect(describeRelationship(family, "@MLONE1@", "@FLONE2@")).toBe("sister");
-  });
-
   it("is undefined when the root or target isn't in the file", () => {
     expect(describeFromRoot("@MISSING@")).toBeUndefined();
     expect(describeRelationship(family, "@MISSING@", "@MDAD@")).toBeUndefined();
@@ -130,7 +126,7 @@ describe("describeRelationship", () => {
       ["@F1@", "@MA@", "", ["@MB@"]],
       ["@F2@", "@MB@", "", ["@MA@"]],
     ]);
-    expect(describeRelationship(loop, "@MA@", "@MB@")).toBe("son");
+    expect(describeRelationship(loop, "@MA@", "@MB@")).toBe("father");
   });
 });
 

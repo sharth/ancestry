@@ -1,14 +1,18 @@
 import type { GedcomDatabase } from "../gedcom/gedcomDatabase";
 import type { GedcomIndividual } from "../gedcom/gedcomIndividual";
 
+// Finding a relationship is a search, and naming it is a separate step:
+//
+// 1. findPath searches outward from the root along parent, child and spouse
+//    links for the target, through as few marriages as possible.
+// 2. describePath splits that path at each marriage into blood links (up to
+//    a common ancestor, then down) and names them: "first cousin",
+//    "sister-in-law", "wife of the first cousin".
+
 /** How `targetXref` is related to `rootXref`, from the root's side: the
- * target is the root's "grandfather", "great-aunt", "first cousin once
- * removed", and so on. Blood relationships are found through shared
- * ancestors (or a shared family, when the parents aren't recorded). Failing
- * that, the relationship goes through marriages, with as few as possible:
- * "sister-in-law", "stepmother", "husband of the first cousin", "brother of
- * the wife of the nephew". "self" when they're the same person, undefined
- * when either is missing or nothing connects them. */
+ * target is the root's "grandfather", "great-aunt", "stepmother", "wife of
+ * the first cousin", and so on. "self" when they're the same person,
+ * undefined when either is missing or nothing connects them. */
 export function describeRelationship(
   gedcomDatabase: GedcomDatabase,
   rootXref: string,
@@ -16,28 +20,225 @@ export function describeRelationship(
 ): string | undefined {
   const root = gedcomDatabase.individuals[rootXref];
   const target = gedcomDatabase.individuals[targetXref];
-  if (root === undefined || target === undefined) {
-    return undefined;
-  }
-  if (rootXref === targetXref) {
-    return "self";
-  }
+  if (root === undefined || target === undefined) return undefined;
+  if (root === target) return "self";
 
-  const sex = target.sex.sex;
-  if (isSpouse(gedcomDatabase, root, targetXref)) {
-    return gendered(sex, "husband", "wife", "spouse");
-  }
-
-  const generations = closestCommonAncestor(gedcomDatabase, root, target);
-  if (generations !== undefined) {
-    return relationshipName(generations.root, generations.target, sex, {
-      half: generations.half,
-    });
-  }
-
-  const segments = marriagePath(gedcomDatabase, rootXref, targetXref);
-  return segments && describeMarriagePath(gedcomDatabase, segments);
+  // A spouse who is also a cousin is still called a spouse.
+  const path = spouseOf(gedcomDatabase, root, target)
+    ? [{ kind: "spouse" as const, individual: target }]
+    : findPath(gedcomDatabase, root, target);
+  return path && describePath(gedcomDatabase, root, path);
 }
+
+// One step along a path: to a parent, a child or a spouse of the previous
+// individual.
+interface Step {
+  kind: "parent" | "child" | "spouse";
+  individual: GedcomIndividual;
+}
+
+// The shortest path from the root to the target using the fewest marriages.
+// A blood relationship goes up to a common ancestor and then down, so once
+// a path has stepped down to a child it can't step up to a parent again
+// until after a marriage.
+function findPath(
+  gedcomDatabase: GedcomDatabase,
+  root: GedcomIndividual,
+  target: GedcomIndividual,
+): Step[] | undefined {
+  interface State {
+    individual: GedcomIndividual;
+    goingDown: boolean;
+    path: Step[];
+  }
+  const visited = new Set<string>();
+
+  // Breadth first within each marriage count; a step to a spouse is queued
+  // for the next count.
+  let queue: State[] = [{ individual: root, goingDown: false, path: [] }];
+  while (queue.length > 0) {
+    const nextQueue: State[] = [];
+    // The loop picks up states pushed onto `queue` while it runs.
+    for (const { individual, goingDown, path } of queue) {
+      const key = `${goingDown ? "down" : "up"} ${individual.xref}`;
+      if (visited.has(key)) continue;
+      visited.add(key);
+      if (individual === target) return path;
+
+      for (const step of neighbors(gedcomDatabase, individual)) {
+        if (step.kind === "parent" && goingDown) continue;
+        const next = {
+          individual: step.individual,
+          goingDown: step.kind === "child",
+          path: [...path, step],
+        };
+        (step.kind === "spouse" ? nextQueue : queue).push(next);
+      }
+    }
+    queue = nextQueue;
+  }
+  return undefined;
+}
+
+function neighbors(
+  gedcomDatabase: GedcomDatabase,
+  individual: GedcomIndividual,
+): Step[] {
+  const steps: Step[] = [];
+  const add = (kind: Step["kind"], xref: string) => {
+    const other = gedcomDatabase.individuals[xref];
+    if (other !== undefined && other !== individual) {
+      steps.push({ kind, individual: other });
+    }
+  };
+  for (const familyXref of individual.childOfFamilyXrefs) {
+    const family = gedcomDatabase.families[familyXref];
+    add("parent", family?.husbandXref ?? "");
+    add("parent", family?.wifeXref ?? "");
+  }
+  for (const familyXref of individual.parentOfFamilyXrefs) {
+    const family = gedcomDatabase.families[familyXref];
+    add("spouse", family?.husbandXref ?? "");
+    add("spouse", family?.wifeXref ?? "");
+    for (const childXref of family?.childXrefs ?? []) add("child", childXref);
+  }
+  return steps;
+}
+
+function spouseOf(
+  gedcomDatabase: GedcomDatabase,
+  individual: GedcomIndividual,
+  other: GedcomIndividual,
+): boolean {
+  return neighbors(gedcomDatabase, individual).some(
+    (step) => step.kind === "spouse" && step.individual === other,
+  );
+}
+
+// Whether two individuals are full siblings: children of one family, or
+// of two families with the same two parents.
+function shareParents(
+  gedcomDatabase: GedcomDatabase,
+  a: GedcomIndividual,
+  b: GedcomIndividual,
+): boolean {
+  const parents = (individual: GedcomIndividual) =>
+    new Set(
+      neighbors(gedcomDatabase, individual)
+        .filter((step) => step.kind === "parent")
+        .map((step) => step.individual),
+    );
+  const aParents = parents(a);
+  const shared = [...parents(b)].filter((parent) => aParents.has(parent));
+  return (
+    shared.length >= 2 ||
+    a.childOfFamilyXrefs.some((xref) => b.childOfFamilyXrefs.includes(xref))
+  );
+}
+
+// A piece of a path: a blood relationship, `up` generations to a common
+// ancestor and `down` again, or a marriage. `individual` is where it ends.
+type Link =
+  | {
+      kind: "blood";
+      up: number;
+      down: number;
+      half: boolean;
+      individual: GedcomIndividual;
+    }
+  | { kind: "marriage"; individual: GedcomIndividual };
+
+function describePath(
+  gedcomDatabase: GedcomDatabase,
+  root: GedcomIndividual,
+  path: Step[],
+): string {
+  // Split the path into links.
+  const links: Link[] = [];
+  let blood: Extract<Link, { kind: "blood" }> | undefined;
+  let previous = root;
+  let beforePeak = root;
+  for (const step of path) {
+    if (step.kind === "spouse") {
+      blood = undefined;
+      links.push({ kind: "marriage", individual: step.individual });
+    } else {
+      if (blood === undefined) {
+        blood = {
+          kind: "blood",
+          up: 0,
+          down: 0,
+          half: false,
+          individual: previous,
+        };
+        links.push(blood);
+      }
+      if (step.kind === "parent") {
+        blood.up++;
+        beforePeak = previous;
+      } else {
+        // At the common ancestor, the half relationships are the ones whose
+        // two lines come down from different families.
+        if (blood.down === 0 && blood.up > 0) {
+          blood.half = !shareParents(
+            gedcomDatabase,
+            beforePeak,
+            step.individual,
+          );
+        }
+        blood.down++;
+      }
+      blood.individual = step.individual;
+    }
+    previous = step.individual;
+  }
+
+  // Name each link, using a single word for the familiar pairs.
+  const names: string[] = [];
+  for (let i = 0; i < links.length; i++) {
+    const link = links[i];
+    const next = links[i + 1];
+    if (link === undefined) continue;
+    if (next !== undefined) {
+      const pair = PAIRED_NAMES[`${linkKind(link)} ${linkKind(next)}`];
+      if (pair !== undefined) {
+        names.push(gendered(next.individual.sex.sex, ...pair));
+        i++;
+        continue;
+      }
+    }
+    names.push(linkName(link));
+  }
+
+  // From the root outward, read back to front: "wife of the first cousin".
+  return names.reverse().join(" of the ");
+}
+
+function linkName(link: Link): string {
+  const sex = link.individual.sex.sex;
+  return link.kind === "marriage"
+    ? gendered(sex, "husband", "wife", "spouse")
+    : relationshipName(link.up, link.down, sex, { half: link.half });
+}
+
+function linkKind(link: Link): string {
+  if (link.kind === "marriage") return "spouse";
+  if (link.half) return "other";
+  if (link.up === 1 && link.down === 0) return "parent";
+  if (link.up === 0 && link.down === 1) return "child";
+  if (link.up === 1 && link.down === 1) return "sibling";
+  return "other";
+}
+
+// Two links in a row with a name of their own, as [male, female, neutral].
+const PAIRED_NAMES: Record<string, [string, string, string] | undefined> = {
+  "sibling spouse": ["brother-in-law", "sister-in-law", "sibling-in-law"],
+  "spouse sibling": ["brother-in-law", "sister-in-law", "sibling-in-law"],
+  "spouse parent": ["father-in-law", "mother-in-law", "parent-in-law"],
+  "child spouse": ["son-in-law", "daughter-in-law", "child-in-law"],
+  "parent spouse": ["stepfather", "stepmother", "stepparent"],
+  "spouse child": ["stepson", "stepdaughter", "stepchild"],
+};
 
 /** The name of a blood relationship where the closest common ancestor is
  * `rootGenerations` above the root and `targetGenerations` above the
@@ -164,337 +365,4 @@ const TIMES_WORDS = [
 
 function timesRemoved(n: number): string {
   return `${TIMES_WORDS[n] ?? `${n} times`} removed`;
-}
-
-function isSpouse(
-  gedcomDatabase: GedcomDatabase,
-  root: GedcomIndividual,
-  targetXref: string,
-): boolean {
-  return root.parentOfFamilyXrefs.some((familyXref) => {
-    const family = gedcomDatabase.families[familyXref];
-    return (
-      family !== undefined &&
-      (family.husbandXref === targetXref || family.wifeXref === targetXref)
-    );
-  });
-}
-
-interface Ancestry {
-  // Each ancestor, the individual included at 0, by how many generations up
-  // it is (the fewest, if there's more than one line).
-  individuals: Map<string, number>;
-  // Each family an ancestor (or the individual) is a child of, by the
-  // generation of its parents: 1 for the individual's own parents.
-  families: Map<string, number>;
-}
-
-function ancestry(
-  gedcomDatabase: GedcomDatabase,
-  individual: GedcomIndividual,
-): Ancestry {
-  const individuals = new Map<string, number>([[individual.xref, 0]]);
-  const families = new Map<string, number>();
-  // Breadth first, so each is first reached by its shortest line.
-  let generation = [individual];
-  for (let depth = 1; generation.length > 0; depth++) {
-    const nextGeneration: GedcomIndividual[] = [];
-    for (const child of generation) {
-      for (const familyXref of child.childOfFamilyXrefs) {
-        if (families.has(familyXref)) continue;
-        families.set(familyXref, depth);
-        const family = gedcomDatabase.families[familyXref];
-        if (family === undefined) continue;
-        for (const parentXref of [family.husbandXref, family.wifeXref]) {
-          const parent = gedcomDatabase.individuals[parentXref];
-          if (parent === undefined || individuals.has(parentXref)) continue;
-          individuals.set(parentXref, depth);
-          nextGeneration.push(parent);
-        }
-      }
-    }
-    generation = nextGeneration;
-  }
-  return { individuals, families };
-}
-
-// The generations up from the root and from the target to their closest
-// common ancestor. A shared family (both parents, or whichever are recorded)
-// is a full relationship; sharing only one parent at the closest distance
-// makes it a half relationship.
-function closestCommonAncestor(
-  gedcomDatabase: GedcomDatabase,
-  root: GedcomIndividual,
-  target: GedcomIndividual,
-): { root: number; target: number; half: boolean } | undefined {
-  const rootAncestry = ancestry(gedcomDatabase, root);
-  const targetAncestry = ancestry(gedcomDatabase, target);
-
-  const closest = (
-    rootGenerations: Map<string, number>,
-    targetGenerations: Map<string, number>,
-  ) => {
-    let best: { root: number; target: number } | undefined;
-    for (const [xref, rootDepth] of rootGenerations) {
-      const targetDepth = targetGenerations.get(xref);
-      if (targetDepth === undefined) continue;
-      if (
-        best === undefined ||
-        rootDepth + targetDepth < best.root + best.target
-      ) {
-        best = { root: rootDepth, target: targetDepth };
-      }
-    }
-    return best;
-  };
-
-  const viaFamily = closest(rootAncestry.families, targetAncestry.families);
-  const viaIndividual = closest(
-    rootAncestry.individuals,
-    targetAncestry.individuals,
-  );
-
-  if (
-    viaFamily !== undefined &&
-    (viaIndividual === undefined ||
-      viaFamily.root + viaFamily.target <=
-        viaIndividual.root + viaIndividual.target)
-  ) {
-    return { ...viaFamily, half: false };
-  }
-  if (viaIndividual !== undefined) {
-    // A direct line (one is the other's ancestor) has no half form.
-    const direct = viaIndividual.root === 0 || viaIndividual.target === 0;
-    return { ...viaIndividual, half: !direct };
-  }
-  return undefined;
-}
-
-// A blood relationship (`start` up to a common ancestor and down to `end`),
-// with `end` married to the next segment's `start`.
-interface Segment {
-  start: GedcomIndividual;
-  end: GedcomIndividual;
-}
-
-// The path from the root to the target through the fewest marriages, and
-// then the fewest parent/child steps, as blood relationships joined by
-// marriages. Within a segment the path only goes up and then down, so each
-// segment is a single blood relationship.
-function marriagePath(
-  gedcomDatabase: GedcomDatabase,
-  rootXref: string,
-  targetXref: string,
-): Segment[] | undefined {
-  // A marriage outweighs any number of parent/child steps.
-  const MARRIAGE = 1_000_000;
-  type Phase = "up" | "down";
-  type Step = "parent" | "child" | "spouse";
-  const key = (xref: string, phase: Phase) => `${phase}${xref}`;
-
-  const cost = new Map<string, number>();
-  const previous = new Map<string, { key: string; step: Step }>();
-  const queue = new MinQueue<{ xref: string; phase: Phase }>();
-  cost.set(key(rootXref, "up"), 0);
-  queue.push(0, { xref: rootXref, phase: "up" });
-
-  const visit = (
-    from: string,
-    fromCost: number,
-    xref: string,
-    phase: Phase,
-    step: Step,
-  ) => {
-    const toKey = key(xref, phase);
-    const toCost = fromCost + (step === "spouse" ? MARRIAGE : 1);
-    if (toCost >= (cost.get(toKey) ?? Infinity)) return;
-    cost.set(toKey, toCost);
-    previous.set(toKey, { key: from, step });
-    queue.push(toCost, { xref, phase });
-  };
-
-  let foundKey: string | undefined;
-  for (let entry = queue.pop(); entry; entry = queue.pop()) {
-    const { priority, value } = entry;
-    const fromKey = key(value.xref, value.phase);
-    if (priority > (cost.get(fromKey) ?? Infinity)) continue;
-    if (value.xref === targetXref) {
-      foundKey = fromKey;
-      break;
-    }
-    const individual = gedcomDatabase.individuals[value.xref];
-    if (individual === undefined) continue;
-
-    if (value.phase === "up") {
-      for (const familyXref of individual.childOfFamilyXrefs) {
-        const family = gedcomDatabase.families[familyXref];
-        for (const parentXref of [family?.husbandXref, family?.wifeXref]) {
-          if (parentXref) visit(fromKey, priority, parentXref, "up", "parent");
-        }
-      }
-    }
-    for (const familyXref of individual.parentOfFamilyXrefs) {
-      const family = gedcomDatabase.families[familyXref];
-      if (family === undefined) continue;
-      for (const childXref of family.childXrefs) {
-        visit(fromKey, priority, childXref, "down", "child");
-      }
-      for (const spouseXref of [family.husbandXref, family.wifeXref]) {
-        if (spouseXref && spouseXref !== value.xref) {
-          visit(fromKey, priority, spouseXref, "up", "spouse");
-        }
-      }
-    }
-  }
-  if (foundKey === undefined) return undefined;
-
-  // Walk back from the target, splitting at each marriage.
-  const xrefOf = (stateKey: string) => stateKey.replace(/^(up|down)/, "");
-  const segments: { start: string; end: string }[] = [];
-  let end = xrefOf(foundKey);
-  for (let at = foundKey; ;) {
-    const step = previous.get(at);
-    if (step === undefined) {
-      segments.unshift({ start: xrefOf(at), end });
-      break;
-    }
-    if (step.step === "spouse") {
-      segments.unshift({ start: xrefOf(at), end });
-      end = xrefOf(step.key);
-    }
-    at = step.key;
-  }
-
-  const result: Segment[] = [];
-  for (const segment of segments) {
-    const start = gedcomDatabase.individuals[segment.start];
-    const segmentEnd = gedcomDatabase.individuals[segment.end];
-    if (start === undefined || segmentEnd === undefined) return undefined;
-    result.push({ start, end: segmentEnd });
-  }
-  return result;
-}
-
-interface Term {
-  name: string;
-  sex: string;
-  // Generations up and down, for a blood term; undefined for a marriage.
-  generations?: { up: number; down: number };
-}
-
-function describeMarriagePath(
-  gedcomDatabase: GedcomDatabase,
-  segments: Segment[],
-): string | undefined {
-  // Each step from the root outward: a blood relationship, then a marriage,
-  // and so on.
-  const terms: Term[] = [];
-  segments.forEach(({ start, end }, index) => {
-    if (index > 0) {
-      terms.push({
-        name: gendered(start.sex.sex, "husband", "wife", "spouse"),
-        sex: start.sex.sex,
-      });
-    }
-    if (start.xref === end.xref) return;
-    const generations = closestCommonAncestor(gedcomDatabase, start, end);
-    if (generations === undefined) return;
-    terms.push({
-      name: relationshipName(
-        generations.root,
-        generations.target,
-        end.sex.sex,
-        {
-          half: generations.half,
-        },
-      ),
-      sex: end.sex.sex,
-      generations: { up: generations.root, down: generations.target },
-    });
-  });
-
-  // Collapse the familiar in-law and step relationships.
-  const is = (term: Term | undefined, up: number, down: number) =>
-    term?.generations?.up === up && term.generations.down === down;
-  const isMarriage = (term: Term | undefined) =>
-    term !== undefined && term.generations === undefined;
-  const collapsed: string[] = [];
-  for (let i = 0; i < terms.length; i++) {
-    const term = terms[i];
-    const next = terms[i + 1];
-    if (term === undefined) continue;
-    let name: string | undefined;
-    if (next !== undefined) {
-      const sex = next.sex;
-      if (is(term, 1, 1) && isMarriage(next)) {
-        name = gendered(sex, "brother", "sister", "sibling") + "-in-law";
-      } else if (isMarriage(term) && is(next, 1, 1)) {
-        name = gendered(sex, "brother", "sister", "sibling") + "-in-law";
-      } else if (isMarriage(term) && is(next, 1, 0)) {
-        name = gendered(sex, "father", "mother", "parent") + "-in-law";
-      } else if (is(term, 0, 1) && isMarriage(next)) {
-        name = gendered(sex, "son", "daughter", "child") + "-in-law";
-      } else if (is(term, 1, 0) && isMarriage(next)) {
-        name = "step" + gendered(sex, "father", "mother", "parent");
-      } else if (isMarriage(term) && is(next, 0, 1)) {
-        name = "step" + gendered(sex, "son", "daughter", "child");
-      }
-    }
-    if (name !== undefined) {
-      collapsed.push(name);
-      i++;
-    } else {
-      collapsed.push(term.name);
-    }
-  }
-
-  // "brother of the wife of the nephew"
-  return collapsed.reverse().join(" of the ") || undefined;
-}
-
-// A binary min-heap, smallest priority first.
-class MinQueue<T> {
-  private readonly heap: { priority: number; value: T }[] = [];
-
-  push(priority: number, value: T) {
-    this.heap.push({ priority, value });
-    let i = this.heap.length - 1;
-    while (i > 0) {
-      const parent = (i - 1) >> 1;
-      if (this.priority(parent) <= this.priority(i)) break;
-      this.swap(i, parent);
-      i = parent;
-    }
-  }
-
-  pop(): { priority: number; value: T } | undefined {
-    const top = this.heap[0];
-    const last = this.heap.pop();
-    if (top === undefined || last === undefined || this.heap.length === 0) {
-      return top;
-    }
-    this.heap[0] = last;
-    for (let i = 0; ;) {
-      let smallest = i;
-      for (const child of [2 * i + 1, 2 * i + 2]) {
-        if (this.priority(child) < this.priority(smallest)) smallest = child;
-      }
-      if (smallest === i) break;
-      this.swap(i, smallest);
-      i = smallest;
-    }
-    return top;
-  }
-
-  private priority(i: number): number {
-    return this.heap[i]?.priority ?? Infinity;
-  }
-
-  private swap(i: number, j: number) {
-    const a = this.heap[i];
-    const b = this.heap[j];
-    if (a === undefined || b === undefined) return;
-    this.heap[i] = b;
-    this.heap[j] = a;
-  }
 }
