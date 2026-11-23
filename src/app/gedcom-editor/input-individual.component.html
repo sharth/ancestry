@@ -1,38 +1,38 @@
-<app-input-individual-names
-  [formField]="form.names"
-  [workingDatabase]="workingDatabase()"
-></app-input-individual-names>
-
-<app-input-individual-sex
-  [formField]="form.sex"
-  [workingDatabase]="workingDatabase()"
-></app-input-individual-sex>
-
-<app-input-individual-facts
-  [formField]="form.facts"
-  [workingDatabase]="workingDatabase()"
-></app-input-individual-facts>
-
-@if (database(); as database) {
-  <app-input-individual-families
-    [formField]="database"
+@if (individual(); as individual) {
+  <app-input-individual-names
+    [formField]="individual.names"
     [workingDatabase]="workingDatabase()"
-    [individualXref]="value().xref"
+  ></app-input-individual-names>
+
+  <app-input-individual-sex
+    [formField]="individual.sex"
+    [workingDatabase]="workingDatabase()"
+  ></app-input-individual-sex>
+
+  <app-input-individual-facts
+    [formField]="individual.facts"
+    [workingDatabase]="workingDatabase()"
+  ></app-input-individual-facts>
+
+  <app-input-individual-families
+    [formField]="form"
+    [workingDatabase]="workingDatabase()"
+    [individualXref]="individualXref()"
   ></app-input-individual-families>
+
+  <app-input-external-identifiers
+    [formField]="individual.externalIdentifiers"
+    [workingDatabase]="workingDatabase()"
+  ></app-input-external-identifiers>
+
+  <app-input-notes
+    [collapseWhenEmpty]="false"
+    [formField]="individual.notes"
+    [workingDatabase]="workingDatabase()"
+  ></app-input-notes>
+
+  <app-input-unknown-records
+    [formField]="individual.unknownRecords"
+    [workingDatabase]="workingDatabase()"
+  ></app-input-unknown-records>
 }
-
-<app-input-external-identifiers
-  [formField]="form.externalIdentifiers"
-  [workingDatabase]="workingDatabase()"
-></app-input-external-identifiers>
-
-<app-input-notes
-  [collapseWhenEmpty]="false"
-  [formField]="form.notes"
-  [workingDatabase]="workingDatabase()"
-></app-input-notes>
-
-<app-input-unknown-records
-  [formField]="form.unknownRecords"
-  [workingDatabase]="workingDatabase()"
-></app-input-unknown-records>

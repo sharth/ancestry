@@ -1,16 +1,10 @@
-import { Component, input, model } from "@angular/core";
-import {
-  FormField,
-  form,
-  type FieldTree,
-  type FormValueControl,
-} from "@angular/forms/signals";
+import { Component, computed, input, model } from "@angular/core";
+import { FormField, form, type FormValueControl } from "@angular/forms/signals";
 
-import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import {
-  newGedcomIndividual,
-  type GedcomIndividual,
-} from "../../gedcom/gedcomIndividual";
+  newGedcomDatabase,
+  type GedcomDatabase,
+} from "../../gedcom/gedcomDatabase";
 import { InputExternalIdentifiersComponent } from "./input-external-identifiers.component";
 import { InputIndividualFactsComponent } from "./input-individual-facts.component";
 import { InputIndividualFamiliesComponent } from "./input-individual-families.component";
@@ -19,6 +13,9 @@ import { InputIndividualSexComponent } from "./input-individual-sex.component";
 import { InputNotesComponent } from "./input-notes.component";
 import { InputUnknownRecordsComponent } from "./input-unknown-records.component";
 
+// Edits one individual, given by `individualXref`, within the database it is
+// bound to. The value is the whole database so that the Families section can
+// edit the individual's families (and their other members) too.
 @Component({
   selector: "app-input-individual",
   imports: [
@@ -34,11 +31,12 @@ import { InputUnknownRecordsComponent } from "./input-unknown-records.component"
   templateUrl: "./input-individual.component.html",
   styleUrl: "./input.component.css",
 })
-export class InputIndividualComponent implements FormValueControl<GedcomIndividual> {
+export class InputIndividualComponent implements FormValueControl<GedcomDatabase> {
   readonly workingDatabase = input.required<GedcomDatabase>();
-  // The editor's whole form, so the Families section can edit the
-  // individual's families (and their other members) too.
-  readonly database = input<FieldTree<GedcomDatabase>>();
-  readonly value = model<GedcomIndividual>(newGedcomIndividual({ xref: "" }));
+  readonly individualXref = input.required<string>();
+  readonly value = model<GedcomDatabase>(newGedcomDatabase());
   readonly form = form(this.value);
+  readonly individual = computed(
+    () => this.form.individuals[this.individualXref()],
+  );
 }

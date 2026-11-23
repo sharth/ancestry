@@ -12,7 +12,10 @@ describe("InputIndividualComponent", () => {
 
   beforeEach(async () => {
     const renderResult = await render(InputIndividualComponent, {
-      bindings: [inputBinding("workingDatabase", signal(newGedcomDatabase()))],
+      bindings: [
+        inputBinding("workingDatabase", signal(newGedcomDatabase())),
+        inputBinding("individualXref", signal("@I1@")),
+      ],
       waitForStableOnRender: true,
     });
 

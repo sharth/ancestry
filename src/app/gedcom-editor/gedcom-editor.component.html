@@ -86,13 +86,11 @@
     <div [hidden]="!isActive">
       @switch (tabInformation.type) {
         @case ("INDI") {
-          @if (form.individuals[tabInformation.xref]; as individual) {
-            <app-input-individual
-              [workingDatabase]="workingDatabase()"
-              [formField]="individual"
-              [database]="form"
-            />
-          }
+          <app-input-individual
+            [workingDatabase]="workingDatabase()"
+            [formField]="form"
+            [individualXref]="tabInformation.xref"
+          />
         }
         @case ("SOUR") {
           @if (form.sources[tabInformation.xref]; as source) {
