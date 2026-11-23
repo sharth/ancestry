@@ -81,9 +81,6 @@ describe("ValidationTableComponent", () => {
     const updateGedcomDatabaseSpy = vi
       .spyOn(ancestryService, "updateGedcomDatabase")
       .mockResolvedValue(undefined);
-    ancestryService.gedcomResource.set(
-      newGedcomResourceValue({ gedcomDatabase: loadedDatabase }),
-    );
     return {
       fixture,
       table,
@@ -130,15 +127,24 @@ describe("ValidationTableComponent", () => {
   });
 
   it("submits a row's fix directly", async () => {
-    const { updateGedcomDatabaseSpy } = await setup();
+    const { ancestryService, updateGedcomDatabaseSpy } = await setup();
+    ancestryService.gedcomResource.set(
+      newGedcomResourceValue({ gedcomDatabase: loadedDatabase }),
+    );
     screen.getByRole("button", { name: "Submit changes as proposed" }).click();
     await vi.waitFor(() => {
-      expect(updateGedcomDatabaseSpy).toHaveBeenCalledWith(loadedDatabase, fixedDatabase);
+      expect(updateGedcomDatabaseSpy).toHaveBeenCalledWith(
+        loadedDatabase,
+        fixedDatabase,
+      );
     });
   });
 
   it("submits every fix at once", async () => {
-    const { updateGedcomDatabaseSpy } = await setup();
+    const { ancestryService, updateGedcomDatabaseSpy } = await setup();
+    ancestryService.gedcomResource.set(
+      newGedcomResourceValue({ gedcomDatabase: loadedDatabase }),
+    );
     screen.getByRole("button", { name: "Submit all 1 as proposed" }).click();
     await vi.waitFor(() => {
       expect(updateGedcomDatabaseSpy).toHaveBeenCalledWith(
