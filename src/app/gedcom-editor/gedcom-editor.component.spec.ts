@@ -178,13 +178,14 @@ describe("GedcomEditorComponent Integration", () => {
       fixture.detectChanges();
       await fixture.whenStable();
 
-      const spouse = (
+      // The spouse family's Husband and Wife pickers; @I0@ is the husband.
+      const [, wife] = (
         fixture.nativeElement as HTMLElement
-      ).querySelector<HTMLSelectElement>(
+      ).querySelectorAll<HTMLSelectElement>(
         "app-input-individual-families app-input-individual-xref select",
       );
-      assert.isOk(spouse);
-      await userEvent.setup().selectOptions(spouse, "@I1@");
+      assert.isOk(wife);
+      await userEvent.setup().selectOptions(wife, "@I1@");
 
       const database = component.workingDatabase();
       expect(database.families["@F0@"]?.wifeXref).toBe("@I1@");

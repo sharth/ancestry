@@ -4,7 +4,6 @@ import {
   twoWayBinding,
   type Provider,
 } from "@angular/core";
-import type { ComponentFixture } from "@angular/core/testing";
 import { render, screen } from "@testing-library/angular/zoneless";
 import { userEvent } from "@testing-library/user-event";
 import { assert, beforeEach, describe, expect, it, vi } from "vitest";
@@ -58,13 +57,12 @@ function database(): GedcomDatabase {
 }
 
 describe("InputIndividualFamiliesComponent", () => {
-  let fixture: ComponentFixture<InputIndividualFamiliesComponent>;
   const openFamily = vi.fn();
   const value = signal<GedcomDatabase>(newGedcomDatabase());
 
   async function renderFamilies(providers: Provider[]) {
     value.set(database());
-    const renderResult = await render(InputIndividualFamiliesComponent, {
+    await render(InputIndividualFamiliesComponent, {
       bindings: [
         inputBinding("workingDatabase", signal(database())),
         inputBinding("individualXref", signal("@I1@")),
@@ -73,7 +71,6 @@ describe("InputIndividualFamiliesComponent", () => {
       providers,
       waitForStableOnRender: true,
     });
-    fixture = renderResult.fixture;
   }
 
   beforeEach(async () => {
@@ -130,38 +127,7 @@ describe("InputIndividualFamiliesComponent", () => {
     ]);
   });
 
-  it("changes the other spouse, updating both spouses' links", async () => {
-    await userEvent
-      .setup()
-      .selectOptions(screen.getByRole("combobox", { name: "Spouse" }), "@I3@");
-
-    expect(value().families["@F2@"]?.wifeXref).toBe("@I3@");
-    expect(value().individuals["@I2@"]?.parentOfFamilyXrefs).toEqual([]);
-    expect(value().individuals["@I3@"]?.parentOfFamilyXrefs).toEqual(["@F2@"]);
-  });
-
-  it("adds and removes a child, on both sides", async () => {
-    const user = userEvent.setup();
-    await user.click(screen.getByText("Add child"));
-    // Every individual picker's select has the same id, so its label doesn't
-    // name it; find the select next to the "Child" label instead.
-    const childPicker = screen
-      .getByText("Child", { selector: "label" })
-      .parentElement?.querySelector("select");
-    assert.isOk(childPicker);
-    await user.selectOptions(childPicker, "@I4@");
-    await fixture.whenStable();
-
-    expect(value().families["@F2@"]?.childXrefs).toEqual(["@I4@"]);
-    expect(value().individuals["@I4@"]?.childOfFamilyXrefs).toEqual(["@F2@"]);
-
-    await user.click(screen.getByRole("button", { name: "Remove child" }));
-
-    expect(value().families["@F2@"]?.childXrefs).toEqual([]);
-    expect(value().individuals["@I4@"]?.childOfFamilyXrefs).toEqual([]);
-  });
-
-  it("adds an event to the spouse family", async () => {
+  it("edits each spouse family with the family editor", async () => {
     await userEvent.setup().click(screen.getByText("Append another event"));
 
     expect(value().families["@F2@"]?.facts).toHaveLength(1);

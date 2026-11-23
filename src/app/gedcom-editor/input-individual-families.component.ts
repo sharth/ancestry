@@ -1,6 +1,6 @@
-import { Component, inject, input, model, signal } from "@angular/core";
+import { Component, inject, input, model } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
-import { produce, type Draft } from "immer";
+import { produce } from "immer";
 
 import {
   newGedcomDatabase,
@@ -11,18 +11,19 @@ import type { GedcomIndividual } from "../../gedcom/gedcomIndividual";
 import { displayGedcomName } from "../../gedcom/gedcomName";
 import { calculateNextFamilyXref } from "../../util/next-xref";
 import { GEDCOM_EDITOR } from "./gedcom-editor-interface";
-import { InputFamilyFactsComponent } from "./input-family-facts.component";
-import { InputIndividualXrefComponent } from "./input-individual-xref.component";
+import {
+  InputFamilyComponent,
+  setFamilyMembers,
+} from "./input-family.component";
 
 // The families an individual is part of, as a child or as a spouse. Each
-// spouse family can be edited here: the other spouse, the children, and the
-// family's events (e.g. the marriage). The value is the database being
-// edited, since these edits change the family and its members together:
-// GEDCOM links each family member both ways (FAMC/FAMS on the individual,
-// HUSB/WIFE/CHIL on the family).
+// spouse family is edited here with the family editor (its spouses,
+// children and events, e.g. the marriage). The value is the whole database,
+// like the family editor's, since adding or leaving a family changes the
+// family and its members together.
 @Component({
   selector: "app-input-individual-families",
-  imports: [FormField, InputFamilyFactsComponent, InputIndividualXrefComponent],
+  imports: [FormField, InputFamilyComponent],
   templateUrl: "./input-individual-families.component.html",
   styleUrl: "./input.component.css",
 })
@@ -33,9 +34,6 @@ export class InputIndividualFamiliesComponent implements FormValueControl<Gedcom
   readonly individualXref = input.required<string>();
   readonly value = model<GedcomDatabase>(newGedcomDatabase());
   readonly form = form(this.value);
-
-  // The spouse family whose "Add child" picker is showing.
-  readonly addingChildTo = signal<string | undefined>(undefined);
 
   individual(): GedcomIndividual | undefined {
     return this.value().individuals[this.individualXref()];
@@ -54,12 +52,12 @@ export class InputIndividualFamiliesComponent implements FormValueControl<Gedcom
     return `Spouse in: ${spouse || "Unknown"} (${familyXref})`;
   }
 
-  individualLabel(xref: string): string {
+  private individualLabel(xref: string): string {
     const name = this.workingDatabase().individuals[xref]?.names.at(0);
     return (name ? displayGedcomName(name) : "") || xref;
   }
 
-  spouseOf(familyXref: string): string {
+  private spouseOf(familyXref: string): string {
     const family = this.value().families[familyXref];
     return family?.husbandXref === this.individualXref()
       ? family.wifeXref
@@ -69,96 +67,38 @@ export class InputIndividualFamiliesComponent implements FormValueControl<Gedcom
   // A new family with this individual as husband or wife (by sex).
   addSpouseFamily() {
     const familyXref = calculateNextFamilyXref(this.workingDatabase());
+    const individualXref = this.individualXref();
+    const isWife = this.individual()?.sex.sex === "F";
     this.value.update(
       produce((draft) => {
-        const individual = draft.individuals[this.individualXref()];
-        if (!individual) return;
-        const isWife = individual.sex.sex === "F";
-        draft.families[familyXref] = newGedcomFamily({
-          xref: familyXref,
-          husbandXref: isWife ? "" : individual.xref,
-          wifeXref: isWife ? individual.xref : "",
-        });
-        individual.parentOfFamilyXrefs.push(familyXref);
+        draft.families[familyXref] = newGedcomFamily({ xref: familyXref });
+        setFamilyMembers(
+          draft,
+          familyXref,
+          isWife
+            ? { wifeXref: individualXref }
+            : { husbandXref: individualXref },
+        );
       }),
     );
   }
 
   // Takes this individual out of the family, as a spouse or a child.
   removeFromFamily(familyXref: string) {
-    this.value.update(
-      produce((draft) => {
-        unlink(draft, familyXref, this.individualXref());
-      }),
-    );
-  }
-
-  changeSpouse(familyXref: string, spouseXref: string) {
-    if (spouseXref === this.individualXref()) return;
+    const individualXref = this.individualXref();
     this.value.update(
       produce((draft) => {
         const family = draft.families[familyXref];
         if (!family) return;
-        const field =
-          family.husbandXref === this.individualXref()
-            ? "wifeXref"
-            : "husbandXref";
-        const oldSpouse = draft.individuals[family[field]];
-        if (oldSpouse) {
-          oldSpouse.parentOfFamilyXrefs = oldSpouse.parentOfFamilyXrefs.filter(
-            (xref) => xref !== familyXref,
-          );
-        }
-        family[field] = spouseXref;
-        draft.individuals[spouseXref]?.parentOfFamilyXrefs.push(familyXref);
+        setFamilyMembers(draft, familyXref, {
+          husbandXref:
+            family.husbandXref === individualXref ? "" : family.husbandXref,
+          wifeXref: family.wifeXref === individualXref ? "" : family.wifeXref,
+          childXrefs: family.childXrefs.filter(
+            (xref) => xref !== individualXref,
+          ),
+        });
       }),
-    );
-  }
-
-  addChild(familyXref: string, childXref: string) {
-    this.addingChildTo.set(undefined);
-    if (!childXref) return;
-    this.value.update(
-      produce((draft) => {
-        const family = draft.families[familyXref];
-        const child = draft.individuals[childXref];
-        if (!family || !child || family.childXrefs.includes(childXref)) return;
-        family.childXrefs.push(childXref);
-        child.childOfFamilyXrefs.push(familyXref);
-      }),
-    );
-  }
-
-  removeChild(familyXref: string, childXref: string) {
-    this.value.update(
-      produce((draft) => {
-        unlink(draft, familyXref, childXref);
-      }),
-    );
-  }
-}
-
-// Removes the links, both ways, between a family and one of its members.
-function unlink(
-  draft: Draft<GedcomDatabase>,
-  familyXref: string,
-  individualXref: string,
-) {
-  const family = draft.families[familyXref];
-  if (family) {
-    if (family.husbandXref === individualXref) family.husbandXref = "";
-    if (family.wifeXref === individualXref) family.wifeXref = "";
-    family.childXrefs = family.childXrefs.filter(
-      (xref) => xref !== individualXref,
-    );
-  }
-  const individual = draft.individuals[individualXref];
-  if (individual) {
-    individual.parentOfFamilyXrefs = individual.parentOfFamilyXrefs.filter(
-      (xref) => xref !== familyXref,
-    );
-    individual.childOfFamilyXrefs = individual.childOfFamilyXrefs.filter(
-      (xref) => xref !== familyXref,
     );
   }
 }
