@@ -4,6 +4,7 @@ import { RouterModule } from "@angular/router";
 import type { GedcomResourceValue } from "../../database/ancestry.service";
 import { fullname } from "../../gedcom/gedcomIndividual";
 import { externalIdentifierLink } from "../../util/external-identifier-link";
+import { describeRelationship } from "../../util/relationship";
 import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
 import type { ComponentWithUnsavedChanges } from "../unsaved-changes.guard";
 
@@ -30,9 +31,28 @@ export class IndividualComponent implements ComponentWithUnsavedChanges {
     if (individual === undefined) {
       return undefined;
     }
+    const rootXref = this.gedcom().rootIndividualXref;
+    const root =
+      rootXref === undefined
+        ? undefined
+        : ancestryDatabase.individuals[rootXref];
     return {
       individual,
       name: fullname(individual),
+      root:
+        root === undefined
+          ? undefined
+          : {
+              xref: root.xref,
+              name: fullname(root) || root.xref,
+              relationship: capitalize(
+                describeRelationship(
+                  ancestryDatabase,
+                  root.xref,
+                  individual.xref,
+                ),
+              ),
+            },
       sex: individual.sex.sex || "Unknown",
       externalIdentifiers: individual.externalIdentifiers.map(
         (externalIdentifier) => ({
@@ -42,4 +62,10 @@ export class IndividualComponent implements ComponentWithUnsavedChanges {
       ),
     };
   });
+}
+
+function capitalize(text: string | undefined): string | undefined {
+  return text === undefined
+    ? undefined
+    : text.charAt(0).toUpperCase() + text.slice(1);
 }

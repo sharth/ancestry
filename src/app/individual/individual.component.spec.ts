@@ -28,6 +28,7 @@ describe("IndividualComponent", () => {
   let component: IndividualComponent;
   let fixture: ComponentFixture<IndividualComponent>;
 
+  const rootIndividualXref = signal<string | undefined>(undefined);
   const ancestryDatabase = signal(
     newGedcomDatabase({
       individuals: {
@@ -152,7 +153,10 @@ describe("IndividualComponent", () => {
         inputBinding(
           "gedcom",
           computed(() =>
-            newGedcomResourceValue({ gedcomDatabase: ancestryDatabase() }),
+            newGedcomResourceValue({
+              gedcomDatabase: ancestryDatabase(),
+              rootIndividualXref: rootIndividualXref(),
+            }),
           ),
         ),
         inputBinding("xref", signal("@I1@")),
@@ -184,5 +188,50 @@ describe("IndividualComponent", () => {
       "https://www.familysearch.org/tree/person/details/KWCB-QS1",
     );
     expect(link?.textContent).toContain("FamilySearch: KWCB-QS1");
+  });
+
+  describe("relationship to the root person", () => {
+    const relationshipText = () => {
+      const heading = Array.from(
+        (fixture.nativeElement as HTMLElement).querySelectorAll("h2"),
+      ).find((h2) => h2.textContent.includes("Relationship"));
+      return heading?.nextElementSibling?.textContent
+        .replace(/\s+/g, " ")
+        .trim();
+    };
+
+    const setRoot = async (xref: string | undefined) => {
+      rootIndividualXref.set(xref);
+      await fixture.whenStable();
+    };
+
+    it("asks for a root person when none is chosen", async () => {
+      await setRoot(undefined);
+      expect(relationshipText()).toBe(
+        "Choose a root person in Settings to see how this person is related to them.",
+      );
+    });
+
+    it("names the relationship from the root person", async () => {
+      await setRoot("@I3@");
+      expect(relationshipText()).toBe("Father of Baby Doe");
+    });
+
+    it("says when this is the root person", async () => {
+      await setRoot("@I1@");
+      expect(relationshipText()).toBe("This is the root person.");
+    });
+
+    it("says when no relationship is found", async () => {
+      ancestryDatabase.update((database) => ({
+        ...database,
+        individuals: {
+          ...database.individuals,
+          "@I4@": newGedcomIndividual({ xref: "@I4@" }),
+        },
+      }));
+      await setRoot("@I4@");
+      expect(relationshipText()).toBe("No relationship to @I4@ found.");
+    });
   });
 });
