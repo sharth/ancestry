@@ -1,0 +1,36 @@
+@if (problems().length === 0) {
+  <p>Parsing the file found no problems.</p>
+} @else {
+  <p>
+    Parsing the file found these problems. Problems at the same path are counted
+    together, with where the first one is.
+  </p>
+  <app-validation-table
+    [columns]="[
+      'Path',
+      'Severity',
+      'Message',
+      'Count',
+      'First line',
+      'First record',
+    ]"
+    [rows]="rows()"
+  >
+    <ng-template let-row>
+      <div role="cell">{{ row.first.path }}</div>
+      <div role="cell">
+        {{ row.first.severity === "error" ? "Error" : "Warning" }}
+      </div>
+      <div role="cell">{{ row.first.message }}</div>
+      <div role="cell">{{ row.count }}</div>
+      <div role="cell">{{ row.first.line }}</div>
+      <div role="cell">
+        @if (row.recordPage; as page) {
+          <a [routerLink]="[page, row.first.xref]">{{ row.first.xref }}</a>
+        } @else {
+          {{ row.first.xref }}
+        }
+      </div>
+    </ng-template>
+  </app-validation-table>
+}

@@ -17,6 +17,7 @@ import {
 } from "../gedcom/gedcomDatabase";
 import { parseGedcomRecords, type GedcomRecord } from "../gedcom/gedcomRecord";
 import { copyFileToPath, fileExistsAtPath } from "../util/file-system";
+import type { GedcomProblem } from "../util/record-unparsed-records";
 
 export const BUILTIN_GEDCOM_URL = "assets/samples/royal-family.ged";
 
@@ -57,6 +58,8 @@ export interface GedcomResourceValue {
   gedcomText: string;
   gedcomRecords: GedcomRecord[];
   gedcomDatabase: GedcomDatabase;
+  /** What parsing found wrong with the file, short of failing. */
+  gedcomProblems: GedcomProblem[];
   directoryHandle: FileSystemDirectoryHandle | undefined;
   // The person relationships are described from, chosen in settings. It
   // may name someone who isn't in the file.
@@ -73,6 +76,7 @@ export function newGedcomResourceValue(
     gedcomText: "",
     gedcomRecords: [],
     gedcomDatabase: newGedcomDatabase(),
+    gedcomProblems: [],
     directoryHandle: undefined,
     rootIndividualXref: undefined,
     ...fieldsToUpdate,
@@ -92,13 +96,15 @@ async function loadGedcom(
     const response = await fetch(BUILTIN_GEDCOM_URL);
     const gedcomText = await response.text();
     const gedcomRecords = parseGedcomRecords(gedcomText);
+    const gedcomProblems: GedcomProblem[] = [];
     return {
       dataSource,
       gedcomFileHandle: undefined,
       gedcomFile: undefined,
       gedcomText,
       gedcomRecords,
-      gedcomDatabase: parseGedcomDatabase(gedcomRecords),
+      gedcomDatabase: parseGedcomDatabase(gedcomRecords, gedcomProblems),
+      gedcomProblems,
       directoryHandle: undefined,
       rootIndividualXref,
     };
@@ -116,6 +122,7 @@ async function loadGedcom(
   const gedcomFile = await gedcomFileHandle.getFile();
   const gedcomText = await gedcomFile.text();
   const gedcomRecords = parseGedcomRecords(gedcomText);
+  const gedcomProblems: GedcomProblem[] = [];
 
   return {
     dataSource,
@@ -123,7 +130,8 @@ async function loadGedcom(
     gedcomFile,
     gedcomText,
     gedcomRecords,
-    gedcomDatabase: parseGedcomDatabase(gedcomRecords),
+    gedcomDatabase: parseGedcomDatabase(gedcomRecords, gedcomProblems),
+    gedcomProblems,
     directoryHandle,
     rootIndividualXref,
   };

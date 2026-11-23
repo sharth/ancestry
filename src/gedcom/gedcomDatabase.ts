@@ -1,6 +1,8 @@
 import {
+  clearUnparsedRecords,
+  collectUnparsedRecords,
   reportUnparsedRecord,
-  warnUnparsedRecords,
+  type GedcomProblem,
 } from "../util/record-unparsed-records";
 import { newGedcomChangeDate, type GedcomChangeDate } from "./gedcomChangeDate";
 import {
@@ -75,7 +77,13 @@ export function newGedcomDatabase(
   };
 }
 
-export function parseGedcomDatabase(gedcomRecords: GedcomRecord[]) {
+/** Parses `gedcomRecords`, appending anything wrong with them that doesn't
+ * stop the parse to `problems`. */
+export function parseGedcomDatabase(
+  gedcomRecords: GedcomRecord[],
+  problems: GedcomProblem[] = [],
+) {
+  clearUnparsedRecords();
   const gedcomDatabase = newGedcomDatabase();
   const headers: GedcomHeader[] = [];
   const trailers: GedcomTrailer[] = [];
@@ -123,7 +131,7 @@ export function parseGedcomDatabase(gedcomRecords: GedcomRecord[]) {
         break;
     }
   }
-  warnUnparsedRecords(gedcomRecords);
+  problems.push(...collectUnparsedRecords(gedcomRecords));
 
   // For whatever reason, GEDCOM has the family references in both the FAM and INDI.
   // Ensure that these are consistent.

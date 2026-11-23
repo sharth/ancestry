@@ -30,6 +30,7 @@ const tabs = [
   { id: "bibliography-without-title", label: "Bibliography without title" },
   { id: "tree-ids", label: "Tree ids" },
   { id: "outdated-urls", label: "Outdated URLs" },
+  { id: "gedcom-problems", label: "GEDCOM problems" },
 ] as const;
 
 type TabId = (typeof tabs)[number]["id"];
@@ -67,6 +68,7 @@ export class ValidationComponent {
       "tree-ids": findTreeIdsToConvert(database).length,
       "outdated-urls": findOutdatedUrls(database).length,
       "duplicate-sources": findDuplicateSources(database).length,
+      "gedcom-problems": this.gedcom().gedcomProblems.length,
     };
   });
 }
