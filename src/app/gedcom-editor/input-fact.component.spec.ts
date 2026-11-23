@@ -9,6 +9,7 @@ import {
   gedcomFamilyFacts,
   gedcomIndividualFacts,
 } from "../../gedcom/gedcomFactMetadata";
+import { GEDCOM_EDITOR } from "./gedcom-editor-interface";
 import { InputFactComponent } from "./input-fact.component";
 
 describe("InputFactComponent", () => {
@@ -78,5 +79,42 @@ describe("InputFactComponent", () => {
     await fixture.whenStable();
     expect(tagValues()).toContain("MARR");
     expect(tagValues()).not.toContain("BIRT");
+  });
+});
+
+describe("InputFactComponent fact type lock", () => {
+  async function renderFact(saved: boolean) {
+    const fact = newGedcomFact({ tag: "BIRT" });
+    const { fixture } = await render(InputFactComponent, {
+      bindings: [
+        inputBinding("workingDatabase", signal(newGedcomDatabase())),
+        inputBinding("value", signal(fact)),
+        inputBinding("tags", signal(gedcomIndividualFacts)),
+      ],
+      providers: [
+        {
+          provide: GEDCOM_EDITOR,
+          useValue: {
+            savedFactIds: signal(new Set(saved ? [fact.id] : [])),
+          },
+        },
+      ],
+      waitForStableOnRender: true,
+    });
+    return fixture.nativeElement as HTMLElement;
+  }
+
+  it("shows a saved fact's type read-only", async () => {
+    const element = await renderFact(true);
+    const tag = within(element).getByLabelText<HTMLInputElement>("Tag");
+    expect(tag.tagName).toBe("INPUT");
+    expect(tag.readOnly).toBe(true);
+    expect(tag.value).toBe("Birth");
+  });
+
+  it("lets a new fact choose its type", async () => {
+    const element = await renderFact(false);
+    const tag = within(element).getByLabelText("Tag");
+    expect(tag.tagName).toBe("SELECT");
   });
 });

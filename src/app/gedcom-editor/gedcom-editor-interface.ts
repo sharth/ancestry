@@ -1,4 +1,4 @@
-import { InjectionToken } from "@angular/core";
+import { InjectionToken, type Signal } from "@angular/core";
 
 export interface TabInformation {
   type: "INDI" | "SOUR" | "FAM" | "REPO" | "OBJE" | "SUBM";
@@ -16,6 +16,10 @@ export interface GedcomEditorInterface {
   openSource(xref: string): void;
   openNewFamily(): string;
   openFamily(xref: string): void;
+  // The ids (see GedcomFact.id) of the facts in the file as it was loaded. A
+  // fact's type can only be changed while the fact is new, so that a Birth
+  // with citations can't be turned into a Death by accident.
+  readonly savedFactIds: Signal<ReadonlySet<number>>;
 }
 
 export const GEDCOM_EDITOR = new InjectionToken<GedcomEditorInterface>(
