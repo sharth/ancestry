@@ -23,7 +23,6 @@ export function describeRelationship(
   if (root === undefined || target === undefined) return undefined;
   if (root === target) return "self";
 
-  // A spouse who is also a cousin is still called a spouse.
   const path = spouseOf(gedcomDatabase, root, target)
     ? [{ kind: "spouse" as const, individual: target }]
     : findPath(gedcomDatabase, root, target);
