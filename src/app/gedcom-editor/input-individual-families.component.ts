@@ -30,7 +30,6 @@ import {
 export class InputIndividualFamiliesComponent implements FormValueControl<GedcomDatabase> {
   readonly gedcomEditor = inject(GEDCOM_EDITOR, { optional: true });
 
-  readonly workingDatabase = input.required<GedcomDatabase>();
   readonly individualXref = input.required<string>();
   readonly value = model<GedcomDatabase>(newGedcomDatabase());
   readonly form = form(this.value);
@@ -40,7 +39,7 @@ export class InputIndividualFamiliesComponent implements FormValueControl<Gedcom
   }
 
   childOfFamilyLabel(familyXref: string): string {
-    const family = this.workingDatabase().families[familyXref];
+    const family = this.value().families[familyXref];
     const parents = [family?.husbandXref, family?.wifeXref]
       .map((xref) => this.individualLabel(xref ?? ""))
       .filter((label) => label !== "");
@@ -53,7 +52,7 @@ export class InputIndividualFamiliesComponent implements FormValueControl<Gedcom
   }
 
   private individualLabel(xref: string): string {
-    const name = this.workingDatabase().individuals[xref]?.names.at(0);
+    const name = this.value().individuals[xref]?.names.at(0);
     return (name ? displayGedcomName(name) : "") || xref;
   }
 
@@ -66,7 +65,7 @@ export class InputIndividualFamiliesComponent implements FormValueControl<Gedcom
 
   // A new family with this individual as husband or wife (by sex).
   addSpouseFamily() {
-    const familyXref = calculateNextFamilyXref(this.workingDatabase());
+    const familyXref = calculateNextFamilyXref(this.value());
     const individualXref = this.individualXref();
     const isWife = this.individual()?.sex.sex === "F";
     this.value.update(

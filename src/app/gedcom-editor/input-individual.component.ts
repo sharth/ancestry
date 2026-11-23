@@ -32,7 +32,6 @@ import { InputUnknownRecordsComponent } from "./input-unknown-records.component"
   styleUrl: "./input.component.css",
 })
 export class InputIndividualComponent implements FormValueControl<GedcomDatabase> {
-  readonly workingDatabase = input.required<GedcomDatabase>();
   readonly individualXref = input.required<string>();
   readonly value = model<GedcomDatabase>(newGedcomDatabase());
   readonly form = form(this.value);

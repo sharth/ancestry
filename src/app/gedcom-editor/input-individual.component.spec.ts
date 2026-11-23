@@ -3,7 +3,6 @@ import type { ComponentFixture } from "@angular/core/testing";
 import { render } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { InputIndividualComponent } from "./input-individual.component";
 
 describe("InputIndividualComponent", () => {
@@ -12,10 +11,7 @@ describe("InputIndividualComponent", () => {
 
   beforeEach(async () => {
     const renderResult = await render(InputIndividualComponent, {
-      bindings: [
-        inputBinding("workingDatabase", signal(newGedcomDatabase())),
-        inputBinding("individualXref", signal("@I1@")),
-      ],
+      bindings: [inputBinding("individualXref", signal("@I1@"))],
       waitForStableOnRender: true,
     });
 

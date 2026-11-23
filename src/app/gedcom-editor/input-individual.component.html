@@ -1,38 +1,37 @@
 @if (individual(); as individual) {
   <app-input-individual-names
     [formField]="individual.names"
-    [workingDatabase]="workingDatabase()"
+    [workingDatabase]="value()"
   ></app-input-individual-names>
 
   <app-input-individual-sex
     [formField]="individual.sex"
-    [workingDatabase]="workingDatabase()"
+    [workingDatabase]="value()"
   ></app-input-individual-sex>
 
   <app-input-individual-facts
     [formField]="individual.facts"
-    [workingDatabase]="workingDatabase()"
+    [workingDatabase]="value()"
   ></app-input-individual-facts>
 
   <app-input-individual-families
     [formField]="form"
-    [workingDatabase]="workingDatabase()"
     [individualXref]="individualXref()"
   ></app-input-individual-families>
 
   <app-input-external-identifiers
     [formField]="individual.externalIdentifiers"
-    [workingDatabase]="workingDatabase()"
+    [workingDatabase]="value()"
   ></app-input-external-identifiers>
 
   <app-input-notes
     [collapseWhenEmpty]="false"
     [formField]="individual.notes"
-    [workingDatabase]="workingDatabase()"
+    [workingDatabase]="value()"
   ></app-input-notes>
 
   <app-input-unknown-records
     [formField]="individual.unknownRecords"
-    [workingDatabase]="workingDatabase()"
+    [workingDatabase]="value()"
   ></app-input-unknown-records>
 }

@@ -64,7 +64,6 @@ describe("InputIndividualFamiliesComponent", () => {
     value.set(database());
     await render(InputIndividualFamiliesComponent, {
       bindings: [
-        inputBinding("workingDatabase", signal(database())),
         inputBinding("individualXref", signal("@I1@")),
         twoWayBinding("value", value),
       ],
@@ -138,7 +137,6 @@ describe("InputIndividualFamiliesComponent without an editor", () => {
   it("disables the open buttons", async () => {
     await render(InputIndividualFamiliesComponent, {
       bindings: [
-        inputBinding("workingDatabase", signal(database())),
         inputBinding("individualXref", signal("@I1@")),
         inputBinding("value", signal(database())),
       ],
