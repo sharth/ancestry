@@ -52,8 +52,6 @@ function findPath(
   }
   const visited = new Set<string>();
 
-  // Breadth first within each marriage count; a step to a spouse is queued
-  // for the next count.
   let queue: State[] = [{ individual: root, goingDown: false, path: [] }];
   while (queue.length > 0) {
     const nextQueue: State[] = [];
@@ -71,7 +69,17 @@ function findPath(
           goingDown: step.kind === "child",
           path: [...path, step],
         };
-        (step.kind === "spouse" ? nextQueue : queue).push(next);
+        // `queue` holds paths with the current number of marriages, so a
+        // parent or child step stays in it and is searched this round. A
+        // spouse step adds a marriage, so it waits in `nextQueue` until
+        // every path with fewer marriages has been tried: the target is
+        // only reached through a marriage if no blood path (or path with
+        // fewer marriages) exists.
+        if (step.kind === "spouse") {
+          nextQueue.push(next);
+        } else {
+          queue.push(next);
+        }
       }
     }
     queue = nextQueue;
