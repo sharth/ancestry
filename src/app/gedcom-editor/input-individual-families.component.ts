@@ -69,66 +69,72 @@ export class InputIndividualFamiliesComponent implements FormValueControl<Gedcom
   // A new family with this individual as husband or wife (by sex).
   addSpouseFamily() {
     const familyXref = calculateNextFamilyXref(this.workingDatabase());
-    this.edit((draft) => {
-      const individual = draft.individuals[this.individualXref()];
-      if (!individual) return;
-      const isWife = individual.sex.sex === "F";
-      draft.families[familyXref] = newGedcomFamily({
-        xref: familyXref,
-        husbandXref: isWife ? "" : individual.xref,
-        wifeXref: isWife ? individual.xref : "",
-      });
-      individual.parentOfFamilyXrefs.push(familyXref);
-    });
+    this.value.update(
+      produce((draft) => {
+        const individual = draft.individuals[this.individualXref()];
+        if (!individual) return;
+        const isWife = individual.sex.sex === "F";
+        draft.families[familyXref] = newGedcomFamily({
+          xref: familyXref,
+          husbandXref: isWife ? "" : individual.xref,
+          wifeXref: isWife ? individual.xref : "",
+        });
+        individual.parentOfFamilyXrefs.push(familyXref);
+      }),
+    );
   }
 
   // Takes this individual out of the family, as a spouse or a child.
   removeFromFamily(familyXref: string) {
-    this.edit((draft) => {
-      unlink(draft, familyXref, this.individualXref());
-    });
+    this.value.update(
+      produce((draft) => {
+        unlink(draft, familyXref, this.individualXref());
+      }),
+    );
   }
 
   changeSpouse(familyXref: string, spouseXref: string) {
     if (spouseXref === this.individualXref()) return;
-    this.edit((draft) => {
-      const family = draft.families[familyXref];
-      if (!family) return;
-      const field =
-        family.husbandXref === this.individualXref()
-          ? "wifeXref"
-          : "husbandXref";
-      const oldSpouse = draft.individuals[family[field]];
-      if (oldSpouse) {
-        oldSpouse.parentOfFamilyXrefs = oldSpouse.parentOfFamilyXrefs.filter(
-          (xref) => xref !== familyXref,
-        );
-      }
-      family[field] = spouseXref;
-      draft.individuals[spouseXref]?.parentOfFamilyXrefs.push(familyXref);
-    });
+    this.value.update(
+      produce((draft) => {
+        const family = draft.families[familyXref];
+        if (!family) return;
+        const field =
+          family.husbandXref === this.individualXref()
+            ? "wifeXref"
+            : "husbandXref";
+        const oldSpouse = draft.individuals[family[field]];
+        if (oldSpouse) {
+          oldSpouse.parentOfFamilyXrefs = oldSpouse.parentOfFamilyXrefs.filter(
+            (xref) => xref !== familyXref,
+          );
+        }
+        family[field] = spouseXref;
+        draft.individuals[spouseXref]?.parentOfFamilyXrefs.push(familyXref);
+      }),
+    );
   }
 
   addChild(familyXref: string, childXref: string) {
     this.addingChildTo.set(undefined);
     if (!childXref) return;
-    this.edit((draft) => {
-      const family = draft.families[familyXref];
-      const child = draft.individuals[childXref];
-      if (!family || !child || family.childXrefs.includes(childXref)) return;
-      family.childXrefs.push(childXref);
-      child.childOfFamilyXrefs.push(familyXref);
-    });
+    this.value.update(
+      produce((draft) => {
+        const family = draft.families[familyXref];
+        const child = draft.individuals[childXref];
+        if (!family || !child || family.childXrefs.includes(childXref)) return;
+        family.childXrefs.push(childXref);
+        child.childOfFamilyXrefs.push(familyXref);
+      }),
+    );
   }
 
   removeChild(familyXref: string, childXref: string) {
-    this.edit((draft) => {
-      unlink(draft, familyXref, childXref);
-    });
-  }
-
-  private edit(recipe: (draft: Draft<GedcomDatabase>) => void) {
-    this.value.update((database) => produce(database, recipe));
+    this.value.update(
+      produce((draft) => {
+        unlink(draft, familyXref, childXref);
+      }),
+    );
   }
 }
 
