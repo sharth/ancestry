@@ -134,6 +134,21 @@ async function loadGedcom(
   };
 }
 
+/** Thrown by AncestryService.updateGedcomDatabase() when the file on disk
+ * no longer matches what was loaded, so saving would overwrite someone
+ * else's changes. Nothing is written. */
+export class GedcomFileChangedError extends Error {
+  constructor() {
+    super(
+      "The GEDCOM file was changed after this page loaded it, maybe by " +
+        "another tab. Nothing was saved, so those changes are safe. " +
+        "Reload the page to get the latest version, then make your edit " +
+        "again.",
+    );
+    this.name = "GedcomFileChangedError";
+  }
+}
+
 export async function findGedcomFilenames(
   directoryHandle: FileSystemDirectoryHandle,
 ): Promise<string[]> {
@@ -215,10 +230,18 @@ export class AncestryService {
     );
   }
 
+  /** Saves `gedcomDatabase`, an edit of the loaded database. Throws
+   * GedcomFileChangedError, writing nothing, if the file on disk no longer
+   * matches what was loaded (another tab or program saved it since):
+   * writing anyway would silently throw those changes away. */
   async updateGedcomDatabase(gedcomDatabase: GedcomDatabase) {
     const gedcomResource = this.gedcomResource.value();
     if (gedcomResource?.gedcomFileHandle == undefined) {
       throw new Error("No GEDCOM file handle available");
+    }
+    const currentFile = await gedcomResource.gedcomFileHandle.getFile();
+    if ((await currentFile.text()) !== gedcomResource.gedcomText) {
+      throw new GedcomFileChangedError();
     }
 
     const text = serializeGedcomDatabase(
