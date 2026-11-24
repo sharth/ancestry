@@ -10,8 +10,12 @@ import {
 } from "./unsaved-changes.guard";
 
 describe("confirmUnsavedChangesGuard", () => {
+  // The guard only reads the component, so empty fakes stand in for the router snapshots.
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-class-instance-assignment
   const currentRoute = {} as ActivatedRouteSnapshot;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-class-instance-assignment
   const currentState = {} as RouterStateSnapshot;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-class-instance-assignment
   const nextState = {} as RouterStateSnapshot;
 
   afterEach(() => {
