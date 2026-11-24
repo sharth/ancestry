@@ -44,6 +44,17 @@ describe("GedcomEditorDialogComponent", () => {
     expect(component.editDialog().nativeElement.open).toBe(true);
   });
 
+  it("reloads a changed file before opening", async () => {
+    vi.spyOn(ancestryService, "requestWritePermission").mockResolvedValue(true);
+    const checkSpy = vi
+      .spyOn(ancestryService, "reloadIfFileChanged")
+      .mockResolvedValue();
+
+    await component.showModal();
+
+    expect(checkSpy).toHaveBeenCalled();
+  });
+
   // These tests stub out the nested <app-gedcom-editor> rather than
   // actually opening the dialog: the real child renders a Signal Forms
   // form over an immer-produced (and therefore deep-frozen) working
