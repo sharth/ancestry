@@ -217,21 +217,17 @@ export class AncestryService {
 
   async updateGedcomDatabase(gedcomDatabase: GedcomDatabase) {
     const gedcomResource = this.gedcomResource.value();
-    const originalGedcomRecords = gedcomResource?.gedcomRecords ?? [];
-    const originalGedcomDatabase =
-      this.gedcomResource.value()?.gedcomDatabase ?? newGedcomDatabase();
-    const text = serializeGedcomDatabase(
-      originalGedcomRecords,
-      originalGedcomDatabase,
-      gedcomDatabase,
-    );
-
-    const gedcomFileHandle = this.gedcomResource.value()?.gedcomFileHandle;
-    if (gedcomFileHandle == undefined) {
+    if (gedcomResource?.gedcomFileHandle == undefined) {
       throw new Error("No GEDCOM file handle available");
     }
 
-    const writableStream = await gedcomFileHandle.createWritable();
+    const text = serializeGedcomDatabase(
+      gedcomResource.gedcomRecords,
+      gedcomResource.gedcomDatabase,
+      gedcomDatabase,
+    );
+    const writableStream =
+      await gedcomResource.gedcomFileHandle.createWritable();
     await writableStream.write(text.join("\n"));
     await writableStream.write("\n");
     await writableStream.close();
