@@ -178,10 +178,10 @@ describe("GedcomEditorComponent Integration", () => {
       fixture.detectChanges();
       await fixture.whenStable();
 
-      // The spouse family's Husband and Wife pickers; @I0@ is the husband.
-      const [, wife] = (
+      // @I0@ is the husband, so the spouse family only shows the Wife picker.
+      const wife = (
         fixture.nativeElement as HTMLElement
-      ).querySelectorAll<HTMLSelectElement>(
+      ).querySelector<HTMLSelectElement>(
         "app-input-individual-families app-input-individual-xref select",
       );
       assert.isOk(wife);

@@ -1,17 +1,21 @@
 @if (family(); as family) {
-  <app-input-individual-xref
-    [value]="family.husbandXref"
-    label="Husband"
-    (valueChange)="updateFamilyMembers({ husbandXref: $event })"
-    [workingDatabase]="value()"
-  ></app-input-individual-xref>
+  @if (!spouseXref() || family.husbandXref !== spouseXref()) {
+    <app-input-individual-xref
+      [value]="family.husbandXref"
+      label="Husband"
+      (valueChange)="updateFamilyMembers({ husbandXref: $event })"
+      [workingDatabase]="value()"
+    ></app-input-individual-xref>
+  }
 
-  <app-input-individual-xref
-    [value]="family.wifeXref"
-    label="Wife"
-    (valueChange)="updateFamilyMembers({ wifeXref: $event })"
-    [workingDatabase]="value()"
-  ></app-input-individual-xref>
+  @if (!spouseXref() || family.wifeXref !== spouseXref()) {
+    <app-input-individual-xref
+      [value]="family.wifeXref"
+      label="Wife"
+      (valueChange)="updateFamilyMembers({ wifeXref: $event })"
+      [workingDatabase]="value()"
+    ></app-input-individual-xref>
+  }
 
   <app-input-family-children
     [value]="family.childXrefs"

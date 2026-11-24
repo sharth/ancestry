@@ -80,15 +80,23 @@ describe("InputIndividualFamiliesComponent", () => {
   });
 
   it("opens the spouse family, labelled with the other spouse", () => {
-    const button = screen.getByRole("button", { name: /Spouse in/ });
-    expect(button.textContent).toContain("Mary /Jones/");
-    button.click();
+    expect(screen.getByText(/Spouse in/).textContent).toContain("Mary /Jones/");
+    const [, spouseIn] = screen.getAllByTitle(
+      "Edit this family in a session tab",
+    );
+    spouseIn?.click();
     expect(openFamily).toHaveBeenCalledWith("@F2@");
   });
 
   it("opens the family the individual is a child of", () => {
-    screen.getByRole("button", { name: /Child of/ }).click();
+    const [childOf] = screen.getAllByTitle("Edit this family in a session tab");
+    childOf?.click();
     expect(openFamily).toHaveBeenCalledWith("@F1@");
+  });
+
+  it("shows only the other spouse's picker in the family editor", () => {
+    expect(screen.queryByText("Husband", { selector: "label" })).toBeNull();
+    expect(screen.getByText("Wife", { selector: "label" })).toBeTruthy();
   });
 
   it("removes the individual from a family they are a child of, on both sides", async () => {
@@ -134,7 +142,7 @@ describe("InputIndividualFamiliesComponent", () => {
 });
 
 describe("InputIndividualFamiliesComponent without an editor", () => {
-  it("disables the open buttons", async () => {
+  it("disables the Edit buttons", async () => {
     await render(InputIndividualFamiliesComponent, {
       bindings: [
         inputBinding("individualXref", signal("@I1@")),
@@ -142,13 +150,10 @@ describe("InputIndividualFamiliesComponent without an editor", () => {
       ],
       waitForStableOnRender: true,
     });
-    expect(screen.getByRole("button", { name: /Spouse in/ })).toHaveProperty(
-      "disabled",
-      true,
-    );
-    expect(screen.getByRole("button", { name: /Child of/ })).toHaveProperty(
-      "disabled",
-      true,
-    );
+    for (const button of screen.getAllByTitle(
+      "Edit this family in a session tab",
+    )) {
+      expect(button).toHaveProperty("disabled", true);
+    }
   });
 });

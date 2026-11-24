@@ -34,6 +34,9 @@ type FamilyMembers = Pick<
 })
 export class InputFamilyComponent implements FormValueControl<GedcomDatabase> {
   readonly xref = input.required<string>();
+  // Set when the family is shown on one of its spouses' own editor, which
+  // leaves out that spouse's picker: they leave the family from there.
+  readonly spouseXref = input<string>();
   readonly value = model<GedcomDatabase>(newGedcomDatabase());
   readonly form = form(this.value);
 

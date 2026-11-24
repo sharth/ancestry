@@ -14,14 +14,18 @@
         title="Remove this person from the family"
         (click)="removeFromFamily(familyXref)"
       ></button>
+      <span
+        ><i class="bi bi-people me-1"></i
+        >{{ childOfFamilyLabel(familyXref) }}</span
+      >
       <button
         type="button"
-        class="btn btn-sm btn-outline-secondary"
+        class="btn btn-sm btn-outline-secondary text-nowrap"
         [disabled]="!gedcomEditor"
         (click)="gedcomEditor?.openFamily(familyXref)"
         title="Edit this family in a session tab"
       >
-        <i class="bi bi-people me-1"></i>{{ childOfFamilyLabel(familyXref) }}
+        <i class="bi bi-pencil"></i> Edit
       </button>
     </div>
   }
@@ -35,21 +39,23 @@
           title="Remove this person from the family"
           (click)="removeFromFamily(familyXref)"
         ></button>
+        <i class="bi bi-people me-1"></i>{{ parentOfFamilyLabel(familyXref) }}
         <button
           type="button"
-          class="btn btn-sm btn-outline-secondary"
+          class="btn btn-sm btn-outline-secondary text-nowrap ms-2"
           [disabled]="!gedcomEditor"
           (click)="
             $event.preventDefault(); gedcomEditor?.openFamily(familyXref)
           "
           title="Edit this family in a session tab"
         >
-          <i class="bi bi-people me-1"></i>{{ parentOfFamilyLabel(familyXref) }}
+          <i class="bi bi-pencil"></i> Edit
         </button>
       </summary>
       <app-input-family
         [formField]="form"
         [xref]="familyXref"
+        [spouseXref]="individualXref()"
       ></app-input-family>
     </details>
   }
