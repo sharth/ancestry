@@ -144,6 +144,17 @@ describe("ValidationTableComponent", () => {
     expect(updateGedcomDatabaseSpy).not.toHaveBeenCalled();
   });
 
+  it("tells the user when saving a fix fails", async () => {
+    const { table, updateGedcomDatabaseSpy } = await setup();
+    updateGedcomDatabaseSpy.mockRejectedValue(new Error("disk full"));
+    const alertSpy = vi.spyOn(window, "alert").mockReturnValue(undefined);
+    vi.spyOn(console, "error").mockReturnValue(undefined);
+
+    await table.submit(fixedDatabase);
+
+    expect(alertSpy).toHaveBeenCalledWith("Couldn't save: disk full");
+  });
+
   // The preview goes through the same diff the save path writes from, so
   // it can't drift from what actually gets written to disk.
   it("builds each preview from AncestryService.gedcomDatabaseDifferences", async () => {

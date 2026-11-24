@@ -31,6 +31,7 @@ import {
   calculateNextSourceXref,
   calculateNextSubmitterXref,
 } from "../../util/next-xref";
+import { saveOrAlert } from "../../util/save-or-alert";
 import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
 import {
   GEDCOM_EDITOR,
@@ -360,15 +361,13 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     event.preventDefault();
     // Any failure (a taken path, a write error) leaves the dialog open with
     // the edits intact, so the user can fix it and submit again.
-    try {
+    const saved = await saveOrAlert(async () => {
       await this.copyPendingMultimediaFiles();
       await this.ancestryService.updateGedcomDatabase(this.workingDatabase());
-    } catch (error) {
-      console.error(error);
-      alert(`Couldn't save: ${(error as Error).message}`);
-      return;
+    });
+    if (saved) {
+      this.finished.emit();
     }
-    this.finished.emit();
   }
 
   cancelForm() {
