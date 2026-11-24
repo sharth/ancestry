@@ -1,0 +1,32 @@
+@for (error of errorReporter.errors(); track error) {
+  <div class="alert alert-danger shadow-sm" role="alert">
+    <div class="d-flex align-items-start gap-2">
+      <i class="bi-exclamation-triangle-fill"></i>
+      <div class="flex-grow-1 text-break">
+        <strong>Something went wrong.</strong>
+        {{ error.message }}
+        @if (error.count > 1) {
+          <span class="badge text-bg-danger">×{{ error.count }}</span>
+        }
+      </div>
+      <button
+        type="button"
+        class="btn-close"
+        aria-label="Dismiss"
+        (click)="errorReporter.dismiss(error)"
+      ></button>
+    </div>
+    <details class="mt-2">
+      <summary>Details</summary>
+      <pre class="mt-2 mb-2">{{ error.details }}</pre>
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-danger"
+        (click)="copy(error)"
+      >
+        <i class="bi-clipboard"></i>
+        {{ copied() === error ? "Copied" : "Copy" }}
+      </button>
+    </details>
+  </div>
+}
