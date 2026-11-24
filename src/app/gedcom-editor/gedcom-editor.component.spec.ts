@@ -182,6 +182,12 @@ describe("GedcomEditorComponent Integration", () => {
       expect(component.hasUnsavedChanges()).toBe(true);
     });
 
+    it("doesn't hand the deleted record's xref out again", () => {
+      component.deleteRecord(newIndividual);
+
+      expect(component.openNewIndividual()).toBe("@I2@");
+    });
+
     it("doesn't recreate the deleted record when another tab opens", () => {
       component.deleteRecord(newIndividual);
 

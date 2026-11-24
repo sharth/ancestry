@@ -118,6 +118,16 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     return newGedcomDatabase();
   });
 
+  // workingDatabase() with the deleted records put back, so a new record
+  // doesn't take a deleted one's xref (which Undo would then clash with).
+  private readonly workingDatabaseWithDeleted = computed(() => {
+    const deleted = this.deletedDatabase();
+    return produce(this.workingDatabase(), (draft) => {
+      for (const key of Object.values(recordsKeys))
+        Object.assign(draft[key], deleted[key]);
+    });
+  });
+
   // Signal Forms only creates a field node when something reads it, so this
   // costs nothing for records that aren't open. That relies on
   // patches/@angular+forms+*.patch until angular/angular#70627 is
@@ -145,7 +155,7 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   );
 
   openNewIndividual(): string {
-    const xref = calculateNextIndividualXref(this.workingDatabase());
+    const xref = calculateNextIndividualXref(this.workingDatabaseWithDeleted());
     this.openNewTab({ type: "INDI", xref });
     return xref;
   }
@@ -155,7 +165,7 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   }
 
   openNewMultimedia(): string {
-    const xref = calculateNextMultimediaXref(this.workingDatabase());
+    const xref = calculateNextMultimediaXref(this.workingDatabaseWithDeleted());
     this.openNewTab({ type: "OBJE", xref });
     return xref;
   }
@@ -165,7 +175,7 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   }
 
   openNewRepository(): string {
-    const xref = calculateNextRepositoryXref(this.workingDatabase());
+    const xref = calculateNextRepositoryXref(this.workingDatabaseWithDeleted());
     this.openNewTab({ type: "REPO", xref });
     return xref;
   }
@@ -175,7 +185,7 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   }
 
   openNewSource(): string {
-    const xref = calculateNextSourceXref(this.workingDatabase());
+    const xref = calculateNextSourceXref(this.workingDatabaseWithDeleted());
     this.openNewTab({ type: "SOUR", xref });
     return xref;
   }
@@ -185,7 +195,7 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   }
 
   openNewFamily(): string {
-    const xref = calculateNextFamilyXref(this.workingDatabase());
+    const xref = calculateNextFamilyXref(this.workingDatabaseWithDeleted());
     this.openNewTab({ type: "FAM", xref });
     return xref;
   }
