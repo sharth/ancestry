@@ -10,11 +10,13 @@ import { IdGenerator } from "../../util/id-generator";
   imports: [FormField],
   templateUrl: "./input-notes.component.html",
   styleUrl: "./input.component.css",
-  host: { "[class.empty-list]": "form.length === 0" },
+  host: { "[class.empty-list]": "collapseWhenEmpty() && form.length === 0" },
 })
 export class InputNotesComponent implements FormValueControl<GedcomNote[]> {
   readonly id = inject(IdGenerator).getId("input-notes");
   readonly workingDatabase = input.required<GedcomDatabase>();
+  /** Show only an add button, not a whole section, while the list is empty. */
+  readonly collapseWhenEmpty = input(true);
   readonly value = model<GedcomNote[]>([]);
   readonly form = form(this.value);
 

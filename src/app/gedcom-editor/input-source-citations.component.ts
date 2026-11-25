@@ -28,13 +28,15 @@ import { InputSourceXrefComponent } from "./input-source-xref.component";
   ],
   templateUrl: "./input-source-citations.component.html",
   styleUrl: "./input.component.css",
-  host: { "[class.empty-list]": "form.length === 0" },
+  host: { "[class.empty-list]": "collapseWhenEmpty() && form.length === 0" },
 })
 export class InputSourceCitationsComponent implements FormValueControl<
   GedcomSourceCitation[]
 > {
   readonly id = inject(IdGenerator).getId("input-source-citations");
   readonly workingDatabase = input.required<GedcomDatabase>();
+  /** Show only an add button, not a whole section, while the list is empty. */
+  readonly collapseWhenEmpty = input(true);
   readonly value = model<GedcomSourceCitation[]>([]);
   readonly form = form(this.value);
 

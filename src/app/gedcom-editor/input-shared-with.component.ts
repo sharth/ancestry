@@ -18,13 +18,15 @@ import { InputIndividualXrefComponent } from "./input-individual-xref.component"
   imports: [FormField, InputIndividualXrefComponent],
   templateUrl: "./input-shared-with.component.html",
   styleUrl: "./input.component.css",
-  host: { "[class.empty-list]": "form.length === 0" },
+  host: { "[class.empty-list]": "collapseWhenEmpty() && form.length === 0" },
 })
 export class InputSharedWithComponent implements FormValueControl<
   GedcomFactSharedWith[]
 > {
   readonly id = inject(IdGenerator).getId("input-shared-with");
   readonly workingDatabase = input.required<GedcomDatabase>();
+  /** Show only an add button, not a whole section, while the list is empty. */
+  readonly collapseWhenEmpty = input(true);
   readonly value = model<GedcomFactSharedWith[]>([]);
   readonly form = form(this.value);
 
