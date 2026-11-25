@@ -1,6 +1,7 @@
 import { inputBinding, signal } from "@angular/core";
 import type { ComponentFixture } from "@angular/core/testing";
-import { render } from "@testing-library/angular/zoneless";
+import { render, screen } from "@testing-library/angular/zoneless";
+import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
@@ -21,5 +22,23 @@ describe("InputNotesComponent", () => {
 
   it("should create", () => {
     expect(component).toBeTruthy();
+  });
+
+  it("shows only an add button while there are no notes", () => {
+    const element = fixture.nativeElement as HTMLElement;
+    expect(element.querySelector("details")).toBeNull();
+    expect(element.classList).toContain("empty-list");
+    expect(screen.getByRole("button", { name: "Add note" })).toBeTruthy();
+  });
+
+  it("shows the Notes section once a note is added", async () => {
+    await userEvent.click(screen.getByRole("button", { name: "Add note" }));
+    await fixture.whenStable();
+
+    const element = fixture.nativeElement as HTMLElement;
+    expect(element.querySelector("summary")?.textContent).toContain(
+      "Notes (1)",
+    );
+    expect(element.classList).not.toContain("empty-list");
   });
 });

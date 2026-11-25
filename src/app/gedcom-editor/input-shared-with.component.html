@@ -1,43 +1,53 @@
-<details open>
-  <summary>Shared With ({{ form.length }})</summary>
-  @for (formGroup of form; track formGroup) {
-    <details open>
-      <summary>
-        {{ formGroup.xref().value() }}
-        <button
-          type="button"
-          class="btn btn-sm btn-outline-danger bi-trash"
-          aria-label="Remove shared citation"
-          (click)="removeSharedEvent($index)"
-        ></button>
-      </summary>
-      <app-input-individual-xref
-        #focusTarget
-        [formField]="formGroup.xref"
-        [workingDatabase]="workingDatabase()"
-      ></app-input-individual-xref>
-      <div class="form-floating">
-        <input
-          class="form-control"
-          [id]="id + '-role-' + $index"
-          [formField]="formGroup.role"
-        />
-        <label [for]="id + '-role-' + $index">Role</label>
-      </div>
-    </details>
-  }
-  <div
-    class="details-lookalike"
-    tabindex="0"
+@if (form.length === 0) {
+  <button
+    type="button"
+    class="btn btn-sm btn-outline-primary"
     (click)="appendSharedEvent()"
-    (keydown.enter)="appendSharedEvent()"
   >
-    <button
-      type="button"
-      class="btn btn-sm btn-outline-primary bi-plus"
-      aria-label="Add shared citation"
-      (click)="$event.preventDefault()"
-    ></button>
-    Share event with another individual
-  </div>
-</details>
+    <i class="bi bi-plus"></i> Share event
+  </button>
+} @else {
+  <details open>
+    <summary>Shared With ({{ form.length }})</summary>
+    @for (formGroup of form; track formGroup) {
+      <details open>
+        <summary>
+          {{ formGroup.xref().value() }}
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-danger bi-trash"
+            aria-label="Remove shared citation"
+            (click)="removeSharedEvent($index)"
+          ></button>
+        </summary>
+        <app-input-individual-xref
+          #focusTarget
+          [formField]="formGroup.xref"
+          [workingDatabase]="workingDatabase()"
+        ></app-input-individual-xref>
+        <div class="form-floating">
+          <input
+            class="form-control"
+            [id]="id + '-role-' + $index"
+            [formField]="formGroup.role"
+          />
+          <label [for]="id + '-role-' + $index">Role</label>
+        </div>
+      </details>
+    }
+    <div
+      class="details-lookalike"
+      tabindex="0"
+      (click)="appendSharedEvent()"
+      (keydown.enter)="appendSharedEvent()"
+    >
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-primary bi-plus"
+        aria-label="Add shared citation"
+        (click)="$event.preventDefault()"
+      ></button>
+      Share event with another individual
+    </div>
+  </details>
+}

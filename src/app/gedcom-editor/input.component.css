@@ -134,3 +134,10 @@ div.details-lookalike {
 .default-file-name {
   background-color: var(--bs-success-bg-subtle);
 }
+
+/* An empty list collapses to just its add button, and these sit side by
+   side on one line instead of each taking a section of its own. */
+:host(.empty-list) {
+  display: inline-block;
+  margin: 0 0.3rem 0.3rem 0;
+}

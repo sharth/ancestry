@@ -18,6 +18,7 @@ import { InputIndividualXrefComponent } from "./input-individual-xref.component"
   imports: [FormField, InputIndividualXrefComponent],
   templateUrl: "./input-shared-with.component.html",
   styleUrl: "./input.component.css",
+  host: { "[class.empty-list]": "form.length === 0" },
 })
 export class InputSharedWithComponent implements FormValueControl<
   GedcomFactSharedWith[]

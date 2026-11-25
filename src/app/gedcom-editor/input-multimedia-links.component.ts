@@ -28,6 +28,7 @@ import { InputMultimediaCropComponent } from "./input-multimedia-crop.component"
   selector: "app-input-multimedia-links",
   templateUrl: "./input-multimedia-links.component.html",
   styleUrl: "./input.component.css",
+  host: { "[class.empty-list]": "form.length === 0" },
   imports: [RouterModule, FormField, InputMultimediaCropComponent],
 })
 export class InputMultimediaLinksComponent implements FormValueControl<
