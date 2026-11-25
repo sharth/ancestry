@@ -1,39 +1,43 @@
-<details open>
-  <summary>Notes ({{ form.length }})</summary>
-  @for (note of form; track note) {
-    <details open>
-      <summary>
-        <button
-          class="btn btn-sm btn-outline-danger bi-trash"
-          type="button"
-          aria-label="Remove note"
-          (click)="removeNote($index)"
-        ></button>
-        {{ note.text().value() }}
-      </summary>
-      <div class="form-floating">
-        <input
-          class="form-control"
-          type="text"
-          [id]="id + '-text-' + $index"
-          [formField]="note.text"
-        />
-        <label [for]="id + '-text-' + $index">Note</label>
-      </div>
-    </details>
-  }
-  <div
-    class="details-lookalike"
-    tabindex="0"
+@if (form.length === 0) {
+  <button
+    type="button"
+    class="btn btn-sm btn-outline-primary"
     (click)="appendNote()"
-    (keydown.enter)="appendNote()"
   >
-    <button
-      type="button"
-      class="btn btn-sm btn-outline-primary bi-plus"
-      aria-label="Append note"
-      (click)="$event.preventDefault()"
-    ></button>
-    Append note
-  </div>
-</details>
+    <i class="bi bi-plus"></i> Add note
+  </button>
+} @else {
+  <details open>
+    <summary>
+      Notes ({{ form.length }})<button
+        type="button"
+        class="btn btn-sm btn-outline-primary ms-auto py-0"
+        (click)="$event.preventDefault(); appendNote()"
+      >
+        <i class="bi bi-plus"></i> Add note
+      </button>
+    </summary>
+    @for (note of form; track note) {
+      <details open>
+        <summary>
+          <button
+            class="btn btn-sm btn-outline-danger bi-trash"
+            type="button"
+            aria-label="Remove note"
+            (click)="removeNote($index)"
+          ></button>
+          {{ note.text().value() }}
+        </summary>
+        <div class="form-floating">
+          <input
+            class="form-control"
+            type="text"
+            [id]="id + '-text-' + $index"
+            [formField]="note.text"
+          />
+          <label [for]="id + '-text-' + $index">Note</label>
+        </div>
+      </details>
+    }
+  </details>
+}

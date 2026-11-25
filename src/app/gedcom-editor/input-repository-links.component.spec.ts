@@ -1,7 +1,7 @@
 import { inputBinding, signal } from "@angular/core";
 import type { ComponentFixture } from "@angular/core/testing";
 import { provideRouter } from "@angular/router";
-import { render } from "@testing-library/angular/zoneless";
+import { render, screen } from "@testing-library/angular/zoneless";
 import { userEvent } from "@testing-library/user-event";
 import { assert, beforeEach, describe, expect, it } from "vitest";
 
@@ -54,9 +54,9 @@ describe("InputRepositoryLinksComponent", () => {
     assert.isTrue(containerDetails.open);
 
     // Add an additional repository link.
-    const addButton = containerDetails.querySelector(
-      'button[aria-label="Add repository link"]',
-    );
+    const addButton = screen.getByRole("button", {
+      name: "Add repository link",
+    });
     assert.isOk(addButton);
     await user.click(addButton);
     await fixture.whenStable();
@@ -74,9 +74,9 @@ describe("InputRepositoryLinksComponent", () => {
 
   it("should start a newly appended repository link with one empty call number", async () => {
     const user = userEvent.setup();
-    const addButton = nativeElement.querySelector(
-      'button[aria-label="Add repository link"]',
-    );
+    const addButton = screen.getByRole("button", {
+      name: "Add repository link",
+    });
     assert.isOk(addButton);
     await user.click(addButton);
     await fixture.whenStable();

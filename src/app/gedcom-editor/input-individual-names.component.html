@@ -1,5 +1,13 @@
 <details open>
-  <summary>Names ({{ form.length }})</summary>
+  <summary>
+    Names ({{ form.length }})<button
+      type="button"
+      class="btn btn-sm btn-outline-primary ms-auto py-0"
+      (click)="$event.preventDefault(); appendName()"
+    >
+      <i class="bi bi-plus"></i> Add name
+    </button>
+  </summary>
   @for (name of form; track name) {
     <details open>
       <summary>
@@ -72,18 +80,4 @@
       ></app-input-source-citations>
     </details>
   }
-  <div
-    class="details-lookalike"
-    tabindex="0"
-    (click)="appendName()"
-    (keydown.enter)="appendName()"
-  >
-    <button
-      type="button"
-      class="btn btn-sm btn-outline-primary bi-plus"
-      aria-label="Add name"
-      (click)="$event.preventDefault()"
-    ></button>
-    Append another name
-  </div>
 </details>

@@ -1,5 +1,13 @@
 <details open>
-  <summary>Repositories ({{ form.length }})</summary>
+  <summary>
+    Repositories ({{ form.length }})<button
+      type="button"
+      class="btn btn-sm btn-outline-primary ms-auto py-0"
+      (click)="$event.preventDefault(); appendCitation()"
+    >
+      <i class="bi bi-plus"></i> Add repository link
+    </button>
+  </summary>
   @for (formGroup of form; track formGroup) {
     @let repositoryXref = formGroup.repositoryXref().value();
     <details open>
@@ -49,17 +57,4 @@
       ></app-input-repository-call-numbers>
     </details>
   }
-  <div
-    class="details-lookalike"
-    tabindex="0"
-    (click)="appendCitation()"
-    (keydown.enter)="appendCitation()"
-  >
-    <button
-      class="btn btn-sm btn-outline-primary bi-plus"
-      aria-label="Add repository link"
-      (click)="$event.preventDefault()"
-    ></button>
-    Associate with another repository
-  </div>
 </details>

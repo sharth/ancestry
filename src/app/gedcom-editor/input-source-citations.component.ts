@@ -28,6 +28,7 @@ import { InputSourceXrefComponent } from "./input-source-xref.component";
   ],
   templateUrl: "./input-source-citations.component.html",
   styleUrl: "./input.component.css",
+  host: { "[class.empty-list]": "form.length === 0" },
 })
 export class InputSourceCitationsComponent implements FormValueControl<
   GedcomSourceCitation[]

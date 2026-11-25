@@ -1,6 +1,6 @@
 import { inputBinding, signal } from "@angular/core";
 import type { ComponentFixture } from "@angular/core/testing";
-import { render } from "@testing-library/angular/zoneless";
+import { render, screen } from "@testing-library/angular/zoneless";
 import { userEvent } from "@testing-library/user-event";
 import { assert, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -37,9 +37,7 @@ describe("InputIndividualFactsComponent", () => {
     assert.isOk(factsContainer);
     expect(factsContainer.open).toBe(true);
 
-    const addEventButton = factsContainer.querySelector(
-      'button[aria-label="Add event"]',
-    );
+    const addEventButton = screen.getByRole("button", { name: "Add event" });
     assert.isOk(addEventButton);
 
     await user.click(addEventButton);

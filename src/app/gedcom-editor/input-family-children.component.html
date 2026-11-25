@@ -1,5 +1,13 @@
 <details open>
-  <summary>Children ({{ form.length }})</summary>
+  <summary>
+    Children ({{ form.length }})<button
+      type="button"
+      class="btn btn-sm btn-outline-primary ms-auto py-0"
+      (click)="$event.preventDefault(); appendChild()"
+    >
+      <i class="bi bi-plus"></i> Add child
+    </button>
+  </summary>
   @for (childXref of form; track childXref) {
     <div class="d-flex gap-2 align-items-center mb-2">
       <div class="flex-grow-1">
@@ -17,18 +25,4 @@
       ></button>
     </div>
   }
-  <div
-    class="details-lookalike"
-    tabindex="0"
-    (click)="appendChild()"
-    (keydown.enter)="appendChild()"
-  >
-    <button
-      type="button"
-      class="btn btn-sm btn-outline-primary bi-plus"
-      aria-label="Add child"
-      (click)="$event.preventDefault()"
-    ></button>
-    Add child
-  </div>
 </details>

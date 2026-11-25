@@ -1,6 +1,6 @@
 import { inputBinding, signal } from "@angular/core";
 import type { ComponentFixture } from "@angular/core/testing";
-import { render } from "@testing-library/angular/zoneless";
+import { render, screen } from "@testing-library/angular/zoneless";
 import { userEvent } from "@testing-library/user-event";
 import { assert, beforeEach, describe, expect, it } from "vitest";
 
@@ -61,10 +61,7 @@ describe("InputFamilyChildrenComponent", () => {
   it("appends an empty child when Add child is clicked", async () => {
     const user = userEvent.setup();
     const element = fixture.nativeElement as HTMLElement;
-    const addButton = element.querySelector('button[aria-label="Add child"]');
-    assert.isOk(addButton);
-
-    await user.click(addButton);
+    await user.click(screen.getByRole("button", { name: "Add child" }));
     await fixture.whenStable();
 
     expect(component.value()).toEqual(["@I1@", "@I2@", ""]);

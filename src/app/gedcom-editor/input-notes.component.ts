@@ -10,6 +10,7 @@ import { IdGenerator } from "../../util/id-generator";
   imports: [FormField],
   templateUrl: "./input-notes.component.html",
   styleUrl: "./input.component.css",
+  host: { "[class.empty-list]": "form.length === 0" },
 })
 export class InputNotesComponent implements FormValueControl<GedcomNote[]> {
   readonly id = inject(IdGenerator).getId("input-notes");

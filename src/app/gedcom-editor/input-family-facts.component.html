@@ -1,5 +1,13 @@
 <details open>
-  <summary>Events ({{ form.length }})</summary>
+  <summary>
+    Events ({{ form.length }})<button
+      type="button"
+      class="btn btn-sm btn-outline-primary ms-auto py-0"
+      (click)="$event.preventDefault(); appendEvent()"
+    >
+      <i class="bi bi-plus"></i> Add event
+    </button>
+  </summary>
   @for (event of form; track event) {
     <details open>
       <summary>
@@ -18,18 +26,4 @@
       ></app-input-fact>
     </details>
   }
-  <div
-    class="details-lookalike"
-    tabindex="0"
-    (click)="appendEvent()"
-    (keydown.enter)="appendEvent()"
-  >
-    <button
-      type="button"
-      class="btn btn-sm btn-outline-primary bi-plus"
-      aria-label="Add event"
-      (click)="$event.preventDefault()"
-    ></button>
-    Append another event
-  </div>
 </details>
