@@ -1,14 +1,27 @@
 <div class="fields-grid">
-  <div class="form-floating">
-    <select class="form-control" [id]="id + '-tag'" [formField]="form.tag">
-      @for (event of gedcomEventTags(); track event.tag) {
-        <option [value]="event.tag">
-          {{ event.humanReadableDescription }}
-        </option>
-      }
-    </select>
-    <label [for]="id + '-tag'">Tag</label>
-  </div>
+  @if (tagLocked()) {
+    <div class="form-floating">
+      <input
+        class="form-control"
+        [id]="id + '-tag'"
+        readonly
+        [value]="tagDescription()"
+        title="The type of a saved fact can't be changed"
+      />
+      <label [for]="id + '-tag'">Tag <i class="bi bi-lock"></i></label>
+    </div>
+  } @else {
+    <div class="form-floating">
+      <select class="form-control" [id]="id + '-tag'" [formField]="form.tag">
+        @for (event of gedcomEventTags(); track event.tag) {
+          <option [value]="event.tag">
+            {{ event.humanReadableDescription }}
+          </option>
+        }
+      </select>
+      <label [for]="id + '-tag'">Tag</label>
+    </div>
+  }
   <div class="form-floating">
     <input class="form-control" [id]="id + '-type'" [formField]="form.type" />
     <label [for]="id + '-type'">Type</label>
