@@ -170,6 +170,7 @@ describe("GedcomEditorComponent Integration", () => {
   describe("deleteRecord tests", () => {
     // The tabs input opens a new individual, which gets @I1@.
     const newIndividual = { type: "INDI", xref: "@I1@" } as const;
+    const stockIndividual = { type: "INDI", xref: "@I0@" } as const;
     const stockFamily = { type: "FAM", xref: "@F0@" } as const;
 
     it("moves the record out of the working database, keeping its tab", () => {
@@ -208,11 +209,53 @@ describe("GedcomEditorComponent Integration", () => {
       ).toBe("Edited");
     });
 
+    it("is invalid while an unopened record links to the deleted one", () => {
+      component.openTab(stockIndividual);
+
+      component.deleteRecord(stockIndividual);
+
+      expect(component.form().invalid()).toBe(true);
+      expect(component.referrersOfDeleted().get("@I0@")).toEqual([stockFamily]);
+    });
+
+    it("is invalid while an open record links to the deleted one, until the link is removed", () => {
+      component.openTab(stockIndividual);
+      component.openTab(stockFamily);
+      component.deleteRecord(stockIndividual);
+
+      expect(component.form().invalid()).toBe(true);
+      expect(component.referrersOfDeleted().get("@I0@")).toEqual([stockFamily]);
+
+      component.workingDatabase.update((database) =>
+        produce(database, (draft) => {
+          const family = draft.families["@F0@"];
+          assert(family);
+          family.husbandXref = "";
+        }),
+      );
+
+      expect(component.form().invalid()).toBe(false);
+      expect(component.referrersOfDeleted().size).toBe(0);
+    });
+
+    it("doesn't save while the form is invalid", async () => {
+      const update = vi
+        .spyOn(ancestryService, "updateGedcomDatabase")
+        .mockResolvedValue(undefined);
+      component.openTab(stockIndividual);
+      component.deleteRecord(stockIndividual);
+
+      await component.submitForm(new Event("submit"));
+
+      expect(update).not.toHaveBeenCalled();
+    });
+
     it("takes a deleted family out of its members' links, and undo puts it back", () => {
       component.openTab(stockFamily);
 
       component.deleteRecord(stockFamily);
 
+      expect(component.form().invalid()).toBe(false);
       expect(component.workingDatabase().families["@F0@"]).toBeUndefined();
       expect(
         component.workingDatabase().individuals["@I0@"]?.parentOfFamilyXrefs,

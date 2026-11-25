@@ -130,6 +130,28 @@
                   Its members' links back to it are removed too.
                 </p>
               }
+              @let referrers =
+                referrersOfDeleted().get(tabInformation.xref) ?? [];
+              @if (referrers.length > 0) {
+                <p class="card-text mb-1">
+                  These records still link to it. Remove those links before
+                  saving:
+                </p>
+                <ul class="list-unstyled">
+                  @for (referrer of referrers; track referrer.xref) {
+                    <li>
+                      <button
+                        type="button"
+                        class="btn btn-link p-0"
+                        (click)="openTab(referrer)"
+                      >
+                        <i class="bi me-1" [class]="tabIcon(referrer)"></i
+                        >{{ tabLabel(referrer) }}
+                      </button>
+                    </li>
+                  }
+                </ul>
+              }
               <button
                 type="button"
                 class="btn btn-outline-primary"
@@ -239,8 +261,17 @@
     ></app-gedcom-diff>
   }
 
+  @if (form().invalid()) {
+    <div class="alert alert-danger" role="alert">
+      <ul class="mb-0">
+        @for (error of form().errors(); track $index) {
+          <li>{{ error.message }}</li>
+        }
+      </ul>
+    </div>
+  }
   <div>
-    <input type="submit" />
+    <input type="submit" [disabled]="form().invalid()" />
     <input type="button" value="Cancel" (click)="cancelForm()" />
   </div>
 </form>
