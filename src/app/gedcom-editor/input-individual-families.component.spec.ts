@@ -125,7 +125,7 @@ describe("InputIndividualFamiliesComponent", () => {
   it("adds a new family with the individual as a spouse", async () => {
     await userEvent
       .setup()
-      .click(screen.getByText("Add a family with this person as a spouse"));
+      .click(screen.getByRole("button", { name: "Add family" }));
 
     expect(value().families["@F3@"]?.husbandXref).toBe("@I1@");
     expect(value().individuals["@I1@"]?.parentOfFamilyXrefs).toEqual([
@@ -135,7 +135,9 @@ describe("InputIndividualFamiliesComponent", () => {
   });
 
   it("edits each spouse family with the family editor", async () => {
-    await userEvent.setup().click(screen.getByText("Append another event"));
+    await userEvent
+      .setup()
+      .click(screen.getByRole("button", { name: "Add event" }));
 
     expect(value().families["@F2@"]?.facts).toHaveLength(1);
   });

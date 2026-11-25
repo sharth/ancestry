@@ -3,10 +3,17 @@
     Families ({{
       (individual()?.childOfFamilyXrefs?.length ?? 0) +
         (individual()?.parentOfFamilyXrefs?.length ?? 0)
-    }})
+    }})<button
+      type="button"
+      class="btn btn-sm btn-outline-primary ms-auto py-0"
+      title="Add a family with this person as a spouse"
+      (click)="$event.preventDefault(); addSpouseFamily()"
+    >
+      <i class="bi bi-plus"></i> Add family
+    </button>
   </summary>
   @for (familyXref of individual()?.childOfFamilyXrefs; track familyXref) {
-    <div class="d-flex gap-2 align-items-center mb-2">
+    <div class="d-flex gap-2 align-items-center mb-1">
       <button
         type="button"
         class="btn btn-sm btn-outline-danger bi-trash"
@@ -20,7 +27,7 @@
       >
       <button
         type="button"
-        class="btn btn-sm btn-outline-secondary text-nowrap"
+        class="btn btn-sm btn-outline-secondary ms-auto py-0 text-nowrap"
         [disabled]="!gedcomEditor"
         (click)="gedcomEditor?.openFamily(familyXref)"
         title="Edit this family in a session tab"
@@ -39,10 +46,10 @@
           title="Remove this person from the family"
           (click)="removeFromFamily(familyXref)"
         ></button>
-        <i class="bi bi-people me-1"></i>{{ parentOfFamilyLabel(familyXref) }}
+        <i class="bi bi-people"></i>{{ parentOfFamilyLabel(familyXref) }}
         <button
           type="button"
-          class="btn btn-sm btn-outline-secondary text-nowrap ms-2"
+          class="btn btn-sm btn-outline-secondary ms-auto py-0 text-nowrap"
           [disabled]="!gedcomEditor"
           (click)="
             $event.preventDefault(); gedcomEditor?.openFamily(familyXref)
@@ -59,18 +66,4 @@
       ></app-input-family>
     </details>
   }
-  <div
-    class="details-lookalike"
-    tabindex="0"
-    (click)="addSpouseFamily()"
-    (keydown.enter)="addSpouseFamily()"
-  >
-    <button
-      type="button"
-      class="btn btn-sm btn-outline-primary bi-plus"
-      aria-label="Add family"
-      (click)="$event.preventDefault()"
-    ></button>
-    Add a family with this person as a spouse
-  </div>
 </details>
