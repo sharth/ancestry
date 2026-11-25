@@ -13,9 +13,7 @@ export function* xrefsLinkedFromIndividual(
   for (const name of individual.names) {
     yield* xrefsLinkedFromSourceCitations(name.citations);
   }
-  for (const fact of individual.facts) {
-    yield* xrefsLinkedFromFact(fact);
-  }
+  yield* xrefsLinkedFromFacts(individual.facts);
 }
 
 export function* xrefsLinkedFromFamily(
@@ -25,14 +23,14 @@ export function* xrefsLinkedFromFamily(
   yield family.wifeXref;
   yield* family.childXrefs;
   yield* xrefsLinkedFromSourceCitations(family.citations);
-  for (const fact of family.facts) {
-    yield* xrefsLinkedFromFact(fact);
-  }
+  yield* xrefsLinkedFromFacts(family.facts);
 }
 
-export function* xrefsLinkedFromFact(fact: GedcomFact): Generator<string> {
-  yield* fact.sharedWith.map((sharedWith) => sharedWith.xref);
-  yield* xrefsLinkedFromSourceCitations(fact.citations);
+export function* xrefsLinkedFromFacts(facts: GedcomFact[]): Generator<string> {
+  for (const fact of facts) {
+    yield* fact.sharedWith.map((sharedWith) => sharedWith.xref);
+    yield* xrefsLinkedFromSourceCitations(fact.citations);
+  }
 }
 
 export function* xrefsLinkedFromSource(
