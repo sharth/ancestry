@@ -37,21 +37,23 @@
             [workingDatabase]="workingDatabase()"
           ></app-input-source-xref>
         </div>
-        <div class="form-floating">
-          <input
-            class="form-control"
-            [id]="id + '-page-' + $index"
-            [formField]="formGroup.page"
-          />
-          <label [for]="id + '-page-' + $index">Page</label>
-        </div>
-        <div class="form-floating">
-          <input
-            class="form-control"
-            [id]="id + '-quality-' + $index"
-            [formField]="formGroup.quality"
-          />
-          <label [for]="id + '-quality-' + $index">Quality</label>
+        <div class="fields-grid">
+          <div class="form-floating">
+            <input
+              class="form-control"
+              [id]="id + '-page-' + $index"
+              [formField]="formGroup.page"
+            />
+            <label [for]="id + '-page-' + $index">Page</label>
+          </div>
+          <div class="form-floating">
+            <input
+              class="form-control"
+              [id]="id + '-quality-' + $index"
+              [formField]="formGroup.quality"
+            />
+            <label [for]="id + '-quality-' + $index">Quality</label>
+          </div>
         </div>
         <div class="form-floating">
           <textarea
