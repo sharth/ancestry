@@ -10,10 +10,15 @@ import { InputNotesComponent } from "./input-notes.component";
 describe("InputNotesComponent", () => {
   let fixture: ComponentFixture<InputNotesComponent>;
   let component: InputNotesComponent;
+  const collapseWhenEmpty = signal(true);
 
   beforeEach(async () => {
+    collapseWhenEmpty.set(true);
     const renderResult = await render(InputNotesComponent, {
-      bindings: [inputBinding("workingDatabase", signal(newGedcomDatabase()))],
+      bindings: [
+        inputBinding("workingDatabase", signal(newGedcomDatabase())),
+        inputBinding("collapseWhenEmpty", collapseWhenEmpty),
+      ],
     });
 
     fixture = renderResult.fixture;
@@ -38,6 +43,17 @@ describe("InputNotesComponent", () => {
     const element = fixture.nativeElement as HTMLElement;
     expect(element.querySelector("summary")?.textContent).toContain(
       "Notes (1)",
+    );
+    expect(element.classList).not.toContain("empty-list");
+  });
+
+  it("keeps the whole Notes section when collapseWhenEmpty is false", async () => {
+    collapseWhenEmpty.set(false);
+    await fixture.whenStable();
+
+    const element = fixture.nativeElement as HTMLElement;
+    expect(element.querySelector("summary")?.textContent).toContain(
+      "Notes (0)",
     );
     expect(element.classList).not.toContain("empty-list");
   });

@@ -28,7 +28,7 @@ import { InputMultimediaCropComponent } from "./input-multimedia-crop.component"
   selector: "app-input-multimedia-links",
   templateUrl: "./input-multimedia-links.component.html",
   styleUrl: "./input.component.css",
-  host: { "[class.empty-list]": "form.length === 0" },
+  host: { "[class.empty-list]": "collapseWhenEmpty() && form.length === 0" },
   imports: [RouterModule, FormField, InputMultimediaCropComponent],
 })
 export class InputMultimediaLinksComponent implements FormValueControl<
@@ -39,6 +39,8 @@ export class InputMultimediaLinksComponent implements FormValueControl<
   readonly gedcomEditor = inject(GEDCOM_EDITOR, { optional: true });
 
   readonly workingDatabase = input.required<GedcomDatabase>();
+  /** Show only an add button, not a whole section, while the list is empty. */
+  readonly collapseWhenEmpty = input(true);
   readonly value = model<GedcomMultimediaLink[]>([]);
   readonly form = form(this.value);
   readonly multimediaLinkTitle = multimediaLinkTitle;
