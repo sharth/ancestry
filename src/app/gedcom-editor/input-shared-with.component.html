@@ -8,7 +8,15 @@
   </button>
 } @else {
   <details open>
-    <summary>Shared With ({{ form.length }})</summary>
+    <summary>
+      Shared With ({{ form.length }})<button
+        type="button"
+        class="btn btn-sm btn-outline-primary ms-auto py-0"
+        (click)="$event.preventDefault(); appendSharedEvent()"
+      >
+        <i class="bi bi-plus"></i> Share event
+      </button>
+    </summary>
     @for (formGroup of form; track formGroup) {
       <details open>
         <summary>
@@ -35,19 +43,5 @@
         </div>
       </details>
     }
-    <div
-      class="details-lookalike"
-      tabindex="0"
-      (click)="appendSharedEvent()"
-      (keydown.enter)="appendSharedEvent()"
-    >
-      <button
-        type="button"
-        class="btn btn-sm btn-outline-primary bi-plus"
-        aria-label="Add shared citation"
-        (click)="$event.preventDefault()"
-      ></button>
-      Share event with another individual
-    </div>
   </details>
 }

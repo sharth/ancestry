@@ -8,7 +8,15 @@
   </button>
 } @else {
   <details open>
-    <summary>Citations ({{ form.length }})</summary>
+    <summary>
+      Citations ({{ form.length }})<button
+        type="button"
+        class="btn btn-sm btn-outline-primary ms-auto py-0"
+        (click)="$event.preventDefault(); appendCitation()"
+      >
+        <i class="bi bi-plus"></i> Add citation
+      </button>
+    </summary>
     @for (formGroup of form; track formGroup) {
       <details open>
         <summary>
@@ -63,19 +71,5 @@
         ></app-input-notes>
       </details>
     }
-    <div
-      class="details-lookalike"
-      tabindex="0"
-      (click)="appendCitation()"
-      (keydown.enter)="appendCitation()"
-    >
-      <button
-        type="button"
-        class="btn btn-sm btn-outline-primary bi-plus"
-        aria-label="Add citation"
-        (click)="$event.preventDefault()"
-      ></button>
-      Append another citation
-    </div>
   </details>
 }

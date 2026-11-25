@@ -8,7 +8,15 @@
   </button>
 } @else {
   <details open>
-    <summary>Notes ({{ form.length }})</summary>
+    <summary>
+      Notes ({{ form.length }})<button
+        type="button"
+        class="btn btn-sm btn-outline-primary ms-auto py-0"
+        (click)="$event.preventDefault(); appendNote()"
+      >
+        <i class="bi bi-plus"></i> Add note
+      </button>
+    </summary>
     @for (note of form; track note) {
       <details open>
         <summary>
@@ -31,19 +39,5 @@
         </div>
       </details>
     }
-    <div
-      class="details-lookalike"
-      tabindex="0"
-      (click)="appendNote()"
-      (keydown.enter)="appendNote()"
-    >
-      <button
-        type="button"
-        class="btn btn-sm btn-outline-primary bi-plus"
-        aria-label="Append note"
-        (click)="$event.preventDefault()"
-      ></button>
-      Append note
-    </div>
   </details>
 }

@@ -8,7 +8,15 @@
   </button>
 } @else {
   <details open>
-    <summary>Multimedia ({{ form.length }})</summary>
+    <summary>
+      Multimedia ({{ form.length }})<button
+        type="button"
+        class="btn btn-sm btn-outline-primary ms-auto py-0"
+        (click)="$event.preventDefault(); appendMultimediaLink()"
+      >
+        <i class="bi bi-plus"></i> Add multimedia
+      </button>
+    </summary>
     @for (formEntry of form; track formEntry) {
       @let multimediaLink = formEntry().value();
       @let multimedia = workingDatabase().multimedias[multimediaLink.xref];
@@ -79,19 +87,5 @@
         }
       </details>
     }
-    <div
-      class="details-lookalike"
-      tabindex="0"
-      (click)="appendMultimediaLink()"
-      (keydown.enter)="appendMultimediaLink()"
-    >
-      <button
-        type="button"
-        class="btn btn-sm btn-outline-primary bi-plus"
-        aria-label="Add multimedia"
-        (click)="$event.preventDefault()"
-      ></button>
-      Append multimedia
-    </div>
   </details>
 }

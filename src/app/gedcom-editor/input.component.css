@@ -23,7 +23,7 @@ textarea {
 }
 
 details {
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.2rem;
 }
 
 details > summary {
@@ -32,7 +32,7 @@ details > summary {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.35rem 0.65rem;
+  padding: 0.15rem 0.5rem;
   background-color: #f1f3f5;
   border: 1px solid #dee2e6;
   border-radius: 0.3rem;
@@ -67,7 +67,7 @@ details[open] > summary {
 }
 
 details[open]::details-content {
-  padding: 0.6rem 0.75rem 0.6rem 1.15rem;
+  padding: 0.3rem 0.5rem 0.3rem 0.75rem;
   border: 1px solid #dee2e6;
   border-top: none;
   border-bottom-left-radius: 0.3rem;
@@ -75,17 +75,7 @@ details[open]::details-content {
 }
 
 details details {
-  margin: 0.35rem 0;
-}
-
-div.details-lookalike {
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.3rem 0.5rem;
-  color: #0d6efd;
-  font-size: 0.9rem;
+  margin: 0.2rem 0;
 }
 
 .form-floating {
@@ -140,4 +130,13 @@ div.details-lookalike {
 :host(.empty-list) {
   display: inline-block;
   margin: 0 0.3rem 0.3rem 0;
+}
+
+/* A section with no entries is just its header. */
+details:has(> summary:only-child)::details-content {
+  display: none;
+}
+
+details[open]:has(> summary:only-child) > summary {
+  border-radius: 0.3rem;
 }
