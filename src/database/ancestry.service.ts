@@ -194,20 +194,9 @@ export class AncestryService {
   }
 
   private async setDataSource(dataSource: DataSource) {
-    await this.dexieDatabase.transaction(
-      "rw",
-      this.dexieDatabase.metadata,
-      async () => {
-        // Upsert logic for singleton
-        const metadata = (await this.dexieDatabase.metadata.get(1)) ?? {
-          id: 1,
-        };
-        metadata.dataSource = dataSource;
-        // A root person picked in another file means nothing in this one.
-        delete metadata.rootIndividualXref;
-        await this.dexieDatabase.metadata.put(metadata);
-      },
-    );
+    // Replaces the whole row, so the root person is dropped too: a root
+    // person picked in another file means nothing in this one.
+    await this.dexieDatabase.metadata.put({ id: 1, dataSource });
   }
 
   async setRootIndividualXref(rootIndividualXref: string | undefined) {
@@ -234,13 +223,7 @@ export class AncestryService {
   }
 
   async clearDatabase() {
-    await this.dexieDatabase.transaction(
-      "rw",
-      this.dexieDatabase.metadata,
-      async () => {
-        await this.dexieDatabase.metadata.clear();
-      },
-    );
+    await this.dexieDatabase.metadata.clear();
   }
 
   // Whether something already exists at `relativePath` in the loaded
