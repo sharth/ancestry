@@ -265,7 +265,7 @@ export function compareGedcomDatabase(
  * same diff the save path writes from, minus those that would be written
  * exactly as they are in the file. A record whose xref is in
  * `alwaysIncludeXrefs` is listed even when unchanged. */
-export function gedcomDatabaseDifferences(
+export function diffGedcomDatabase(
   originalGedcomRecords: GedcomRecord[],
   originalGedcomDatabase: GedcomDatabase,
   updatedGedcomDatabase: GedcomDatabase,

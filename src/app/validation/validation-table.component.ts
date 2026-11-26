@@ -13,7 +13,7 @@ import {
 
 import { AncestryService } from "../../database/ancestry.service";
 import {
-  gedcomDatabaseDifferences,
+  diffGedcomDatabase,
   newGedcomDatabase,
   type GedcomDatabase,
 } from "../../gedcom/gedcomDatabase";
@@ -102,7 +102,7 @@ export class ValidationTableComponent<
     return this.rows().map((row) =>
       row.fixedDatabase === undefined
         ? []
-        : gedcomDatabaseDifferences(
+        : diffGedcomDatabase(
             gedcom?.gedcomRecords ?? [],
             gedcom?.gedcomDatabase ?? newGedcomDatabase(),
             row.fixedDatabase,

@@ -74,7 +74,7 @@ describe("GedcomEditorComponent Integration", () => {
 
   describe("hasUnsavedChanges tests", () => {
     // hasUnsavedChanges() is based on the Signal Forms "dirty" state, not
-    // gedcomDatabaseDifferences(), so it's false even though differences()
+    // diffGedcomDatabase(), so it's false even though differences()
     // reports the whole database as new (no file is loaded here).
     it("returns false when the form hasn't been touched, even if there are differences", () => {
       expect(component.differences()).not.toEqual([]);
@@ -308,11 +308,11 @@ describe("GedcomEditorComponent Integration", () => {
 // GedcomIndividual/GedcomSource), so FAM child records the parser doesn't
 // have a typed field for (e.g. NOTE, RIN) were silently dropped on
 // serialize. That made the freshly opened, unedited family look
-// different from the file on disk, which gedcomDatabaseDifferences()
+// different from the file on disk, which diffGedcomDatabase()
 // reports as a real difference. differences() still surfaces that
 // comparison (it drives the Gedcom diff-review tab), so it's what this
 // regression test checks now; hasUnsavedChanges() itself no longer depends
-// on gedcomDatabaseDifferences() at all -- see the dirty-form tests below.
+// on diffGedcomDatabase() at all -- see the dirty-form tests below.
 //
 // This is a separate top-level describe, with its own TestBed, rather
 // than nested in the suite above: that suite's beforeEach already

@@ -146,7 +146,7 @@ describe("ValidationTableComponent", () => {
 
   // The preview goes through the same diff the save path writes from, so
   // it can't drift from what actually gets written to disk.
-  it("builds each preview from gedcomDatabaseDifferences", async () => {
+  it("builds each preview from diffGedcomDatabase", async () => {
     const { table } = await setup();
     expect(table.differences()).toHaveLength(2);
     expect(

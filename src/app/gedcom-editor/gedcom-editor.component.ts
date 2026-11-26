@@ -11,7 +11,7 @@ import { produce } from "immer";
 
 import { AncestryService } from "../../database/ancestry.service";
 import {
-  gedcomDatabaseDifferences,
+  diffGedcomDatabase,
   newGedcomDatabase,
   type GedcomDatabase,
 } from "../../gedcom/gedcomDatabase";
@@ -155,7 +155,7 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     // incidental header DATE/VERS stamp, or another tab's edits).
     const openXrefs = new Set(this.openTabs().map((tab) => tab.xref));
     const gedcom = this.ancestryService.gedcomResource.value();
-    return gedcomDatabaseDifferences(
+    return diffGedcomDatabase(
       gedcom?.gedcomRecords ?? [],
       gedcom?.gedcomDatabase ?? newGedcomDatabase(),
       this.workingDatabase(),

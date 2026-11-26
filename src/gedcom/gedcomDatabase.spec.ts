@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { newGedcomChangeDate } from "./gedcomChangeDate";
 import {
   compareGedcomDatabase,
-  gedcomDatabaseDifferences,
+  diffGedcomDatabase,
   parseGedcomDatabase,
   serializeGedcomDatabase,
 } from "./gedcomDatabase";
@@ -113,7 +113,7 @@ describe("compareGedcomDatabase change dates", () => {
   });
 });
 
-describe("gedcomDatabaseDifferences", () => {
+describe("diffGedcomDatabase", () => {
   const originalGedcomRecords = parseGedcomRecords(
     [
       "0 HEAD",
@@ -138,7 +138,7 @@ describe("gedcomDatabaseDifferences", () => {
 
   // HEAD is left out: it's regenerated (and so differs) on every compare.
   function changedXrefs(alwaysIncludeXrefs?: ReadonlySet<string>) {
-    return gedcomDatabaseDifferences(
+    return diffGedcomDatabase(
       originalGedcomRecords,
       originalDatabase,
       updated,
