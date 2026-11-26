@@ -36,6 +36,7 @@ import { DuplicateCallNumbersComponent } from "./validation/duplicate-call-numbe
 import { DuplicateRepositoriesComponent } from "./validation/duplicate-repositories.component";
 import { DuplicateSourcesComponent } from "./validation/duplicate-sources.component";
 import { OutdatedUrlsComponent } from "./validation/outdated-urls.component";
+import { QueryStringCallNumbersComponent } from "./validation/query-string-call-numbers.component";
 import { SourceWarningsComponent } from "./validation/source-warnings.component";
 import { SourcesWithoutRepositoriesComponent } from "./validation/sources-without-repositories.component";
 import { TreeIdsComponent } from "./validation/tree-ids.component";
@@ -192,6 +193,11 @@ export const routes: Routes = [
       {
         path: "duplicate-call-numbers",
         component: DuplicateCallNumbersComponent,
+        canDeactivate: [confirmUnsavedChangesGuard],
+      },
+      {
+        path: "query-string-call-numbers",
+        component: QueryStringCallNumbersComponent,
         canDeactivate: [confirmUnsavedChangesGuard],
       },
       { path: "unused-sources", component: UnusedSourcesComponent },
