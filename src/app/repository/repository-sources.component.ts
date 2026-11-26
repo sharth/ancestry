@@ -32,7 +32,11 @@ export class RepositorySourcesComponent {
           xref: source.xref,
           abbr: source.abbr,
           callNumbers: repositoryLink.callNumbers,
-        })),
+        }))
+        // Sort by the same label the template shows for each source.
+        .sort((lhs, rhs) =>
+          (lhs.abbr || lhs.xref).localeCompare(rhs.abbr || rhs.xref),
+        ),
     };
   });
 }

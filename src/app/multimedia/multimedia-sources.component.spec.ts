@@ -56,4 +56,43 @@ describe("MultimediaSourcesComponent", () => {
       screen.getByText("No sources link to this multimedia."),
     ).toBeTruthy();
   });
+
+  it("orders linked sources by their displayed label", async () => {
+    const link = [newGedcomMultimediaLink({ xref: "@M1@" })];
+    await render(MultimediaSourcesComponent, {
+      providers: [provideRouter([])],
+      bindings: [
+        inputBinding(
+          "ancestryDatabase",
+          signal(
+            newGedcomDatabase({
+              sources: {
+                "@S1@": newGedcomSource({
+                  xref: "@S1@",
+                  abbr: "Parish register",
+                  multimediaLinks: link,
+                }),
+                "@S2@": newGedcomSource({
+                  xref: "@S2@",
+                  title: "census of 1901",
+                  multimediaLinks: link,
+                }),
+                "@S3@": newGedcomSource({
+                  xref: "@S3@",
+                  abbr: "Baptisms",
+                  multimediaLinks: link,
+                }),
+              },
+            }),
+          ),
+        ),
+        inputBinding("xref", signal("@M1@")),
+      ],
+      waitForStableOnRender: true,
+    });
+
+    expect(
+      screen.getAllByRole("link").map((link) => link.textContent.trim()),
+    ).toEqual(["Baptisms", "census of 1901", "Parish register"]);
+  });
 });
