@@ -1,18 +1,29 @@
-import { inputBinding, signal, computed } from "@angular/core";
+import {
+  inputBinding,
+  signal,
+  type WritableSignal,
+  computed,
+} from "@angular/core";
 import type { ComponentFixture } from "@angular/core/testing";
-import { render } from "@testing-library/angular/zoneless";
+import { provideRouter } from "@angular/router";
+import { render, screen } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { newGedcomResourceValue } from "../../database/ancestry.service";
-import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
+import {
+  type GedcomDatabase,
+  newGedcomDatabase,
+} from "../../gedcom/gedcomDatabase";
+import { newGedcomSource } from "../../gedcom/gedcomSource";
 import { SourcesComponent } from "./sources.component";
 
-describe("RepositoriesComponent", () => {
+describe("SourcesComponent", () => {
   let component: SourcesComponent;
   let fixture: ComponentFixture<SourcesComponent>;
+  let ancestryDatabase: WritableSignal<GedcomDatabase>;
 
   beforeEach(async () => {
-    const ancestryDatabase = signal(newGedcomDatabase());
+    ancestryDatabase = signal(newGedcomDatabase());
 
     const renderResult = await render(SourcesComponent, {
       bindings: [
@@ -23,6 +34,7 @@ describe("RepositoriesComponent", () => {
           ),
         ),
       ],
+      providers: [provideRouter([])],
       waitForStableOnRender: true,
     });
 
@@ -32,5 +44,31 @@ describe("RepositoriesComponent", () => {
 
   it("should create", () => {
     expect(component).toBeTruthy();
+  });
+
+  it("lists sources alphabetically by displayed label", async () => {
+    const gedcomDatabase = newGedcomDatabase();
+    for (const source of [
+      newGedcomSource({ xref: "@S1@", abbr: "Zebra Census" }),
+      newGedcomSource({ xref: "@S9@" }),
+      newGedcomSource({ xref: "@S2@" }),
+      newGedcomSource({ xref: "@S3@", abbr: "baptisms" }),
+      newGedcomSource({ xref: "@S4@", abbr: "Burials" }),
+    ]) {
+      gedcomDatabase.sources[source.xref] = source;
+    }
+    ancestryDatabase.set(gedcomDatabase);
+    await fixture.whenStable();
+
+    const links = screen
+      .getAllByRole("link")
+      .map((link) => link.textContent.trim());
+    expect(links).toEqual([
+      "@S2@",
+      "@S9@",
+      "baptisms",
+      "Burials",
+      "Zebra Census",
+    ]);
   });
 });
