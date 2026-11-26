@@ -10,17 +10,12 @@ import Dexie, { liveQuery } from "dexie";
 import { filter, firstValueFrom, from, switchMap } from "rxjs";
 
 import {
-  compareGedcomDatabase,
   newGedcomDatabase,
   parseGedcomDatabase,
   serializeGedcomDatabase,
   type GedcomDatabase,
 } from "../gedcom/gedcomDatabase";
-import {
-  gedcomRecordsEqual,
-  parseGedcomRecords,
-  type GedcomRecord,
-} from "../gedcom/gedcomRecord";
+import { parseGedcomRecords, type GedcomRecord } from "../gedcom/gedcomRecord";
 import { copyFileToPath, fileExistsAtPath } from "../util/file-system";
 
 export const BUILTIN_GEDCOM_URL = "assets/samples/royal-family.ged";
@@ -178,42 +173,6 @@ export class AncestryService {
         switchMap((metadata) => loadGedcom(metadata)),
       ),
   });
-
-  compareGedcomDatabase(gedcomDatabase: GedcomDatabase): {
-    originalGedcomRecord?: GedcomRecord;
-    updatedGedcomRecord?: GedcomRecord;
-  }[] {
-    return compareGedcomDatabase(
-      this.gedcomResource.value()?.gedcomRecords ?? [],
-      this.gedcomResource.value()?.gedcomDatabase ?? newGedcomDatabase(),
-      gedcomDatabase,
-    );
-  }
-
-  /** The records that would actually change on disk if `gedcomDatabase`
-   * were saved: compareGedcomDatabase()'s pairs, the same diff the save
-   * path writes from, minus those that would be written exactly as they
-   * are in the file. A record whose xref is in `alwaysIncludeXrefs` is
-   * listed even when unchanged. */
-  gedcomDatabaseDifferences(
-    gedcomDatabase: GedcomDatabase,
-    alwaysIncludeXrefs: ReadonlySet<string> = new Set(),
-  ): {
-    originalGedcomRecord?: GedcomRecord;
-    updatedGedcomRecord?: GedcomRecord;
-  }[] {
-    return this.compareGedcomDatabase(gedcomDatabase).filter(
-      ({ originalGedcomRecord, updatedGedcomRecord }) => {
-        const xref = originalGedcomRecord?.xref ?? updatedGedcomRecord?.xref;
-        return (
-          (xref != undefined && alwaysIncludeXrefs.has(xref)) ||
-          originalGedcomRecord == undefined ||
-          updatedGedcomRecord == undefined ||
-          !gedcomRecordsEqual(originalGedcomRecord, updatedGedcomRecord)
-        );
-      },
-    );
-  }
 
   async updateGedcomDatabase(gedcomDatabase: GedcomDatabase) {
     const gedcomResource = this.gedcomResource.value();

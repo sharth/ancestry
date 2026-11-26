@@ -13,6 +13,7 @@ import {
 
 import { AncestryService } from "../../database/ancestry.service";
 import {
+  gedcomDatabaseDifferences,
   newGedcomDatabase,
   type GedcomDatabase,
 } from "../../gedcom/gedcomDatabase";
@@ -96,13 +97,18 @@ export class ValidationTableComponent<
   // change (CHAN and HEAD included). Built once per set of rows rather
   // than from the template, which would rebuild every preview on every
   // change detection.
-  readonly differences = computed(() =>
-    this.rows().map((row) =>
+  readonly differences = computed(() => {
+    const gedcom = this.ancestryService.gedcomResource.value();
+    return this.rows().map((row) =>
       row.fixedDatabase === undefined
         ? []
-        : this.ancestryService.gedcomDatabaseDifferences(row.fixedDatabase),
-    ),
-  );
+        : gedcomDatabaseDifferences(
+            gedcom?.gedcomRecords ?? [],
+            gedcom?.gedcomDatabase ?? newGedcomDatabase(),
+            row.fixedDatabase,
+          ),
+    );
+  });
 
   // The row whose fix is open in the editor dialog, if any.
   readonly reviewing = signal<Row | undefined>(undefined);

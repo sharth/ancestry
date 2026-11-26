@@ -146,15 +146,9 @@ describe("ValidationTableComponent", () => {
 
   // The preview goes through the same diff the save path writes from, so
   // it can't drift from what actually gets written to disk.
-  it("builds each preview from AncestryService.gedcomDatabaseDifferences", async () => {
-    const { table, ancestryService } = await setup();
-    const differencesSpy = vi.spyOn(
-      ancestryService,
-      "gedcomDatabaseDifferences",
-    );
+  it("builds each preview from gedcomDatabaseDifferences", async () => {
+    const { table } = await setup();
     expect(table.differences()).toHaveLength(2);
-    // Already computed during render; reading it again doesn't rebuild.
-    expect(differencesSpy).not.toHaveBeenCalled();
     expect(
       table
         .differences()[0]
@@ -164,18 +158,15 @@ describe("ValidationTableComponent", () => {
   });
 
   it("doesn't rebuild the previews on change detection", async () => {
-    const { fixture, table, ancestryService } = await setup();
-    const differencesSpy = vi.spyOn(
-      ancestryService,
-      "gedcomDatabaseDifferences",
-    );
+    const { fixture, table } = await setup();
+    const differences = table.differences();
     // e.g. picking a row to review in the editor dialog.
     vi.spyOn(table.editDialog(), "showModal").mockResolvedValue(undefined);
     screen
       .getByRole("button", { name: "Open editor with proposed changes" })
       .click();
     await fixture.whenStable();
-    expect(differencesSpy).not.toHaveBeenCalled();
+    expect(table.differences()).toBe(differences);
   });
 
   it("sticks the header and each row, each row only within its own section", async () => {

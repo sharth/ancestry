@@ -30,6 +30,7 @@ import {
   type GedcomMultimedia,
 } from "./gedcomMultimedia";
 import {
+  gedcomRecordsEqual,
   newGedcomRecord,
   serializeGedcomRecordToText,
   type GedcomRecord,
@@ -257,6 +258,35 @@ export function compareGedcomDatabase(
   });
 
   return recordMap.values().toArray();
+}
+
+/** The records that would actually change on disk if
+ * `updatedGedcomDatabase` were saved: compareGedcomDatabase()'s pairs, the
+ * same diff the save path writes from, minus those that would be written
+ * exactly as they are in the file. A record whose xref is in
+ * `alwaysIncludeXrefs` is listed even when unchanged. */
+export function gedcomDatabaseDifferences(
+  originalGedcomRecords: GedcomRecord[],
+  originalGedcomDatabase: GedcomDatabase,
+  updatedGedcomDatabase: GedcomDatabase,
+  alwaysIncludeXrefs: ReadonlySet<string> = new Set(),
+): {
+  originalGedcomRecord?: GedcomRecord;
+  updatedGedcomRecord?: GedcomRecord;
+}[] {
+  return compareGedcomDatabase(
+    originalGedcomRecords,
+    originalGedcomDatabase,
+    updatedGedcomDatabase,
+  ).filter(({ originalGedcomRecord, updatedGedcomRecord }) => {
+    const xref = originalGedcomRecord?.xref ?? updatedGedcomRecord?.xref;
+    return (
+      (xref != undefined && alwaysIncludeXrefs.has(xref)) ||
+      originalGedcomRecord == undefined ||
+      updatedGedcomRecord == undefined ||
+      !gedcomRecordsEqual(originalGedcomRecord, updatedGedcomRecord)
+    );
+  });
 }
 
 export function serializeGedcomDatabase(
