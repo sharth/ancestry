@@ -275,9 +275,9 @@ export class AncestryService {
    * Cheap when it hasn't changed: it compares the file's size and
    * modification time, without reading it. */
   async reloadIfFileChanged(): Promise<void> {
-    // A reload already under way (e.g. after our own save) picks up the
-    // change anyway.
-    if (this.gedcomResource.isLoading()) return;
+    // Compare against what a load already under way (e.g. after our own
+    // save) ends up with, not the value it's replacing.
+    await this.waitUntilLoaded();
     const loaded = this.gedcomResource.value();
     if (loaded?.gedcomFileHandle === undefined) return;
     const loadedFile = loaded.gedcomFile;
@@ -293,14 +293,19 @@ export class AncestryService {
     }
     if (!changed || this.gedcomResource.value() !== loaded) return;
     this.gedcomResource.reload();
-    if (this.gedcomResource.isLoading()) {
-      // defaultValue: the service may be destroyed (completing isLoading$)
-      // before the reload finishes, e.g. at the end of a test.
-      await firstValueFrom(
-        this.isLoading$.pipe(filter((isLoading) => !isLoading)),
-        { defaultValue: false },
-      );
-    }
+    await this.waitUntilLoaded();
+  }
+
+  private async waitUntilLoaded(): Promise<void> {
+    if (!this.gedcomResource.isLoading()) return;
+    // isLoading$ replays its last value, which can be a stale `false` from
+    // before this load started, so check the signal itself.
+    // defaultValue: the service may be destroyed (completing isLoading$)
+    // before the load finishes, e.g. at the end of a test.
+    await firstValueFrom(
+      this.isLoading$.pipe(filter(() => !this.gedcomResource.isLoading())),
+      { defaultValue: false },
+    );
   }
 
   compareGedcomDatabase(gedcomDatabase: GedcomDatabase): {

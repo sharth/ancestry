@@ -240,6 +240,15 @@ describe("AncestryService.updateGedcomDatabase", () => {
     expect(reloadSpy).toHaveBeenCalled();
   });
 
+  it("waits for a load under way before checking", async () => {
+    ancestryService.gedcomResource.reload();
+    expect(ancestryService.gedcomResource.isLoading()).toBe(true);
+
+    await ancestryService.reloadIfFileChanged();
+
+    expect(ancestryService.gedcomResource.isLoading()).toBe(false);
+  });
+
   it("checks the file when the tab gets focus", () => {
     const checkSpy = vi
       .spyOn(ancestryService, "reloadIfFileChanged")
