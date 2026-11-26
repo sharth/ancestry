@@ -4,7 +4,10 @@ import { provideRouter } from "@angular/router";
 import { render } from "@testing-library/angular/zoneless";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { AncestryService } from "../../database/ancestry.service";
+import {
+  AncestryService,
+  newGedcomResourceValue,
+} from "../../database/ancestry.service";
 import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import type { GedcomEditorComponent } from "../gedcom-editor/gedcom-editor.component";
 import { GedcomEditorDialogComponent } from "./gedcom-editor-dialog.component";
@@ -19,6 +22,7 @@ describe("GedcomEditorDialogComponent", () => {
       providers: [provideRouter([])],
       bindings: [
         inputBinding("tabs", signal([{ type: "INDI" as const, xref: "" }])),
+        inputBinding("gedcom", signal(newGedcomResourceValue())),
         inputBinding("ancestryDatabase", signal(newGedcomDatabase())),
       ],
       waitForStableOnRender: true,

@@ -7,7 +7,10 @@ import {
   type ElementRef,
 } from "@angular/core";
 
-import { AncestryService } from "../../database/ancestry.service";
+import {
+  AncestryService,
+  type GedcomResourceValue,
+} from "../../database/ancestry.service";
 import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
 import type { TabInformation } from "../gedcom-editor/gedcom-editor-interface";
 import { GedcomEditorComponent } from "../gedcom-editor/gedcom-editor.component";
@@ -26,6 +29,7 @@ export class GedcomEditorDialogComponent {
   private readonly ancestryService = inject(AncestryService);
 
   readonly tabs = input.required<TabInformation[]>();
+  readonly gedcom = input.required<GedcomResourceValue>();
   readonly ancestryDatabase = input.required<GedcomDatabase>();
 
   readonly editDialog =

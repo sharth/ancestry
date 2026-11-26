@@ -9,6 +9,7 @@
     to keep it.
   </p>
   <app-validation-table
+    [gedcom]="gedcom()"
     [columns]="['Abbreviation', 'Sources', 'Conflicts']"
     [rows]="rows()"
   >

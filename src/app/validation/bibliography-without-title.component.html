@@ -5,7 +5,11 @@
     These sources have a bibliography (_BIBL) but no title. The suggested fix
     moves the bibliography into the title.
   </p>
-  <app-validation-table [columns]="['Source', 'Bibliography']" [rows]="rows()">
+  <app-validation-table
+    [gedcom]="gedcom()"
+    [columns]="['Source', 'Bibliography']"
+    [rows]="rows()"
+  >
     <ng-template let-row>
       <div role="cell">
         <a [routerLink]="['/source', row.source.xref]">

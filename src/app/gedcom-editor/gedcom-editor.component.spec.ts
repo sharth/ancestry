@@ -66,6 +66,7 @@ describe("GedcomEditorComponent Integration", () => {
 
     fixture.componentRef.setInput("tabs", [{ type: "INDI", xref: "" }]);
     fixture.componentRef.setInput("ancestryDatabase", initialDatabase);
+    fixture.componentRef.setInput("gedcom", newGedcomResourceValue());
   });
 
   it("should create", () => {
@@ -339,6 +340,7 @@ describe("GedcomEditorComponent unlinked multimedia files", () => {
         },
       }),
     );
+    fixture.componentRef.setInput("gedcom", newGedcomResourceValue());
   });
 
   function setFilePath(xref: string, filePath: string) {
@@ -410,10 +412,8 @@ describe("GedcomEditorComponent differences with a real, unedited family", () =>
       originalDatabase,
     );
 
-    vi.spyOn(
-      TestBed.inject(AncestryService).gedcomResource,
-      "value",
-    ).mockReturnValue(
+    renderResult.fixture.componentRef.setInput(
+      "gedcom",
       newGedcomResourceValue({
         gedcomRecords: originalGedcomRecords,
         gedcomDatabase: originalDatabase,
@@ -481,6 +481,10 @@ describe("GedcomEditorComponent hasUnsavedChanges with real form interaction", (
       { type: "FAM", xref: "@F0@" },
     ]);
     renderResult.fixture.componentRef.setInput("ancestryDatabase", database);
+    renderResult.fixture.componentRef.setInput(
+      "gedcom",
+      newGedcomResourceValue(),
+    );
     renderResult.fixture.detectChanges();
     await renderResult.fixture.whenStable();
     return renderResult;
@@ -534,6 +538,10 @@ describe("GedcomEditorComponent edits leave the original individual untouched", 
       { type: "INDI", xref: "@I0@" },
     ]);
     renderResult.fixture.componentRef.setInput("ancestryDatabase", database);
+    renderResult.fixture.componentRef.setInput(
+      "gedcom",
+      newGedcomResourceValue(),
+    );
     renderResult.fixture.detectChanges();
     await renderResult.fixture.whenStable();
 
@@ -574,6 +582,10 @@ describe("GedcomEditorComponent opening an existing record", () => {
       { type: "OBJE", xref: "" },
     ]);
     renderResult.fixture.componentRef.setInput("ancestryDatabase", database);
+    renderResult.fixture.componentRef.setInput(
+      "gedcom",
+      newGedcomResourceValue(),
+    );
     renderResult.fixture.detectChanges();
     await renderResult.fixture.whenStable();
 

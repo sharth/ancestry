@@ -8,6 +8,7 @@
     first source's value; open the editor to keep the other.
   </p>
   <app-validation-table
+    [gedcom]="gedcom()"
     [columns]="['Call number', 'Sources', 'Conflicts']"
     [rows]="rows()"
   >

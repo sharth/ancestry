@@ -2,7 +2,11 @@
   <p>Every source is cited at least once.</p>
 } @else {
   <p>No citation anywhere in the file uses these sources.</p>
-  <app-validation-table [columns]="['Source', 'Title']" [rows]="rows()">
+  <app-validation-table
+    [gedcom]="gedcom()"
+    [columns]="['Source', 'Title']"
+    [rows]="rows()"
+  >
     <ng-template let-row>
       <div role="cell">
         <a [routerLink]="['/source', row.source.xref]">

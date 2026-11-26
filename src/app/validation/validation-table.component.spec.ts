@@ -3,7 +3,10 @@ import { TestBed } from "@angular/core/testing";
 import { render, screen } from "@testing-library/angular/zoneless";
 import { describe, expect, it, vi } from "vitest";
 
-import { AncestryService } from "../../database/ancestry.service";
+import {
+  AncestryService,
+  newGedcomResourceValue,
+} from "../../database/ancestry.service";
 import {
   newGedcomDatabase,
   type GedcomDatabase,
@@ -27,6 +30,7 @@ const allFixedDatabase = newGedcomDatabase();
   imports: [ValidationTableComponent],
   template: `
     <app-validation-table
+      [gedcom]="gedcom"
       [columns]="['Name']"
       [rows]="rows()"
       [fixAll]="fixAll()"
@@ -38,6 +42,7 @@ const allFixedDatabase = newGedcomDatabase();
   `,
 })
 class HostComponent {
+  readonly gedcom = newGedcomResourceValue();
   readonly rows = signal<Row[]>([
     {
       key: "a",

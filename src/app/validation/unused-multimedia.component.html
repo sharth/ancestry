@@ -2,7 +2,11 @@
   <p>Every multimedia object is linked from at least one place.</p>
 } @else {
   <p>Nothing in the file links to these multimedia objects.</p>
-  <app-validation-table [columns]="['Multimedia', 'File']" [rows]="rows()">
+  <app-validation-table
+    [gedcom]="gedcom()"
+    [columns]="['Multimedia', 'File']"
+    [rows]="rows()"
+  >
     <ng-template let-row>
       <div role="cell">
         <a [routerLink]="['/multimedia', row.multimedia.xref]">

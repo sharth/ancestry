@@ -32,6 +32,7 @@
 
   <app-gedcom-editor-dialog
     #editDialog
+    [gedcom]="gedcom()"
     [tabs]="[{ type: 'FAM', xref: xref() }]"
     [ancestryDatabase]="ancestryDatabase()"
   />

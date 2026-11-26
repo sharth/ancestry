@@ -6,6 +6,7 @@
     the repository it suggests is listed alongside.
   </p>
   <app-validation-table
+    [gedcom]="gedcom()"
     [columns]="['Source', 'Title', 'Suggested repositories']"
     [rows]="rows()"
   >

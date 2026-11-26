@@ -7,6 +7,7 @@
     when a source cited more than one), and deletes the others.
   </p>
   <app-validation-table
+    [gedcom]="gedcom()"
     [columns]="['Name', 'Keep', 'Merge and delete']"
     [rows]="rows()"
   >

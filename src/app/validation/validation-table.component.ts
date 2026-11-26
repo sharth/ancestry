@@ -11,7 +11,10 @@ import {
   ViewEncapsulation,
 } from "@angular/core";
 
-import { AncestryService } from "../../database/ancestry.service";
+import {
+  AncestryService,
+  type GedcomResourceValue,
+} from "../../database/ancestry.service";
 import {
   diffGedcomDatabase,
   newGedcomDatabase,
@@ -61,6 +64,8 @@ export class ValidationTableComponent<
 > implements ComponentWithUnsavedChanges {
   private readonly ancestryService = inject(AncestryService);
 
+  /** The loaded file, which each row's preview compares against. */
+  readonly gedcom = input.required<GedcomResourceValue>();
   readonly columns = input.required<string[]>();
   /** Each column's CSS grid track size; every column gets an equal share
    * by default. */
@@ -98,15 +103,11 @@ export class ValidationTableComponent<
   // than from the template, which would rebuild every preview on every
   // change detection.
   readonly differences = computed(() => {
-    const gedcom = this.ancestryService.gedcomResource.value();
+    const { gedcomRecords, gedcomDatabase } = this.gedcom();
     return this.rows().map((row) =>
       row.fixedDatabase === undefined
         ? []
-        : diffGedcomDatabase(
-            gedcom?.gedcomRecords ?? [],
-            gedcom?.gedcomDatabase ?? newGedcomDatabase(),
-            row.fixedDatabase,
-          ),
+        : diffGedcomDatabase(gedcomRecords, gedcomDatabase, row.fixedDatabase),
     );
   });
 

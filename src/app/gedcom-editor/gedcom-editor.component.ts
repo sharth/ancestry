@@ -9,10 +9,12 @@ import {
 import { FormField, form } from "@angular/forms/signals";
 import { produce } from "immer";
 
-import { AncestryService } from "../../database/ancestry.service";
+import {
+  AncestryService,
+  type GedcomResourceValue,
+} from "../../database/ancestry.service";
 import {
   diffGedcomDatabase,
-  newGedcomDatabase,
   type GedcomDatabase,
 } from "../../gedcom/gedcomDatabase";
 import { newGedcomFamily } from "../../gedcom/gedcomFamily";
@@ -71,6 +73,8 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   // default; an empty xref on any of them means "create a new record of
   // this type" (its xref is calculated once resolved).
   readonly tabs = input.required<TabInformation[]>();
+  /** The loaded file, which differences() compares against. */
+  readonly gedcom = input.required<GedcomResourceValue>();
   readonly ancestryDatabase = input.required<GedcomDatabase>();
   readonly finished = output();
 
@@ -154,10 +158,9 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     // aren't open only show up here when they genuinely differ (e.g. an
     // incidental header DATE/VERS stamp, or another tab's edits).
     const openXrefs = new Set(this.openTabs().map((tab) => tab.xref));
-    const gedcom = this.ancestryService.gedcomResource.value();
     return diffGedcomDatabase(
-      gedcom?.gedcomRecords ?? [],
-      gedcom?.gedcomDatabase ?? newGedcomDatabase(),
+      this.gedcom().gedcomRecords,
+      this.gedcom().gedcomDatabase,
       this.workingDatabase(),
       openXrefs,
     );

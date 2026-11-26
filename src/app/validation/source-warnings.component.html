@@ -2,6 +2,7 @@
   <p>No source has an error or a warning.</p>
 } @else {
   <app-validation-table
+    [gedcom]="gedcom()"
     [columns]="['Source', 'Message']"
     [columnSizes]="['minmax(0, 1fr)', 'minmax(0, 3fr)']"
     [rows]="rows()"
