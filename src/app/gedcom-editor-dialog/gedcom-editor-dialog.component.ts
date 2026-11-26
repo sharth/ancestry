@@ -30,7 +30,8 @@ export class GedcomEditorDialogComponent {
 
   readonly tabs = input.required<TabInformation[]>();
   readonly gedcom = input.required<GedcomResourceValue>();
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  /** The database the editor starts from; the loaded file's by default. */
+  readonly ancestryDatabase = input<GedcomDatabase>();
 
   readonly editDialog =
     viewChild.required<ElementRef<HTMLDialogElement>>("editDialog");

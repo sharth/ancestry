@@ -17,7 +17,6 @@ import {
 } from "../../database/ancestry.service";
 import {
   diffGedcomDatabase,
-  newGedcomDatabase,
   type GedcomDatabase,
 } from "../../gedcom/gedcomDatabase";
 import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
@@ -37,8 +36,6 @@ export interface ValidationRow {
   /** Says what the fix does, after "Open editor with proposed changes: ". */
   fixLabel?: string;
 }
-
-const emptyDatabase = newGedcomDatabase();
 
 /** The table every validation tab lists its findings in. The tab gives the
  * column headers and an `<ng-template let-row>` holding one
@@ -131,6 +128,4 @@ export class ValidationTableComponent<
     if (!granted) return;
     await this.ancestryService.updateGedcomDatabase(database);
   }
-
-  protected readonly emptyDatabase = emptyDatabase;
 }
