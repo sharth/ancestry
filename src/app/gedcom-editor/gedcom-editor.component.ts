@@ -10,7 +10,11 @@ import { FormField, form } from "@angular/forms/signals";
 import { produce } from "immer";
 
 import { AncestryService } from "../../database/ancestry.service";
-import type { GedcomDatabase } from "../../gedcom/gedcomDatabase";
+import {
+  diffGedcomDatabase,
+  newGedcomDatabase,
+  type GedcomDatabase,
+} from "../../gedcom/gedcomDatabase";
 import { newGedcomFamily } from "../../gedcom/gedcomFamily";
 import { newGedcomIndividual } from "../../gedcom/gedcomIndividual";
 import {
@@ -150,7 +154,10 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     // aren't open only show up here when they genuinely differ (e.g. an
     // incidental header DATE/VERS stamp, or another tab's edits).
     const openXrefs = new Set(this.openTabs().map((tab) => tab.xref));
-    return this.ancestryService.gedcomDatabaseDifferences(
+    const gedcom = this.ancestryService.gedcomResource.value();
+    return diffGedcomDatabase(
+      gedcom?.gedcomRecords ?? [],
+      gedcom?.gedcomDatabase ?? newGedcomDatabase(),
       this.workingDatabase(),
       openXrefs,
     );

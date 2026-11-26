@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import { newGedcomChangeDate } from "./gedcomChangeDate";
 import {
   compareGedcomDatabase,
+  diffGedcomDatabase,
   parseGedcomDatabase,
   serializeGedcomDatabase,
 } from "./gedcomDatabase";
@@ -109,5 +110,61 @@ describe("compareGedcomDatabase change dates", () => {
     expect(originalDatabase.sources["@S1@"]?.changeDate).toEqual(
       newGedcomChangeDate({ value: "5 AUG 2020" }),
     );
+  });
+});
+
+describe("diffGedcomDatabase", () => {
+  const originalGedcomRecords = parseGedcomRecords(
+    [
+      "0 HEAD",
+      "1 GEDC",
+      "2 VERS 7.0.18",
+      "0 @I1@ INDI",
+      "1 SEX M",
+      "0 @I2@ INDI",
+      "1 SEX F",
+      "0 @S1@ SOUR",
+      "1 TITL Old title",
+      "0 TRLR",
+    ].join("\n"),
+  );
+  const originalDatabase = parseGedcomDatabase(originalGedcomRecords);
+  const updated = produce(originalDatabase, (draft) => {
+    const source = draft.sources["@S1@"];
+    if (source) source.title = "New title";
+    delete draft.individuals["@I1@"];
+    draft.repositories["@R1@"] = newGedcomRepository({ xref: "@R1@" });
+  });
+
+  // HEAD is left out: it's regenerated (and so differs) on every compare.
+  function changedXrefs(alwaysIncludeXrefs?: ReadonlySet<string>) {
+    return diffGedcomDatabase(
+      originalGedcomRecords,
+      originalDatabase,
+      updated,
+      alwaysIncludeXrefs,
+    )
+      .filter(
+        ({ originalGedcomRecord, updatedGedcomRecord }) =>
+          (originalGedcomRecord ?? updatedGedcomRecord)?.tag !== "HEAD",
+      )
+      .map(
+        ({ originalGedcomRecord, updatedGedcomRecord }) =>
+          originalGedcomRecord?.xref ?? updatedGedcomRecord?.xref,
+      );
+  }
+
+  it("lists only the records that would be written differently", () => {
+    // Removed, edited and added; the unchanged @I2@ and TRLR are left out.
+    expect(changedXrefs()).toEqual(["@I1@", "@S1@", "@R1@"]);
+  });
+
+  it("also lists an unchanged record whose xref is always included", () => {
+    expect(changedXrefs(new Set(["@I2@"]))).toEqual([
+      "@I1@",
+      "@I2@",
+      "@S1@",
+      "@R1@",
+    ]);
   });
 });

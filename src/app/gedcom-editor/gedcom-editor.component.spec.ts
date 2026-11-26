@@ -5,9 +5,11 @@ import { userEvent } from "@testing-library/user-event";
 import { produce } from "immer";
 import { assert, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { AncestryService } from "../../database/ancestry.service";
 import {
-  compareGedcomDatabase,
+  AncestryService,
+  newGedcomResourceValue,
+} from "../../database/ancestry.service";
+import {
   newGedcomDatabase,
   parseGedcomDatabase,
 } from "../../gedcom/gedcomDatabase";
@@ -23,7 +25,6 @@ import {
 import { newGedcomMultimedia } from "../../gedcom/gedcomMultimedia";
 import { newGedcomName } from "../../gedcom/gedcomName";
 import {
-  newGedcomRecord,
   parseGedcomRecords,
   serializeGedcomRecordToText,
 } from "../../gedcom/gedcomRecord";
@@ -71,67 +72,12 @@ describe("GedcomEditorComponent Integration", () => {
     expect(component).toBeTruthy();
   });
 
-  describe("differences tests", () => {
-    // AncestryService.compareGedcomDatabase() diffs against whatever GEDCOM
-    // file is currently loaded (nothing, in this test environment), so it's
-    // stubbed directly to control what differences() reports. differences()
-    // still drives the Gedcom diff-review tab.
-    it("reflects an empty compareGedcomDatabase result", () => {
-      vi.spyOn(ancestryService, "compareGedcomDatabase").mockReturnValue([]);
-      expect(component.differences()).toEqual([]);
-    });
-
-    it("reflects a non-empty compareGedcomDatabase result", () => {
-      const difference = {
-        originalGedcomRecord: undefined,
-        updatedGedcomRecord: undefined,
-      };
-      vi.spyOn(ancestryService, "compareGedcomDatabase").mockReturnValue([
-        difference,
-      ]);
-      expect(component.differences()).toEqual([difference]);
-    });
-
-    it("includes the open tab's record even when it is unchanged", () => {
-      // The default tab (set in beforeEach) is a new individual resolved
-      // to xref @I1@. Its Gedcom should still show up here even though
-      // nothing differs from the file on disk, so the Gedcom tab isn't
-      // hidden just because there's nothing to show as changed.
-      const unchangedOpenRecord = newGedcomRecord({
-        tag: "INDI",
-        xref: "@I1@",
-      });
-      const unchangedUnrelatedRecord = newGedcomRecord({
-        tag: "INDI",
-        xref: "@I0@",
-      });
-      vi.spyOn(ancestryService, "compareGedcomDatabase").mockReturnValue([
-        {
-          originalGedcomRecord: unchangedOpenRecord,
-          updatedGedcomRecord: unchangedOpenRecord,
-        },
-        {
-          originalGedcomRecord: unchangedUnrelatedRecord,
-          updatedGedcomRecord: unchangedUnrelatedRecord,
-        },
-      ]);
-
-      expect(component.differences()).toEqual([
-        {
-          originalGedcomRecord: unchangedOpenRecord,
-          updatedGedcomRecord: unchangedOpenRecord,
-        },
-      ]);
-    });
-  });
-
   describe("hasUnsavedChanges tests", () => {
     // hasUnsavedChanges() is based on the Signal Forms "dirty" state, not
-    // compareGedcomDatabase(), so it's unaffected by what that mock reports.
-    it("returns false when the form hasn't been touched, even if compareGedcomDatabase reports differences", () => {
-      vi.spyOn(ancestryService, "compareGedcomDatabase").mockReturnValue([
-        { originalGedcomRecord: undefined, updatedGedcomRecord: undefined },
-      ]);
+    // diffGedcomDatabase(), so it's false even though differences()
+    // reports the whole database as new (no file is loaded here).
+    it("returns false when the form hasn't been touched, even if there are differences", () => {
+      expect(component.differences()).not.toEqual([]);
       expect(component.hasUnsavedChanges()).toBe(false);
     });
   });
@@ -362,12 +308,11 @@ describe("GedcomEditorComponent Integration", () => {
 // GedcomIndividual/GedcomSource), so FAM child records the parser doesn't
 // have a typed field for (e.g. NOTE, RIN) were silently dropped on
 // serialize. That made the freshly opened, unedited family look
-// different from the file on disk, which compareGedcomDatabase() (used
-// here via the real implementation, not a canned mock) reports as a real
-// difference. differences() still surfaces that comparison (it drives the
-// Gedcom diff-review tab), so it's what this regression test checks now;
-// hasUnsavedChanges() itself no longer depends on compareGedcomDatabase()
-// at all -- see the dirty-form tests below.
+// different from the file on disk, which diffGedcomDatabase()
+// reports as a real difference. differences() still surfaces that
+// comparison (it drives the Gedcom diff-review tab), so it's what this
+// regression test checks now; hasUnsavedChanges() itself no longer depends
+// on diffGedcomDatabase() at all -- see the dirty-form tests below.
 //
 // This is a separate top-level describe, with its own TestBed, rather
 // than nested in the suite above: that suite's beforeEach already
@@ -466,14 +411,13 @@ describe("GedcomEditorComponent differences with a real, unedited family", () =>
     );
 
     vi.spyOn(
-      TestBed.inject(AncestryService),
-      "compareGedcomDatabase",
-    ).mockImplementation((gedcomDatabase) =>
-      compareGedcomDatabase(
-        originalGedcomRecords,
-        originalDatabase,
-        gedcomDatabase,
-      ),
+      TestBed.inject(AncestryService).gedcomResource,
+      "value",
+    ).mockReturnValue(
+      newGedcomResourceValue({
+        gedcomRecords: originalGedcomRecords,
+        gedcomDatabase: originalDatabase,
+      }),
     );
 
     // The open family's record is always included (the point of this
