@@ -16,6 +16,7 @@ import {
   newGedcomDatabase,
   type GedcomDatabase,
 } from "../../gedcom/gedcomDatabase";
+import { saveOrAlert } from "../../util/save-or-alert";
 import { GedcomDiffComponent } from "../gedcom-diff/gedcom-diff.component";
 import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
 import type { TabInformation } from "../gedcom-editor/gedcom-editor-interface";
@@ -122,7 +123,9 @@ export class ValidationTableComponent<
   async submit(database: GedcomDatabase) {
     const granted = await this.ancestryService.requestWritePermission();
     if (!granted) return;
-    await this.ancestryService.updateGedcomDatabase(database);
+    await saveOrAlert(() =>
+      this.ancestryService.updateGedcomDatabase(database),
+    );
   }
 
   protected readonly emptyDatabase = emptyDatabase;
