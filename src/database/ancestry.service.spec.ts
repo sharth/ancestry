@@ -81,7 +81,7 @@ describe("ancestryDatabaseGuard", () => {
 
     await ancestryService.clearDatabase();
     // liveQuery's change notification lands asynchronously, separately from
-    // the transaction promise clearDatabase() awaits, so give it a moment to
+    // the promise clearDatabase() awaits, so give it a moment to
     // actually reach gedcomResource before navigating again.
     await vi.waitFor(() => {
       expect(
