@@ -4,6 +4,7 @@ import { RouterModule } from "@angular/router";
 import type { GedcomResourceValue } from "../../database/ancestry.service";
 import { gedcomFamilyFacts } from "../../gedcom/gedcomFactMetadata";
 import { getFamilySourceCitations } from "../../gedcom/gedcomFamily";
+import type { GedcomSource } from "../../gedcom/gedcomSource";
 import type { GedcomSourceCitation } from "../../gedcom/gedcomSourceCitation";
 
 @Component({
@@ -52,7 +53,15 @@ export class FamilySourcesComponent {
           source: ancestryDatabase.sources[sourceXref],
           rows,
         }))
-        .sort((a, b) => a.sourceXref.localeCompare(b.sourceXref)),
+        // Sort by the same label the template shows for each source.
+        .sort((a, b) => sourceLabel(a).localeCompare(sourceLabel(b))),
     };
   });
+}
+
+function sourceLabel(group: {
+  sourceXref: string;
+  source?: GedcomSource;
+}): string {
+  return group.source?.abbr || group.source?.title || group.sourceXref;
 }

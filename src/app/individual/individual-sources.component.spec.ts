@@ -139,4 +139,13 @@ describe("IndividualSourcesComponent", () => {
     expect(text).toContain("Nickname reference");
     expect(text).not.toContain("NAME");
   });
+
+  it("orders sources by their displayed label, not by xref", () => {
+    const element = fixture.nativeElement as HTMLElement;
+    const headings = Array.from(
+      element.querySelectorAll(".sources-grid-title"),
+      (heading) => heading.textContent.trim(),
+    );
+    expect(headings).toEqual(["FGS", "Vital Records"]);
+  });
 });

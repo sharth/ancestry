@@ -2,6 +2,7 @@ import { Component, computed, input, viewChild } from "@angular/core";
 import { RouterLink } from "@angular/router";
 
 import type { GedcomResourceValue } from "../../database/ancestry.service";
+import type { GedcomSource } from "../../gedcom/gedcomSource";
 import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
 import type { ComponentWithUnsavedChanges } from "../unsaved-changes.guard";
 
@@ -24,7 +25,9 @@ export class SourcesComponent implements ComponentWithUnsavedChanges {
   vm = computed(() => {
     const ancestryDatabase = this.ancestryDatabase();
     const sources = Object.values(ancestryDatabase.sources);
-    sources.sort((lhs, rhs) => lhs.abbr.localeCompare(rhs.abbr));
+    // Sort by the same label the template shows for each source.
+    const label = (source: GedcomSource) => source.abbr || source.xref;
+    sources.sort((lhs, rhs) => label(lhs).localeCompare(label(rhs)));
 
     return { sources };
   });

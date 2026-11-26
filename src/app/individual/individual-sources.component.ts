@@ -8,6 +8,7 @@ import {
 } from "../../gedcom/gedcomFactMetadata";
 import { getFamilySourceCitations } from "../../gedcom/gedcomFamily";
 import { getIndividualSourceCitations } from "../../gedcom/gedcomIndividual";
+import type { GedcomSource } from "../../gedcom/gedcomSource";
 import type { GedcomSourceCitation } from "../../gedcom/gedcomSourceCitation";
 import { IndividualLinkComponent } from "../individual-link/individual-link.component";
 
@@ -78,7 +79,15 @@ export class IndividualSourcesComponent {
           source: ancestryDatabase.sources[sourceXref],
           rows,
         }))
-        .sort((a, b) => a.sourceXref.localeCompare(b.sourceXref)),
+        // Sort by the same label the template shows for each source.
+        .sort((a, b) => sourceLabel(a).localeCompare(sourceLabel(b))),
     };
   });
+}
+
+function sourceLabel(group: {
+  sourceXref: string;
+  source?: GedcomSource;
+}): string {
+  return group.source?.abbr || group.source?.title || group.sourceXref;
 }
