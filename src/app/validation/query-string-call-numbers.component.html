@@ -1,0 +1,41 @@
+@if (rows().length === 0) {
+  <p>No call number repeats another with only a query string added.</p>
+} @else {
+  <p>
+    These sources have the same URL as a call number twice, once with a query
+    string and once without. The suggested fix removes the one with the query
+    string.
+  </p>
+  <app-validation-table
+    [columns]="['Source', 'Call numbers']"
+    [columnSizes]="['minmax(0, 1fr)', 'minmax(0, 2fr)']"
+    [rows]="rows()"
+    [fixAll]="fixAll"
+  >
+    <ng-template let-row>
+      <div role="cell">
+        <a [routerLink]="['/source', row.source.xref]">
+          {{ row.source.abbr || row.source.xref }}
+        </a>
+      </div>
+      <div role="cell">
+        @for (callNumber of row.callNumbers; track callNumber.withQuery) {
+          <dl class="row mb-0">
+            <dt class="col-auto">Remove</dt>
+            <dd class="col mb-0">
+              <app-repository-call-number [callNumber]="callNumber.withQuery" />
+            </dd>
+          </dl>
+          <dl class="row mb-2">
+            <dt class="col-auto">Keep</dt>
+            <dd class="col mb-0">
+              <app-repository-call-number
+                [callNumber]="callNumber.withoutQuery"
+              />
+            </dd>
+          </dl>
+        }
+      </div>
+    </ng-template>
+  </app-validation-table>
+}

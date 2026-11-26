@@ -7,6 +7,7 @@ import { findDuplicateCallNumbers } from "./duplicate-call-numbers.component";
 import { findDuplicateRepositories } from "./duplicate-repositories.component";
 import { findDuplicateSources } from "./duplicate-sources.component";
 import { findOutdatedUrls } from "./outdated-urls.component";
+import { findQueryStringCallNumbers } from "./query-string-call-numbers.component";
 import { findSourceWarnings } from "./source-warnings.component";
 import { findSourcesWithoutRepositories } from "./sources-without-repositories.component";
 import { findTreeIdsToConvert } from "./tree-ids.component";
@@ -18,6 +19,10 @@ const tabs = [
   { id: "source-warnings", label: "Source warnings" },
   { id: "sources-without-repositories", label: "Sources without repositories" },
   { id: "duplicate-call-numbers", label: "Duplicate call numbers" },
+  {
+    id: "query-string-call-numbers",
+    label: "Call numbers with query strings",
+  },
   { id: "duplicate-repositories", label: "Duplicate repositories" },
   { id: "duplicate-sources", label: "Duplicate sources" },
   { id: "unused-sources", label: "Unused sources" },
@@ -52,6 +57,7 @@ export class ValidationComponent {
       "sources-without-repositories":
         findSourcesWithoutRepositories(database).length,
       "duplicate-call-numbers": findDuplicateCallNumbers(database).length,
+      "query-string-call-numbers": findQueryStringCallNumbers(database).length,
       "duplicate-repositories": findDuplicateRepositories(database).length,
       "unused-sources": findUnusedSources(database).length,
       "unused-multimedia": findUnusedMultimedia(database).length,
