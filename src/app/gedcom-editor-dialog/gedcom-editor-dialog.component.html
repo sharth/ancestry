@@ -3,7 +3,7 @@
     <app-gedcom-editor
       [tabs]="tabs()"
       [gedcom]="gedcom()"
-      [ancestryDatabase]="ancestryDatabase() ?? gedcom().gedcomDatabase"
+      [ancestryDatabase]="ancestryDatabase()"
       (finished)="editDialog.close()"
     />
   }

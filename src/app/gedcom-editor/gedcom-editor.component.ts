@@ -75,15 +75,21 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   readonly tabs = input.required<TabInformation[]>();
   /** The loaded file, which differences() compares against. */
   readonly gedcom = input.required<GedcomResourceValue>();
-  readonly ancestryDatabase = input.required<GedcomDatabase>();
+  /** The database to start editing from; the loaded file's by default.
+   * The validation table passes a row's fixed database here. */
+  readonly ancestryDatabase = input<GedcomDatabase>();
   readonly finished = output();
+
+  private readonly startingDatabase = computed(
+    () => this.ancestryDatabase() ?? this.gedcom().gedcomDatabase,
+  );
 
   // The records open as tabs in the editor: `tabs()` with each xref
   // resolved, plus any opened later with openTab(). An empty xref means
   // "create a new record of this type," so we calculate the next available
   // xref for it.
   readonly openTabs = linkedSignal<TabInformation[]>(() => {
-    const database = this.ancestryDatabase();
+    const database = this.startingDatabase();
     return this.tabs().map((tab): TabInformation => {
       if (tab.xref) return tab;
       switch (tab.type) {
@@ -104,7 +110,7 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   });
 
   // The GedcomDatabase that the form edits, and that submitting saves. It
-  // starts from ancestryDatabase(), with a new record for each open tab
+  // starts from startingDatabase(), with a new record for each open tab
   // whose xref isn't in it yet. Opening another tab keeps the edits made so
   // far and only adds that tab's record.
   readonly workingDatabase = linkedSignal<
@@ -112,7 +118,7 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     GedcomDatabase
   >({
     source: () => ({
-      database: this.ancestryDatabase(),
+      database: this.startingDatabase(),
       tabs: this.openTabs(),
     }),
     computation: ({ database, tabs }, previous) => {
@@ -306,7 +312,7 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   readonly unlinkedMultimediaFiles = computed<
     { xref: string; oldPath: string; stillLinkedFrom: string[] }[]
   >(() => {
-    const original = this.ancestryDatabase().multimedias;
+    const original = this.startingDatabase().multimedias;
     const working = Object.values(this.workingDatabase().multimedias);
     return Object.values(original).flatMap((multimedia) => {
       const oldPath = multimedia.filePath;
