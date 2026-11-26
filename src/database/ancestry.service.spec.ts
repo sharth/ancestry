@@ -223,6 +223,67 @@ describe("AncestryService.updateGedcomDatabase", () => {
     expect(await readFile()).toContain("2 GIVN Jane");
   });
 
+  it("doesn't reload when the file is unchanged", async () => {
+    const reloadSpy = vi.spyOn(ancestryService.gedcomResource, "reload");
+
+    await ancestryService.reloadIfFileChanged();
+
+    expect(reloadSpy).not.toHaveBeenCalled();
+  });
+
+  it("reloads when another program changed the file", async () => {
+    const reloadSpy = vi.spyOn(ancestryService.gedcomResource, "reload");
+
+    await writeFile(MINIMAL_GEDCOM_TEXT.replace("John", "Johnny"));
+    await ancestryService.reloadIfFileChanged();
+
+    expect(reloadSpy).toHaveBeenCalled();
+  });
+
+  it("waits for a load under way before checking", async () => {
+    ancestryService.gedcomResource.reload();
+    expect(ancestryService.gedcomResource.isLoading()).toBe(true);
+
+    await ancestryService.reloadIfFileChanged();
+
+    expect(ancestryService.gedcomResource.isLoading()).toBe(false);
+  });
+
+  it("checks the file when the tab gets focus", () => {
+    const checkSpy = vi
+      .spyOn(ancestryService, "reloadIfFileChanged")
+      .mockResolvedValue();
+
+    window.dispatchEvent(new Event("focus"));
+
+    expect(checkSpy).toHaveBeenCalled();
+  });
+
+  it("notices the file changing without being asked", async () => {
+    const reloadSpy = vi.spyOn(ancestryService.gedcomResource, "reload");
+    TestBed.tick();
+
+    await writeFile(MINIMAL_GEDCOM_TEXT.replace("John", "Johnny"));
+
+    await vi.waitFor(() => {
+      expect(reloadSpy).toHaveBeenCalled();
+    });
+  });
+
+  it("tells other tabs it saved", async () => {
+    const otherTab = new BroadcastChannel("ancestry-gedcom-saved");
+    const received = new Promise<unknown>((resolve) => {
+      otherTab.onmessage = (event) => {
+        resolve(event.data);
+      };
+    });
+
+    await ancestryService.updateGedcomDatabase(renameJohnToJane());
+
+    await expect(received).resolves.toBe("saved");
+    otherTab.close();
+  });
+
   it("refuses to overwrite a file that changed after it was loaded", async () => {
     const changedElsewhere = MINIMAL_GEDCOM_TEXT.replace(
       "John /Doe/",
@@ -236,5 +297,29 @@ describe("AncestryService.updateGedcomDatabase", () => {
     ).rejects.toBeInstanceOf(GedcomFileChangedError);
 
     expect(await readFile()).toBe(changedElsewhere);
+  });
+});
+
+describe("AncestryService across tabs", () => {
+  // Stands in for another tab: a channel of the same name in this page.
+  let otherTab: BroadcastChannel;
+
+  beforeEach(() => {
+    otherTab = new BroadcastChannel("ancestry-gedcom-saved");
+  });
+
+  afterEach(() => {
+    otherTab.close();
+  });
+
+  it("reloads the file when another tab saves it", async () => {
+    const ancestryService = TestBed.inject(AncestryService);
+    const reloadSpy = vi.spyOn(ancestryService.gedcomResource, "reload");
+
+    otherTab.postMessage("saved");
+
+    await vi.waitFor(() => {
+      expect(reloadSpy).toHaveBeenCalled();
+    });
   });
 });
