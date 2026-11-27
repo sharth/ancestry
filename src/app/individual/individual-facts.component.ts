@@ -21,7 +21,7 @@ export class IndividualFactsComponent {
   readonly ancestryDatabase = computed(() => this.gedcom().gedcomDatabase);
   readonly individual = input.required<GedcomIndividual>();
 
-  readonly events = computed((): TimelineEvent[] => {
+  readonly events = computed<TimelineEvent[]>(() => {
     const ancestryDatabase = this.ancestryDatabase();
     const individual = this.individual();
 
