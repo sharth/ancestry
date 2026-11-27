@@ -16,24 +16,15 @@ import {
   type GedcomDatabase,
 } from "../../gedcom/gedcomDatabase";
 import { newGedcomFamily } from "../../gedcom/gedcomFamily";
-import {
-  type GedcomIndividual,
-  newGedcomIndividual,
-} from "../../gedcom/gedcomIndividual";
+import { newGedcomIndividual } from "../../gedcom/gedcomIndividual";
 import {
   type GedcomMultimedia,
   newGedcomMultimedia,
 } from "../../gedcom/gedcomMultimedia";
 import { displayGedcomName } from "../../gedcom/gedcomName";
-import {
-  type GedcomRepository,
-  newGedcomRepository,
-} from "../../gedcom/gedcomRepository";
-import { type GedcomSource, newGedcomSource } from "../../gedcom/gedcomSource";
-import {
-  type GedcomSubmitter,
-  newGedcomSubmitter,
-} from "../../gedcom/gedcomSubmitter";
+import { newGedcomRepository } from "../../gedcom/gedcomRepository";
+import { newGedcomSource } from "../../gedcom/gedcomSource";
+import { newGedcomSubmitter } from "../../gedcom/gedcomSubmitter";
 import { FileExistsError } from "../../util/file-system";
 import { multimediaFilePathProblem } from "../../util/multimedia-file-name";
 import {
@@ -407,13 +398,13 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
 
   tabLabel(tabInformation: TabInformation): string {
     // A deleted tab keeps its label, so look in deletedDatabase() too.
-    const record =
-      findRecord(this.workingDatabase(), tabInformation) ??
-      findRecord(this.deletedDatabase(), tabInformation);
+    const working = this.workingDatabase();
+    const deleted = this.deletedDatabase();
     const xref = tabInformation.xref;
     switch (tabInformation.type) {
       case "INDI": {
-        const individual = record as GedcomIndividual | undefined;
+        const individual =
+          working.individuals[xref] ?? deleted.individuals[xref];
         return individual?.names[0]
           ? displayGedcomName(individual.names[0])
           : `Individual ${xref}`;
@@ -422,21 +413,23 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
         return `Family ${xref}`;
       }
       case "SOUR": {
-        const source = record as GedcomSource | undefined;
+        const source = working.sources[xref] ?? deleted.sources[xref];
         return source?.abbr || source?.title || `Source ${xref}`;
       }
       case "REPO": {
-        const repository = record as GedcomRepository | undefined;
+        const repository =
+          working.repositories[xref] ?? deleted.repositories[xref];
         return repository?.name || `Repository ${xref}`;
       }
       case "OBJE": {
-        const multimedia = record as GedcomMultimedia | undefined;
+        const multimedia =
+          working.multimedias[xref] ?? deleted.multimedias[xref];
         return (
           multimedia?.title || multimedia?.filePath || `Multimedia ${xref}`
         );
       }
       case "SUBM": {
-        const submitter = record as GedcomSubmitter | undefined;
+        const submitter = working.submitters[xref] ?? deleted.submitters[xref];
         return submitter?.name || `Submitter ${xref}`;
       }
     }
