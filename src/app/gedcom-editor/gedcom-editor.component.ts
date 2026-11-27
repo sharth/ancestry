@@ -6,7 +6,12 @@ import {
   linkedSignal,
   output,
 } from "@angular/core";
-import { FormField, form } from "@angular/forms/signals";
+import {
+  FormField,
+  type ValidationError,
+  form,
+  validate,
+} from "@angular/forms/signals";
 import { produce } from "immer";
 
 import { AncestryService } from "../../database/ancestry.service";
@@ -26,6 +31,11 @@ import { newGedcomRepository } from "../../gedcom/gedcomRepository";
 import { newGedcomSource } from "../../gedcom/gedcomSource";
 import { newGedcomSubmitter } from "../../gedcom/gedcomSubmitter";
 import { FileExistsError } from "../../util/file-system";
+import {
+  xrefsLinkedFromFamily,
+  xrefsLinkedFromIndividual,
+  xrefsLinkedFromSource,
+} from "../../util/linked-xrefs";
 import { multimediaFilePathProblem } from "../../util/multimedia-file-name";
 import {
   calculateNextFamilyXref,
@@ -118,11 +128,87 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     return newGedcomDatabase();
   });
 
+  // For each xref, the records in the file that link to it. Built once from
+  // the file as loaded (and only once something is deleted), to find the
+  // records that might still link to a deleted one without scanning the
+  // whole working database on every edit.
+  private readonly fileReferrers = computed(() => {
+    const index = new Map<string, TabInformation[]>();
+    const add = (referrer: TabInformation, xrefs: Iterable<string>) => {
+      for (const xref of new Set(xrefs)) {
+        index.set(xref, [...(index.get(xref) ?? []), referrer]);
+      }
+    };
+    const database = this.ancestryDatabase();
+    for (const individual of Object.values(database.individuals)) {
+      add(
+        { type: "INDI", xref: individual.xref },
+        xrefsLinkedFromIndividual(individual),
+      );
+    }
+    for (const family of Object.values(database.families)) {
+      add({ type: "FAM", xref: family.xref }, xrefsLinkedFromFamily(family));
+    }
+    for (const source of Object.values(database.sources)) {
+      add({ type: "SOUR", xref: source.xref }, xrefsLinkedFromSource(source));
+    }
+    return index;
+  });
+
   // Signal Forms only creates a field node when something reads it, so this
   // costs nothing for records that aren't open. That relies on
   // patches/@angular+forms+*.patch until angular/angular#70627 is
   // fixed; without it, the form builds a node for every field in the file.
-  readonly form = form(this.workingDatabase);
+  readonly form = form(this.workingDatabase, (database) => {
+    // Saving is blocked while any record still links to a deleted one.
+    validate(database, () => this.deletedLinkErrors());
+  });
+
+  // A record can only have gained a link to a deleted record by being
+  // edited, and edits happen in open tabs, so the candidates are the open
+  // records plus the ones that linked to it in the file. Each is checked
+  // against its working copy.
+  private deletedLinkErrors(): DeletedLinkError[] {
+    const deleted = this.deletedDatabase();
+    const deletedTabs = Object.entries(recordsKeys).flatMap(([type, key]) =>
+      Object.keys(deleted[key]).map(
+        (xref) => ({ type, xref }) as TabInformation,
+      ),
+    );
+    if (deletedTabs.length === 0) return [];
+    const database = this.workingDatabase();
+    return deletedTabs.flatMap((deletedTab) => {
+      const xref = deletedTab.xref;
+      const deletedName = `${this.deleteRecordLabel(deletedTab)} ${this.tabLabel(deletedTab)}`;
+      const candidates = new Map(
+        [...this.openTabs(), ...(this.fileReferrers().get(xref) ?? [])].map(
+          (referrer) => [referrer.xref, referrer],
+        ),
+      );
+      return [...candidates.values()]
+        .filter((referrer) => linksTo(database, referrer, xref))
+        .map((referrer) => ({
+          kind: "deletedLink",
+          message: `${this.tabLabel(referrer)} still links to deleted ${deletedName}.`,
+          referrer,
+          deletedXref: xref,
+        }));
+    });
+  }
+
+  // The records that still link to each deleted record, read back from the
+  // form's validation errors, for the deleted tab's card.
+  readonly referrersOfDeleted = computed(() => {
+    const result = new Map<string, TabInformation[]>();
+    for (const error of this.form().errors()) {
+      if (!isDeletedLinkError(error)) continue;
+      result.set(error.deletedXref, [
+        ...(result.get(error.deletedXref) ?? []),
+        error.referrer,
+      ]);
+    }
+    return result;
+  });
 
   readonly differences = computed(() => {
     // Every record currently open as a tab should show its Gedcom, even if
@@ -530,6 +616,8 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     // beforeunload prompt (GedcomEditorDialogComponent.onBeforeUnload)
     // before the save has finished.
     event.preventDefault();
+    // Validators block saving while anything links to a deleted record.
+    if (this.form().invalid()) return;
     // Any failure (a taken path, a write error) leaves the dialog open with
     // the edits intact, so the user can fix it and submit again.
     try {
@@ -566,6 +654,48 @@ function findRecord(
   { type, xref }: TabInformation,
 ): GedcomRecordOfAnyType | undefined {
   return database[recordsKeys[type]][xref];
+}
+
+// Whether `referrer`'s record in `database` links to `xref`.
+function linksTo(
+  database: GedcomDatabase,
+  referrer: TabInformation,
+  xref: string,
+): boolean {
+  let linked: Iterable<string> = [];
+  switch (referrer.type) {
+    case "INDI": {
+      const individual = database.individuals[referrer.xref];
+      if (individual) linked = xrefsLinkedFromIndividual(individual);
+      break;
+    }
+    case "FAM": {
+      const family = database.families[referrer.xref];
+      if (family) linked = xrefsLinkedFromFamily(family);
+      break;
+    }
+    case "SOUR": {
+      const source = database.sources[referrer.xref];
+      if (source) linked = xrefsLinkedFromSource(source);
+      break;
+    }
+    case "REPO":
+    case "OBJE":
+    case "SUBM":
+      // These don't link to other records.
+      break;
+  }
+  return Iterator.from(linked).some((linkedXref) => linkedXref === xref);
+}
+
+interface DeletedLinkError extends ValidationError {
+  kind: "deletedLink";
+  referrer: TabInformation;
+  deletedXref: string;
+}
+
+function isDeletedLinkError(error: ValidationError): error is DeletedLinkError {
+  return error.kind === "deletedLink";
 }
 
 // Adds an empty record for each tab whose xref isn't in the database yet.
