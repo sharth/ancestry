@@ -74,11 +74,9 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   readonly ancestryDatabase = input.required<GedcomDatabase>();
   readonly finished = output();
 
-  // The records open as tabs in the editor: `tabs()` with each xref
-  // resolved, plus any opened later with openTab(). An empty xref means
-  // "create a new record of this type," so we calculate the next available
-  // xref for it.
-  readonly openTabs = linkedSignal<TabInformation[]>(() => {
+  // `tabs()` with each empty xref resolved to the next available xref for
+  // a new record of that type.
+  private readonly initialTabs = computed(() => {
     const database = this.ancestryDatabase();
     return this.tabs().map((tab): TabInformation => {
       if (tab.xref) return tab;
@@ -99,47 +97,17 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     });
   });
 
+  // The records open as tabs in the editor: initialTabs(), plus any opened
+  // later with openTab().
+  readonly openTabs = linkedSignal(() => this.initialTabs());
+
   // The GedcomDatabase that the form edits, and that submitting saves. It
-  // starts from ancestryDatabase(), with a new record for each open tab
-  // whose xref isn't in it yet. Opening another tab keeps the edits made so
-  // far and only adds that tab's record.
-  readonly workingDatabase = linkedSignal<
-    { database: GedcomDatabase; tabs: TabInformation[] },
-    GedcomDatabase
-  >({
-    source: () => ({
-      database: this.ancestryDatabase(),
-      tabs: this.openTabs(),
-    }),
-    computation: ({ database, tabs }, previous) => {
-      const base =
-        previous?.source.database === database ? previous.value : database;
-      return produce(base, (draft) => {
-        for (const { type, xref } of tabs) {
-          switch (type) {
-            case "INDI":
-              draft.individuals[xref] ??= newGedcomIndividual({ xref });
-              break;
-            case "SOUR":
-              draft.sources[xref] ??= newGedcomSource({ xref });
-              break;
-            case "FAM":
-              draft.families[xref] ??= newGedcomFamily({ xref });
-              break;
-            case "REPO":
-              draft.repositories[xref] ??= newGedcomRepository({ xref });
-              break;
-            case "OBJE":
-              draft.multimedias[xref] ??= newGedcomMultimedia({ xref });
-              break;
-            case "SUBM":
-              draft.submitters[xref] ??= newGedcomSubmitter({ xref });
-              break;
-          }
-        }
-      });
-    },
-  });
+  // starts from ancestryDatabase(), with a new record for each of
+  // initialTabs() that isn't in it yet. The openNew*() methods add the
+  // records they create.
+  readonly workingDatabase = linkedSignal(() =>
+    withNewRecords(this.ancestryDatabase(), this.initialTabs()),
+  );
 
   // Signal Forms only creates a field node when something reads it, so this
   // costs nothing for records that aren't open. That relies on
@@ -169,7 +137,7 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
 
   openNewIndividual(): string {
     const xref = calculateNextIndividualXref(this.workingDatabase());
-    this.openTab({ type: "INDI", xref });
+    this.openNewTab({ type: "INDI", xref });
     return xref;
   }
 
@@ -179,7 +147,7 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
 
   openNewMultimedia(): string {
     const xref = calculateNextMultimediaXref(this.workingDatabase());
-    this.openTab({ type: "OBJE", xref });
+    this.openNewTab({ type: "OBJE", xref });
     return xref;
   }
 
@@ -189,7 +157,7 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
 
   openNewRepository(): string {
     const xref = calculateNextRepositoryXref(this.workingDatabase());
-    this.openTab({ type: "REPO", xref });
+    this.openNewTab({ type: "REPO", xref });
     return xref;
   }
 
@@ -199,7 +167,7 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
 
   openNewSource(): string {
     const xref = calculateNextSourceXref(this.workingDatabase());
-    this.openTab({ type: "SOUR", xref });
+    this.openNewTab({ type: "SOUR", xref });
     return xref;
   }
 
@@ -209,7 +177,7 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
 
   openNewFamily(): string {
     const xref = calculateNextFamilyXref(this.workingDatabase());
-    this.openTab({ type: "FAM", xref });
+    this.openNewTab({ type: "FAM", xref });
     return xref;
   }
 
@@ -217,9 +185,14 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     this.openTab({ type: "FAM", xref });
   }
 
+  private openNewTab(tabInformation: TabInformation) {
+    this.workingDatabase.update((database) =>
+      withNewRecords(database, [tabInformation]),
+    );
+    this.openTab(tabInformation);
+  }
+
   openTab(tabInformation: TabInformation) {
-    // Adding the tab also gives workingDatabase() a new record for it, if
-    // it doesn't have one.
     // Include the xref in the list of editable tabs.
     if (
       !this.openTabs().some(
@@ -350,7 +323,7 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     // flag) dirty in response to a real control-originated value change --
     // typing into a bound input, or a custom FormValueControl emitting a
     // new value -- not in response to a programmatic signal update like
-    // workingDatabase.update() in openTab(). That makes it the right
+    // workingDatabase.update() in openNewTab(). That makes it the right
     // signal for "did the user actually change anything", unlike
     // differences() (which also reflects unrelated, by-design differences
     // between the working database and the file on disk, such as the
@@ -381,4 +354,35 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   cancelForm() {
     this.finished.emit();
   }
+}
+
+// Adds an empty record for each tab whose xref isn't in the database yet.
+function withNewRecords(
+  database: GedcomDatabase,
+  tabs: readonly TabInformation[],
+): GedcomDatabase {
+  return produce(database, (draft) => {
+    for (const { type, xref } of tabs) {
+      switch (type) {
+        case "INDI":
+          draft.individuals[xref] ??= newGedcomIndividual({ xref });
+          break;
+        case "SOUR":
+          draft.sources[xref] ??= newGedcomSource({ xref });
+          break;
+        case "FAM":
+          draft.families[xref] ??= newGedcomFamily({ xref });
+          break;
+        case "REPO":
+          draft.repositories[xref] ??= newGedcomRepository({ xref });
+          break;
+        case "OBJE":
+          draft.multimedias[xref] ??= newGedcomMultimedia({ xref });
+          break;
+        case "SUBM":
+          draft.submitters[xref] ??= newGedcomSubmitter({ xref });
+          break;
+      }
+    }
+  });
 }
