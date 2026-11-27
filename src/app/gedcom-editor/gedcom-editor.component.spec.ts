@@ -225,6 +225,28 @@ describe("GedcomEditorComponent Integration", () => {
         component.workingDatabase().individuals["@I0@"]?.parentOfFamilyXrefs,
       ).toEqual(["@F0@"]);
     });
+
+    it("keeps a deleted member's links right when its family is deleted too", () => {
+      const stockIndividual = { type: "INDI", xref: "@I0@" } as const;
+      component.openTab(stockIndividual);
+      component.openTab(stockFamily);
+
+      component.deleteRecord(stockIndividual);
+      component.deleteRecord(stockFamily);
+      component.undoDelete(stockIndividual);
+
+      expect(
+        component.workingDatabase().individuals["@I0@"]?.parentOfFamilyXrefs,
+      ).toEqual([]);
+
+      component.deleteRecord(stockIndividual);
+      component.undoDelete(stockFamily);
+      component.undoDelete(stockIndividual);
+
+      expect(
+        component.workingDatabase().individuals["@I0@"]?.parentOfFamilyXrefs,
+      ).toEqual(["@F0@"]);
+    });
   });
 
   describe("submitForm tests", () => {

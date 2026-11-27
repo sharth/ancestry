@@ -257,16 +257,21 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
           case "FAM": {
             const family = working.families[xref];
             if (!family) return;
-            // Its members' FAMS/FAMC mirror its HUSB/WIFE/CHIL.
+            // Its members' FAMS/FAMC mirror its HUSB/WIFE/CHIL. A member
+            // may be deleted too, and keeps its links right for its undo.
             for (const spouseXref of [family.husbandXref, family.wifeXref]) {
-              const spouse = working.individuals[spouseXref];
+              const spouse =
+                working.individuals[spouseXref] ??
+                deleted.individuals[spouseXref];
               if (spouse)
                 spouse.parentOfFamilyXrefs = spouse.parentOfFamilyXrefs.filter(
                   (linked) => linked !== xref,
                 );
             }
             for (const childXref of family.childXrefs) {
-              const child = working.individuals[childXref];
+              const child =
+                working.individuals[childXref] ??
+                deleted.individuals[childXref];
               if (child)
                 child.childOfFamilyXrefs = child.childOfFamilyXrefs.filter(
                   (linked) => linked !== xref,
@@ -328,14 +333,19 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
           case "FAM": {
             const family = deleted.families[xref];
             if (!family) return;
-            // Its members' FAMS/FAMC mirror its HUSB/WIFE/CHIL.
+            // Its members' FAMS/FAMC mirror its HUSB/WIFE/CHIL. A member
+            // may be deleted too, and keeps its links right for its undo.
             for (const spouseXref of [family.husbandXref, family.wifeXref]) {
-              const spouse = working.individuals[spouseXref];
+              const spouse =
+                working.individuals[spouseXref] ??
+                deleted.individuals[spouseXref];
               if (spouse && !spouse.parentOfFamilyXrefs.includes(xref))
                 spouse.parentOfFamilyXrefs.push(xref);
             }
             for (const childXref of family.childXrefs) {
-              const child = working.individuals[childXref];
+              const child =
+                working.individuals[childXref] ??
+                deleted.individuals[childXref];
               if (child && !child.childOfFamilyXrefs.includes(xref))
                 child.childOfFamilyXrefs.push(xref);
             }
