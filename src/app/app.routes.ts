@@ -35,6 +35,7 @@ import { BibliographyWithoutTitleComponent } from "./validation/bibliography-wit
 import { DuplicateCallNumbersComponent } from "./validation/duplicate-call-numbers.component";
 import { DuplicateRepositoriesComponent } from "./validation/duplicate-repositories.component";
 import { DuplicateSourcesComponent } from "./validation/duplicate-sources.component";
+import { GedcomProblemsComponent } from "./validation/gedcom-problems.component";
 import { OutdatedUrlsComponent } from "./validation/outdated-urls.component";
 import { QueryStringCallNumbersComponent } from "./validation/query-string-call-numbers.component";
 import { SourceWarningsComponent } from "./validation/source-warnings.component";
@@ -227,6 +228,7 @@ export const routes: Routes = [
         component: DuplicateSourcesComponent,
         canDeactivate: [confirmUnsavedChangesGuard],
       },
+      { path: "gedcom-problems", component: GedcomProblemsComponent },
     ],
   },
   { path: "**", component: PageNotFoundComponent },

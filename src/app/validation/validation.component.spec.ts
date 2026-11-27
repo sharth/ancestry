@@ -71,6 +71,7 @@ describe("ValidationComponent", () => {
       "Bibliography without title": "0",
       "Tree ids": "0",
       "Outdated URLs": "0",
+      "GEDCOM problems": "0",
     });
   });
 });
