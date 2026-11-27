@@ -23,3 +23,9 @@
   z-index: 1020; /* Bootstrap's sticky z-index, above floating labels */
   background-color: var(--bs-body-bg);
 }
+
+/* The card shown in place of a deleted record's form. */
+.deleted-card .card {
+  max-width: 32rem;
+  margin: 1rem auto;
+}

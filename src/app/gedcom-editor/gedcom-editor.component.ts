@@ -5,6 +5,7 @@ import {
   input,
   linkedSignal,
   output,
+  signal,
 } from "@angular/core";
 import { FormField, form } from "@angular/forms/signals";
 import { produce } from "immer";
@@ -15,16 +16,25 @@ import {
   newGedcomDatabase,
   type GedcomDatabase,
 } from "../../gedcom/gedcomDatabase";
-import { newGedcomFamily } from "../../gedcom/gedcomFamily";
-import { newGedcomIndividual } from "../../gedcom/gedcomIndividual";
+import { type GedcomFamily, newGedcomFamily } from "../../gedcom/gedcomFamily";
+import {
+  type GedcomIndividual,
+  newGedcomIndividual,
+} from "../../gedcom/gedcomIndividual";
 import {
   type GedcomMultimedia,
   newGedcomMultimedia,
 } from "../../gedcom/gedcomMultimedia";
 import { displayGedcomName } from "../../gedcom/gedcomName";
-import { newGedcomRepository } from "../../gedcom/gedcomRepository";
-import { newGedcomSource } from "../../gedcom/gedcomSource";
-import { newGedcomSubmitter } from "../../gedcom/gedcomSubmitter";
+import {
+  type GedcomRepository,
+  newGedcomRepository,
+} from "../../gedcom/gedcomRepository";
+import { type GedcomSource, newGedcomSource } from "../../gedcom/gedcomSource";
+import {
+  type GedcomSubmitter,
+  newGedcomSubmitter,
+} from "../../gedcom/gedcomSubmitter";
 import { FileExistsError } from "../../util/file-system";
 import { multimediaFilePathProblem } from "../../util/multimedia-file-name";
 import {
@@ -107,6 +117,13 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   // records they create.
   readonly workingDatabase = linkedSignal(() =>
     withNewRecords(this.ancestryDatabase(), this.initialTabs()),
+  );
+
+  // Records deleted in this session, by xref. Deleting moves a record out of
+  // workingDatabase() into here, and undoDelete() moves it back with its
+  // edits. Its tab stays open, showing a "Deleted" card instead of a form.
+  readonly deletedRecords = signal<ReadonlyMap<string, DeletedRecord>>(
+    new Map(),
   );
 
   // Signal Forms only creates a field node when something reads it, so this
@@ -208,6 +225,106 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     this.activeTab.set(tabInformation);
   }
 
+  deleteRecordLabel(tabInformation: TabInformation): string {
+    switch (tabInformation.type) {
+      case "INDI":
+        return "individual";
+      case "FAM":
+        return "family";
+      case "SOUR":
+        return "source";
+      case "REPO":
+        return "repository";
+      case "OBJE":
+        return "multimedia";
+      case "SUBM":
+        return "submitter";
+    }
+  }
+
+  // Moves the record out of workingDatabase() into deletedRecords(). Its
+  // tab stays open, so undoDelete() can bring it back. A family's members'
+  // FAMS/FAMC mirror its HUSB/WIFE/CHIL, so deleting a family also takes it
+  // out of their links, and undo puts it back where it was.
+  deleteRecord(tab: TabInformation) {
+    const record = findRecord(this.workingDatabase(), tab);
+    if (!record) return;
+    const memberLinks: MemberLink[] = [];
+    this.workingDatabase.update(
+      produce((draft) => {
+        if (tab.type === "FAM") {
+          const family = record as GedcomFamily;
+          const members = [
+            ...[family.husbandXref, family.wifeXref].map(
+              (xref) => ({ xref, links: "parentOfFamilyXrefs" }) as const,
+            ),
+            ...family.childXrefs.map(
+              (xref) => ({ xref, links: "childOfFamilyXrefs" }) as const,
+            ),
+          ];
+          for (const { xref, links } of members) {
+            const member = draft.individuals[xref];
+            const index = member?.[links].indexOf(tab.xref) ?? -1;
+            if (member && index >= 0) {
+              member[links] = member[links].toSpliced(index, 1);
+              memberLinks.push({ xref, links, index });
+            }
+          }
+        }
+        /* eslint-disable @typescript-eslint/no-dynamic-delete */
+        switch (tab.type) {
+          case "INDI":
+            delete draft.individuals[tab.xref];
+            break;
+          case "FAM":
+            delete draft.families[tab.xref];
+            break;
+          case "SOUR":
+            delete draft.sources[tab.xref];
+            break;
+          case "REPO":
+            delete draft.repositories[tab.xref];
+            break;
+          case "OBJE":
+            delete draft.multimedias[tab.xref];
+            break;
+          case "SUBM":
+            delete draft.submitters[tab.xref];
+            break;
+        }
+        /* eslint-enable @typescript-eslint/no-dynamic-delete */
+      }),
+    );
+    this.deletedRecords.update((deleted) =>
+      new Map(deleted).set(tab.xref, {
+        tab,
+        record,
+        memberLinks,
+      } as DeletedRecord),
+    );
+  }
+
+  undoDelete(tab: TabInformation) {
+    const deleted = this.deletedRecords().get(tab.xref);
+    if (!deleted) return;
+    this.workingDatabase.update((database) =>
+      produce(restoreRecords(database, [deleted]), (draft) => {
+        // Put the family back into its members' links, in reverse so each
+        // index is where it was.
+        for (const { xref, links, index } of deleted.memberLinks.toReversed()) {
+          const member = draft.individuals[xref];
+          if (member)
+            member[links] = member[links].toSpliced(index, 0, tab.xref);
+        }
+      }),
+    );
+    this.deletedRecords.update((records) => {
+      const remaining = new Map(records);
+      remaining.delete(tab.xref);
+      return remaining;
+    });
+  }
+
   tabIcon(tabInformation: TabInformation): string {
     switch (tabInformation.type) {
       case "INDI":
@@ -226,11 +343,14 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   }
 
   tabLabel(tabInformation: TabInformation): string {
-    const database = this.workingDatabase();
+    // A deleted tab keeps its label, so look in deletedRecords() too.
+    const record =
+      findRecord(this.workingDatabase(), tabInformation) ??
+      this.deletedRecords().get(tabInformation.xref)?.record;
     const xref = tabInformation.xref;
     switch (tabInformation.type) {
       case "INDI": {
-        const individual = database.individuals[xref];
+        const individual = record as GedcomIndividual | undefined;
         return individual?.names[0]
           ? displayGedcomName(individual.names[0])
           : `Individual ${xref}`;
@@ -239,21 +359,21 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
         return `Family ${xref}`;
       }
       case "SOUR": {
-        const source = database.sources[xref];
+        const source = record as GedcomSource | undefined;
         return source?.abbr || source?.title || `Source ${xref}`;
       }
       case "REPO": {
-        const repository = database.repositories[xref];
+        const repository = record as GedcomRepository | undefined;
         return repository?.name || `Repository ${xref}`;
       }
       case "OBJE": {
-        const multimedia = database.multimedias[xref];
+        const multimedia = record as GedcomMultimedia | undefined;
         return (
           multimedia?.title || multimedia?.filePath || `Multimedia ${xref}`
         );
       }
       case "SUBM": {
-        const submitter = database.submitters[xref];
+        const submitter = record as GedcomSubmitter | undefined;
         return submitter?.name || `Submitter ${xref}`;
       }
     }
@@ -327,8 +447,9 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
     // signal for "did the user actually change anything", unlike
     // differences() (which also reflects unrelated, by-design differences
     // between the working database and the file on disk, such as the
-    // header getting a fresh DATE/VERS stamp on every save).
-    return this.form().dirty();
+    // header getting a fresh DATE/VERS stamp on every save). A delete
+    // removes the record's form fields, so deletes are checked separately.
+    return this.form().dirty() || this.deletedRecords().size !== 0;
   }
 
   async submitForm(event: Event) {
@@ -354,6 +475,74 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   cancelForm() {
     this.finished.emit();
   }
+}
+
+// Where a deleted family sat in one member's FAMS or FAMC.
+interface MemberLink {
+  xref: string;
+  links: "parentOfFamilyXrefs" | "childOfFamilyXrefs";
+  index: number;
+}
+
+type DeletedRecord = { memberLinks: MemberLink[] } & (
+  | { tab: TabInformation & { type: "INDI" }; record: GedcomIndividual }
+  | { tab: TabInformation & { type: "FAM" }; record: GedcomFamily }
+  | { tab: TabInformation & { type: "SOUR" }; record: GedcomSource }
+  | { tab: TabInformation & { type: "REPO" }; record: GedcomRepository }
+  | { tab: TabInformation & { type: "OBJE" }; record: GedcomMultimedia }
+  | { tab: TabInformation & { type: "SUBM" }; record: GedcomSubmitter }
+);
+
+function findRecord(
+  database: GedcomDatabase,
+  { type, xref }: TabInformation,
+): DeletedRecord["record"] | undefined {
+  switch (type) {
+    case "INDI":
+      return database.individuals[xref];
+    case "FAM":
+      return database.families[xref];
+    case "SOUR":
+      return database.sources[xref];
+    case "REPO":
+      return database.repositories[xref];
+    case "OBJE":
+      return database.multimedias[xref];
+    case "SUBM":
+      return database.submitters[xref];
+  }
+}
+
+function restoreRecords(
+  database: GedcomDatabase,
+  records: Iterable<DeletedRecord>,
+): GedcomDatabase {
+  const toRestore = [...records];
+  if (toRestore.length === 0) return database;
+  return produce(database, (draft) => {
+    for (const { tab, record } of toRestore) {
+      switch (tab.type) {
+        case "INDI":
+          draft.individuals[tab.xref] = record as GedcomIndividual;
+          break;
+        case "FAM":
+          draft.families[tab.xref] = record as GedcomFamily;
+          break;
+        case "SOUR":
+          draft.sources[tab.xref] = record as GedcomSource;
+          break;
+        case "REPO":
+          draft.repositories[tab.xref] = record as GedcomRepository;
+          break;
+        case "OBJE":
+          draft.multimedias[tab.xref] = record as GedcomMultimedia;
+          break;
+        case "SUBM":
+          draft.submitters[tab.xref] = record as GedcomSubmitter;
+          break;
+      }
+    }
+  });
 }
 
 // Adds an empty record for each tab whose xref isn't in the database yet.
