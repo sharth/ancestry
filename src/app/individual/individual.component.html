@@ -1,103 +1,100 @@
-@if (vm(); as vm) {
-  <h2>Name</h2>
-  <p>{{ vm.name }}</p>
+@let vm = this.vm();
+<h2>Name</h2>
+<p>{{ vm.name }}</p>
 
-  <h2>Relationship</h2>
-  @if (vm.root; as root) {
-    @if (root.xref === xref()) {
-      <p>This is the root person.</p>
-    } @else if (root.relationship) {
-      <p>
-        {{ root.relationship }}
-        of
-        <a [routerLink]="['/individual', root.xref]">{{ root.name }}</a>
-      </p>
-    } @else {
-      <p class="text-body-secondary">
-        No relationship to
-        <a [routerLink]="['/individual', root.xref]">{{ root.name }}</a>
-        found.
-      </p>
-    }
+<h2>Relationship</h2>
+@if (vm.root; as root) {
+  @if (root.xref === vm.individual.xref) {
+    <p>This is the root person.</p>
+  } @else if (root.relationship) {
+    <p>
+      {{ root.relationship }}
+      of
+      <a [routerLink]="['/individual', root.xref]">{{ root.name }}</a>
+    </p>
   } @else {
     <p class="text-body-secondary">
-      Choose a root person in <a routerLink="/settings">Settings</a> to see how
-      this person is related to them.
+      No relationship to
+      <a [routerLink]="['/individual', root.xref]">{{ root.name }}</a>
+      found.
     </p>
   }
-
-  <h2>Sex</h2>
-  <!-- TODO: Include the citations. -->
-  <p>{{ vm.sex }}</p>
-
-  @if (vm.externalIdentifiers.length > 0) {
-    <h2>External Trees</h2>
-    <ul class="list-unstyled">
-      @for (externalIdentifier of vm.externalIdentifiers; track $index) {
-        <li>
-          @if (externalIdentifier.link; as link) {
-            <a
-              [href]="link.url"
-              target="_blank"
-              rel="noopener noreferrer nofollow"
-              referrerpolicy="no-referrer"
-              class="d-inline-flex gap-1 text-decoration-none"
-            >
-              <i class="bi bi-box-arrow-up-right"></i>
-              <span class="text-decoration-underline">
-                {{ link.label }}: {{ externalIdentifier.id }}
-              </span>
-            </a>
-          } @else {
-            {{ externalIdentifier.id }}
-            @if (externalIdentifier.type) {
-              <span class="text-body-secondary">
-                ({{ externalIdentifier.type }})
-              </span>
-            }
-          }
-        </li>
-      }
-    </ul>
-  }
-
-  <ul class="nav nav-tabs mb-3" role="tablist">
-    <li class="nav-item" role="presentation">
-      <a class="nav-link" routerLink="facts" routerLinkActive="active">
-        Facts
-      </a>
-    </li>
-    <li class="nav-item" role="presentation">
-      <a class="nav-link" routerLink="ancestors" routerLinkActive="active">
-        Ancestors
-      </a>
-    </li>
-    <li class="nav-item" role="presentation">
-      <a class="nav-link" routerLink="sources" routerLinkActive="active">
-        Sources
-      </a>
-    </li>
-    <li class="nav-item" role="presentation">
-      <a class="nav-link" routerLink="gedcom" routerLinkActive="active">
-        Gedcom
-      </a>
-    </li>
-  </ul>
-
-  <router-outlet />
-
-  <div class="position-fixed bottom-0 end-0 rounded-circle m-5">
-    <button
-      type="button"
-      class="btn btn-primary btn-lg bi-pencil"
-      aria-label="Edit individual"
-      (click)="editDialog.showModal()"
-    ></button>
-  </div>
-
-  <app-gedcom-editor-dialog
-    #editDialog
-    [tabs]="[{ type: 'INDI', xref: xref() }]"
-    [ancestryDatabase]="ancestryDatabase()"
-  />
+} @else {
+  <p class="text-body-secondary">
+    Choose a root person in <a routerLink="/settings">Settings</a> to see how
+    this person is related to them.
+  </p>
 }
+
+<h2>Sex</h2>
+<!-- TODO: Include the citations. -->
+<p>{{ vm.sex }}</p>
+
+@if (vm.externalIdentifiers.length > 0) {
+  <h2>External Trees</h2>
+  <ul class="list-unstyled">
+    @for (externalIdentifier of vm.externalIdentifiers; track $index) {
+      <li>
+        @if (externalIdentifier.link; as link) {
+          <a
+            [href]="link.url"
+            target="_blank"
+            rel="noopener noreferrer nofollow"
+            referrerpolicy="no-referrer"
+            class="d-inline-flex gap-1 text-decoration-none"
+          >
+            <i class="bi bi-box-arrow-up-right"></i>
+            <span class="text-decoration-underline">
+              {{ link.label }}: {{ externalIdentifier.id }}
+            </span>
+          </a>
+        } @else {
+          {{ externalIdentifier.id }}
+          @if (externalIdentifier.type) {
+            <span class="text-body-secondary">
+              ({{ externalIdentifier.type }})
+            </span>
+          }
+        }
+      </li>
+    }
+  </ul>
+}
+
+<ul class="nav nav-tabs mb-3" role="tablist">
+  <li class="nav-item" role="presentation">
+    <a class="nav-link" routerLink="facts" routerLinkActive="active"> Facts </a>
+  </li>
+  <li class="nav-item" role="presentation">
+    <a class="nav-link" routerLink="ancestors" routerLinkActive="active">
+      Ancestors
+    </a>
+  </li>
+  <li class="nav-item" role="presentation">
+    <a class="nav-link" routerLink="sources" routerLinkActive="active">
+      Sources
+    </a>
+  </li>
+  <li class="nav-item" role="presentation">
+    <a class="nav-link" routerLink="gedcom" routerLinkActive="active">
+      Gedcom
+    </a>
+  </li>
+</ul>
+
+<router-outlet />
+
+<div class="position-fixed bottom-0 end-0 rounded-circle m-5">
+  <button
+    type="button"
+    class="btn btn-primary btn-lg bi-pencil"
+    aria-label="Edit individual"
+    (click)="editDialog.showModal()"
+  ></button>
+</div>
+
+<app-gedcom-editor-dialog
+  #editDialog
+  [tabs]="[{ type: 'INDI', xref: vm.individual.xref }]"
+  [ancestryDatabase]="ancestryDatabase()"
+/>

@@ -15,6 +15,10 @@ import { IndividualFactsComponent } from "./individual/individual-facts.componen
 import { IndividualGedcomComponent } from "./individual/individual-gedcom.component";
 import { IndividualSourcesComponent } from "./individual/individual-sources.component";
 import { IndividualComponent } from "./individual/individual.component";
+import {
+  individualExistsGuard,
+  individualResources,
+} from "./individual/individual.routes";
 import { IndividualsComponent } from "./individuals/individuals.component";
 import { MultimediaComponent } from "./multimedia/multimedia.component";
 import { MultimediasComponent } from "./multimedias/multimedias.component";
@@ -68,8 +72,8 @@ export const routes: Routes = [
   {
     path: "individual/:xref",
     component: IndividualComponent,
-    canActivate: [ancestryDatabaseGuard],
-    resources: gedcomResources,
+    canActivate: [ancestryDatabaseGuard, individualExistsGuard],
+    resources: individualResources,
     canDeactivate: [confirmUnsavedChangesGuard],
     children: [
       { path: "", redirectTo: "facts", pathMatch: "full" },

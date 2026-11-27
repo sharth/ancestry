@@ -1,3 +1,4 @@
+import { Location } from "@angular/common";
 import { Component } from "@angular/core";
 import { TestBed } from "@angular/core/testing";
 import {
@@ -119,5 +120,48 @@ describe("data routes", () => {
 
     expect(await screen.findByText("2 Individuals")).toBeTruthy();
     expect(navigate).not.toHaveBeenCalled();
+  });
+});
+
+describe("individual route", () => {
+  let router: Router;
+
+  beforeEach(async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() => Promise.resolve(new Response(MINIMAL_GEDCOM_TEXT))),
+    );
+    await render(OutletStubComponent, {
+      providers: [
+        provideRouter(
+          routes,
+          withComponentInputBinding(),
+          withRouterResources(),
+        ),
+      ],
+      waitForStableOnRender: true,
+    });
+    router = TestBed.inject(Router);
+    await TestBed.inject(AncestryService).openBuiltin();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("shows an individual that's in the file", async () => {
+    await router.navigateByUrl("/individual/@I1@");
+
+    expect(await screen.findByRole("heading", { name: "Name" })).toBeTruthy();
+    expect(screen.queryByText("Page not found")).toBeNull();
+  });
+
+  it("shows the not-found page at the requested URL for an unknown xref", async () => {
+    await router.navigateByUrl("/individual/@I9@");
+
+    expect(
+      await screen.findByRole("heading", { name: "Page not found" }),
+    ).toBeTruthy();
+    expect(TestBed.inject(Location).path()).toBe("/individual/@I9@/facts");
   });
 });

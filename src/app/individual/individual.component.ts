@@ -2,7 +2,7 @@ import { Component, computed, input, viewChild } from "@angular/core";
 import { RouterModule } from "@angular/router";
 
 import type { GedcomResourceValue } from "../../database/ancestry.service";
-import { fullname } from "../../gedcom/gedcomIndividual";
+import { fullname, type GedcomIndividual } from "../../gedcom/gedcomIndividual";
 import { externalIdentifierLink } from "../../util/external-identifier-link";
 import { describeRelationship } from "../../util/relationship";
 import { GedcomEditorDialogComponent } from "../gedcom-editor-dialog/gedcom-editor-dialog.component";
@@ -15,7 +15,7 @@ import type { ComponentWithUnsavedChanges } from "../unsaved-changes.guard";
   styleUrl: "./individual.component.css",
 })
 export class IndividualComponent implements ComponentWithUnsavedChanges {
-  readonly xref = input.required<string>();
+  readonly individual = input.required<GedcomIndividual>();
   readonly gedcom = input.required<GedcomResourceValue>();
   readonly ancestryDatabase = computed(() => this.gedcom().gedcomDatabase);
 
@@ -27,10 +27,7 @@ export class IndividualComponent implements ComponentWithUnsavedChanges {
 
   readonly vm = computed(() => {
     const ancestryDatabase = this.ancestryDatabase();
-    const individual = ancestryDatabase.individuals[this.xref()];
-    if (individual === undefined) {
-      return undefined;
-    }
+    const individual = this.individual();
     const rootXref = this.gedcom().rootIndividualXref;
     const root =
       rootXref === undefined

@@ -159,7 +159,10 @@ describe("IndividualComponent", () => {
             }),
           ),
         ),
-        inputBinding("xref", signal("@I1@")),
+        inputBinding(
+          "individual",
+          computed(() => ancestryDatabase().individuals["@I1@"]),
+        ),
       ],
       waitForStableOnRender: true,
     });

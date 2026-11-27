@@ -282,19 +282,25 @@ export class AncestryService {
 /** Keeps the data routes away until a GEDCOM file is loaded, sending the
  * user to /settings to pick one if there's none. */
 export const ancestryDatabaseGuard: CanActivateFn = async () => {
-  const ancestryService = inject(AncestryService);
   const router = inject(Router);
-
-  await firstValueFrom(
-    toObservable(ancestryService.gedcomResource.isLoading).pipe(
-      filter((isLoading) => !isLoading),
-    ),
-  );
-  if (ancestryService.gedcomResource.value() === undefined) {
+  if ((await loadedGedcom()) === undefined) {
     return new RedirectCommand(router.parseUrl("/settings"));
   }
   return true;
 };
+
+/** Waits for gedcomResource to settle and returns the loaded file, or
+ * undefined if there's none. Call it from an injection context (a guard),
+ * before any other await. */
+export async function loadedGedcom(): Promise<GedcomResourceValue | undefined> {
+  const gedcomResource = inject(AncestryService).gedcomResource;
+  await firstValueFrom(
+    toObservable(gedcomResource.isLoading).pipe(
+      filter((isLoading) => !isLoading),
+    ),
+  );
+  return gedcomResource.value();
+}
 
 /** A data route's `resources`, binding gedcomResource to the page's
  * `gedcom` input: the page gets the whole loaded file (handles, records
