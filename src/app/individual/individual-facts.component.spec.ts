@@ -71,7 +71,6 @@ describe("IndividualFactsComponent", () => {
         },
       }),
     );
-    const xref = signal("@I1@");
 
     const renderResult = await render(IndividualFactsComponent, {
       providers: [provideRouter([])],
@@ -82,7 +81,10 @@ describe("IndividualFactsComponent", () => {
             newGedcomResourceValue({ gedcomDatabase: ancestryDatabase() }),
           ),
         ),
-        inputBinding("xref", xref),
+        inputBinding(
+          "individual",
+          computed(() => ancestryDatabase().individuals["@I1@"]),
+        ),
       ],
       waitForStableOnRender: true,
     });
@@ -173,7 +175,7 @@ describe("IndividualFactsComponent", () => {
     expect(
       component
         .vm()
-        ?.events.map(({ fact, familyXref, spouseXref }) => [
+        .events.map(({ fact, familyXref, spouseXref }) => [
           fact.tag,
           familyXref,
           spouseXref,

@@ -1,7 +1,9 @@
 import { Component, computed, input } from "@angular/core";
 
-import type { GedcomResourceValue } from "../../database/ancestry.service";
-import { serializeGedcomIndividual } from "../../gedcom/gedcomIndividual";
+import {
+  serializeGedcomIndividual,
+  type GedcomIndividual,
+} from "../../gedcom/gedcomIndividual";
 import { GedcomDisplayComponent } from "../gedcom-display/gedcom-display.component";
 
 @Component({
@@ -11,19 +13,8 @@ import { GedcomDisplayComponent } from "../gedcom-display/gedcom-display.compone
   styleUrl: "./individual.component.css",
 })
 export class IndividualGedcomComponent {
-  readonly gedcom = input.required<GedcomResourceValue>();
-  readonly ancestryDatabase = computed(() => this.gedcom().gedcomDatabase);
-  readonly xref = input.required<string>();
-
-  readonly vm = computed(() => {
-    const individual = this.ancestryDatabase().individuals[this.xref()];
-    if (individual == undefined) {
-      return undefined;
-    }
-
-    return {
-      individual,
-      gedcomRecord: serializeGedcomIndividual(individual),
-    };
-  });
+  readonly individual = input.required<GedcomIndividual>();
+  readonly gedcomRecord = computed(() =>
+    serializeGedcomIndividual(this.individual()),
+  );
 }

@@ -93,7 +93,10 @@ describe("IndividualAncestorsComponent", () => {
           "gedcom",
           signal(newGedcomResourceValue({ gedcomDatabase: ancestryDatabase })),
         ),
-        inputBinding("xref", signal("@I1@")),
+        inputBinding(
+          "individual",
+          signal(ancestryDatabase.individuals["@I1@"]),
+        ),
       ],
       waitForStableOnRender: true,
     });

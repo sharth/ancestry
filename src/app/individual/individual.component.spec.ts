@@ -109,7 +109,7 @@ describe("IndividualComponent", () => {
                   newGedcomResourceValue({
                     gedcomDatabase: ancestryDatabase(),
                   }),
-                xref: () => "@I1@",
+                individual: () => ancestryDatabase().individuals["@I1@"],
               },
             },
             {
@@ -120,7 +120,7 @@ describe("IndividualComponent", () => {
                   newGedcomResourceValue({
                     gedcomDatabase: ancestryDatabase(),
                   }),
-                xref: () => "@I1@",
+                individual: () => ancestryDatabase().individuals["@I1@"],
               },
             },
             {
@@ -131,7 +131,7 @@ describe("IndividualComponent", () => {
                   newGedcomResourceValue({
                     gedcomDatabase: ancestryDatabase(),
                   }),
-                xref: () => "@I1@",
+                individual: () => ancestryDatabase().individuals["@I1@"],
               },
             },
             {
@@ -142,7 +142,7 @@ describe("IndividualComponent", () => {
                   newGedcomResourceValue({
                     gedcomDatabase: ancestryDatabase(),
                   }),
-                xref: () => "@I1@",
+                individual: () => ancestryDatabase().individuals["@I1@"],
               },
             },
           ],

@@ -1,20 +1,19 @@
-@if (vm(); as vm) {
-  <div class="row">
-    <div class="col-md-6">
-      <h2>Events</h2>
-      <app-events-timeline
-        [events]="vm.events"
-        [birthDate]="vm.birthDate"
-        [ancestryDatabase]="ancestryDatabase()"
-      />
-    </div>
-
-    <div class="col-md-6">
-      <h2>Relatives</h2>
-      <app-individual-relatives
-        [ancestryDatabase]="ancestryDatabase()"
-        [individual]="vm.individual"
-      />
-    </div>
+@let vm = this.vm();
+<div class="row">
+  <div class="col-md-6">
+    <h2>Events</h2>
+    <app-events-timeline
+      [events]="vm.events"
+      [birthDate]="vm.birthDate"
+      [ancestryDatabase]="ancestryDatabase()"
+    />
   </div>
-}
+
+  <div class="col-md-6">
+    <h2>Relatives</h2>
+    <app-individual-relatives
+      [ancestryDatabase]="ancestryDatabase()"
+      [individual]="vm.individual"
+    />
+  </div>
+</div>

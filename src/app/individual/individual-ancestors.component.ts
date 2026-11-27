@@ -19,14 +19,11 @@ import { IndividualSunburstComponent } from "./individual-sunburst.component";
 export class IndividualAncestorsComponent {
   readonly gedcom = input.required<GedcomResourceValue>();
   readonly ancestryDatabase = computed(() => this.gedcom().gedcomDatabase);
-  readonly xref = input.required<string>();
+  readonly individual = input.required<GedcomIndividual>();
 
   readonly vm = computed(() => {
     const ancestry = this.ancestryDatabase();
-    const individual = ancestry.individuals[this.xref()];
-    if (individual == undefined) {
-      return undefined;
-    }
+    const individual = this.individual();
 
     const ancestors: (GedcomIndividual | undefined)[] = [];
     ancestors[1] = individual;

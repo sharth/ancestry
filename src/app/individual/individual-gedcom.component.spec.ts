@@ -1,10 +1,8 @@
-import { computed, inputBinding, signal } from "@angular/core";
+import { inputBinding, signal } from "@angular/core";
 import type { ComponentFixture } from "@angular/core/testing";
 import { render } from "@testing-library/angular/zoneless";
 import { assert, beforeEach, describe, it } from "vitest";
 
-import { newGedcomResourceValue } from "../../database/ancestry.service";
-import { newGedcomDatabase } from "../../gedcom/gedcomDatabase";
 import { newGedcomFact } from "../../gedcom/gedcomFact";
 import { newGedcomIndividual } from "../../gedcom/gedcomIndividual";
 import { newGedcomName } from "../../gedcom/gedcomName";
@@ -17,36 +15,21 @@ describe("IndividualGedcomComponent", () => {
   let element: HTMLElement;
 
   beforeEach(async () => {
-    const ancestryDatabase = signal(
-      newGedcomDatabase({
-        individuals: {
-          "@I1@": newGedcomIndividual({
-            xref: "@I1@",
-            names: [newGedcomName({ givenName: "John", surname: "Doe" })],
-            sex: newGedcomSex({ sex: "M" }),
-            facts: [
-              newGedcomFact({
-                tag: "BIRT",
-                date: { value: "1 JAN 1900" },
-                place: "Springfield",
-              }),
-            ],
-          }),
-        },
-      }),
-    );
-    const xref = signal("@I1@");
+    const individual = newGedcomIndividual({
+      xref: "@I1@",
+      names: [newGedcomName({ givenName: "John", surname: "Doe" })],
+      sex: newGedcomSex({ sex: "M" }),
+      facts: [
+        newGedcomFact({
+          tag: "BIRT",
+          date: { value: "1 JAN 1900" },
+          place: "Springfield",
+        }),
+      ],
+    });
 
     const renderResult = await render(IndividualGedcomComponent, {
-      bindings: [
-        inputBinding(
-          "gedcom",
-          computed(() =>
-            newGedcomResourceValue({ gedcomDatabase: ancestryDatabase() }),
-          ),
-        ),
-        inputBinding("xref", xref),
-      ],
+      bindings: [inputBinding("individual", signal(individual))],
       waitForStableOnRender: true,
     });
 
