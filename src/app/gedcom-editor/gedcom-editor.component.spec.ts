@@ -176,7 +176,7 @@ describe("GedcomEditorComponent Integration", () => {
       component.deleteRecord(newIndividual);
 
       expect(component.workingDatabase().individuals["@I1@"]).toBeUndefined();
-      expect(component.deletedRecords().has("@I1@")).toBe(true);
+      expect(component.isDeleted(newIndividual)).toBe(true);
       expect(component.openTabs()).toEqual([newIndividual]);
       expect(component.activeTab()).toEqual(newIndividual);
       expect(component.hasUnsavedChanges()).toBe(true);
@@ -202,7 +202,7 @@ describe("GedcomEditorComponent Integration", () => {
       component.deleteRecord(newIndividual);
       component.undoDelete(newIndividual);
 
-      expect(component.deletedRecords().size).toBe(0);
+      expect(component.isDeleted(newIndividual)).toBe(false);
       expect(
         component.workingDatabase().individuals["@I1@"]?.names[0]?.givenName,
       ).toBe("Edited");

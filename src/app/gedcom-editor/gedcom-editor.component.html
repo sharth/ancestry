@@ -7,7 +7,7 @@
       role="tablist"
     >
       @for (item of openTabs(); track item.xref) {
-        @let itemDeleted = deletedRecords().has(item.xref);
+        @let itemDeleted = isDeleted(item);
         <div class="btn-group" role="group">
           <button
             type="button"
@@ -111,9 +111,9 @@
     @let isActive =
       activeTab()?.type === tabInformation.type &&
       activeTab()?.xref === tabInformation.xref;
-    @let isDeleted = deletedRecords().has(tabInformation.xref);
+    @let tabDeleted = isDeleted(tabInformation);
     <div [hidden]="!isActive">
-      @if (isDeleted) {
+      @if (tabDeleted) {
         <div class="deleted-card">
           <div class="card border-danger" role="status">
             <div class="card-body">
