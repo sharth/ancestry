@@ -174,8 +174,8 @@ describe("IndividualFactsComponent", () => {
 
     expect(
       component
-        .vm()
-        .events.map(({ fact, familyXref, spouseXref }) => [
+        .events()
+        .map(({ fact, familyXref, spouseXref }) => [
           fact.tag,
           familyXref,
           spouseXref,

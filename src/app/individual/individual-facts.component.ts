@@ -21,7 +21,7 @@ export class IndividualFactsComponent {
   readonly ancestryDatabase = computed(() => this.gedcom().gedcomDatabase);
   readonly individual = input.required<GedcomIndividual>();
 
-  readonly vm = computed(() => {
+  readonly events = computed((): TimelineEvent[] => {
     const ancestryDatabase = this.ancestryDatabase();
     const individual = this.individual();
 
@@ -29,7 +29,7 @@ export class IndividualFactsComponent {
     // which they are a spouse. Names have no date, so (like other undated
     // facts) they naturally sort to the end of the timeline - this is also
     // the only place the primary name's citations are shown.
-    const events: TimelineEvent[] = [
+    return [
       ...individual.facts.map((fact): TimelineEvent => ({
         fact,
         owner: "individual",
@@ -59,15 +59,9 @@ export class IndividualFactsComponent {
         }));
       }),
     ];
-
-    const birthDate = individual.facts.find(
-      (fact) => fact.tag === "BIRT",
-    )?.date;
-
-    return {
-      individual,
-      events,
-      birthDate,
-    };
   });
+
+  readonly birthDate = computed(
+    () => this.individual().facts.find((fact) => fact.tag === "BIRT")?.date,
+  );
 }

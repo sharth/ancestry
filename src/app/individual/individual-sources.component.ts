@@ -32,7 +32,7 @@ export class IndividualSourcesComponent {
   readonly ancestryDatabase = computed(() => this.gedcom().gedcomDatabase);
   readonly individual = input.required<GedcomIndividual>();
 
-  readonly vm = computed(() => {
+  readonly sourceGroups = computed(() => {
     const ancestryDatabase = this.ancestryDatabase();
     const individual = this.individual();
 
@@ -69,17 +69,16 @@ export class IndividualSourcesComponent {
       sourceGroups.set(citation.citation.sourceXref, rows);
     }
 
-    return {
-      individual,
-      sourceGroups: Array.from(sourceGroups.entries())
+    return (
+      Array.from(sourceGroups.entries())
         .map(([sourceXref, rows]) => ({
           sourceXref,
           source: ancestryDatabase.sources[sourceXref],
           rows,
         }))
         // Sort by the same label the template shows for each source.
-        .sort((a, b) => sourceLabel(a).localeCompare(sourceLabel(b))),
-    };
+        .sort((a, b) => sourceLabel(a).localeCompare(sourceLabel(b)))
+    );
   });
 }
 

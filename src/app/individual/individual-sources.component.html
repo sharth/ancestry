@@ -1,7 +1,6 @@
-@let vm = this.vm();
-@if (vm.sourceGroups.length > 0) {
+@if (sourceGroups().length > 0) {
   <div class="sources-grid">
-    @for (group of vm.sourceGroups; track group.sourceXref) {
+    @for (group of sourceGroups(); track group.sourceXref) {
       <h3 class="sources-grid-title">
         <a routerLink="/source/{{ group.sourceXref }}">{{
           group.source?.abbr || group.source?.title || group.sourceXref
