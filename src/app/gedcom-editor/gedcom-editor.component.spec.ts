@@ -167,6 +167,35 @@ describe("GedcomEditorComponent Integration", () => {
     });
   });
 
+  describe("families section tests", () => {
+    it("links a spouse who isn't open, and saves both sides", async () => {
+      fixture.componentRef.setInput("tabs", [{ type: "INDI", xref: "@I0@" }]);
+      component.workingDatabase.update(
+        produce((draft) => {
+          draft.individuals["@I1@"] = newGedcomIndividual({ xref: "@I1@" });
+        }),
+      );
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      // @I0@ is the husband, so the spouse family only shows the Wife picker.
+      const wife = (
+        fixture.nativeElement as HTMLElement
+      ).querySelector<HTMLSelectElement>(
+        "app-input-individual-families app-input-individual-xref select",
+      );
+      assert.isOk(wife);
+      await userEvent.setup().selectOptions(wife, "@I1@");
+
+      const database = component.workingDatabase();
+      expect(database.families["@F0@"]?.wifeXref).toBe("@I1@");
+      expect(database.individuals["@I1@"]?.parentOfFamilyXrefs).toEqual([
+        "@F0@",
+      ]);
+      expect(component.hasUnsavedChanges()).toBe(true);
+    });
+  });
+
   describe("submitForm tests", () => {
     // The page picks up the saved file through its route's resources, so
     // saving needs no navigation to refresh it.

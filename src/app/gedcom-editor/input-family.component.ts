@@ -1,6 +1,6 @@
 import { Component, computed, input, model } from "@angular/core";
 import { FormField, form, type FormValueControl } from "@angular/forms/signals";
-import { produce } from "immer";
+import { produce, type Draft } from "immer";
 
 import {
   newGedcomDatabase,
@@ -34,6 +34,9 @@ type FamilyMembers = Pick<
 })
 export class InputFamilyComponent implements FormValueControl<GedcomDatabase> {
   readonly xref = input.required<string>();
+  // Set when the family is shown on one of its spouses' own editor, which
+  // leaves out that spouse's picker: they leave the family from there.
+  readonly spouseXref = input<string>();
   readonly value = model<GedcomDatabase>(newGedcomDatabase());
   readonly form = form(this.value);
 
@@ -44,56 +47,62 @@ export class InputFamilyComponent implements FormValueControl<GedcomDatabase> {
     const familyXref = this.xref();
     this.value.update(
       produce((draft) => {
-        const family = draft.families[familyXref];
-        if (!family) return;
-        const spousesBefore = [family.husbandXref, family.wifeXref];
-        const childrenBefore = family.childXrefs;
-        Object.assign(family, members);
-        const spousesAfter = [family.husbandXref, family.wifeXref];
-        const childrenAfter = family.childXrefs;
-
-        const spousesAdded = spousesAfter.filter(
-          (x) => !spousesBefore.includes(x),
-        );
-        const spousesRemoved = spousesBefore.filter(
-          (x) => !spousesAfter.includes(x),
-        );
-        const childrenAdded = childrenAfter.filter(
-          (x) => !childrenBefore.includes(x),
-        );
-        const childrenRemoved = childrenBefore.filter(
-          (x) => !childrenAfter.includes(x),
-        );
-
-        for (const xref of spousesRemoved) {
-          const spouse = draft.individuals[xref];
-          if (spouse) {
-            spouse.parentOfFamilyXrefs = spouse.parentOfFamilyXrefs.filter(
-              (x) => x !== familyXref,
-            );
-          }
-        }
-        for (const xref of spousesAdded) {
-          const spouse = draft.individuals[xref];
-          if (spouse && !spouse.parentOfFamilyXrefs.includes(familyXref)) {
-            spouse.parentOfFamilyXrefs.push(familyXref);
-          }
-        }
-        for (const xref of childrenRemoved) {
-          const child = draft.individuals[xref];
-          if (child) {
-            child.childOfFamilyXrefs = child.childOfFamilyXrefs.filter(
-              (x) => x !== familyXref,
-            );
-          }
-        }
-        for (const xref of childrenAdded) {
-          const child = draft.individuals[xref];
-          if (child && !child.childOfFamilyXrefs.includes(familyXref)) {
-            child.childOfFamilyXrefs.push(familyXref);
-          }
-        }
+        setFamilyMembers(draft, familyXref, members);
       }),
     );
+  }
+}
+
+// Sets some of a family's members, and updates the FAMS/FAMC of each member
+// added or removed to match.
+export function setFamilyMembers(
+  draft: Draft<GedcomDatabase>,
+  familyXref: string,
+  members: Partial<FamilyMembers>,
+) {
+  const family = draft.families[familyXref];
+  if (!family) return;
+  const spousesBefore = [family.husbandXref, family.wifeXref];
+  const childrenBefore = family.childXrefs;
+  Object.assign(family, members);
+  const spousesAfter = [family.husbandXref, family.wifeXref];
+  const childrenAfter = family.childXrefs;
+
+  const spousesAdded = spousesAfter.filter((x) => !spousesBefore.includes(x));
+  const spousesRemoved = spousesBefore.filter((x) => !spousesAfter.includes(x));
+  const childrenAdded = childrenAfter.filter(
+    (x) => !childrenBefore.includes(x),
+  );
+  const childrenRemoved = childrenBefore.filter(
+    (x) => !childrenAfter.includes(x),
+  );
+
+  for (const xref of spousesRemoved) {
+    const spouse = draft.individuals[xref];
+    if (spouse) {
+      spouse.parentOfFamilyXrefs = spouse.parentOfFamilyXrefs.filter(
+        (x) => x !== familyXref,
+      );
+    }
+  }
+  for (const xref of spousesAdded) {
+    const spouse = draft.individuals[xref];
+    if (spouse && !spouse.parentOfFamilyXrefs.includes(familyXref)) {
+      spouse.parentOfFamilyXrefs.push(familyXref);
+    }
+  }
+  for (const xref of childrenRemoved) {
+    const child = draft.individuals[xref];
+    if (child) {
+      child.childOfFamilyXrefs = child.childOfFamilyXrefs.filter(
+        (x) => x !== familyXref,
+      );
+    }
+  }
+  for (const xref of childrenAdded) {
+    const child = draft.individuals[xref];
+    if (child && !child.childOfFamilyXrefs.includes(familyXref)) {
+      child.childOfFamilyXrefs.push(familyXref);
+    }
   }
 }

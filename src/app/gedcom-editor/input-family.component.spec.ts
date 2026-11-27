@@ -144,3 +144,19 @@ describe("InputFamilyComponent", () => {
     expect(reloaded.individuals["@I4@"]?.childOfFamilyXrefs).toEqual(["@F2@"]);
   });
 });
+
+describe("InputFamilyComponent shown on a spouse's own editor", () => {
+  it("leaves out that spouse's picker", async () => {
+    await render(InputFamilyComponent, {
+      bindings: [
+        inputBinding("value", signal(database)),
+        inputBinding("xref", signal("@F1@")),
+        inputBinding("spouseXref", signal("@I1@")),
+      ],
+      waitForStableOnRender: true,
+    });
+
+    expect(screen.queryByText("Husband", { selector: "label" })).toBeNull();
+    expect(screen.getByText("Wife", { selector: "label" })).toBeTruthy();
+  });
+});
