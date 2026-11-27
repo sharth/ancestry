@@ -9,6 +9,7 @@ import { FamilyFactsComponent } from "./family/family-facts.component";
 import { FamilyGedcomComponent } from "./family/family-gedcom.component";
 import { FamilySourcesComponent } from "./family/family-sources.component";
 import { FamilyComponent } from "./family/family.component";
+import { HistoryComponent } from "./history/history.component";
 import { IndexComponent } from "./index/index.component";
 import { IndividualAncestorsComponent } from "./individual/individual-ancestors.component";
 import { IndividualFactsComponent } from "./individual/individual-facts.component";
@@ -229,5 +230,8 @@ export const routes: Routes = [
       },
     ],
   },
+  // No guard or resources: the page reads the file itself, so it can still
+  // restore an earlier save when the current file fails to parse.
+  { path: "history", component: HistoryComponent },
   { path: "**", component: PageNotFoundComponent },
 ];

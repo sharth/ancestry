@@ -1,0 +1,86 @@
+<div class="container mt-3">
+  <h1>History</h1>
+  @if (gedcomFilename(); as gedcomFilename) {
+    <p class="text-muted">
+      Each save keeps a copy of {{ gedcomFilename }} as it was just before the
+      save, in this browser. Restoring a copy writes it back to the file, and
+      keeps the version it replaces here too, so a restore can be undone.
+    </p>
+    @let saves = this.saves.value() ?? [];
+    @if (saves.length === 0) {
+      <p>No saves yet.</p>
+    } @else {
+      <table class="table table-striped align-middle">
+        <thead>
+          <tr>
+            <th>Before the save at</th>
+            <th>Size</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (save of saves; track save.id) {
+            @let selected = selectedSave()?.id === save.id;
+            <tr [class.table-primary]="selected">
+              <td>{{ save.savedAt | date: "medium" }}</td>
+              <td>{{ save.gedcomText.length | number }} characters</td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary"
+                    [attr.aria-pressed]="selected"
+                    (click)="toggle(save)"
+                  >
+                    {{ selected ? "Hide differences" : "Show differences" }}
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-danger"
+                    (click)="restore(save)"
+                  >
+                    Restore
+                  </button>
+                </div>
+              </td>
+            </tr>
+            @if (selected) {
+              <tr>
+                <td colspan="3">
+                  <p class="small text-muted">
+                    Left: this saved copy. Right: the file as it is now.
+                  </p>
+                  @if (differences(); as differences) {
+                    @for (d of differences; track $index) {
+                      <app-gedcom-diff
+                        [oldGedcomRecord]="d.oldGedcomRecord"
+                        [newGedcomRecord]="d.newGedcomRecord"
+                      />
+                    } @empty {
+                      <p class="mb-0">Same as the current file.</p>
+                    }
+                  } @else {
+                    <p class="mb-0">
+                      The current file can't be read as GEDCOM, so there's
+                      nothing to compare against. Restoring still works.
+                    </p>
+                  }
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    }
+  } @else if (file.error()) {
+    <p>
+      The GEDCOM file couldn't be read. You may need to allow access again in
+      <a routerLink="/settings">Settings</a>.
+    </p>
+  } @else if (!file.isLoading()) {
+    <p>
+      Save history is kept for a GEDCOM file opened from your computer. The
+      example data can't be saved, so it has no history.
+    </p>
+  }
+</div>
