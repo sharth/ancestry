@@ -167,6 +167,88 @@ describe("GedcomEditorComponent Integration", () => {
     });
   });
 
+  describe("deleteRecord tests", () => {
+    // The tabs input opens a new individual, which gets @I1@.
+    const newIndividual = { type: "INDI", xref: "@I1@" } as const;
+    const stockFamily = { type: "FAM", xref: "@F0@" } as const;
+
+    it("moves the record out of the working database, keeping its tab", () => {
+      component.deleteRecord(newIndividual);
+
+      expect(component.workingDatabase().individuals["@I1@"]).toBeUndefined();
+      expect(component.isDeleted(newIndividual)).toBe(true);
+      expect(component.openTabs()).toEqual([newIndividual]);
+      expect(component.activeTab()).toEqual(newIndividual);
+      expect(component.hasUnsavedChanges()).toBe(true);
+    });
+
+    it("doesn't recreate the deleted record when another tab opens", () => {
+      component.deleteRecord(newIndividual);
+
+      component.openTab(stockFamily);
+
+      expect(component.workingDatabase().individuals["@I1@"]).toBeUndefined();
+    });
+
+    it("keeps edits made before the delete when it's undone", () => {
+      component.workingDatabase.update((database) =>
+        produce(database, (draft) => {
+          const individual = draft.individuals["@I1@"];
+          assert(individual);
+          individual.names = [newGedcomName({ givenName: "Edited" })];
+        }),
+      );
+
+      component.deleteRecord(newIndividual);
+      component.undoDelete(newIndividual);
+
+      expect(component.isDeleted(newIndividual)).toBe(false);
+      expect(
+        component.workingDatabase().individuals["@I1@"]?.names[0]?.givenName,
+      ).toBe("Edited");
+    });
+
+    it("takes a deleted family out of its members' links, and undo puts it back", () => {
+      component.openTab(stockFamily);
+
+      component.deleteRecord(stockFamily);
+
+      expect(component.workingDatabase().families["@F0@"]).toBeUndefined();
+      expect(
+        component.workingDatabase().individuals["@I0@"]?.parentOfFamilyXrefs,
+      ).toEqual([]);
+
+      component.undoDelete(stockFamily);
+
+      expect(component.workingDatabase().families["@F0@"]).toBeDefined();
+      expect(
+        component.workingDatabase().individuals["@I0@"]?.parentOfFamilyXrefs,
+      ).toEqual(["@F0@"]);
+    });
+
+    it("keeps a deleted member's links right when its family is deleted too", () => {
+      const stockIndividual = { type: "INDI", xref: "@I0@" } as const;
+      component.openTab(stockIndividual);
+      component.openTab(stockFamily);
+
+      component.deleteRecord(stockIndividual);
+      component.deleteRecord(stockFamily);
+      component.undoDelete(stockIndividual);
+
+      expect(
+        component.workingDatabase().individuals["@I0@"]?.parentOfFamilyXrefs,
+      ).toEqual([]);
+
+      component.deleteRecord(stockIndividual);
+      component.undoDelete(stockFamily);
+      component.undoDelete(stockIndividual);
+
+      expect(
+        component.workingDatabase().individuals["@I0@"]?.parentOfFamilyXrefs,
+      ).toEqual(["@F0@"]);
+    });
+  });
+
   describe("submitForm tests", () => {
     // The page picks up the saved file through its route's resources, so
     // saving needs no navigation to refresh it.
@@ -507,6 +589,24 @@ describe("GedcomEditorComponent hasUnsavedChanges with real form interaction", (
     expect(renderResult.fixture.componentInstance.hasUnsavedChanges()).toBe(
       true,
     );
+  });
+
+  it("still returns true after an edited family is deleted and undone", async () => {
+    const renderResult = await renderOnFamily();
+    const component = renderResult.fixture.componentInstance;
+
+    const [, wifeSelect] = screen.getAllByRole<HTMLSelectElement>("combobox");
+    assert.isOk(wifeSelect);
+    const user = userEvent.setup();
+    await user.selectOptions(wifeSelect, "@I1@");
+    component.deleteRecord({ type: "FAM", xref: "@F0@" });
+    renderResult.fixture.detectChanges();
+    await renderResult.fixture.whenStable();
+    component.undoDelete({ type: "FAM", xref: "@F0@" });
+    renderResult.fixture.detectChanges();
+    await renderResult.fixture.whenStable();
+
+    expect(component.hasUnsavedChanges()).toBe(true);
   });
 });
 

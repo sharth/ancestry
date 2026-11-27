@@ -7,6 +7,7 @@
       role="tablist"
     >
       @for (item of openTabs(); track item.xref) {
+        @let itemDeleted = isDeleted(item);
         <div class="btn-group" role="group">
           <button
             type="button"
@@ -16,8 +17,35 @@
             (click)="openTab(item)"
           >
             <i class="bi me-1" [class]="tabIcon(item)"></i>
-            <span>{{ tabLabel(item) }}</span>
+            <span [class.text-decoration-line-through]="itemDeleted">{{
+              tabLabel(item)
+            }}</span>
           </button>
+          @if (itemDeleted) {
+            <button
+              type="button"
+              class="btn btn-sm"
+              [class.btn-primary]="activeTab()?.xref === item.xref"
+              [class.btn-outline-secondary]="activeTab()?.xref !== item.xref"
+              [attr.aria-label]="'Undo delete ' + deleteRecordLabel(item)"
+              title="Undo delete"
+              (click)="undoDelete(item)"
+            >
+              <i class="bi bi-arrow-counterclockwise"></i>
+            </button>
+          } @else {
+            <button
+              type="button"
+              class="btn btn-sm"
+              [class.btn-primary]="activeTab()?.xref === item.xref"
+              [class.btn-outline-secondary]="activeTab()?.xref !== item.xref"
+              [attr.aria-label]="'Delete ' + deleteRecordLabel(item)"
+              title="Delete"
+              (click)="deleteRecord(item)"
+            >
+              <i class="bi bi-trash"></i>
+            </button>
+          }
         </div>
       }
     </div>
@@ -83,41 +111,71 @@
     @let isActive =
       activeTab()?.type === tabInformation.type &&
       activeTab()?.xref === tabInformation.xref;
+    @let tabDeleted = isDeleted(tabInformation);
     <div [hidden]="!isActive">
-      @switch (tabInformation.type) {
-        @case ("INDI") {
-          @if (form.individuals[tabInformation.xref]; as individual) {
-            <app-input-individual
-              [workingDatabase]="workingDatabase()"
-              [formField]="individual"
-            />
+      @if (tabDeleted) {
+        <div class="deleted-card">
+          <div class="card border-danger" role="status">
+            <div class="card-body">
+              <h3 class="card-title h5 text-danger">
+                <i class="bi bi-trash me-1"></i>Deleted
+              </h3>
+              <p class="card-text">
+                This {{ deleteRecordLabel(tabInformation) }} will be removed
+                from the file when you save. Undo brings it back with any edits
+                you made to it.
+              </p>
+              @if (tabInformation.type === "FAM") {
+                <p class="card-text">
+                  Its members' links back to it are removed too.
+                </p>
+              }
+              <button
+                type="button"
+                class="btn btn-outline-primary"
+                (click)="undoDelete(tabInformation)"
+              >
+                <i class="bi bi-arrow-counterclockwise me-1"></i>Undo
+              </button>
+            </div>
+          </div>
+        </div>
+      } @else {
+        @switch (tabInformation.type) {
+          @case ("INDI") {
+            @if (form.individuals[tabInformation.xref]; as individual) {
+              <app-input-individual
+                [workingDatabase]="workingDatabase()"
+                [formField]="individual"
+              />
+            }
           }
-        }
-        @case ("SOUR") {
-          @if (form.sources[tabInformation.xref]; as source) {
-            <app-input-source
-              [workingDatabase]="workingDatabase()"
-              [formField]="source"
-            />
+          @case ("SOUR") {
+            @if (form.sources[tabInformation.xref]; as source) {
+              <app-input-source
+                [workingDatabase]="workingDatabase()"
+                [formField]="source"
+              />
+            }
           }
-        }
-        @case ("FAM") {
-          <app-input-family [formField]="form" [xref]="tabInformation.xref" />
-        }
-        @case ("REPO") {
-          @if (form.repositories[tabInformation.xref]; as repository) {
-            <app-input-repository
-              [workingDatabase]="workingDatabase()"
-              [formField]="repository"
-            />
+          @case ("FAM") {
+            <app-input-family [formField]="form" [xref]="tabInformation.xref" />
           }
-        }
-        @case ("OBJE") {
-          @if (form.multimedias[tabInformation.xref]; as multimedia) {
-            <app-input-multimedia
-              [workingDatabase]="workingDatabase()"
-              [formField]="multimedia"
-            />
+          @case ("REPO") {
+            @if (form.repositories[tabInformation.xref]; as repository) {
+              <app-input-repository
+                [workingDatabase]="workingDatabase()"
+                [formField]="repository"
+              />
+            }
+          }
+          @case ("OBJE") {
+            @if (form.multimedias[tabInformation.xref]; as multimedia) {
+              <app-input-multimedia
+                [workingDatabase]="workingDatabase()"
+                [formField]="multimedia"
+              />
+            }
           }
         }
       }
