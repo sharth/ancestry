@@ -15,7 +15,7 @@ import {
   newGedcomDatabase,
   type GedcomDatabase,
 } from "../../gedcom/gedcomDatabase";
-import { type GedcomFamily, newGedcomFamily } from "../../gedcom/gedcomFamily";
+import { newGedcomFamily } from "../../gedcom/gedcomFamily";
 import {
   type GedcomIndividual,
   newGedcomIndividual,
@@ -248,43 +248,144 @@ export class GedcomEditorComponent implements GedcomEditorInterface {
   }
 
   // Moves the record out of workingDatabase() into deletedDatabase(). Its
-  // tab stays open, so undoDelete() can bring it back. A family's members'
-  // FAMS/FAMC mirror its HUSB/WIFE/CHIL, so deleting a family also takes it
-  // out of their links, and undo adds it back.
-  deleteRecord(tab: TabInformation) {
-    const record = findRecord(this.workingDatabase(), tab);
-    if (!record) return;
-    this.workingDatabase.update((database) =>
-      produce(withoutRecord(database, tab), (draft) => {
-        if (tab.type !== "FAM") return;
-        for (const { member, links } of familyMembers(record as GedcomFamily)) {
-          const individual = draft.individuals[member];
-          if (individual)
-            individual[links] = individual[links].filter(
-              (xref) => xref !== tab.xref,
-            );
+  // tab stays open, so undoDelete() can bring it back. Deleting a family
+  // also takes it out of its members' FAMS/FAMC, and undo adds it back.
+  deleteRecord({ type, xref }: TabInformation) {
+    const result = produce(
+      { working: this.workingDatabase(), deleted: this.deletedDatabase() },
+      ({ working, deleted }) => {
+        /* eslint-disable @typescript-eslint/no-dynamic-delete */
+        switch (type) {
+          case "INDI": {
+            const record = working.individuals[xref];
+            if (!record) return;
+            deleted.individuals[xref] = record;
+            delete working.individuals[xref];
+            break;
+          }
+          case "FAM": {
+            const family = working.families[xref];
+            if (!family) return;
+            // Its members' FAMS/FAMC mirror its HUSB/WIFE/CHIL.
+            for (const spouseXref of [family.husbandXref, family.wifeXref]) {
+              const spouse = working.individuals[spouseXref];
+              if (spouse)
+                spouse.parentOfFamilyXrefs = spouse.parentOfFamilyXrefs.filter(
+                  (linked) => linked !== xref,
+                );
+            }
+            for (const childXref of family.childXrefs) {
+              const child = working.individuals[childXref];
+              if (child)
+                child.childOfFamilyXrefs = child.childOfFamilyXrefs.filter(
+                  (linked) => linked !== xref,
+                );
+            }
+            deleted.families[xref] = family;
+            delete working.families[xref];
+            break;
+          }
+          case "SOUR": {
+            const record = working.sources[xref];
+            if (!record) return;
+            deleted.sources[xref] = record;
+            delete working.sources[xref];
+            break;
+          }
+          case "REPO": {
+            const record = working.repositories[xref];
+            if (!record) return;
+            deleted.repositories[xref] = record;
+            delete working.repositories[xref];
+            break;
+          }
+          case "OBJE": {
+            const record = working.multimedias[xref];
+            if (!record) return;
+            deleted.multimedias[xref] = record;
+            delete working.multimedias[xref];
+            break;
+          }
+          case "SUBM": {
+            const record = working.submitters[xref];
+            if (!record) return;
+            deleted.submitters[xref] = record;
+            delete working.submitters[xref];
+            break;
+          }
         }
-      }),
+        /* eslint-enable @typescript-eslint/no-dynamic-delete */
+      },
     );
-    this.deletedDatabase.update((database) =>
-      withRecord(database, tab, record),
-    );
+    this.workingDatabase.set(result.working);
+    this.deletedDatabase.set(result.deleted);
   }
 
-  undoDelete(tab: TabInformation) {
-    const record = findRecord(this.deletedDatabase(), tab);
-    if (!record) return;
-    this.workingDatabase.update((database) =>
-      produce(withRecord(database, tab, record), (draft) => {
-        if (tab.type !== "FAM") return;
-        for (const { member, links } of familyMembers(record as GedcomFamily)) {
-          const individual = draft.individuals[member];
-          if (individual && !individual[links].includes(tab.xref))
-            individual[links] = [...individual[links], tab.xref];
+  undoDelete({ type, xref }: TabInformation) {
+    const result = produce(
+      { working: this.workingDatabase(), deleted: this.deletedDatabase() },
+      ({ working, deleted }) => {
+        /* eslint-disable @typescript-eslint/no-dynamic-delete */
+        switch (type) {
+          case "INDI": {
+            const record = deleted.individuals[xref];
+            if (!record) return;
+            working.individuals[xref] = record;
+            delete deleted.individuals[xref];
+            break;
+          }
+          case "FAM": {
+            const family = deleted.families[xref];
+            if (!family) return;
+            // Its members' FAMS/FAMC mirror its HUSB/WIFE/CHIL.
+            for (const spouseXref of [family.husbandXref, family.wifeXref]) {
+              const spouse = working.individuals[spouseXref];
+              if (spouse && !spouse.parentOfFamilyXrefs.includes(xref))
+                spouse.parentOfFamilyXrefs.push(xref);
+            }
+            for (const childXref of family.childXrefs) {
+              const child = working.individuals[childXref];
+              if (child && !child.childOfFamilyXrefs.includes(xref))
+                child.childOfFamilyXrefs.push(xref);
+            }
+            working.families[xref] = family;
+            delete deleted.families[xref];
+            break;
+          }
+          case "SOUR": {
+            const record = deleted.sources[xref];
+            if (!record) return;
+            working.sources[xref] = record;
+            delete deleted.sources[xref];
+            break;
+          }
+          case "REPO": {
+            const record = deleted.repositories[xref];
+            if (!record) return;
+            working.repositories[xref] = record;
+            delete deleted.repositories[xref];
+            break;
+          }
+          case "OBJE": {
+            const record = deleted.multimedias[xref];
+            if (!record) return;
+            working.multimedias[xref] = record;
+            delete deleted.multimedias[xref];
+            break;
+          }
+          case "SUBM": {
+            const record = deleted.submitters[xref];
+            if (!record) return;
+            working.submitters[xref] = record;
+            delete deleted.submitters[xref];
+            break;
+          }
         }
-      }),
+        /* eslint-enable @typescript-eslint/no-dynamic-delete */
+      },
     );
-    this.deletedDatabase.update((database) => withoutRecord(database, tab));
+    this.workingDatabase.set(result.working);
+    this.deletedDatabase.set(result.deleted);
   }
 
   tabIcon(tabInformation: TabInformation): string {
@@ -462,39 +563,6 @@ function findRecord(
   { type, xref }: TabInformation,
 ): GedcomRecordOfAnyType | undefined {
   return database[recordsKeys[type]][xref];
-}
-
-function withRecord(
-  database: GedcomDatabase,
-  { type, xref }: TabInformation,
-  record: GedcomRecordOfAnyType,
-): GedcomDatabase {
-  return produce(database, (draft) => {
-    (draft[recordsKeys[type]] as Record<string, GedcomRecordOfAnyType>)[xref] =
-      record;
-  });
-}
-
-function withoutRecord(
-  database: GedcomDatabase,
-  { type, xref }: TabInformation,
-): GedcomDatabase {
-  return produce(database, (draft) => {
-    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-    delete draft[recordsKeys[type]][xref];
-  });
-}
-
-// The family's members, and which of their links points back at it.
-function familyMembers(family: GedcomFamily) {
-  return [
-    ...[family.husbandXref, family.wifeXref].map(
-      (member) => ({ member, links: "parentOfFamilyXrefs" }) as const,
-    ),
-    ...family.childXrefs.map(
-      (member) => ({ member, links: "childOfFamilyXrefs" }) as const,
-    ),
-  ];
 }
 
 // Adds an empty record for each tab whose xref isn't in the database yet.
