@@ -4,6 +4,7 @@ import {
   serializeGedcomIndividual,
   type GedcomIndividual,
 } from "../../gedcom/gedcomIndividual";
+import type { GedcomRecord } from "../../gedcom/gedcomRecord";
 import { GedcomDisplayComponent } from "../gedcom-display/gedcom-display.component";
 
 @Component({
@@ -14,7 +15,7 @@ import { GedcomDisplayComponent } from "../gedcom-display/gedcom-display.compone
 })
 export class IndividualGedcomComponent {
   readonly individual = input.required<GedcomIndividual>();
-  readonly gedcomRecord = computed(() =>
+  readonly gedcomRecord = computed<GedcomRecord>(() =>
     serializeGedcomIndividual(this.individual()),
   );
 }

@@ -21,6 +21,12 @@ interface SourceCitationRow {
   citation: GedcomSourceCitation;
 }
 
+interface SourceGroup {
+  sourceXref: string;
+  source?: GedcomSource;
+  rows: SourceCitationRow[];
+}
+
 @Component({
   selector: "app-individual-sources",
   imports: [RouterModule, IndividualLinkComponent],
@@ -32,7 +38,7 @@ export class IndividualSourcesComponent {
   readonly ancestryDatabase = computed(() => this.gedcom().gedcomDatabase);
   readonly individual = input.required<GedcomIndividual>();
 
-  readonly sourceGroups = computed(() => {
+  readonly sourceGroups = computed<SourceGroup[]>(() => {
     const ancestryDatabase = this.ancestryDatabase();
     const individual = this.individual();
 
@@ -82,9 +88,6 @@ export class IndividualSourcesComponent {
   });
 }
 
-function sourceLabel(group: {
-  sourceXref: string;
-  source?: GedcomSource;
-}): string {
+function sourceLabel(group: SourceGroup): string {
   return group.source?.abbr || group.source?.title || group.sourceXref;
 }

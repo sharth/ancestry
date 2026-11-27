@@ -1,6 +1,7 @@
 import { Component, computed, input } from "@angular/core";
 
 import type { GedcomResourceValue } from "../../database/ancestry.service";
+import type { GedcomDate } from "../../gedcom/gedcomDate";
 import { newGedcomFact } from "../../gedcom/gedcomFact";
 import type { GedcomIndividual } from "../../gedcom/gedcomIndividual";
 import { nameToString } from "../../gedcom/gedcomIndividual";
@@ -61,7 +62,7 @@ export class IndividualFactsComponent {
     ];
   });
 
-  readonly birthDate = computed(
+  readonly birthDate = computed<GedcomDate | undefined>(
     () => this.individual().facts.find((fact) => fact.tag === "BIRT")?.date,
   );
 }

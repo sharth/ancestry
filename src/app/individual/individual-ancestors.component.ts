@@ -21,7 +21,7 @@ export class IndividualAncestorsComponent {
   readonly ancestryDatabase = computed(() => this.gedcom().gedcomDatabase);
   readonly individual = input.required<GedcomIndividual>();
 
-  readonly ancestors = computed(() => {
+  readonly ancestors = computed<(GedcomIndividual | undefined)[]>(() => {
     const ancestry = this.ancestryDatabase();
     const individual = this.individual();
 
